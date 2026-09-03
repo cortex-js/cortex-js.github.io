@@ -19,9 +19,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.b8cf4556.js" defer="defer"></script>
-<script src="/assets/js/main.fd881ca3.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
+<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
+<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -44,6 +44,15 @@ reason their operands are not reordered at canonicalization. (<code>Xor</code> a
 <code>Equivalent</code> cannot short-circuit: every operand affects the result.) An element-wise application (some operand is a collection)
 is the exception: every operand is evaluated once and the result is a list.
 See the <a class="" href="/compute-engine/guides/logic/">Logic guide</a>.</p>
+<p>An operand that is skipped is <strong>dead code</strong>: if it contains an error, that
+error never reaches the value. Because operands are evaluated in the order
+written, this is order-dependent.</p>
+<div class="language-json codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-json codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;And&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;False&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;Divide&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;x&quot;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token comment" style="color:var(--base-05)">// ➔ False       — the malformed operand is never evaluated</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain" style="display:inline-block"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;And&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">[</span><span class="token string" style="color:var(--base-0b)">&quot;Divide&quot;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;x&quot;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;False&quot;</span><span class="token punctuation" style="color:var(--base-06)">]</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token comment" style="color:var(--base-05)">// ➔ Error       — the malformed operand is reached first</span><br></div></code></pre></div></div>
+<p>Only <em>evaluation</em> skips the operand. The boxed expression still carries the
+diagnostic, so <code>ce.box([&quot;And&quot;, &quot;False&quot;, [&quot;Divide&quot;, &quot;x&quot;]]).json</code> is
+<code>[&quot;And&quot;, &quot;False&quot;, [&quot;Divide&quot;, &quot;x&quot;, [&quot;Error&quot;, &quot;&#x27;missing&#x27;&quot;]]]</code> and the error is
+still reportable to the user. Operators that cannot short-circuit have no dead
+operands: <code>[&quot;Xor&quot;, &quot;False&quot;, [&quot;Divide&quot;, &quot;x&quot;]]</code> evaluates to an <code>Error</code>.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="operator-precedence">Operator Precedence<a href="#operator-precedence" class="hash-link" aria-label="Direct link to Operator Precedence" title="Direct link to Operator Precedence" translate="no">​</a></h3>
 <p>Logical operators have lower precedence than comparison and arithmetic operators,
 so expressions parse naturally without requiring parentheses:</p>

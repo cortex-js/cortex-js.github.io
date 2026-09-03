@@ -179,9 +179,11 @@ Read more about **lists, sets, tuples and dictionaries**.
 ## Future Directions
 
 Several keywords are **reserved but not designed** — they are held so that a
-future version of Epsil can introduce them without breaking existing programs,
-and using one as an ordinary name today is an error. None of the following are
-part of the language yet:
+future version of Epsil can introduce them without breaking existing programs.
+None of the following are part of the language yet, and because the grammar
+does not claim any of them, each is still an ordinary identifier today:
+`let import = 5` binds a variable named `import`. Prefer not to use them as
+names, so that a program keeps working when the language does claim them.
 
 - **Modules and imports** — `import`, `export`, `module`.
 - **Error-handling keywords** — `try`, `catch`, `throw`. In Epsil, errors are
@@ -189,8 +191,10 @@ part of the language yet:
 - **Concurrency** — `async`, `await`, `parallel`.
 - **Macros** and compile-time metaprogramming.
 
-If you need a symbol whose name collides with one of these reserved words, use
-the verbatim form (`` `match` ``).
+A word the grammar DOES claim — a literal or an active keyword such as `match`,
+`for` or `if` — cannot be spelled as a plain symbol at all. Use the verbatim
+form for those (`` `match` ``); it works for the reserved words above too.
+[`literals.md`](/literals#symbols) lists which words are in which group.
 
 ---
 
@@ -371,7 +375,7 @@ numerical algorithm:
 
 ```epsil
 N(Sqrt(2))
-// ➔ 1.4142135623730951
+// ➔ 1.4142135623730950488
 ```
 
 Capitalized names such as `Simplify`, `Sqrt`, and `N` are Compute Engine
@@ -413,7 +417,7 @@ formula after `=`:
 ```epsil
 circleArea(r) = Pi * r^2
 circleArea(3)
-// ➔ 9π
+// ➔ 9pi
 ```
 
 For a function with local names or several steps, use a block. The last
@@ -1418,7 +1422,7 @@ The program pulls together most of the language:
   `(v, j) := parseValue(cs, j)`.
 - `parseValue` dispatches on the next character with a **`match`
   expression**; the string scanner decodes escapes with another.
-- The character predicates take `string | missing`: an indexed read `cs[j]`
+- The character predicates take `character | missing`: an indexed read `cs[j]`
   is absent past the end of input, and that possibility is part of its type.
 
 ```epsil
@@ -2176,7 +2180,7 @@ is not cosmetic:
 
 ```epsil
 (Type({1, 2, 3}), Type([1, 2, 3]))
-// ➔ ("set<finite_integer>", "vector<finite_integer^3>")
+// ➔ (TypeFrom("set<integer>"), TypeFrom("vector<integer^3>"))
 ```
 
 ### Threading over lists
@@ -2754,24 +2758,42 @@ annotation. This page is about using them.
 ## Every value already has a type
 
 You never have to introduce types into a program: they are there from the
-start. `Type` reports the one a value has:
+start. `Type` reports the one a value has. For a number literal that is the
+most precise claim there is — the value itself:
 
 ```epsil-live
-(Type(42), Type(1/3), Type(2.5), Type("hi"), Type(True))
-// ➔ ("finite_integer", "finite_rational", "finite_real", "string", "boolean")
+(Type(42), Type(2.5), Type("hi"), Type(True))
+// ➔ (TypeFrom("42"), TypeFrom("2.5"), TypeFrom("string"), TypeFrom("boolean"))
 ```
+
+A literal type sits inside its numeric tier — `42` is an `integer`, `2.5` a
+`real` — so a literal is accepted anywhere its tier is. An exact value no
+machine number holds — `1/3`, `√2`, an astronomically large integer — has no
+literal type to report, so it is typed by the narrowest safe claim instead:
+its tier, narrowed by a range that encloses the value. `Type(1/3)` reports
+`rational<0.33..0.34>` and `Type(Sqrt(2))` reports `real<1.4..1.5>` — bounds
+wide enough to be certainly true, which is also what fixes the sign. And
+anything *stored* carries the tier: `let n = 42` declares `n: integer`, and
+the `radius` example below infers `real`.
 
 Collections carry the type of what is in them, and how many:
 
 ```epsil-live
 (Type([1, 2, 3]), Type({1, 2}), Type((1, "a")), Type({x -> 1}))
-// ➔ ("vector<finite_integer^3>", "set<finite_integer>", "tuple<finite_integer, string>", "record{x: finite_integer}")
+// ➔ (TypeFrom("vector<integer^3>"), TypeFrom("set<integer>"), TypeFrom("tuple<integer, string>"), TypeFrom("record{x: integer}"))
 ```
 
 Numeric types form a tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` —
 and a value of a narrower type is accepted wherever a wider one is expected,
 with no conversion and no cast. An `integer` *is* a `real`, so a function
 declared `f(x: real)` takes `3` happily.
+
+Every name in that tower up to `complex` means a **finite** number. The
+infinities and `NaN` are not in any of them: they have types of their own,
+`infinity` and `nan`, and only the top of the tower covers all three —
+`number` is `complex`, `infinity` and `nan` together. So `f(x: real)` takes
+`3` and rejects `Infinity` and `NaN` with an `incompatible-type` error, while
+`f(x: number)` takes all of them.
 
 ## When to write an annotation
 
@@ -2783,7 +2805,7 @@ would have written:
 let radius = 2.5
 let area = Pi * radius^2
 Type(area)
-// ➔ "real"
+// ➔ TypeFrom("real")
 ```
 
 Writing `let radius: real = 2.5` adds a word and no information — the
@@ -2849,7 +2871,7 @@ starts at the bottom of the lattice:
 ```epsil-live
 let xs = []
 Type(xs)
-// ➔ "list<never>"
+// ➔ TypeFrom("list<never>")
 ```
 
 Say what you mean instead:
@@ -2857,7 +2879,7 @@ Say what you mean instead:
 ```epsil-live
 let xs: list<integer> = []
 Type(xs)
-// ➔ "list<integer>"
+// ➔ TypeFrom("list<integer>")
 ```
 
 The same applies to a name declared without an initializer (`let x: real`) and
@@ -3095,7 +3117,7 @@ A value built this way carries its type with it, wherever it goes:
 type point = tuple<x: number, y: number>
 let ps = [point(1, 2), point(3, 4)]
 Type(ps)
-// ➔ "list<point^2>"
+// ➔ TypeFrom("list<point^2>")
 ```
 
 An **alias** constructor is a checked cast instead of a tag: it validates the
@@ -3126,7 +3148,7 @@ the type. This is how a `record`-bodied type gets its constructor:
 type circle = record{x: number, y: number, r: number}
 function circle(x, y, r) { {x -> x, y -> y, r -> r} }
 Type(circle(1, 2, 3))
-// ➔ "circle"
+// ➔ TypeFrom("circle")
 ```
 
 Constructor functions are not record-specific: one may be written for any
@@ -3322,7 +3344,7 @@ never expanded — which is exactly what lets its body mention itself:
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t = tree(1, [tree(2, [])])
 Type(t)
-// ➔ "tree<finite_integer>"
+// ➔ TypeFrom("tree<integer>")
 ```
 
 The constructor is **quantified** — `tree: (T, list<tree<T>>) -> tree<T>
@@ -3338,7 +3360,7 @@ arguments**, so it comes back at the type the application supplied, not at
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t: tree<number> = tree(1, [])
 Type(t.value)
-// ➔ "number"
+// ➔ TypeFrom("number")
 ```
 
 `match` is not a projection of the annotation — it binds **values**, so each
@@ -3349,7 +3371,7 @@ the annotation's:
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t: tree<number> = tree(1, [])
 match t { tree(v, cs) => Type(v) }
-// ➔ "integer"
+// ➔ TypeFrom("integer")
 ```
 
 ### Variance
@@ -3388,7 +3410,7 @@ always sound, just less permissive.
 
 One limitation follows from that. A construction solves its parameters from
 its arguments alone, and an annotation does not widen them: `let t:
-tree<number> = tree(1, [])` works only because the `tree<finite_integer>` it
+tree<number> = tree(1, [])` works only because the `tree<integer>` it
 builds *is* a `tree<number>` under `out`. For an explicitly `inout` or `in`
 parameter that step is not available, so such a type can only be constructed
 at exactly its argument type.
@@ -3402,7 +3424,7 @@ optional payload expressible:
 type opt<T> = T | missing
 let a = opt(1)
 Type(a)
-// ➔ "opt<finite_integer>"
+// ➔ TypeFrom("opt<integer>")
 ```
 
 Each construction takes exactly one arm. Taking the **ground** arm says
@@ -3413,7 +3435,7 @@ family, and (under `out`) a subtype of every other:
 type opt<T> = T | missing
 let b = opt(Missing)
 Type(b)
-// ➔ "opt<never>"
+// ➔ TypeFrom("opt<never>")
 ```
 
 Only **one** arm may mention a variable: with two open arms nothing at the
@@ -3468,7 +3490,8 @@ Epsil distinguishes three related kinds of absence:
 - `Nothing` means “no value here” and is removed from function arguments and
   collection literals.
 - `Missing` is a position-preserving missing value. Its type is `missing`.
-- `NaN` is the numeric form of an absent or undefined result. Numeric
+- `NaN` is the numeric form of an absent or undefined result. Its type is
+  `nan`, which sits outside `real` and `complex` and inside `number`. Numeric
   operations and missing numeric fields generally normalize absence to `NaN`.
 
 `IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
@@ -3498,7 +3521,9 @@ curious about why the system behaves the way it does.
 The foundation is **subtyping**: types are arranged in a hierarchy, and most
 questions the engine asks are of the form "is this type a subtype of that
 one?". The numeric tower — `integer ⊂ rational ⊂ real ⊂ complex ⊂ number` — is
-the familiar part. Around it the type language adds unions
+the familiar part; its one surprise is that every step up to `complex` is
+finite, so the infinities and `NaN` join only at `number`. Around it the type
+language adds unions
 (`integer | boolean`), range refinements (`integer<0..10>`), collections with
 element types (`list<integer>`, `set<string>`), tuples and records, and
 function signatures with effect labels.
@@ -3550,7 +3575,7 @@ signature.
 Subtyping also quietly absorbs a classic use of polymorphism: the empty
 list needs no "for all" type — it is simply `list<never>`, and since
 `never` is the bottom of the lattice (joining it with anything gives the
-other type back), `Join([], [1, 2])` comes out as `list<finite_integer>`
+other type back), `Join([], [1, 2])` comes out as `list<integer>`
 with no quantifier anywhere.
 
 For the representation a type declaration lowers to, see
@@ -4574,7 +4599,7 @@ element by element:
 ```epsil
 let xs = [1, 2, 3]
 xs[2] = 9
-// ➔ Error(ErrorCode("incompatible-type", "symbol", "number"))
+// ➔ Error(ErrorCode("incompatible-type", "symbol", "integer | nan"), At("xs", 2))
 ```
 
 Build the value you want and rebind the name:
@@ -4651,7 +4676,7 @@ share it:
 ```epsil
 function counter() {
   let n = 0
-  function bump() { n = n + 1; n }
+  function bump() scope { n = n + 1; n }
   bump
 }
 let c1 = counter()
@@ -4661,6 +4686,12 @@ let c2 = counter()
 ```
 
 `c1` and `c2` count independently.
+
+`bump` writes to `n`, which belongs to the enclosing call rather than to
+`bump` itself. Writing to a binding outside the function is the `scope`
+effect, and it must be declared — without the specifier the definition is
+rejected and `counter()` never produces a callable. See
+[Effect specifiers](/control-flow#effect-specifiers).
 
 Reach for `const` when a name should not move at all. Constness is a property
 of the *binding*, not of the value it holds — every value is immutable
@@ -5247,6 +5278,13 @@ symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
 is structurally not `0`, even though it *could* be zero semantically. Use
 `if`/`Which` when you want that kind of semantic case-split instead.
 
+A list pattern matches a list *value* whatever produced it: `Rest(xs)`,
+`Drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
+list literal, and the case holding the list pattern reads it as a list —
+element by element for the positions the pattern names, with a copy only for
+a named `...rest`. (A lazy list of more than 100 000 elements is left as it
+is, and then matches only the wildcard.)
+
 The final catch-all may also be spelled `otherwise`, a synonym for a bare
 `_` pattern (it takes a guard the same way, and binds nothing):
 
@@ -5344,7 +5382,8 @@ the body to bind `a` to when the alternatives disagree on shape.
 ### Range patterns
 
 `lo..hi` in pattern position is an **inclusive numeric membership test**: the
-case is selected when the subject is a real number and `lo ≤ subject ≤ hi`.
+case is selected when the subject is a real number or an infinity and
+`lo ≤ subject ≤ hi`.
 The call spelling `Range(lo, hi)` means exactly the same thing — the pattern
 form keys on the operator, not on how it was written:
 
@@ -5358,9 +5397,9 @@ match x {
 
 Both endpoints are included, and they are compared with the same tolerance
 `match` uses for every other number leaf, so a subject a hair outside an
-endpoint still selects the case. Only a **number** matches: a symbol, a
-collection, a string, a complex number and `NaN` all fall through to the next
-case.
+endpoint still selects the case. Only a number **on the real line** matches: a
+symbol, a collection, a string, a complex number with a nonzero imaginary part
+and `NaN` all fall through to the next case.
 
 Bounds must be **numeric literals** — negated literals and `Infinity` /
 `-Infinity` included, so `0..Infinity` reads as "any nonnegative number":
@@ -5533,6 +5572,58 @@ match 3 {
 
 Evaluating this expression yields `Error("match-no-case", 3)`.
 
+### `if let` {#if-let}
+
+When one case is what matters and everything else is the fallback, `if let`
+spells the test as a conditional. The pattern is any `match` pattern; the
+block runs with the pattern's bindings in scope when the subject matches, and
+the `else` branch — optional, and chainable with `else if` — when it does not:
+
+```epsil-live
+let point = (2, 5)
+if let (x, y) = point { x * y } else { 0 }
+// ➔ 10
+```
+
+It is sugar over `match`: the statement above is
+`match point { (x, y) => do { x * y }; _ => do { 0 } }`, and the two forms
+lower to the same expression. Without an `else`, a subject that does not
+match evaluates to `Missing`, as a false `if` without an `else` does.
+
+The form earns its keep with a typed binding, which is how a result that may
+have failed is taken apart without a `match` block:
+
+```epsil-live
+function head(xs: list) {
+  match xs {
+    [h, ...] => h
+  }
+}
+if let h: !error = head([]) { h } else { "empty" }
+// ➔ "empty"
+```
+
+`head([])` has no matching case, so it evaluates to a `match-no-case` error
+value; the typed binding `h: !error` refuses it and the `else` branch runs.
+With `head([4, 5])`, `4` binds to `h`. The same test reads absence:
+`if let v: !missing = First(xs) { … }` binds `v` only when the list has a
+first element.
+
+`if let` chains with `else if` in either direction, and a plain `if` can
+follow an `if let`:
+
+```epsil-live
+let v = [1]
+if let [] = v { "empty" } else if let [x] = v { x } else { "many" }
+// ➔ 1
+```
+
+A pattern that cannot fail — a bare name or `_` with no type — makes the
+`else` branch dead code; that is what `let` is for, and it is reported as an
+`if-let-irrefutable` warning. There is no guard slot: to test a condition on
+the bound values, nest an `if` in the block. Bindings are scoped to the
+block, as in a `match` case.
+
 ### `if`, `a if c else b`, or `match`? {#choosing-a-conditional}
 
 All three produce a value, so the choice is about what you are branching *on*.
@@ -5562,6 +5653,10 @@ match v {
 // ➔ "several items"
 ```
 
+When only one shape matters — a non-empty list, a value that is not an
+error — [`if let`](#if-let) tests it as a conditional, and the `else` takes
+everything else.
+
 Two differences are worth remembering when the subject may be symbolic.
 `match` is **structural**: a symbolic `x` is not `0`, even though it might turn
 out to be zero, so it takes the wildcard case. And `match` is **total**: it
@@ -5581,6 +5676,29 @@ Value-producing iteration over a collection belongs to the library functions
 ```epsil
 while x > 0 { x }
 ```
+
+`while let pattern = subject { … }` is the loop form of [`if let`](#if-let):
+each turn matches the subject against the pattern and runs the body with the
+pattern's bindings in scope, and the first turn on which the subject does not
+match ends the loop. It consumes a list one element at a time:
+
+```epsil-live
+let xs = [1, 2, 3]
+let s = 0
+while let [h, ...t] = xs { s = s + h; xs = [t] }
+s
+// ➔ 6
+```
+
+The pattern is any `match` pattern, so a typed binding drains a function that
+may fail: `while let h: !error = head(xs) { … }` runs while `head(xs)` is not
+an error value. `break` and `continue` in the body apply to this loop. It is
+sugar over `while` and `match`: the loop above is
+`while true { match xs { [h, ...t] => do { s = s + h; xs = [t] }; _ => do { break } } }`,
+and the two forms lower to the same expression. A pattern that cannot fail —
+a bare name or `_` with no type — makes the loop end only on a `break`; that
+is `while true` with a `let` in the body, and it is reported as a
+`while-let-irrefutable` warning.
 
 `for x in xs { … }` binds the loop variable to each element in turn:
 
@@ -6459,8 +6577,8 @@ _pragma_ → **`#line`** | **`#column`** | **`#url`** | **`#filename`** |
 _pragma-call_ → (**`#env`** | **`#navigator`** | **`#warning`** |
 **`#error`**) **`(`** \[(_expression_)#**`,`**\] **`)`**
 
-_if-expression_ → **`if`** _expression_ _block_
-\[**`else`** (_block_ | _if-expression_)\]
+_if-expression_ → **`if`** (_expression_ | **`let`** _pattern_ **`=`**
+_expression_) _block_ \[**`else`** (_block_ | _if-expression_)\]
 
 _match-expression_ → **`match`** _expression_ **`{`** _match-case_+ **`}`**
 
@@ -6550,7 +6668,8 @@ over the definition only, and each must be used in it. Types are global, so
 a _type-declaration_ is only valid at the top level of a program — inside a
 block or function body it is the `type-declaration-not-top-level` error
 
-_while-statement_ → **`while`** _expression_ _block_
+_while-statement_ → **`while`** (_expression_ | **`let`** _pattern_ **`=`**
+_expression_) _block_
 
 _for-statement_ → **`for`** _symbol_ **`in`** _expression_ _block_
 
@@ -6830,9 +6949,23 @@ To use a tuple's elements as list elements, convert explicitly: `ListFrom(t)` is
 
 A value's type does not match what its context requires — a typed declaration (`let x: string = …`) whose initializer has a different type, an argument outside a function's signature, or a value that fails a type ascription.
 
-The message reads "expected `T`, got `U`": T is what the context requires, U is what the value actually has. A site may follow — "for argument 2" points at a position in a call, "at `x`" quotes the offending subexpression. A type like `list<string^5>` is a list of exactly 5 strings; `finite_integer` is an integer that is not infinite.
+The message reads "expected `T`, got `U`": T is what the context requires, U is what the value actually has. A site may follow — "for argument 2" points at a position in a call, "at `x`" quotes the offending subexpression. A type like `list<string^5>` is a list of exactly 5 strings; `integer` is a whole number, finite like every bare numeric type name.
 
 The check runs twice by design: once statically, when the program is canonicalized (reported before anything runs), and again during evaluation, where the mismatch becomes an error value that propagates outward (see `epsil doc runtime-error`).
+
+## `no-product-between-points`
+
+Two points (tuples) were multiplied, and there is no implicit product between points. Multiplication of a point by a SCALAR is defined — it scales each component — and so is adding two points of the same arity, but `(1, 2) * (3, 4)` has no single meaning, so the engine rejects it rather than guessing.
+
+Say which product you mean. `Dot(a, b)` is the inner product (`(1,2)·(3,4)` is 11) and is defined whenever the two points have the same number of components. `Cross(a, b)` is the cross product, defined only for two 3-component points; the message names it only when both operands have three components, because for a pair of plane points it would just produce an `incompatible-dimensions` error instead.
+
+Juxtaposition, `\cdot` and `\times` all parse to the same multiplication, so writing `a \times b` between two points does not select the cross product — spell `Cross(a, b)` for that.
+
+## `no-division-by-point`
+
+A point (tuple) was used as a divisor. Dividing a point BY a scalar is defined — it scales each component, so `(4, 6) / 2` is `(2, 3)` — but there is no reciprocal of a point, so neither `x / (1, 2)` nor `(1, 2) / (3, 4)` has a meaning to give them.
+
+If you meant to scale by the reciprocal of one component, index it: `p / q[1]`. If you meant a component-wise quotient, build it explicitly from the components.
 
 ## `missing`
 
@@ -6948,6 +7081,76 @@ Use `Floor(a / b)` for the integer quotient.
 
 To stop a pipeline early, restructure with a condition or a Take/Filter stage instead of breaking out of a callback.
 
+## `symbol-expected`
+
+A name was required at this position — after `let` or `const`, as a `for` loop's variable, as a function's or parameter's name — but something else was found there (`let = 42`).
+
+A subtler cause: the word written there is one the grammar itself consumes. `for = 3` is not an assignment to a variable named `for` — the `for` starts a for-loop, and the loop machinery then finds no variable name. To use such a word as a name anyway, spell it verbatim, wrapped in backquote characters: "let `for` = 3" (see `epsil doc reserved-word`).
+
+## `reserved-word`
+
+A word the language reserves was used where it cannot be a plain identifier. Two cases share this code: an active keyword where an expression was expected — `y = while` reads as the start of a `while` loop, not as a value named `while` — and a literal word (`true`, `false`, `Infinity`, `oo`, `NaN`) used to NAME a binding (`let NaN = 1`): a literal can never be a binding name, in any position.
+
+Only the words the grammar actually consumes today are rejected. The longer documented reservation list (`set`, `with`, `label`, …) stays fully usable — a future construct claims its word contextually where possible (as `type` and `alias` do), so those words may never be taken at all.
+
+The verbatim form always works: the name wrapped in backquote characters, "let `while` = 3", is an ordinary symbol in every position. Note that a BINDING position may accept an active keyword bare (`let while = 3` binds), but the bound name is then unreachable in expressions — `while + 1` reads as a loop again — so the verbatim spelling is the only robust one.
+
+## `asymmetric-operator-whitespace`
+
+An operator was written with whitespace on one side only — `a+ b`. An operator with whitespace on both sides or neither is infix (`a + b`, `a+b`); one with whitespace only BEFORE it starts a new statement instead (`a +b` is the value `a`, then the prefix expression `+b`). The asymmetric middle case matches neither reading, so it is flagged — and recovered as infix, which is almost always what was meant. The quick fix restores the symmetry.
+
+The spacing rule is what lets line breaks alone separate statements: the parser decides where an expression ends from the spacing, so a program without semicolons still parses exactly one way. The same abutment idea splits postfix from prefix `!`: `x!` (abutting) is Factorial, while `x !y` ends the expression `x` and starts the prefix Not `!y`.
+
+## `duplicate-dictionary-key`
+
+A dictionary literal repeats a key: in `{"a" -> 1, "a" -> 2}` the second entry conflicts with the first. Within one uninterrupted run of literal entries, keys are unique by construction — a repeated key there is a typo or a leftover, never an override, so it is reported instead of silently picking one of the two values. (Under error recovery the FIRST entry is the one that remains.)
+
+A spread is an override boundary: `{"a" -> 1, ...d, "a" -> 2}` is legal, and the second `"a"` deliberately overrides whatever the spread brought in — last wins, no diagnostic. And only literal keys are checked: a key computed at runtime cannot collide until the dictionary is actually built.
+
+## `parameter-name-mismatch`
+
+A lambda and its type annotation name the same parameter differently — `const f: (a: number) -> number = (b) => b`. A parameter name binds wherever it is written, so the annotation's `a` and the lambda's `b` would both claim the same slot, and the engine will not guess which one the body meant.
+
+Rename one side so the two agree — the quick fix renames the annotation's parameters to match the lambda's — or leave the annotation's parameters unnamed (`(number) -> number`): an annotation's parameter names are optional documentation, while the lambda's are the real binding.
+
+## `function-redefinition`
+
+Two clauses of one function in a single program have the same dispatch domain, so the second would silently replace the first — `f(x) = x` followed by `f(x) = 2 * x`. Parameter NAMES are not part of a clause's identity: `g(n) = n` then `g(m) = 2 * m` collides all the same, so renaming a parameter never resolves this error.
+
+Only replacement is refused. Clauses that dispatch on genuinely different domains accumulate — a different arity (`k(x)` and `k(x, y)`), different parameter types (`h(x: integer)` and `h(x: string)`), or a literal pattern (`g(0) = 99` alongside `g(x) = x`). That is what multi-clause definitions are for.
+
+The boundary is the program (one file, one cell). Within it, a same-domain redefinition is a mistake with no possible intent. Interactively, re-running an edited definition as a SEPARATE program — a later notebook cell, the next REPL line — replaces the earlier one; that is the intended redefinition gesture, and is legal.
+
+## `type-redefinition`
+
+One program declares the same type name twice. A sum type's variant names count as names its statement declares, so a variant colliding with a later `type` statement reports this too.
+
+The boundary is the program (one file, one cell): within it, a second declaration of a name is a mistake with no possible intent. To redefine a type interactively, re-run the edited declaration as a SEPARATE program (a later cell) — across programs, redefinition is the intended gesture and is legal. `protocol` declarations follow the same rule (see `epsil doc protocol-redefinition`).
+
+## `protocol-redefinition`
+
+One program declares the same protocol name twice — the protocol counterpart of `epsil doc type-redefinition`, with the same rule and the same boundary.
+
+Within one program a redeclaration is a mistake; re-running an edited declaration as a separate program (a later notebook cell) replaces the earlier one and is the intended interactive gesture.
+
+## `type-declaration-not-top-level`
+
+A `type` statement appears inside a block or a function body. Types are engine-global — a type's name, constructor and conformances are visible to the whole session, never scoped to a block — so a nested declaration would promise a locality it cannot deliver. Declare the type at the top level of the program.
+
+`protocol` declarations follow the same rule (see `epsil doc protocol-declaration-not-top-level`).
+
+## `protocol-function-not-a-field`
+
+A protocol's `function` member was read with a dot, as if it were a field or a property.
+
+A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot: `b.area`. So `b.span` is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to.
+
+The mirror mistake, calling a property (`area(b)`), is reported as `protocol-property-not-callable`.
+
+## `protocol-declaration-not-top-level`
+
+A `protocol` statement appears inside a block or a function body. Protocols, like types, are engine-global (see `epsil doc type-declaration-not-top-level`), so protocol declarations are legal only at the top level of a program.
+
 ## `runtime-error`
 
 Runtime problems in Epsil are VALUES, not exceptions: a failing subexpression evaluates to an Error value, which propagates outward through the enclosing expressions. Nothing is thrown, and the rest of the program keeps running.
@@ -6961,6 +7164,20 @@ Only the last statement's value is a program's result, so an error produced by a
 This problem was detected before anything ran, when the program was canonicalized — the same analysis `epsil check` performs.
 
 A static diagnostic never suppresses evaluation: the program still runs exactly as written (errors are values — see `epsil doc runtime-error`), so the same mistake may be reported a second time by the run itself. The label distinguishes the tiers: "Type error"/"Static error" for the pre-run analysis, "Runtime error" for the run.
+
+## `unknown-protocol`
+
+A conformance test named a protocol that does not exist: `Conforms(x, "Hashble")` where no `protocol Hashble` was ever declared. A name that does not exist is a mistake to surface, so it is an error — never a quiet `False`, which would make a typo indistinguishable from a genuine non-conformance.
+
+This error comes from the `Conforms` operator, whose protocol names ride as strings and so are only checkable when it runs. The `is` spelling of the same test (`x is Hashable`) resolves the name when the program is parsed, so a typo there is reported earlier, as a parse-time diagnostic, and never reaches this error.
+
+## `polytype-comparison-unsupported`
+
+A type comparison was given a QUANTIFIED type — a generic signature with a `where` clause, such as the type of a built-in like `Sort` — and comparing those is not supported: `Subtype`, the dynamic test (`x is T`, `MatchesType`), and `Conforms` all reject a quantified operand rather than guess.
+
+Deciding whether one generic signature is a subtype of another engages existential matching — "is there an instantiation that works" — which is a different, harder question than the ground-type compatibility these operators answer. A quantified type is still a legal VALUE (`Type(Sort)` observes one, prints it, and round-trips through `TypeFrom`/`StringFrom`); only comparing it is rejected.
+
+To ask about a SPECIFIC use of a generic, compare the instantiated ground type instead — the type of an actual call's argument or result.
 
 ---
 
@@ -8392,6 +8609,12 @@ fib(0) = 0
   ["Function", 0, ["Typed", "literalParam_1", {"str": "0"}]]]
 ```
 
+The type text is the literal as written, so the non-finite literals reach the
+type as their own spellings: `f(NaN) = …` gives `{"str": "NaN"}`, `f(oo) = …`
+gives `{"str": "oo"}`, and `f(-oo) = …` gives `{"str": "-oo"}`. The `Infinity`
+spelling is normalized to `oo` on the way in — `f(Infinity) = …` also lowers to
+`{"str": "oo"}` — so the two spellings produce the same clause.
+
 ### Anonymous functions
 
 ```epsil
@@ -8676,6 +8899,21 @@ match z {
 Such patterns work when evaluating a `match`, but are not supported by
 `compile()`; compiling a `match` with an operator pattern fails closed, naming
 the offending pattern in the error.
+
+Two other constructs fail closed the same way, both because the JavaScript
+target cannot represent a distinction the interpreter makes. A multi-clause
+function with a clause typed `infinity` or `nan` declines as a WHOLE and runs
+interpreted — `g(a: infinity) = 1` beside `g(x: number) = 0` compiles to no
+code at all — because complex infinity has no JavaScript value of its own to
+test for, so no emitted guard could agree with the interpreter on every
+argument.
+
+Compiled arithmetic also projects a pole differently from the interpreter. At a
+pole the interpreter answers the unsigned `~oo`, but compiled code answers the
+IEEE `Infinity`: `x => 1/x` compiles to `(x) => 1 / x`, which at `x = 0` gives
+`Infinity`, where the interpreter's `1/0` is `~oo`. The magnitude survives the
+projection and the missing direction does not, so a program that distinguishes
+the two must not rely on `compile()` to preserve it.
 
 When no case matches, evaluation produces `Error("match-no-case", subject)`.
 

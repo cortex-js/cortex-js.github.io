@@ -1419,6 +1419,20 @@ console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
 A **collection** is the exception: an error among its elements stays in place,
 because a collection containing an error is still a well-formed collection.
 
+An operand that is never evaluated cannot propagate anything. In a selection —
+`["If"]`, `["Which"]` — or behind a short-circuit operator — `["And"]`,
+`["Or"]` — the branch that is not taken is **dead code**, and an error inside it
+never reaches the value:
+
+```ts
+console.log(ce.box(['If', 'True', 5, ['Divide', 'x']]).evaluate().json);
+// ➔ 5
+```
+
+The diagnostic is not lost, only unevaluated: the boxed expression still holds
+`["If", "True", 5, ["Divide", "x", ["Error", "'missing'"]]]`, so a tool that
+walks the expression still reports it.
+
 Errors do not spread past the tools that inspect them. `Type` reports
 `"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
 `True`/`False`, and
@@ -1426,9 +1440,21 @@ Errors do not spread past the tools that inspect them. `Type` reports
 error subject — an `["Error", ...]` case destructures it, which is how a
 failure is rescued.
 
-`NaN` is **not** an error. It is an ordinary IEEE numeric value that inhabits
-the number domain, so it does not propagate this way: a function applied to
-`NaN` runs and receives it, and is free to inspect it.
+`NaN` is **not** an error. It is an ordinary IEEE numeric value — it has its
+own type, `nan`, under `number` — so it does not propagate this way: a
+function applied to `NaN` runs and receives it, and is free to inspect it.
+
+`NaN` is also **inexact**, so the exactness contract sends it down the numeric
+branch: a numeric function of `NaN` numericizes under plain `evaluate()`,
+without waiting for `.N()`, and the result is `NaN`.
+
+```ts
+console.log(ce.box(['Sin', NaN]).evaluate().json);
+// ➔ "NaN"
+
+console.log(ce.parse('\\ln(2)').evaluate().json);
+// ➔ ["Ln", 2]      — an exact argument stays symbolic
+```
 
 
 ## Lexical Scopes and Evaluation Contexts
@@ -2005,6 +2031,42 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+### Infinity and NaN
+
+The two non-finite results fall on opposite sides of the exactness rule above,
+which is why they behave differently under `evaluate()`.
+
+$\pm\infty$ **is an exact value.** A function of an infinity is therefore
+treated like a function of any other exact argument: if there is a closed form
+it is used, and if there is not, the expression stays symbolic rather than
+numericizing.
+
+```live
+console.log(ce.parse('\\mathrm{Erf}(\\infty)').evaluate());
+// ➔ 1
+
+console.log(ce.parse('\\sin(\\infty)').evaluate());
+// ➔ sin(+oo)
+```
+
+`NaN` **is not an exact value.** It is the argument that triggers the automatic
+numeric approximation, so any numeric function of `NaN` evaluates to `NaN` —
+under plain `evaluate()`, not only under `N()`. There is no exact value to hold
+on to:
+
+```live
+console.log(ce.parse('\\sin(\\operatorname{NaN})').evaluate());
+// ➔ NaN
+```
+
+Note that this is a statement about *values*, not about types. In the type
+system the bare numeric types — `integer`, `rational`, `real`, `complex` —
+denote **finite** values only, so neither an infinity nor `NaN` inhabits them.
+Both are still `number`.
+
+<ReadMore path="/compute-engine/guides/types/" >Read more about **the numeric
+types** <Icon name="chevron-right-bold" /></ReadMore>
+
 ## Angular Units
 
 When a trigonometric function is given a unitless value, the Compute Engine
@@ -2539,13 +2601,14 @@ form:
   - \\(x^\{\tilde\infty\} \to \operatorname\{NaN\}\\)
   - \\(x^0 \to 1\\)
   - \\(x^1 \to x\\)
-  - \\((\pm 1)^\{-1\} \to -1\\)
+  - \\((-1)^\{-1\} \to -1\\) (and \\(1^\{-1\} \to 1\\))
   - \\((\pm\infty)^\{-1\} \to 0\\)
-  - \\(0^\{\infty\} \to \tilde\infty\\)
+  - \\(0^\{\infty\} \to 0\\)
   - \\((\pm 1)^\{\pm \infty\} \to \operatorname\{NaN\}\\)
-  - \\(\infty^\{\infty\} \to \infty\\)
+  - \\(\infty^\{\infty\} \to \tilde\infty\\)
   - \\(\infty^\{-\infty\} \to 0\\)
-  - \\((-\infty)^\{\pm \infty\} \to \operatorname\{NaN\}\\)
+  - \\((-\infty)^\{\infty\} \to \tilde\infty\\)
+  - \\((-\infty)^\{-\infty\} \to 0\\)
 - `Square`: `["Power", "x", 2]` \\(\to\\) `["Square", "x"]`
 - `Sqrt`: `["Sqrt", "x"]` \\(\to\\)`["Power", "x", "Half"]`
 - `Root`:  `["Root", "x", 3]` \\(\to\\) `["Power", "x", ["Rational", 1, 3]]`
@@ -2809,6 +2872,64 @@ console.log("pi = ", smallPi, "=", bigPi);
 // ➔ pi  = 3.1415 = 3.1415926535
 ```
 
+## Using `i` or `e` as a Variable Name
+
+`i` is the imaginary unit and `e` is Euler's number. Both are constants, and
+both are substituted during canonicalization — so a formula that uses one as an
+ordinary variable, most often as a list index, quietly computes with the
+constant instead:
+
+```js
+console.log(ce.parse("A_{i,j}").json);
+// ➔ ["Subscript", "A", ["Sequence", ["Complex", 0, 1], "j"]]
+```
+
+The index became $\imaginaryI$. Nothing errors; an indexed access built this
+way simply yields `NaN`.
+
+**To use one of these names as a variable, declare it before parsing anything
+that mentions it.** A declaration shadows the constant for that scope:
+
+```js
+ce.declare("i", "integer");
+
+console.log(ce.parse("A_{i,j}").json);
+// ➔ ["Subscript", "A", ["Sequence", "i", "j"]]
+
+ce.assign("L", ce.box(["List", 10, 20, 30]));
+ce.assign("i", 2);
+console.log(ce.parse("L_i").evaluate().toString());
+// ➔ 20
+console.log(ce.parse("L[i]").evaluate().toString());
+// ➔ 20
+```
+
+Four things are worth knowing before you do this:
+
+- **Declare before parsing.** An expression parsed before the declaration has
+  already had the constant substituted, and declaring afterwards does not
+  change it. Declare at engine setup.
+- **Prefer `integer` for an index.** `integer` rejects a fractional value at
+  assignment; a symbol declared `unknown` accepts `i = 1.5` and passes the
+  fractional index through to the access with no diagnostic.
+- **Arithmetic with that name changes meaning in that scope**, and only there:
+  with `i` declared and set to 2, `2i` is `4`, not the complex number. The
+  dedicated spelling still works — `\imaginaryI` (and `\mathrm{i}`) always
+  parses as the imaginary unit — and serialization is unaffected, because a
+  complex value is written as `\imaginaryI`, never as a bare `i`. A complex
+  result therefore survives a serialize-and-reparse round trip.
+- **Bound variables are unaffected.** `\sum_{i=1}^{3} i` is `6` whether or not
+  `i` is declared: a binder introduces its own index.
+
+Declaring `e` follows the same rules but costs more, because it takes
+$e^{x}$ with it. Write exponentials as `\exp(x)` instead — it canonicalizes to
+`["Power", "ExponentialE", "x"]`, referring to the constant directly, so it is
+unaffected by a variable named `e`.
+
+To limit either declaration to part of a computation, declare it inside a
+scope (see [Scope](#scope)); the constant is restored when the scope is
+exited.
+
 ## Automatic Declaration
 
 An unknown symbol is automatically declared when it is first used in an
@@ -2822,10 +2943,13 @@ const symbol = ce.expr("m"); // m for mystery
 console.log(symbol.type);
 // ➔ "unknown"
 
-symbol.value = 5;
-console.log(symbol.type);
-// ➔ "finite_integer"
+ce.assign("m", 5);
+console.log(ce.symbol("m").type);
+// ➔ "integer"
 ```
+
+The inferred type is `integer`, not `"finite_integer"`: the numeric types are
+finite by default, so bare `integer` already promises a finite whole number.
 
 If the type of a symbol is inferred from its usage, the type can be 
 adjusted later as further information is provided. However, if the type is
@@ -3238,6 +3362,78 @@ definition.
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
+
+### Validating custom canonical handlers
+
+A custom `canonical` handler participates in expression construction before an
+`evaluate` handler runs. It must not assume that signature validation has
+already produced every missing-argument or incompatible-type error needed by
+the function.
+
+For required operands, check arity first and return an expression containing
+the appropriate `engine.error("missing")` placeholders. For operands whose
+shape or type the handler consumes directly, validate them before reading
+specialized fields. Preserve the original head in the returned error
+expression so serialization, diagnostics, and later evaluation still identify
+the failed call.
+
+Keep validation at the narrowest layer that knows the contract:
+
+- Express ordinary arity and type requirements in the function signature.
+- Validate structural preconditions needed specifically by `canonical` inside
+  that handler.
+- Validate value-dependent conditions, such as a positive evaluated integer,
+  in `evaluate`.
+- Add tests for no arguments, each missing required argument, wrong types, and
+  the valid boundary cases.
+
+This separation avoids both silently accepting malformed calls and evaluating
+operands merely to canonicalize their syntax.
+
+### Deriving the Result Type of an Operator
+
+The `signature` of an operator states its result type once, for every call.
+When the result type depends on the operands — the sum of two integers is an
+integer, the norm of a point whose components are lists is a list — the
+definition can add a `type` handler. The handler receives one **operand
+descriptor** per operand, never the operand expression itself, and returns a
+type (a `Type`, a type string, or `undefined` to keep the signature's result).
+
+```js
+ce.declare("Halve", {
+  signature: "(number) -> number",
+  type: ([x]) => {
+    // The descriptor's `type` is the operand's type; a number literal's
+    // type carries its value (`21`), so a literal is exact here.
+    if (x.facts.finite !== true) return "number";
+    return x.facts.sgn === "zero" ? "0" : "real";
+  },
+  evaluate: ([x]) => x.div(2),
+});
+```
+
+A descriptor has three parts:
+
+- `type` — the operand's type.
+- `facts` — a small set of three-valued facts (`true`, `false`, or
+  `undefined` for "not known"): `finite`, `sgn`, `closed` (no free
+  variables), `collection`, `finiteCollection`, `indexed`, a static `shape`
+  and the `elementType` the operand's own collection handler proves.
+- `structureOf()` — an on-demand structural view: a `symbol` (with its name
+  and whether its type was inferred), a `string`, a `number` (with its exact
+  rational terms when it has them), an `application` (its head and child
+  descriptors), a `function-literal` (parameters and body), a `tuple` or a
+  `list-literal` (with element descriptors).
+
+The second argument is a context with a read-only view of the engine
+(`engine.type()`, `engine.lookupDefinition()`, `engine.tolerance`) and
+`derive(operator, operands)`, which returns the type of applying an operator
+to descriptors you build yourself — the way to type the body of a mapping
+literal over a collection's element type.
+
+Because a handler never holds an expression, it cannot declare, canonicalize,
+or evaluate anything while deriving a type, and the engine's type caches stay
+valid. Under test a handler that writes engine state throws.
 
 ### Declaring the Effects of a Function
 
@@ -3888,10 +4084,16 @@ ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {
     const y = originalSqrtDefinition.evaluate!(x, options);
-    return y?.isReal ? y : ce.NaN;
+    return y?.isExtendedReal ? y : ce.NaN;
   },
 });
 ```
+
+`isExtendedReal` is the test for "lies on the real line", and it accepts
+$\pm\infty$ along with the finite reals; only a value with a non-zero imaginary
+part, or `NaN`, fails it. Use `isFinite` instead when the guard must also
+exclude the infinities — but note that `isFinite` accepts a finite *complex*
+value, so it is not a substitute here.
 
 In general, re-declaring a function in the same scope is not allowed and 
 will throw an error. However, the standard functions are in a `system` scope
@@ -4312,8 +4514,9 @@ console.log(ce.parse("\\keyword{if} x > 0 \\keyword{then} x \\keyword{else} -x")
 // ➔ ["If", ["Greater", "x", 0], "x", ["Negate", "x"]]
 ```
 
-The `else` branch is optional. When omitted, the result is `Nothing` if the
-condition is false.
+The `else` branch is optional. When it is omitted and the condition is false,
+no branch is selected and the result is `Missing` — the marker for a value the
+expression never supplied.
 
 ### Local Bindings with `where`
 
@@ -4528,6 +4731,7 @@ parsing as for serialization.
 
 | Key | Description |
 | :--- | :--- |
+| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)` and `sqrt(x)`, `*` multiplication, `**` powers, parenthesized superscripts/subscripts, and common infinity spellings. Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
 | `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
@@ -5811,31 +6015,64 @@ The Compute Engine supports the following primitive types:
 
 ### Numeric Types
 
-The type `number` represents all numeric values, including `NaN`. 
+The type `number` represents all numeric values. Below it, the numeric types
+are **finite by default**: `complex`, `real`, `rational`, `integer` and
+`imaginary` contain only finite values, and the values that are not finite
+numbers have types of their own. Every numeric value is a finite number, a
+number of infinite magnitude, or the not-a-number marker, and no value is two
+of those:
 
-More specific types of numeric values are represented by subtypes of `number`. 
+$$\texttt{number} = \texttt{complex} \sqcup \texttt{infinity} \sqcup \texttt{nan}$$
 
-Some numeric types have a variant that excludes non-finite values, such as 
-`PositiveInfinity`, `NegativeInfinity` and `ComplexInfinity`.
+So a declared `real` is a **promise of finiteness**: writing `real` as a
+result type says the value is never $\pm\infty$ and never $\mathrm{NaN}$.
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"17ch"}}>
 
 | Type          | Description                                                                                      |
 | :-------------- | :----------------------------------------------------------------------------------------------- |
-| `number`       | All numeric values: a real or complex number or $\mathrm{NaN}$ |
-| `non_finite_number` | The values $+\infty$ and $-\infty$ (`PositiveInfinity` and `NegativeInfinity`) |
-| `complex`      | A number with non-zero real and imaginary parts, such as $2 + 3i$, including $\tilde\infty$ (`ComplexInfinity`) |
-| `imaginary`    | A pure imaginary number, such as $3i$ |
-| `real`         | A real number, such as $-2.5$, including $\pm\infty$ |
-| `rational`     | A number that can be expressed as the quotient of two integers such as $-\nicefrac{3}{4}$, including $\pm\infty$. |
-| `integer`      | A whole number, such as $42$, including $\pm\infty$. |
-| `finite_number` | A real or complex number, except $\pm\infty$ and $\tilde\infty$ |
-| `finite_complex` | A complex number, except $\pm\infty$ and $\tilde\infty$ |
-| `finite_real` | A real number, except $\pm\infty$ |
-| `finite_rational` | A rational number, except $\pm\infty$ |
-| `finite_integer` | An integer, except $\pm\infty$ |
+| `number`       | Any numeric value: a finite number, a number of infinite magnitude, or $\mathrm{NaN}$ |
+| `complex`      | A finite complex number, such as $2 + 3i$. The union of `real` and `imaginary` |
+| `imaginary`    | A finite complex number with a real part of $0$, such as $3i$ |
+| `real`         | A finite real number, such as $-2.5$ |
+| `rational`     | A finite number that can be expressed as the quotient of two integers, such as $-\nicefrac{3}{4}$. Includes the integers |
+| `integer`      | A finite whole number, such as $42$ |
+| `infinity`     | A number of infinite magnitude, in any direction: $+\infty$, $-\infty$, the unsigned $\tilde\infty$ (`ComplexInfinity`), and mixed values such as $\infty + i$. Disjoint from `complex` |
+| `nan`          | The not-a-number marker $\mathrm{NaN}$. Its only supertype is `number` |
+
+When you need exactly the signed pair $+\infty$ and $-\infty$ — the values
+whose *sign* is promised, which `infinity` does not — write
+`signed_infinity`. It is precisely the union of the two value types, and
+`+oo | -oo` is an equivalent spelling of the same type; a union
+containing both signed infinities prints under the name
+(`real | signed_infinity`). The former name for this pair,
+`non_finite_number`, is **retired**: that name was misleading, since
+$\tilde\infty$ and $\infty + i$ are non-finite numbers yet were not
+members. It is still accepted on input for one release cycle and
+normalizes to `signed_infinity`, but it is never printed.
 
 </div>
+
+The extended real line — a real number that may be infinite — has no
+one-word name: write it out as `real | +oo | -oo`. Bare `real` does
+not admit $\pm\infty$, and `real | infinity` would also admit the unsigned
+$\tilde\infty$.
+
+:::warning **Deprecated: the `finite_` type names**
+
+The names `finite_number`, `finite_complex`, `finite_real`,
+`finite_rational` and `finite_integer` have been **retired**. The bare names
+above now carry those meanings, so each retired name denoted the same set of
+values as a bare one.
+
+For one release cycle the type parser still accepts them and normalizes each
+to its replacement — `finite_integer` to `integer`, `finite_rational` to
+`rational`, `finite_real` to `real`, `finite_complex` to `complex`, and
+`finite_number` to `complex` (since "any finite number" *is* the finite
+complex type). They are never produced by the engine, so a type you read back
+is always spelled with the bare name. Update your type strings before the
+aliases are removed.
+:::
 
 Numeric types can be constrained to a specific range within a lower and upper 
 bound
@@ -5861,13 +6098,55 @@ Here is the type of various numeric values:
 
 | Value               | Type                |
 | ------------------: | :------------------ |
-| $42$                | `finite_integer`    |
-| $-3.14$             | `finite_real`       |
-| $\nicefrac{1}{2}$   | `finite_rational`   |
+| $42$                | `42`                |
+| $-3.14$             | `-3.14`             |
+| $\nicefrac{1}{2}$   | `rational<0.5..0.5>` |
+| $\nicefrac{1}{3}$   | `rational<0.33..0.34>` |
+| $\sqrt2$            | `real<1.4..1.5>`     |
 | $3i$                | `imaginary`         |
-| $2 + 3i$            | `finite_complex`    |
-| $-\infty$           | `non_finite_number` |
-| $\mathrm{NaN}$      | `number`            |
+| $2 + 3i$            | `complex`           |
+| $-\infty$           | `-oo` (widens to `infinity`) |
+| $\tilde\infty$      | `~oo` (widens to `infinity`) |
+| $\mathrm{NaN}$      | `NaN` (widens to `nan`) |
+
+A number literal's type is the most precise claim available — its own value
+when a machine number holds it exactly, and otherwise its tier decorated
+with a range that encloses the value (see 
+[Literal Type](#literal-type)). Every one of these types is a subtype of
+the tier you would expect: `42` matches `integer`, 
+`rational<0.5..0.5>` matches `rational`, `real<1.4..1.5>`
+matches `real`, and so on — so code that
+asks *"is this an integer?"* with `.matches()` or `.isInteger` is
+unaffected by the extra precision.
+
+The last three rows are the values that are *not* finite numbers. They no
+longer match `real` or `integer`: since the bare tiers are finite,
+`ce.parse("-\\infty").type.matches("real")` is `false`. Ask
+`matches("real | +oo | -oo")` when you mean the extended real line.
+
+### Where Ranged Types Come From
+
+A ranged type can appear in four ways:
+
+- **You declare it**: `ce.declare("x", "real<-1..1>")` makes the range a
+  contract on `x`.
+- **An assumption refines it**: after `ce.assume(ce.parse("y > 0"))`, the
+  type of `y` is `(real<0..>) & !0`.
+- **An operator derives it**: some operations produce a result that is
+  provably sign-constrained, and their type says so — `|x|` for a real `x`
+  has type `real<0..>`, and `e^x` has type `(real<0..>) & !0`.
+- **A literal carries it**: an exact value that no machine number holds —
+  $\nicefrac{1}{3}$, $\sqrt2$, $10^{30}+1$ — is typed by its tier plus a
+  compact range that encloses the value, such as `real<1.4..1.5>`
+  for $\sqrt2$ (see [Literal Type](#literal-type)). Constants like
+  `Pi` and `ExponentialE` declare a value bracket
+  (`real<3.141592653589793..3.141592653589794>`), so their sign
+  and magnitude are type facts.
+
+Ranges are deliberately **not** propagated through arithmetic: the sum of
+two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls
+back to the bare tier. Carrying bounds through operations is interval
+arithmetic, which the type system does not attempt.
 
 The Compute Engine Standard Library includes definitions for sets that
 correspond to some numeric types.
@@ -5892,7 +6171,7 @@ is the type of the elements of the set.
 
 ```js
 ce.parse("\\{5, 7, 9\\}").type
-// ➔ "set<finite_integer>"
+// ➔ "set<integer>"
 ```
 
 A set can have an infinite number of elements.
@@ -5907,7 +6186,7 @@ where `T1`, `T2`, ... are the types of the elements of the tuple.
 
 ```js
 ce.parse("(7, 5, 7)").type
-// ➔ "tuple<finite_integer, finite_integer, finite_integer>"
+// ➔ "tuple<integer, integer, integer>"
 ```
 
 The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
@@ -5960,12 +6239,12 @@ The type of a list is represented by the type expression `list<T>`, where `T` is
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type.toString();
-// ➔ "vector<finite_integer^3>"  (a list of 3 finite integers)
+// ➔ "vector<integer^3>"  (a list of 3 integers)
 ```
 
 The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
-honest type is a subtype of every broader form — `vector<finite_integer^3>`
+honest type is a subtype of every broader form — `vector<integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
 
 The **empty list** has no elements, so its element type is the bottom type 
@@ -6025,7 +6304,7 @@ ce.parse("\\[1, 2, 3\\]").type.matches("vector<number^3>");
 
 // A list with a non-integer element widens accordingly:
 ce.parse("\\[1, 2.5, 3\\]").type.matches("vector<integer^3>");
-// ➔ false  (the widened element type is finite_real)
+// ➔ false  (the widened element type is real)
 ```
 
 Lists of non-numeric values type honestly too — a list of two colors types
@@ -6050,7 +6329,9 @@ and **`tensor<T>`** is a tensor of elements of type `T`.
 ### Dictionary and Record
 
 The **dictionary** and **record** types represent a collection of key-value pairs, 
-where each key is a string and each value can be any type.
+where each key is a non-empty string and each value can be any type. Building a
+dictionary with a key that is not a non-empty string — an empty string, a
+number, `Nothing` — is an error rather than a silently dropped entry.
 
 A concrete **record value** has a known set of keys, while a **dictionary** can
 have keys that are not defined in advance. A record *type* lists the fields a
@@ -6226,8 +6507,17 @@ one or two integers as input and returning an integer.
 
 If there are any optional arguments, they must be at the end of the argument list.
 
+A function type matches a signature only when it accepts **every call that
+signature permits** — its shortest and its longest. A signature with an
+optional argument permits two call shapes, so a function taking only one
+argument does not match it:
+
 ```js
 ce.type("(integer) -> number")
+  .matches("(integer, integer?) -> number");
+// ➔ false  (cannot serve the two-argument call)
+
+ce.type("(integer, integer?) -> number")
   .matches("(integer, integer?) -> number");
 // ➔ true
 ```
@@ -6250,11 +6540,24 @@ string as a first argument followed by one or more integers and returns an integ
 To indicate that the function accepts a variable number of arguments of any 
 type, use `any+` or `any*`.
 
+A variadic signature permits calls of *any* length, so no fixed-arity function
+matches one — only another variadic function can:
+
 ```js
 ce.type("(integer, integer) -> number")
   .matches("(integer, integer+) -> number");
-// ➔ true
+// ➔ false  (cannot serve a call with three or more integers)
+
+ce.type("(integer, integer*) -> number")
+  .matches("(integer, integer+) -> number");
+// ➔ true   (zero-or-more covers one-or-more)
 ```
+
+This matters when a function is **stored** under a declared type. The
+declaration is a contract: it tells callers which calls are legal, so whatever
+is stored must handle all of them, and assigning does not reshape the declared
+type. Passing a function as an **argument** to a callback slot is a different
+question — see [Function Type](#function-type) below.
 
 If a signature has a variadic argument, it must be the last argument in the list, 
 and it cannot be combined with optional arguments.
@@ -6263,12 +6566,32 @@ and it cannot be combined with optional arguments.
 
 The type `function` matches any function value — any parameter shape, any
 effects. It is a distinct primitive, **not** a shorthand for a signature such
-as `(any*) -> unknown`: a written signature constrains callbacks
-contravariantly (its parameter types are a promise about what callers may
-pass), so no signature spelling can accept every function. Use `function` for
-operator parameters that take a callback whose shape depends on other
-operands (e.g. `Map`), and a full signature only when the callback's shape is
-fixed.
+as `(any*) -> unknown`.
+
+Where types are **compared** — `.matches()`, subtyping — a written signature
+constrains callbacks contravariantly: its parameter types are a promise about
+what callers may pass, so `(number) -> boolean` is not a subtype of
+`(unknown) -> boolean`.
+
+Where a function value is passed as an **operand at an arrow-typed parameter
+slot**, admission is by **compatibility** instead: the operand is admitted
+unless it is provably unusable — not callable at all, unable to accept the
+number of arguments the operator supplies, provably disjoint in a parameter
+or the result, or violating the slot's effect bound. This is what lets
+`CountIf(xs, IsPrime)` work over an integer collection even though
+`IsPrime: (number) -> boolean` is no contravariant subtype of the
+instantiated slot, and what lets a mixed-type collection map a numeric
+function per element. A callback that could never work — a number-only
+predicate over a `list<string>`, a predicate that provably returns a
+non-boolean — is rejected when the expression is canonicalized, with a
+message naming both arrows. (Design ruling:
+`docs/plans/2026-08-18-compatibility-admission-callbacks.md`.)
+
+So: spell a callback slot as the arrow it supplies — the collection
+operators read `(T) any -> boolean` for a predicate, `(T) any -> unknown`
+for a key — and reserve the bare `function` for a slot whose contract the
+type language cannot express (`Iterate`'s parametric accumulator,
+`Tabulate`'s dimension-dependent arity).
 
 ### Effect Specifiers
 
@@ -6664,7 +6987,7 @@ ce.declare("first", {
   evaluate: ([xs]) => xs.at(1),
 });
 
-ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "finite_integer"
+ce.box(["first", ["List", 1, 2, 3]]).type; // ➔ "integer"
 ce.box(["first", ["List", "'a'", "'b'"]]).type; // ➔ "string"
 ```
 
@@ -6688,7 +7011,7 @@ Variables in element positions are solved by matching the argument's structure:
 ce.declare("swap", { signature: "(tuple<T, U>) -> tuple<U, T> where T, U" });
 
 ce.box(["swap", ["Tuple", 1, "'a'"]]).type;
-// ➔ "tuple<string, finite_integer>"
+// ➔ "tuple<string, integer>"
 ```
 
 A callback's parameter type is instantiated too, which is what makes an
@@ -6720,7 +7043,7 @@ argument's kind and its dimensions:
 ce.declare("rev", { signature: "(T) -> T where T: indexed_collection" });
 
 ce.box(["rev", ["List", ["List", 1, 2, 3], ["List", 4, 5, 6]]]).type;
-// ➔ "matrix<finite_integer^(2x3)>"
+// ➔ "matrix<integer^(2x3)>"
 ```
 
 Violating the bound is an error naming the bound:
@@ -6730,7 +7053,7 @@ ce.box(["rev", ["Set", 1, 2]]).isValid; // ➔ false
 
 ce.box(["rev", ["Set", 1, 2]]).toString();
 // ➔ rev(Error(ErrorCode("incompatible-type", "indexed_collection",
-//      "set<finite_integer>")))
+//      "set<integer>")))
 ```
 
 An unbounded variable has an implicit bound of `unknown`: `where T` is
@@ -6753,7 +7076,7 @@ Several standard library operators are declared this way — `Identity` is
 arguments:
 
 ```js
-ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<finite_integer^3>"
+ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<integer^3>"
 ```
 
 A **scalar** bound interacts with broadcasting. On an operator that
@@ -6766,17 +7089,17 @@ wrap then puts the argument's shape back on the result. `Conjugate` and
 
 ```js
 ce.box(["Conjugate", ["List", 1, 2, 3]]).type;
-// ➔ "vector<finite_integer^3>"
+// ➔ "vector<integer^3>"
 
 ce.box(["Remainder", ["List", ["List", 1, 2], ["List", 3, 4]], 7]).type;
-// ➔ "matrix<finite_integer^(2x2)>"
+// ➔ "matrix<integer^(2x2)>"
 ```
 
 Broadcasting maps all the way down to the scalar leaves, so the variable is
 bound to a leaf type whatever the argument's rank. Only the kinds a broadcast
 actually maps are peeled: a `set` argument is admitted but never mapped
-(`Conjugate(Set(1, 2))` stays a `set<finite_integer>`), and a tuple is atomic
-(`Conjugate((1, 2))` is a `tuple<finite_integer, finite_integer>`).
+(`Conjugate(Set(1, 2))` stays a `set<integer>`), and a tuple is atomic
+(`Conjugate((1, 2))` is a `tuple<integer, integer>`).
 
 ### Generic Overload Sets
 
@@ -6865,7 +7188,7 @@ ce.assign("nest", ce.box(["Function",
   "x", "n"]));
 
 ce.box(["nest", 5, 3]).evaluate().toString(); // ➔ "5"
-ce.box(["nest", 5, 3]).type; // ➔ "finite_integer"
+ce.box(["nest", 5, 3]).type; // ➔ "integer"
 ce.box(["nest", "'a'", 2]).type; // ➔ "string"
 ```
 
@@ -6939,10 +7262,10 @@ ce.declare("dup", "(x: T) -> tuple<T, T> where T");
 ce.assign("dup", ce.box(["Function", ["Tuple", "x", "x"], "x"]));
 
 ce.box(["dup", 5]).type;
-// ➔ "tuple<finite_integer, finite_integer>"
+// ➔ "tuple<integer, integer>"
 
 ce.box(["dup", ["List", 1, 2]]).type;
-// ➔ "list<tuple<finite_integer, finite_integer>>"
+// ➔ "list<tuple<integer, integer>>"
 
 ce.box(["dup", ["List", 1, 2]]).evaluate().toString();
 // ➔ "[(1, 1),(2, 2)]"
@@ -6988,6 +7311,114 @@ can be one of multiple values, for example:
 - `0 | 1` is the type of values that are either `0` or `1`.
 - `"red" | "green" | "blue"` is the type of values that are either of the 
   strings `"red"`, `"green"` or `"blue"`.
+
+### Number Literals Have Literal Types
+
+The type of a number literal **is** its literal type: the most precise
+claim the type system can make about it.
+
+```js
+console.info(ce.box(42).type);
+// ➔ "42"
+
+console.info(ce.box(-3.14).type);
+// ➔ "-3.14"
+```
+
+A literal type is a subtype of its numeric tier — `42` matches `integer`,
+`real`, and `number` — so a literal is accepted anywhere its tier is, with
+no conversion and no cast. To check what kind of number an expression is,
+use `.matches()` (or the `isInteger`/`isRational`/`isNumber` shortcuts),
+never a string comparison of the type's name:
+
+```js
+console.info(ce.box(42).type.matches("integer"));
+// ➔ true
+
+console.info(String(ce.box(42).type) === "integer");
+// ➔ false — the type's *name* is "42"
+```
+
+### How a Number Literal Is Typed
+
+Some exact values cannot be spelled as a plain value type. The engine
+therefore picks one of three forms:
+
+1. **A machine number holds the value exactly**: the type is that value.
+   `ce.box(21).type` is `21`, and `ce.box(0.5).type` is `0.5`.
+2. **A machine number holds the value exactly, but the value is an exact
+   rational**: the type is the `rational` tier with a **singleton
+   range**. $\nicefrac{1}{2}$ has type `rational<0.5..0.5>`. A bare
+   value type cannot be used here: the lattice does not class a bare
+   numeric value as rational, so `0.5` matches `real` but not `rational`.
+3. **No machine number holds the value** — $\nicefrac{1}{3}$, $\sqrt2$,
+   $10^{30}+1$: the type is a compact **closed range** on the tier of the
+   value. Both bounds are rounded *outward* to two significant digits.
+
+```js
+console.info(ce.parse("1/3").type);
+// ➔ "rational<0.33..0.34>"
+
+console.info(ce.parse("\\sqrt2").type);
+// ➔ "real<1.4..1.5>"
+
+console.info(ce.parse("10^{30}+1").evaluate().type);
+// ➔ "integer<9.9e+29..1.1e+30>"
+```
+
+The bounds of an enclosing range provably contain the exact value, so the
+type never claims a value the literal does not have. The bounds also
+exclude zero, which keeps the sign of the literal a type fact, and the
+range is never a singleton, so no operation can mistake a bound for the
+value itself.
+
+Domain checks read these bounds. The type of $\nicefrac{1}{3}$ proves that
+its magnitude is not more than $1$, so its arcsine stays real:
+
+```js
+console.info(ce.parse("\\arcsin(1/3)").evaluate().type);
+// ➔ "real"
+```
+
+When the magnitude of the value is outside the range of normal machine
+numbers, no sound compact range exists. The type then falls back to a
+claim about the sign only:
+
+```js
+console.info(ce.parse("10^{400}").evaluate().type);
+// ➔ "(integer<0..>) & !0"
+```
+
+### Literal Types Are Not Stored
+
+A literal type belongs to the literal itself. It lives at expression
+positions only. Whenever a type is **stored** — inferred for a
+declaration, solved for a generic type variable, synthesized for a
+collection, derived as the signature of a function literal, or recorded as
+the result of an operator — the literal widens to its tier:
+
+```js
+ce.assign("k", 42);
+console.info(ce.box("k").type);
+// ➔ "integer" — inference stores the tier, not the value
+
+ce.declare("identity", "(x: T) -> T where T");
+console.info(ce.box(["identity", 5]).type);
+// ➔ "integer" — the type variable binds the tier, never `5`
+
+console.info(ce.box(["List", 1, 2, 3]).type);
+// ➔ "vector<integer^3>" — cells widen to their tier
+
+console.info(ce.box(["Function", 21]).type);
+// ➔ "() -> integer" — a derived signature stores the tier
+```
+
+This is the same discipline as `const`/`let` literal types in TypeScript:
+maximum precision at the expression, a reusable contract in storage.
+
+One place the extra precision is directly useful: type errors name the
+offending value. A wrong argument reports "expected `integer`, got `2.5`"
+rather than "got `real`".
 
 
 ## Other Constructed Types
@@ -7063,12 +7494,13 @@ ce.parse("3.14").type.matches("real");
 Do not check for type compatibility by comparing the type strings directly.
 
 Type strings may represent refined or derived types 
-(e.g. `real` vs `finite_real`), so use `.matches()` for compatibility checks 
-instead of strict equality.
+(e.g. `real<0..>` where you expected `real`, or the literal type of a
+number), so use 
+`.matches()` for compatibility checks instead of strict equality.
 
 ```js
 ce.parse("3.14").type === "real";
-// ➔ false (the type is actually "finite_real")
+// ➔ false (the type is actually "3.14", the literal type)
 
 ce.parse("3.14").type.matches("real");
 // ➔ true
@@ -7154,7 +7586,7 @@ Lists are compatible if they have the same length and the elements are compatibl
 
 ```js
 ce.parse("\\[1, 2, 3\\]").type
-  .matches("list<finite_integer>");
+  .matches("list<integer>");
 // ➔ true
 ```
 
@@ -7369,22 +7801,36 @@ ce.type("(T) -> T where T")
 
 ### Checking the Type of a Numeric Value
 
-The properties `expr.isNumber`, `expr.isInteger`, `expr.isRational` and 
-`expr.isReal` are shortcuts to check if the type of an expression matches the 
-types  `"number"`, `"integer"`, `"rational"` and `"real"` respectively.
+The properties `expr.isNumber`, `expr.isInteger` and `expr.isRational` are
+shortcuts to check if the type of an expression matches the types
+`"number"`, `"integer"` and `"rational"` respectively. The last two tiers
+are finite, so $\pm\infty$ and $\mathrm{NaN}$ answer `false` to both while
+still answering `true` to `isNumber`.
+
+There is no shortcut for bare `real`. The related property
+`expr.isExtendedReal` asks the **extended** question — *is this a point of
+the extended real line?* — so it is `true` for a finite real **and** for
+$\pm\infty$. It is `false` for $\mathrm{NaN}$, for the unsigned
+$\tilde\infty$ and for a number with an imaginary part. It is exactly
+`type.matches("real | +oo | -oo")`. To ask the finite question
+instead, use `type.matches("real")`, or pair `isExtendedReal` with
+`expr.isFinite`.
 
 ```js
 console.info(ce.expr(3.14).type);
-// ➔ "finite_real"
-
-console.info(ce.expr(3.14).type.matches("finite_real")) 
-// ➔ true
+// ➔ "3.14" — a literal's type is its literal type (see Literal Type)
 
 console.info(ce.expr(3.14).type.matches("real")) 
 // ➔ true
 
-console.info(ce.expr(3.14).isReal) 
+console.info(ce.expr(3.14).isExtendedReal) 
 // ➔ true
+
+console.info(ce.parse("\\infty").isExtendedReal) 
+// ➔ true — infinite, but still on the extended real line
+
+console.info(ce.parse("\\infty").type.matches("real")) 
+// ➔ false — bare `real` is finite
 
 console.info(ce.expr(3.14).type.matches("integer")) 
 // ➔ false
@@ -7393,6 +7839,14 @@ console.info(ce.expr(3.14).isInteger)
 // ➔ false
 
 ```
+
+:::info **Renamed: `isReal` is now `isExtendedReal`**
+
+`isExtendedReal` was called `isReal` before the numeric types became
+finite by default. The rename is not cosmetic: the old name suggested the
+bare `real` tier, but the property has always admitted $\pm\infty$, which
+bare `real` no longer does.
+:::
 
 
 ## Type Inference
@@ -7413,9 +7867,11 @@ type:
 
 | Value Type         | Inferred Symbol Type |
 |:--------------------|:----------------------|
-| `complex`  <br/> `imaginary` <br/> `non_finite_number` <br/> `finite_number`          | `number`            |
-| `integer` <br/> `finite_integer`           | `integer`             |
-| `real` <br/> `finite_real` <br/> `rational` <br/> `finite_rational`          | `real`            |
+| `complex`  <br/> `imaginary`          | `number`            |
+| `integer`           | `integer`             |
+| `real` <br/> `rational`          | `real`            |
+| `infinity`          | `infinity`            |
+| `nan`          | `nan`            |
 
 </div>
 
@@ -7425,10 +7881,10 @@ Examples:
 
 | Value               | Value Type | Inferred Symbol Type |
 |:--------------------|:--------------------------|:--------------------------|
-| 34                  | `finite_integer` | `integer`                |
-| 3.14                | `finite_real` | `real`                   |
+| 34                  | `integer` | `integer`                |
+| 3.14                | `real` | `real`                   |
 | 4i                   | `imaginary` | `number`                   |
-| 1/2                  | `finite_rational` | `real`                   |
+| 1/2                  | `rational` | `real`                   |
 </div>
 
 ```js
@@ -7466,7 +7922,7 @@ ce.expr(["k", "n"]);
 ce.expr("n").type;         // ➔ "integer"
 
 // Assigned symbol: the use CHECKS against the evidence
-ce.assign("x", 3.5);       // x: real (finite_real, widened per the table)
+ce.assign("x", 3.5);       // x: real (widened per the table above)
 ce.expr(["k", "x"]);       // ➔ incompatible-type error, at canonicalization
 ce.expr("x").type;         // ➔ still "real" — the use did not rewrite it
 ```
@@ -7510,17 +7966,17 @@ A type reaches a symbol on one of two tracks, and they behave differently:
 - A **declared** type — written by you, in `ce.declare("a", "list")` or
   `let a: list` — is a **contract**. It never moves: assigning `[1, 2, 3]`
   to `a: list` leaves `a`'s type `list`, even though the value's own type is
-  the much more precise `vector<finite_integer^3>`. An assignment that
+  the much more precise `vector<integer^3>`. An assignment that
   violates the contract (`a = 42`) is an `incompatible-type` error.
 - An **inferred** type — produced by the engine from evidence — is
   **revisable**. It follows the value: after `b = [1, 2, 3]` an undeclared
-  `b` types `vector<finite_integer^3>`; after `b = ["x", "y"]` it types
+  `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
 
 For a **bare collection annotation**, the contract is the *constructor*
 and the element slot is a placeholder that refines from evidence: `a: list`
-holding `[1, 2, 3]` reports `list<finite_integer>` — the element type came
+holding `[1, 2, 3]` reports `list<integer>` — the element type came
 from the assignment, while rank and length stay open (you wrote `list`, so
 list-ness of any shape is what you chose). The refinement never hardens:
 `a = ["x"]` re-refines to `list<string>`, exactly as an unannotated
@@ -7564,7 +8020,14 @@ The two "loose" types divide the work (see also the primitive-types table):
   value types: every value type is a subtype of it, but the absence markers
   (`nothing`, `missing`) are **not** — absence is opt-in. An `unknown` in a
   signature slot or an unbounded `where T` is a **placeholder** that later
-  evidence refines.
+  evidence refines. A *value* typed `unknown` is a placeholder too: because
+  it claims nothing, no declaration can refute it, so assigning it to a
+  declared symbol is admitted unchecked — `let xs: list` accepts
+  `xs = f(0)` for an `f` with no signature, exactly as a `list` parameter
+  accepts the same argument, and neither is re-examined later. A declared
+  function *signature* is the exception: it keeps refusing an `unknown`
+  value, since admitting one would make the name callable under a contract
+  nothing proved.
 - **`any`** — the true top type, admitting absence markers as well. An
   explicit `any` is a deliberate, *wider* **contract**: `(any) -> any`
   promises to accept everything; `list<any>` admits a list with absent
@@ -7636,7 +8099,7 @@ it:
 
 - `RangeOf` returns `range | nothing` — the not-found case is *in the
   type*, so code that feeds the result to `Slice` is checked against it.
-- `[1, Missing]` types as `list<finite_integer | missing>` — the hole is
+- `[1, Missing]` types as `list<integer | missing>` — the hole is
   visible, and the missing-propagation machinery keys off exactly that
   visibility.
 - A parameter, lambda slot, or inferred type that never mentions absence
@@ -8014,7 +8477,7 @@ For example, a definition of a JSON value could be:
 ce.declareType("json", `
     missing
   | boolean
-  | finite_real
+  | real
   | string
   | type json_array
   | type json_object
@@ -8045,15 +8508,17 @@ plausible-looking variant of each does not describe JSON:
   and is *erased* from collection literals — `[1, Nothing, 3]` has two
   elements. `Missing` is position-preserving, so it survives inside an array
   or as a dictionary value.
-- `finite_real`, not `number`. The engine's `number` admits complex and
-  non-finite values, so `2 + 3i` and `NaN` would both be accepted as JSON.
+- `real`, not `number`. The engine's `number` admits complex and
+  non-finite values, so `2 + 3i`, `NaN` and $+\infty$ would all be accepted
+  as JSON, and none of them is representable in JSON. Bare `real` is finite
+  by definition, so it excludes them with no extra spelling.
 
 The same set can be written as a single self-recursive alias, which needs no
 forward references at all:
 
 ```js
 ce.declareType("json", `
-    missing | boolean | finite_real | string
+    missing | boolean | real | string
   | list<json> | dictionary<json>
 `, { alias: true });
 ```
@@ -8101,7 +8566,7 @@ solved at each construction, from the arguments:
 
 ```js
 ce.expr(["tree", 1, ["List"]]).type;
-// ➔ "tree<finite_integer>"
+// ➔ "tree<integer>"
 ```
 
 Nothing else is new: a `record` definition still mints no constructor and is
@@ -8191,12 +8656,12 @@ widen them. For a covariant parameter that is invisible, because the narrower
 construction is a subtype of the annotation anyway:
 
 ```plaintext
-let t: tree<number> = tree(1, [])   // builds a tree<finite_integer>, which IS a tree<number>
+let t: tree<number> = tree(1, [])   // builds a tree<integer>, which IS a tree<number>
 ```
 
 For an explicitly `inout` or `in` parameter that step is not available, so
 such a type can only be constructed at exactly its argument type — a
-`box<finite_integer>` is not admissible where a `box<number>` is expected.
+`box<integer>` is not admissible where a `box<number>` is expected.
 Propagating the expected type inward is a future improvement.
 
 #### Reading a Value
@@ -9737,7 +10202,19 @@ console.log(g.run({ x: 3 }));
 // ➔ 9
 ```
 
-When no condition matches, `Which` returns `NaN`.
+When no condition matches, compiled `Which` returns `NaN`. The interpreter
+answers `Missing` for the same input — the absence marker has no value in the
+target's floating-point model, so it projects to `NaN`. See
+[Non-Finite Results](#non-finite-results).
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+// No clause covers x = 0, and there is no fallback clause
+const h = compile("\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\end{cases}");
+console.log(h.run({ x: 0 }));
+// ➔ NaN
+```
 
 #### `Sum` and `Product`
 
@@ -9984,11 +10461,62 @@ be exact: `arcsin(0.5)` compiled through the complex kernel is the number
 `0.5235…`, while `1 + 10^{-12} i` stays `{ re: 1, im: 1e-12 }` — nothing is
 chopped in ring arithmetic.
 
-> **Deprecated:** `realOnly: true` (the old projection: `{ re, im }` → `NaN`
-> unless the imaginary part is at roundoff scale, boolean → `NaN`) is kept for
-> one release with a console warning. The convention above replaces it — the
-> `typeof v === 'number' ? v : NaN` test on the consumer's side is the whole
-> of what it did.
+### Non-Finite Results
+
+The engine distinguishes three kinds of non-finite number — the signed
+infinities $+\infty$ and $-\infty$, complex infinity $\tilde\infty$, and `NaN`.
+A floating-point target has only two: IEEE `Infinity`/`-Infinity` and `NaN`.
+Compiled code therefore reports a **projection** of the interpreted answer, and
+the two agree everywhere except at the direction-less infinity.
+
+The signed infinities and `NaN` round-trip. `\ln(0)` is $-\infty$ interpreted
+and `-Infinity` compiled; a `NaN` argument stays `NaN` through a compiled
+numeric head, exactly as it does through `evaluate()`:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+console.log(compile("\\ln(x)").run({ x: 0 }));
+// ➔ -Infinity
+
+console.log(compile("\\mathrm{Heaviside}(x)").run({ x: NaN }));
+// ➔ NaN
+```
+
+Complex infinity has no distinct floating-point value, so a pole projects onto
+the positive infinity. Interpreting $1/0$ gives $\tilde\infty$, which carries no
+direction; the compiled unit answers `Infinity`, and `-Infinity` for the
+negative-zero approach that IEEE arithmetic does distinguish:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const f = compile("\\frac{1}{x}");
+console.log(f.run({ x: 0 }));    // ➔ Infinity
+console.log(f.run({ x: -0 }));   // ➔ -Infinity
+```
+
+Absence markers project the same way. `Missing` — what an unmatched `Which`
+returns — is not a number, so the chained ternary ends in a literal `NaN` (see
+[`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
+when the expression was never compiled at all: an else-less `If` declines and
+falls back to interpretation, and its `Missing` crosses the boundary as `NaN`
+too.
+
+**Type guards follow the finite-by-default lattice.** Every bare numeric type
+name denotes a **finite** value, so the guard a compiled parameter test emits
+rejects `Infinity` and `NaN` exactly as the interpreter's signature check does:
+`real` lowers to `Number.isFinite`, `integer` to `Number.isInteger`, and
+`complex` to a test that a plain number is finite or that both parts of a
+`{ re, im }` pair are. `+oo | -oo` — the signed pair — is the guard for
+the infinities.
+
+The `infinity` and `nan` tiers have no faithful test in the target's value
+model, because the projection above is lossy in exactly the place those tiers
+distinguish. A definition whose parameters use either one therefore **declines
+as a whole** and runs interpreted, rather than dispatching on a test that would
+disagree with `evaluate()`. This is the usual fail-closed posture for a
+construct the target cannot represent.
 
 ### Modes: `auto`, `strict`, `complex`
 
@@ -11134,12 +11662,54 @@ def euclidean_distance(x_1: float, y_1: float, x_2: float, y_2: float) -> float:
     return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
 ```
 
+## Non-Finite Values
+
+The engine tells the signed infinities $+\infty$ and $-\infty$ apart from
+complex infinity $\tilde\infty$, and both from `NaN`. NumPy floats have only
+`np.inf`, `-np.inf` and `np.nan`, so the generated code carries a **projection**
+of the interpreted value:
+
+```typescript
+const python = new PythonTarget();
+
+python.compile(ce.parse('\\infty'));   // → "np.inf"
+python.compile(ce.parse('-\\infty'));  // → "-np.inf"
+python.compile(ce.box(NaN));           // → "np.nan"
+```
+
+The signed infinities and `NaN` survive the trip unchanged. Complex infinity
+does not: it has no direction, and there is no NumPy float that means "infinite
+magnitude, direction unknown", so it projects onto `np.inf`. That is what you
+see at a pole, where the interpreter answers $\tilde\infty$ but the folded
+constant is positive:
+
+```typescript
+python.compile(ce.parse('\\frac{1}{0}'));  // → "np.inf"
+python.compile(ce.parse('\\ln(0)'));       // → "-np.inf"   (genuinely signed)
+```
+
+Absence markers project the same way. An unmatched `cases` expression evaluates
+to `Missing` in the interpreter, which is not a number; the generated Python
+falls through to `float('nan')`:
+
+```typescript
+python.compile(ce.parse('\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\end{cases}'));
+// → "((x ** 2) if (0 < x) else ((-x) if (x < 0) else float('nan')))"
+```
+
+Keep the projection in mind when reading a type off an expression before
+compiling it. Every bare numeric type name — `integer`, `real`, `complex` —
+denotes a **finite** value, so a symbol typed `real` never stands for `np.inf`;
+the non-finite values belong to the separate `infinity` and `nan` types.
+
 ## Limitations
 
 1. **Not Executable in JavaScript**: Python code must be run in a Python environment
 2. **Type Information Lost**: Generated code is untyped (can add hints manually)
 3. **Some Simplifications**: Expressions are canonicalized (e.g., `x/2` → `0.5 * x`)
 4. **Requires NumPy**: Most functions need NumPy to be installed
+5. **Complex Infinity Is Flattened**: $\tilde\infty$ compiles to `np.inf` — see
+   [Non-Finite Values](#non-finite-values)
 
 ## See Also
 
@@ -11276,7 +11846,7 @@ The type of a symbol is automatically inferred from assumptions:
 ```js
 ce.assume(ce.parse("x > 4"));
 ce.expr("x").type.toString();
-// ➔ 'real'
+// ➔ 'real<4<..>'
 
 ce.assume(ce.parse("n = 42"));
 ce.expr("n").type.toString();
@@ -11287,8 +11857,60 @@ ce.expr("z").type.toString();
 // ➔ 'real'
 ```
 
-Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`.
-Equality assumptions infer the type from the value.
+Inequality assumptions (`>`, `<`, `>=`, `<=`) set the symbol's type to `real`,
+carrying the bound along when there is one. Equality assumptions infer the type
+from the value.
+
+### Assumptions and the Infinities
+
+`real` names the **finite** reals, so an inequality assumption rules the
+infinities out even when it leaves one side unbounded. A symbol assumed greater
+than 4 has an open upper end, but $+\infty$ is not a value it can take:
+
+```js
+ce.assume(ce.parse("x > 4"));
+ce.expr("x").isFinite;
+// ➔ true
+
+ce.expr("x").type.matches("infinity");
+// ➔ false
+```
+
+An equality assumption against an infinite value, on the other hand, infers one
+of the non-finite types — `infinity` for an infinity of any direction, `nan` for
+`NaN`. Neither is a subtype of `real`:
+
+```js
+ce.assume(ce.parse("m = \\infty"));
+ce.expr("m").type.toString();
+// ➔ 'infinity'
+```
+
+Assigning such a value directly declares the same type:
+
+```js
+ce.assign("p", ce.parse("\\infty"));
+ce.expr("p").type.toString();
+// ➔ 'infinity'
+
+ce.assign("r", ce.box(NaN));
+ce.expr("r").type.toString();
+// ➔ 'nan'
+```
+
+Because the two are disjoint, claiming a symbol already known to be infinite is
+a real number is not a narrowing — it is a **contradiction**, and `assume()`
+reports it as one rather than silently discarding either fact:
+
+```js
+ce.assign("a", ce.parse("\\infty"));
+
+ce.assume(ce.parse("a \\in \\R"));
+// ➔ 'contradiction'
+```
+
+Use `ExtendedRealNumbers` when you mean the extended real line — that set does
+contain $\pm\infty$, while `RealNumbers` does not.
 
 ## Assumptions Lifecycle
 
@@ -11370,7 +11992,7 @@ the following forms:
 | Operator                                                 |                                                                                                                     |
 | :--------------------------------------------------- | :------------------------------------------------------------------------------------------------------------------ |
 | `Element`<br/>`NotElement`                            | Indicate the domain of a symbol                                                                                     |
-| `Less`<br/>`LessEqual`<br/>`Greater`<br/>`GreaterEqual` | Inequality. Both sides are assumed to be `RealNumbers`                                                               |
+| `Less`<br/>`LessEqual`<br/>`Greater`<br/>`GreaterEqual` | Inequality. Both sides are assumed to be `RealNumbers`, which are the **finite** reals — an inequality never admits $\pm\infty$ |
 | `Equal`<br/>`NotEqual`                                | Equality                                                                                                            |
 
 </div>
@@ -11398,6 +12020,15 @@ real) does not apply.
 ce.assume(ce.parse("\\Re(s) > 1"));    // real part of s
 ce.assume(ce.parse("\\Im(\\tau) > 0")); // imaginary part of τ (upper half-plane)
 ce.assume(["Less", ["Abs", "q"], 1]);   // |q| < 1 (inside the unit disk)
+```
+
+A bound on the magnitude says the symbol is finite without saying it is real, so
+it infers the type `complex` — the finite complex numbers:
+
+```js
+ce.assume(["Less", ["Abs", "q"], 1]);
+ce.expr("q").type.toString();
+// ➔ 'complex'
 ```
 
 The open upper half-plane has a LaTeX shorthand: `\mathbb{C}^+`. In a
@@ -12299,6 +12930,22 @@ ce.expr(['And', 'False', ['List', 'True', 'False']]).evaluate();
 
 An operand that evaluates to an error also stops the walk: the error is the
 result, and the operands after it do not run.
+
+The converse matters just as much. An operand the walk never reaches is **dead
+code**: an error inside it never reaches the value. Because the walk follows
+the order written, the same two operands give different results depending on
+which comes first:
+
+```js example
+ce.expr(['And', 'False', ['Divide', 'x']]).evaluate();
+// → "False"    — the malformed operand is never reached
+
+ce.expr(['And', ['Divide', 'x'], 'False']).evaluate();
+// → Error      — the malformed operand is reached first
+```
+
+Only *evaluation* skips the operand — the boxed expression still carries the
+diagnostic, so nothing is lost to a tool that walks the expression.
 
 `Nand`, `Nor` and `Implies` short-circuit the same way: `Nand` stops at the
 first `False` (result `True`), `Nor` at the first `True` (result `False`), and
@@ -14904,7 +15551,7 @@ import MemberCard from '@site/src/components/MemberCard';
 
 <MemberCard>
 
-### AngularUnit
+### AngularUnit {#angularunit}
 
 ```ts
 type AngularUnit = "rad" | "deg" | "grad" | "turn";
@@ -14930,7 +15577,7 @@ ce.angularUnit = 'deg';
 
 <MemberCard>
 
-### AssignValue
+### AssignValue {#assignvalue}
 
 ```ts
 type AssignValue = KernelAssignValue<Expression, ExpressionInput, IComputeEngine>;
@@ -14940,7 +15587,7 @@ Assignable value for `ce.assign()`.
 
 </MemberCard>
 
-### ~~ExpressionComputeEngine~~
+### ~~ExpressionComputeEngine~~ {#expressioncomputeengine}
 
 Compute engine surface used by expression types.
 
@@ -14959,7 +15606,7 @@ this alias will be removed in a future release.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~latexSyntax~~
+##### ExpressionComputeEngine.~~latexSyntax~~ {#latexsyntax-1}
 
 ```ts
 readonly latexSyntax: ILatexSyntax | undefined;
@@ -14972,7 +15619,7 @@ The LatexSyntax instance used for LaTeX parsing/serialization.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~latexOptions~~
+##### ExpressionComputeEngine.~~latexOptions~~ {#latexoptions-1}
 
 ```ts
 latexOptions: Partial<ParseLatexOptions & SerializeLatexOptions>;
@@ -14986,7 +15633,7 @@ Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~True~~
+##### ExpressionComputeEngine.~~True~~ {#true-1}
 
 ```ts
 readonly True: Expression;
@@ -14996,7 +15643,7 @@ readonly True: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~False~~
+##### ExpressionComputeEngine.~~False~~ {#false-1}
 
 ```ts
 readonly False: Expression;
@@ -15006,7 +15653,7 @@ readonly False: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Pi~~
+##### ExpressionComputeEngine.~~Pi~~ {#pi-1}
 
 ```ts
 readonly Pi: Expression;
@@ -15016,7 +15663,7 @@ readonly Pi: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~E~~
+##### ExpressionComputeEngine.~~E~~ {#e-1}
 
 ```ts
 readonly E: Expression;
@@ -15026,7 +15673,7 @@ readonly E: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Nothing~~
+##### ExpressionComputeEngine.~~Nothing~~ {#nothing-1}
 
 ```ts
 readonly Nothing: Expression;
@@ -15036,7 +15683,7 @@ readonly Nothing: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Missing~~
+##### ExpressionComputeEngine.~~Missing~~ {#missing-1}
 
 ```ts
 readonly Missing: Expression;
@@ -15048,7 +15695,7 @@ The `Missing` symbol: an absent value whose position is preserved.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Zero~~
+##### ExpressionComputeEngine.~~Zero~~ {#zero-1}
 
 ```ts
 readonly Zero: Expression;
@@ -15058,7 +15705,7 @@ readonly Zero: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~One~~
+##### ExpressionComputeEngine.~~One~~ {#one-1}
 
 ```ts
 readonly One: Expression;
@@ -15068,7 +15715,7 @@ readonly One: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Half~~
+##### ExpressionComputeEngine.~~Half~~ {#half-1}
 
 ```ts
 readonly Half: Expression;
@@ -15078,7 +15725,7 @@ readonly Half: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NegativeOne~~
+##### ExpressionComputeEngine.~~NegativeOne~~ {#negativeone-1}
 
 ```ts
 readonly NegativeOne: Expression;
@@ -15088,7 +15735,7 @@ readonly NegativeOne: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~Two~~
+##### ExpressionComputeEngine.~~Two~~ {#two-1}
 
 ```ts
 readonly Two: Expression;
@@ -15098,7 +15745,7 @@ readonly Two: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~I~~
+##### ExpressionComputeEngine.~~I~~ {#i-1}
 
 ```ts
 readonly I: Expression;
@@ -15110,7 +15757,7 @@ ImaginaryUnit
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NaN~~
+##### ExpressionComputeEngine.~~NaN~~ {#nan-2}
 
 ```ts
 readonly NaN: Expression;
@@ -15120,7 +15767,7 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~PositiveInfinity~~
+##### ExpressionComputeEngine.~~PositiveInfinity~~ {#positiveinfinity-2}
 
 ```ts
 readonly PositiveInfinity: Expression;
@@ -15130,7 +15777,7 @@ readonly PositiveInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~NegativeInfinity~~
+##### ExpressionComputeEngine.~~NegativeInfinity~~ {#negativeinfinity-2}
 
 ```ts
 readonly NegativeInfinity: Expression;
@@ -15140,7 +15787,7 @@ readonly NegativeInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~ComplexInfinity~~
+##### ExpressionComputeEngine.~~ComplexInfinity~~ {#complexinfinity-1}
 
 ```ts
 readonly ComplexInfinity: Expression;
@@ -15150,7 +15797,7 @@ readonly ComplexInfinity: Expression;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~context~~
+##### ExpressionComputeEngine.~~context~~ {#context-1}
 
 ```ts
 readonly context: EvalContext;
@@ -15160,7 +15807,7 @@ readonly context: EvalContext;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~contextStack~~
+##### ExpressionComputeEngine.~~contextStack~~ {#contextstack-1}
 
 ```ts
 contextStack: readonly EvalContext[];
@@ -15170,7 +15817,7 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~iterationLimit~~
+##### ExpressionComputeEngine.~~iterationLimit~~ {#iterationlimit-1}
 
 ```ts
 iterationLimit: number;
@@ -15180,7 +15827,7 @@ iterationLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~recursionLimit~~
+##### ExpressionComputeEngine.~~recursionLimit~~ {#recursionlimit-1}
 
 ```ts
 recursionLimit: number;
@@ -15190,7 +15837,7 @@ recursionLimit: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~maxCollectionSize~~
+##### ExpressionComputeEngine.~~maxCollectionSize~~ {#maxcollectionsize-1}
 
 ```ts
 maxCollectionSize: number;
@@ -15200,7 +15847,7 @@ maxCollectionSize: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~bignum~~
+##### ExpressionComputeEngine.~~bignum~~ {#bignum-2}
 
 ```ts
 bignum: (a) => BigDecimal;
@@ -15210,7 +15857,7 @@ bignum: (a) => BigDecimal;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~complex~~
+##### ExpressionComputeEngine.~~complex~~ {#complex-2}
 
 ```ts
 complex: (a, b?) => Complex;
@@ -15220,7 +15867,7 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tolerance~~
+##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
 
 ```ts
 tolerance: number;
@@ -15230,7 +15877,7 @@ tolerance: number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~angularUnit~~
+##### ExpressionComputeEngine.~~angularUnit~~ {#angularunit-2}
 
 ```ts
 angularUnit: AngularUnit;
@@ -15240,7 +15887,7 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~costFunction~~
+##### ExpressionComputeEngine.~~costFunction~~ {#costfunction-2}
 
 ```ts
 costFunction: (expr) => number;
@@ -15250,7 +15897,7 @@ costFunction: (expr) => number;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~simplificationRules~~
+##### ExpressionComputeEngine.~~simplificationRules~~ {#simplificationrules-1}
 
 ```ts
 simplificationRules: Rule[];
@@ -15264,7 +15911,7 @@ The rules used by `.simplify()` when no explicit `rules` option is passed.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~solveRules~~
+##### ExpressionComputeEngine.~~solveRules~~ {#solverules-1}
 
 ```ts
 solveRules: Rule[];
@@ -15283,7 +15930,7 @@ The rules used by `solve()` to find roots of univariate expressions.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~harmonizationRules~~
+##### ExpressionComputeEngine.~~harmonizationRules~~ {#harmonizationrules-1}
 
 ```ts
 harmonizationRules: Rule[];
@@ -15297,7 +15944,7 @@ The rules used by `solve()` to transform an equation into equivalent,
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~strict~~
+##### ExpressionComputeEngine.~~strict~~ {#strict-1}
 
 ```ts
 strict: boolean;
@@ -15307,7 +15954,7 @@ strict: boolean;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~jit~~
+##### ExpressionComputeEngine.~~jit~~ {#jit-1}
 
 ```ts
 jit: "auto" | "off";
@@ -15323,7 +15970,7 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~trace~~
+##### ExpressionComputeEngine.~~trace~~ {#trace-1}
 
 ```ts
 trace: readonly string[];
@@ -15335,7 +15982,7 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~precision~~
+##### ExpressionComputeEngine.~~precision~~ {#precision-1}
 
 ```ts
 get precision(): number
@@ -15346,7 +15993,69 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareProtocol()~~
+##### ExpressionComputeEngine.~~checkpoint()~~ {#checkpoint-1}
+
+```ts
+checkpoint(label?): EngineCheckpoint
+```
+
+Take a checkpoint of the engine's state at a quiescent point — between
+statements, at any scope depth — so a later [restore](#restore) can rewind
+to it. Legal on a freshly constructed engine, which is how a client gets
+a `cp[0]` covering an edit of the first cell, and inside a host-pushed
+scope, which is how a notebook takes per-cell checkpoints within a pass.
+A checkpoint taken inside a scope dies when that scope pops. Throws a
+`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
+[restore](#restore) additionally requires the same scope stack the
+checkpoint was taken on.
+
+####### label?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~restore()~~ {#restore-1}
+
+```ts
+restore(cp): void
+```
+
+Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
+stays live and can be restored again. Expressions built BEFORE `cp` stay
+valid — their definitions are rewritten in place. Expressions built
+during the rewound window are not: cache cell outputs as serialized
+artifacts, never as live boxed nodes.
+
+####### cp
+
+[`EngineCheckpoint`](#enginecheckpoint)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~discard()~~ {#discard-1}
+
+```ts
+discard(cp): void
+```
+
+Release `cp`'s restore capability. Restoring past a discarded INTERIOR
+checkpoint stays possible through any earlier live one; discarding the
+OLDEST makes the state before the next-younger one unreachable.
+
+####### cp
+
+[`EngineCheckpoint`](#enginecheckpoint)
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~declareProtocol()~~ {#declareprotocol-1}
 
 ```ts
 declareProtocol(name, members): void
@@ -15367,7 +16076,7 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareProtocolImplementation()~~
+##### ExpressionComputeEngine.~~declareProtocolImplementation()~~ {#declareprotocolimplementation-1}
 
 ```ts
 declareProtocolImplementation(
@@ -15417,7 +16126,7 @@ throws.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~withTimeLimit()~~
+##### ExpressionComputeEngine.~~withTimeLimit()~~ {#withtimelimit-1}
 
 ```ts
 withTimeLimit<T>(limit, fn): T
@@ -15453,7 +16162,7 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~chop()~~
+##### ExpressionComputeEngine.~~chop()~~ {#chop-1}
 
 ###### chop(n)
 
@@ -15489,7 +16198,7 @@ chop(n): number | BigDecimal
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~expr()~~
+##### ExpressionComputeEngine.~~expr()~~ {#expr-3}
 
 ```ts
 expr(expr, options?): Expression
@@ -15514,7 +16223,7 @@ expr(expr, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~box()~~
+##### ExpressionComputeEngine.~~box()~~ {#box-1}
 
 ```ts
 box(expr, options?): Expression
@@ -15543,7 +16252,7 @@ Use `expr()` instead.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~parse()~~
+##### ExpressionComputeEngine.~~parse()~~ {#parse-2}
 
 ###### parse(latex, options)
 
@@ -15608,7 +16317,7 @@ parse(latex, options?): Expression | null
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~appliedNonFunctions()~~
+##### ExpressionComputeEngine.~~appliedNonFunctions()~~ {#appliednonfunctions-1}
 
 ```ts
 appliedNonFunctions(latex): string[]
@@ -15634,7 +16343,7 @@ juxtaposition analysis.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~function()~~
+##### ExpressionComputeEngine.~~function()~~ {#function-1}
 
 ```ts
 function(name, ops, options?): Expression
@@ -15666,12 +16375,12 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~\_getCompilationTarget()~~
+##### ExpressionComputeEngine.~~\_getCompilationTarget()~~ {#_getcompilationtarget-1}
 
 ###### \_getCompilationTarget(name)
 
 ```ts
-_getCompilationTarget(name):
+_getCompilationTarget(name): 
   | JavaScriptCompilationTarget<Expression>
   | undefined
 ```
@@ -15683,7 +16392,7 @@ _getCompilationTarget(name):
 ###### \_getCompilationTarget(name)
 
 ```ts
-_getCompilationTarget(name):
+_getCompilationTarget(name): 
   | LanguageTarget<Expression, string, unknown, number>
   | undefined
 ```
@@ -15696,7 +16405,7 @@ _getCompilationTarget(name):
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~number()~~
+##### ExpressionComputeEngine.~~number()~~ {#number-2}
 
 ```ts
 number(value, options?): Expression
@@ -15727,7 +16436,7 @@ number(value, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~symbol()~~
+##### ExpressionComputeEngine.~~symbol()~~ {#symbol-1}
 
 ```ts
 symbol(sym, options?): Expression
@@ -15755,7 +16464,7 @@ symbol(sym, options?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~string()~~
+##### ExpressionComputeEngine.~~string()~~ {#string-2}
 
 ```ts
 string(s, metadata?): Expression
@@ -15773,7 +16482,7 @@ string(s, metadata?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~character()~~
+##### ExpressionComputeEngine.~~character()~~ {#character-2}
 
 ```ts
 character(s, metadata?): Expression
@@ -15797,7 +16506,7 @@ it reports a diagnostic instead.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~error()~~
+##### ExpressionComputeEngine.~~error()~~ {#error-2}
 
 ```ts
 error(message, where?): Expression
@@ -15815,7 +16524,7 @@ error(message, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~typeError()~~
+##### ExpressionComputeEngine.~~typeError()~~ {#typeerror-1}
 
 ```ts
 typeError(expectedType, actualType, where?): Expression
@@ -15839,7 +16548,7 @@ typeError(expectedType, actualType, where?): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~hold()~~
+##### ExpressionComputeEngine.~~hold()~~ {#hold-1}
 
 ```ts
 hold(expr): Expression
@@ -15853,7 +16562,7 @@ hold(expr): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tuple()~~
+##### ExpressionComputeEngine.~~tuple()~~ {#tuple-1}
 
 ###### tuple(elements)
 
@@ -15879,7 +16588,7 @@ tuple(...elements): Expression
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~type()~~
+##### ExpressionComputeEngine.~~type()~~ {#type-11}
 
 ```ts
 type(type): BoxedType
@@ -15902,7 +16611,6 @@ type(type): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -15912,7 +16620,7 @@ type(type): BoxedType
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~rules()~~
+##### ExpressionComputeEngine.~~rules()~~ {#rules-2}
 
 ```ts
 rules(rules, options?): BoxedRuleSet
@@ -15939,7 +16647,7 @@ Default purpose applied to any rule in the set that doesn't carry
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getRuleSet()~~
+##### ExpressionComputeEngine.~~getRuleSet()~~ {#getruleset-1}
 
 ```ts
 getRuleSet(id?): BoxedRuleSet | undefined
@@ -15953,7 +16661,7 @@ getRuleSet(id?): BoxedRuleSet | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~pushScope()~~
+##### ExpressionComputeEngine.~~pushScope()~~ {#pushscope-1}
 
 ```ts
 pushScope(scope?, name?): void
@@ -15971,7 +16679,7 @@ pushScope(scope?, name?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~popScope()~~
+##### ExpressionComputeEngine.~~popScope()~~ {#popscope-1}
 
 ```ts
 popScope(): void
@@ -15981,7 +16689,7 @@ popScope(): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~createScope()~~
+##### ExpressionComputeEngine.~~createScope()~~ {#createscope-1}
 
 ```ts
 createScope(bindings?, parent?): InspectableScope
@@ -16005,7 +16713,6 @@ createScope(bindings?, parent?): InspectableScope
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -16020,7 +16727,7 @@ createScope(bindings?, parent?): InspectableScope
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~lookupDefinition()~~
+##### ExpressionComputeEngine.~~lookupDefinition()~~ {#lookupdefinition-2}
 
 ```ts
 lookupDefinition(id): BoxedDefinition | undefined
@@ -16034,7 +16741,7 @@ lookupDefinition(id): BoxedDefinition | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~assign()~~
+##### ExpressionComputeEngine.~~assign()~~ {#assign-1}
 
 ###### assign(ids)
 
@@ -16076,7 +16783,7 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareType()~~
+##### ExpressionComputeEngine.~~declareType()~~ {#declaretype-1}
 
 ```ts
 declareType(name, type, options?): void
@@ -16103,7 +16810,6 @@ declareType(name, type, options?): void
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -16131,7 +16837,7 @@ declareType(name, type, options?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declare()~~
+##### ExpressionComputeEngine.~~declare()~~ {#declare-1}
 
 ###### declare(symbols)
 
@@ -16141,17 +16847,17 @@ declare(symbols): IComputeEngine
 
 ####### symbols
 
-###### declare(id, def, scope)
+###### declare(id, type, scope)
 
 ```ts
-declare(id, def, scope?): IComputeEngine
+declare(id, type, scope?): IComputeEngine
 ```
 
 ####### id
 
 `string`
 
-####### def
+####### type
 
   \| `string`
   \| [`AlgebraicType`](#algebraictype)
@@ -16168,198 +16874,27 @@ declare(id, def, scope?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
-  \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
-  `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-  `type`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferred`: `boolean`;
-  `effectsDeclared`: `boolean`;
-  `value`:   \| [`ExpressionInput`](#expressioninput)
-     \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
-  `eq`: (`a`) => `boolean` \| `undefined`;
-  `neq`: (`a`) => `boolean` \| `undefined`;
-  `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
- \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-  `signature`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
-  `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
-  `isPositive`: `boolean`;
-  `isNonNegative`: `boolean`;
-  `isNegative`: `boolean`;
-  `isNonPositive`: `boolean`;
-  `even`: (`ops`, `options`) => `boolean` \| `undefined`;
-  `complexity`: `number`;
-  `canonical`: (`ops`, `options`) => [`Expression`](#expression-5) \| `null`;
-  `evaluate`:   \| [`Expression`](#expression-5)
-     \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
-  `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
-  `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
-  `neq`: (`a`, `b`) => `boolean` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
-  `elementCount`: (`expr`) => `number` \| `undefined`;
- \}\>\>
-  \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
-  `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-  `type`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferred`: `boolean`;
-  `effectsDeclared`: `boolean`;
-  `value`:   \| [`ExpressionInput`](#expressioninput)
-     \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
-  `eq`: (`a`) => `boolean` \| `undefined`;
-  `neq`: (`a`) => `boolean` \| `undefined`;
-  `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
- \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-  `signature`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
-  `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
-  `isPositive`: `boolean`;
-  `isNonNegative`: `boolean`;
-  `isNegative`: `boolean`;
-  `isNonPositive`: `boolean`;
-  `even`: (`ops`, `options`) => `boolean` \| `undefined`;
-  `complexity`: `number`;
-  `canonical`: (`ops`, `options`) => [`Expression`](#expression-5) \| `null`;
-  `evaluate`:   \| [`Expression`](#expression-5)
-     \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
-  `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
-  `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
-  `neq`: (`a`, `b`) => `boolean` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
-  `elementCount`: (`expr`) => `number` \| `undefined`;
- \}\>\>
+
+####### scope?
+
+`Scope`
+
+###### declare(id, def, scope)
+
+```ts
+declare(id, def, scope?): IComputeEngine
+```
+
+####### id
+
+`string`
+
+####### def
+
+[`SymbolDefinitionInput`](#symboldefinitioninput)
 
 ####### scope?
 
@@ -16392,7 +16927,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -16413,7 +16947,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -16428,6 +16961,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+  `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
@@ -16443,34 +16977,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
   `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
   `isPositive`: `boolean`;
   `isNonNegative`: `boolean`;
@@ -16507,7 +17018,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -16522,6 +17032,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+  `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
@@ -16537,34 +17048,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
   `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
   `isPositive`: `boolean`;
   `isNonNegative`: `boolean`;
@@ -16584,6 +17072,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
+  \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
 ####### arg3?
 
@@ -16593,7 +17082,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~assume()~~
+##### ExpressionComputeEngine.~~assume()~~ {#assume-1}
 
 ```ts
 assume(predicate): AssumeResult
@@ -16607,7 +17096,7 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~declareSequence()~~
+##### ExpressionComputeEngine.~~declareSequence()~~ {#declaresequence-1}
 
 ```ts
 declareSequence(name, def): IComputeEngine
@@ -16638,7 +17127,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceStatus()~~
+##### ExpressionComputeEngine.~~getSequenceStatus()~~ {#getsequencestatus-1}
 
 ```ts
 getSequenceStatus(name): SequenceStatus
@@ -16662,7 +17151,7 @@ ce.getSequenceStatus('F');
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequence()~~
+##### ExpressionComputeEngine.~~getSequence()~~ {#getsequence-1}
 
 ```ts
 getSequence(name): SequenceInfo | undefined
@@ -16679,7 +17168,7 @@ Returns `undefined` if the symbol is not a sequence.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~listSequences()~~
+##### ExpressionComputeEngine.~~listSequences()~~ {#listsequences-1}
 
 ```ts
 listSequences(): string[]
@@ -16692,7 +17181,7 @@ Returns an array of sequence names.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~isSequence()~~
+##### ExpressionComputeEngine.~~isSequence()~~ {#issequence-1}
 
 ```ts
 isSequence(name): boolean
@@ -16708,7 +17197,7 @@ Check if a symbol is a defined sequence.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~clearSequenceCache()~~
+##### ExpressionComputeEngine.~~clearSequenceCache()~~ {#clearsequencecache-1}
 
 ```ts
 clearSequenceCache(name?): void
@@ -16725,7 +17214,7 @@ If no name is provided, clears caches for all sequences.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceCache()~~
+##### ExpressionComputeEngine.~~getSequenceCache()~~ {#getsequencecache-1}
 
 ```ts
 getSequenceCache(name): 
@@ -16747,7 +17236,7 @@ For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~getSequenceTerms()~~
+##### ExpressionComputeEngine.~~getSequenceTerms()~~ {#getsequenceterms-1}
 
 ```ts
 getSequenceTerms(
@@ -16795,7 +17284,7 @@ ce.getSequenceTerms('F', 0, 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~lookupOEIS()~~
+##### ExpressionComputeEngine.~~lookupOEIS()~~ {#lookupoeis-1}
 
 ```ts
 lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
@@ -16826,7 +17315,7 @@ const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~checkSequenceOEIS()~~
+##### ExpressionComputeEngine.~~checkSequenceOEIS()~~ {#checksequenceoeis-1}
 
 ```ts
 checkSequenceOEIS(name, count?, options?): Promise<{
@@ -16867,7 +17356,7 @@ const result = await ce.checkSequenceOEIS('F', 10);
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~interpret()~~
+##### ExpressionComputeEngine.~~interpret()~~ {#interpret-1}
 
 ```ts
 interpret(expr, options?): Promise<InterpretResult>
@@ -16907,7 +17396,7 @@ const { expression, candidates } = await ce.interpret(
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~forget()~~
+##### ExpressionComputeEngine.~~forget()~~ {#forget-1}
 
 ```ts
 forget(symbol?): void
@@ -16921,7 +17410,7 @@ forget(symbol?): void
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~ask()~~
+##### ExpressionComputeEngine.~~ask()~~ {#ask-1}
 
 ```ts
 ask(pattern): BoxedSubstitution[]
@@ -16935,7 +17424,7 @@ ask(pattern): BoxedSubstitution[]
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~verify()~~
+##### ExpressionComputeEngine.~~verify()~~ {#verify-1}
 
 ```ts
 verify(query): boolean | undefined
@@ -16949,7 +17438,7 @@ verify(query): boolean | undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~operatorInfo()~~
+##### ExpressionComputeEngine.~~operatorInfo()~~ {#operatorinfo-2}
 
 ```ts
 operatorInfo(head): OperatorInfo | undefined
@@ -16974,7 +17463,7 @@ maintaining a parallel list of "known" operators.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~normalizeIdentifier()~~
+##### ExpressionComputeEngine.~~normalizeIdentifier()~~ {#normalizeidentifier-1}
 
 ```ts
 normalizeIdentifier(latex): string
@@ -17000,7 +17489,7 @@ name without the side-effect of auto-declaring the symbol.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~symbolInfo()~~
+##### ExpressionComputeEngine.~~symbolInfo()~~ {#symbolinfo-2}
 
 ```ts
 symbolInfo(name): SymbolInfo | undefined
@@ -17026,7 +17515,7 @@ two methods are non-overlapping).
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~searchDefinitions()~~
+##### ExpressionComputeEngine.~~searchDefinitions()~~ {#searchdefinitions-1}
 
 ```ts
 searchDefinitions(query, options?): DefinitionSearchResult[]
@@ -17058,7 +17547,7 @@ call for full detail.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~suggestOperatorName()~~
+##### ExpressionComputeEngine.~~suggestOperatorName()~~ {#suggestoperatorname-1}
 
 ```ts
 suggestOperatorName(name): string | undefined
@@ -17087,7 +17576,7 @@ ce.suggestOperatorName('foo');      // → undefined
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~functionProperties()~~
+##### ExpressionComputeEngine.~~functionProperties()~~ {#functionproperties-2}
 
 ```ts
 functionProperties(name): FunctionProperties | undefined
@@ -17113,7 +17602,7 @@ residues that depend on parameters) are available via `entries`.
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~toJSON()~~
+##### ExpressionComputeEngine.~~toJSON()~~ {#tojson-3}
 
 ```ts
 toJSON(): string
@@ -17127,7 +17616,7 @@ Debug representation, e.g. for `JSON.stringify()`.
 
 <MemberCard>
 
-### SimplifyOptions
+### SimplifyOptions {#simplifyoptions}
 
 ```ts
 type SimplifyOptions = {
@@ -17143,7 +17632,7 @@ Options for `Expression.simplify()`
 
 <MemberCard>
 
-### ExplainOptions
+### ExplainOptions {#explainoptions}
 
 ```ts
 type ExplainOptions = SimplifyOptions & {
@@ -17173,7 +17662,7 @@ matches `simplify(options)`):
 
 <MemberCard>
 
-### EvaluateOptions
+### EvaluateOptions {#evaluateoptions}
 
 ```ts
 type EvaluateOptions = KernelEvaluateOptions;
@@ -17187,7 +17676,7 @@ This is the compute-engine-specialized form of the generic kernel type.
 
 <MemberCard>
 
-### IntervalBounds
+### IntervalBounds {#intervalbounds}
 
 ```ts
 type IntervalBounds = {
@@ -17205,7 +17694,7 @@ Lower and upper bounds for a symbol extracted from a domain restriction.
 
 </MemberCard>
 
-### NumberLiteralInterface
+### NumberLiteralInterface {#numberliteralinterface}
 
 Narrowed interface for number literal expressions.
 
@@ -17213,7 +17702,7 @@ Obtained via `isNumber()`.
 
 <MemberCard>
 
-##### NumberLiteralInterface.numericValue
+##### NumberLiteralInterface.numericValue {#numericvalue}
 
 ```ts
 readonly numericValue: number | NumericValue;
@@ -17223,7 +17712,7 @@ readonly numericValue: number | NumericValue;
 
 <MemberCard>
 
-##### NumberLiteralInterface.isExact
+##### NumberLiteralInterface.isExact {#isexact-1}
 
 ```ts
 readonly isExact: boolean;
@@ -17233,7 +17722,7 @@ readonly isExact: boolean;
 
 <MemberCard>
 
-##### NumberLiteralInterface.isNumberLiteral
+##### NumberLiteralInterface.isNumberLiteral {#isnumberliteral}
 
 ```ts
 readonly isNumberLiteral: true;
@@ -17241,7 +17730,7 @@ readonly isNumberLiteral: true;
 
 </MemberCard>
 
-### SymbolInterface
+### SymbolInterface {#symbolinterface}
 
 Narrowed interface for symbol expressions.
 
@@ -17249,7 +17738,7 @@ Obtained via `isSymbol()`.
 
 <MemberCard>
 
-##### SymbolInterface.symbol
+##### SymbolInterface.symbol {#symbol-2}
 
 ```ts
 readonly symbol: string;
@@ -17257,7 +17746,7 @@ readonly symbol: string;
 
 </MemberCard>
 
-### FunctionInterface
+### FunctionInterface {#functioninterface}
 
 Narrowed interface for function expressions.
 
@@ -17265,7 +17754,7 @@ Obtained via `isFunction()`.
 
 <MemberCard>
 
-##### FunctionInterface.isFunctionExpression
+##### FunctionInterface.isFunctionExpression {#isfunctionexpression}
 
 ```ts
 readonly isFunctionExpression: true;
@@ -17275,7 +17764,7 @@ readonly isFunctionExpression: true;
 
 <MemberCard>
 
-##### FunctionInterface.ops
+##### FunctionInterface.ops {#ops-1}
 
 ```ts
 readonly ops: readonly Expression[];
@@ -17285,7 +17774,7 @@ readonly ops: readonly Expression[];
 
 <MemberCard>
 
-##### FunctionInterface.nops
+##### FunctionInterface.nops {#nops}
 
 ```ts
 readonly nops: number;
@@ -17295,7 +17784,7 @@ readonly nops: number;
 
 <MemberCard>
 
-##### FunctionInterface.op1
+##### FunctionInterface.op1 {#op1}
 
 ```ts
 readonly op1: Expression;
@@ -17305,7 +17794,7 @@ readonly op1: Expression;
 
 <MemberCard>
 
-##### FunctionInterface.op2
+##### FunctionInterface.op2 {#op2}
 
 ```ts
 readonly op2: Expression;
@@ -17315,7 +17804,7 @@ readonly op2: Expression;
 
 <MemberCard>
 
-##### FunctionInterface.op3
+##### FunctionInterface.op3 {#op3}
 
 ```ts
 readonly op3: Expression;
@@ -17323,7 +17812,7 @@ readonly op3: Expression;
 
 </MemberCard>
 
-### StringInterface
+### StringInterface {#stringinterface}
 
 Narrowed interface for string expressions.
 
@@ -17331,7 +17820,7 @@ Obtained via `isString()`.
 
 <MemberCard>
 
-##### StringInterface.string
+##### StringInterface.string {#string-3}
 
 ```ts
 readonly string: string;
@@ -17341,7 +17830,7 @@ readonly string: string;
 
 <MemberCard>
 
-##### StringInterface.buffer
+##### StringInterface.buffer {#buffer}
 
 ```ts
 readonly buffer: Uint8Array;
@@ -17353,7 +17842,7 @@ The UTF-8 encoding of the string, as a byte buffer.
 
 <MemberCard>
 
-##### StringInterface.unicodeScalars
+##### StringInterface.unicodeScalars {#unicodescalars}
 
 ```ts
 readonly unicodeScalars: number[];
@@ -17363,7 +17852,7 @@ The Unicode scalar values (code points) of the string.
 
 </MemberCard>
 
-### CharacterInterface
+### CharacterInterface {#characterinterface}
 
 Narrowed interface for a character expression — one NFC-normalized grapheme
 cluster (UAX #29).
@@ -17377,7 +17866,7 @@ property without first deciding which it has.
 
 <MemberCard>
 
-##### CharacterInterface.string
+##### CharacterInterface.string {#string-4}
 
 ```ts
 readonly string: string;
@@ -17389,7 +17878,7 @@ The content of the character: exactly one grapheme cluster.
 
 <MemberCard>
 
-##### CharacterInterface.unicodeScalars
+##### CharacterInterface.unicodeScalars {#unicodescalars-1}
 
 ```ts
 readonly unicodeScalars: number[];
@@ -17399,7 +17888,7 @@ The Unicode scalar values (code points) of the cluster.
 
 </MemberCard>
 
-### TensorInterface
+### TensorInterface {#tensorinterface}
 
 Narrowed interface for tensor expressions.
 
@@ -17407,7 +17896,7 @@ Obtained via `isTensor()`.
 
 <MemberCard>
 
-##### TensorInterface.shape
+##### TensorInterface.shape {#shape-4}
 
 ```ts
 readonly shape: number[];
@@ -17417,7 +17906,7 @@ readonly shape: number[];
 
 <MemberCard>
 
-##### TensorInterface.rank
+##### TensorInterface.rank {#rank-3}
 
 ```ts
 readonly rank: number;
@@ -17425,7 +17914,7 @@ readonly rank: number;
 
 </MemberCard>
 
-### CollectionInterface
+### CollectionInterface {#collectioninterface}
 
 Narrowed interface for collection expressions.
 
@@ -17437,7 +17926,7 @@ Obtained via `isCollection()`.
 
 <MemberCard>
 
-##### CollectionInterface.isCollection
+##### CollectionInterface.isCollection {#iscollection-2}
 
 ```ts
 readonly isCollection: true;
@@ -17447,7 +17936,7 @@ readonly isCollection: true;
 
 <MemberCard>
 
-##### CollectionInterface.count
+##### CollectionInterface.count {#count-2}
 
 ```ts
 readonly count: number | undefined;
@@ -17457,7 +17946,7 @@ readonly count: number | undefined;
 
 <MemberCard>
 
-##### CollectionInterface.isFiniteCollection
+##### CollectionInterface.isFiniteCollection {#isfinitecollection-1}
 
 ```ts
 readonly isFiniteCollection: boolean | undefined;
@@ -17467,7 +17956,7 @@ readonly isFiniteCollection: boolean | undefined;
 
 <MemberCard>
 
-##### CollectionInterface.isEmptyCollection
+##### CollectionInterface.isEmptyCollection {#isemptycollection-1}
 
 ```ts
 readonly isEmptyCollection: boolean | undefined;
@@ -17477,7 +17966,7 @@ readonly isEmptyCollection: boolean | undefined;
 
 <MemberCard>
 
-##### CollectionInterface.isEnumerableCollection
+##### CollectionInterface.isEnumerableCollection {#isenumerablecollection-1}
 
 ```ts
 readonly isEnumerableCollection: boolean | undefined;
@@ -17487,7 +17976,7 @@ readonly isEnumerableCollection: boolean | undefined;
 
 <MemberCard>
 
-##### CollectionInterface.each()
+##### CollectionInterface.each() {#each-1}
 
 ```ts
 each(): Generator<Expression>
@@ -17497,7 +17986,7 @@ each(): Generator<Expression>
 
 <MemberCard>
 
-##### CollectionInterface.contains()
+##### CollectionInterface.contains() {#contains-2}
 
 ```ts
 contains(rhs): boolean | undefined
@@ -17511,7 +18000,7 @@ contains(rhs): boolean | undefined
 
 <MemberCard>
 
-##### CollectionInterface.subsetOf()
+##### CollectionInterface.subsetOf() {#subsetof-2}
 
 ```ts
 subsetOf(other, strict): boolean | undefined
@@ -17527,7 +18016,7 @@ subsetOf(other, strict): boolean | undefined
 
 </MemberCard>
 
-### IndexedCollectionInterface
+### IndexedCollectionInterface {#indexedcollectioninterface}
 
 Narrowed interface for indexed collection expressions (lists, vectors,
 matrices, tuples).
@@ -17540,7 +18029,7 @@ Obtained via `isIndexedCollection()`.
 
 <MemberCard>
 
-##### IndexedCollectionInterface.isIndexedCollection
+##### IndexedCollectionInterface.isIndexedCollection {#isindexedcollection-1}
 
 ```ts
 readonly isIndexedCollection: true;
@@ -17550,7 +18039,7 @@ readonly isIndexedCollection: true;
 
 <MemberCard>
 
-##### IndexedCollectionInterface.at()
+##### IndexedCollectionInterface.at() {#at-3}
 
 ```ts
 at(index): Expression | undefined
@@ -17564,7 +18053,7 @@ at(index): Expression | undefined
 
 <MemberCard>
 
-##### IndexedCollectionInterface.indexWhere()
+##### IndexedCollectionInterface.indexWhere() {#indexwhere-2}
 
 ```ts
 indexWhere(predicate): number | undefined
@@ -17578,7 +18067,7 @@ indexWhere(predicate): number | undefined
 
 <MemberCard>
 
-### ExpressionInput
+### ExpressionInput {#expressioninput}
 
 ```ts
 type ExpressionInput = 
@@ -17606,7 +18095,7 @@ of an existing `Expression` while avoiding unboxing and reboxing.
 
 </MemberCard>
 
-### ObjectInterface
+### ObjectInterface {#objectinterface}
 
 Narrowed interface for **object** expressions — the engine's one mutable
 value kind (a reference to a record whose stored fields can be changed in
@@ -17621,12 +18110,12 @@ The members below are engine-internal (they are how the property-access
 operators and the serialization walk reach the slots); user code reads and
 writes fields through the language's property syntax, not through these.
 
-Design: `docs/plans/2026-08-14-object-representation-decision.md`;
+Design: `docs/TYPE-SYSTEM.md`;
 semantics: `docs/TYPE_SYSTEM_ROADMAP.md` Appendix B.
 
 <MemberCard>
 
-##### ObjectInterface.typeName
+##### ObjectInterface.typeName {#typename}
 
 ```ts
 readonly typeName: string;
@@ -17641,7 +18130,7 @@ and `CircularReference` markers).
 
 <MemberCard>
 
-### ReplaceOptions
+### ReplaceOptions {#replaceoptions}
 
 ```ts
 type ReplaceOptions = {
@@ -17662,7 +18151,7 @@ Options for `Expression.replace()`.
 
 <MemberCard>
 
-### CanonicalForm
+### CanonicalForm {#canonicalform}
 
 ```ts
 type CanonicalForm = 
@@ -17682,7 +18171,7 @@ Canonical normalization transforms.
 
 <MemberCard>
 
-### CanonicalOptions
+### CanonicalOptions {#canonicaloptions}
 
 ```ts
 type CanonicalOptions = 
@@ -17695,7 +18184,7 @@ type CanonicalOptions =
 
 <MemberCard>
 
-### FormOption
+### FormOption {#formoption}
 
 ```ts
 type FormOption = 
@@ -17712,7 +18201,7 @@ Controls how expressions are created.
 
 <MemberCard>
 
-### Metadata
+### Metadata {#metadata-1}
 
 ```ts
 type Metadata = {
@@ -17730,7 +18219,7 @@ Metadata that can be associated with a MathJSON expression.
 
 <MemberCard>
 
-### Substitution
+### Substitution {#substitution}
 
 ```ts
 type Substitution<T> = KernelSubstitution<T>;
@@ -17750,7 +18239,7 @@ rule whose `match` is always a symbol.
 
 <MemberCard>
 
-### BoxedSubstitution
+### BoxedSubstitution {#boxedsubstitution}
 
 ```ts
 type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
@@ -17764,7 +18253,7 @@ type BoxedSubstitution<T> = KernelBoxedSubstitution<T>;
 
 <MemberCard>
 
-### PatternMatchOptions
+### PatternMatchOptions {#patternmatchoptions}
 
 ```ts
 type PatternMatchOptions<T> = KernelPatternMatchOptions<T>;
@@ -17782,7 +18271,7 @@ Control how a pattern is matched to an expression.
 
 <MemberCard>
 
-### RuleReplaceFunction
+### RuleReplaceFunction {#rulereplacefunction}
 
 ```ts
 type RuleReplaceFunction = KernelRuleReplaceFunction<Expression>;
@@ -17794,7 +18283,7 @@ Rule replacement callback specialized to boxed expressions.
 
 <MemberCard>
 
-### RuleConditionFunction
+### RuleConditionFunction {#ruleconditionfunction}
 
 ```ts
 type RuleConditionFunction = KernelRuleConditionFunction<Expression, IComputeEngine>;
@@ -17806,7 +18295,7 @@ Rule condition callback with access to the compute engine.
 
 <MemberCard>
 
-### RuleFunction
+### RuleFunction {#rulefunction}
 
 ```ts
 type RuleFunction = KernelRuleFunction<Expression>;
@@ -17818,7 +18307,7 @@ Dynamic rule callback.
 
 <MemberCard>
 
-### Rule
+### Rule {#rule}
 
 ```ts
 type Rule = KernelRule<Expression, ExpressionInput, IComputeEngine>;
@@ -17830,7 +18319,7 @@ Rule declaration specialized to boxed expression and compute engine types.
 
 <MemberCard>
 
-### RulePurpose
+### RulePurpose {#rulepurpose}
 
 ```ts
 type RulePurpose = "simplify" | "transform" | "expand";
@@ -17850,7 +18339,7 @@ the simplification cost policy:
 
 <MemberCard>
 
-### ExplainOperation
+### ExplainOperation {#explainoperation}
 
 ```ts
 type ExplainOperation = "simplify" | "solve" | "D" | "Integrate";
@@ -17862,7 +18351,7 @@ The operation that an `Explanation` traces. See `expr.explain()`.
 
 <MemberCard>
 
-### ExplainVerbosity
+### ExplainVerbosity {#explainverbosity}
 
 ```ts
 type ExplainVerbosity = "default" | "all";
@@ -17880,7 +18369,7 @@ How much of the raw rule trace `expr.explain()` returns:
 
 <MemberCard>
 
-### ExpressionMapInterface
+### ExpressionMapInterface {#expressionmapinterface}
 
 ```ts
 type ExpressionMapInterface<U> = KernelExpressionMapInterface<U, Expression>;
@@ -17896,7 +18385,7 @@ Map-like interface keyed by boxed expressions.
 
 <MemberCard>
 
-### Assumption
+### Assumption {#assumption}
 
 ```ts
 type Assumption = KernelAssumption<Expression, IComputeEngine>;
@@ -17908,7 +18397,32 @@ Assumption predicates bound to this compute engine.
 
 <MemberCard>
 
-### AssumeResult
+### FactSubject {#factsubject}
+
+```ts
+type FactSubject = KernelFactSubject<BoxedValueDefinition>;
+```
+
+One subject of an assumption, specialized to this engine/runtime model.
+
+</MemberCard>
+
+<MemberCard>
+
+### FactRecord {#factrecord}
+
+```ts
+type FactRecord = KernelFactRecord<BoxedValueDefinition>;
+```
+
+One assertion recorded by `assume()`, specialized to this engine/runtime
+model. The assumptions store maps a normalized fact to a list of these.
+
+</MemberCard>
+
+<MemberCard>
+
+### AssumeResult {#assumeresult}
 
 ```ts
 type AssumeResult = 
@@ -17925,7 +18439,7 @@ type AssumeResult =
 
 <MemberCard>
 
-### CompiledType
+### CompiledType {#compiledtype}
 
 ```ts
 type CompiledType = boolean | number | string | object;
@@ -17935,7 +18449,7 @@ type CompiledType = boolean | number | string | object;
 
 <MemberCard>
 
-### JSSource
+### JSSource {#jssource}
 
 ```ts
 type JSSource = string;
@@ -17945,7 +18459,7 @@ type JSSource = string;
 
 <MemberCard>
 
-### CompiledExpression
+### CompiledExpression {#compiledexpression}
 
 ```ts
 type CompiledExpression = {
@@ -17957,7 +18471,7 @@ type CompiledExpression = {
 
 <MemberCard>
 
-### OperatorCompileContext
+### OperatorCompileContext {#operatorcompilecontext}
 
 ```ts
 type OperatorCompileContext = {
@@ -17973,7 +18487,7 @@ target-specific source without exposing the full internal machinery.
 
 <MemberCard>
 
-### OperatorCompileHandler
+### OperatorCompileHandler {#operatorcompilehandler}
 
 ```ts
 type OperatorCompileHandler = (args, compile, context) => string | undefined;
@@ -18013,7 +18527,7 @@ ce.declare('MyGcd', {
 
 <MemberCard>
 
-### EvaluateHandlerOptions
+### EvaluateHandlerOptions {#evaluatehandleroptions}
 
 ```ts
 type EvaluateHandlerOptions = Partial<EvaluateOptions> & {
@@ -18067,7 +18581,7 @@ invoked outside the evaluation driver may not receive one).
 
 <MemberCard>
 
-### ValueDefinition
+### ValueDefinition {#valuedefinition}
 
 ```ts
 type ValueDefinition = BaseDefinition & {
@@ -18163,7 +18677,7 @@ Contains the compute engine and evaluation options
 
 </MemberCard>
 
-### SequenceDefinition
+### SequenceDefinition {#sequencedefinition}
 
 Definition for a sequence declared with `ce.declareSequence()`.
 
@@ -18182,7 +18696,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 
 <MemberCard>
 
-##### SequenceDefinition.variable?
+##### SequenceDefinition.variable? {#variable}
 
 ```ts
 optional variable?: string;
@@ -18195,7 +18709,7 @@ For multi-index sequences, use `variables` instead.
 
 <MemberCard>
 
-##### SequenceDefinition.variables?
+##### SequenceDefinition.variables? {#variables}
 
 ```ts
 optional variables?: string[];
@@ -18210,7 +18724,7 @@ If provided, this takes precedence over `variable`.
 
 <MemberCard>
 
-##### SequenceDefinition.base
+##### SequenceDefinition.base {#base}
 
 ```ts
 base: Record<number | string, number | Expression>;
@@ -18239,7 +18753,7 @@ variable appears multiple times (e.g., 'n,n'), the indices must be equal.
 
 <MemberCard>
 
-##### SequenceDefinition.recurrence
+##### SequenceDefinition.recurrence {#recurrence}
 
 ```ts
 recurrence: string | Expression;
@@ -18251,7 +18765,7 @@ Recurrence relation as LaTeX string or Expression
 
 <MemberCard>
 
-##### SequenceDefinition.memoize?
+##### SequenceDefinition.memoize? {#memoize}
 
 ```ts
 optional memoize?: boolean;
@@ -18263,7 +18777,7 @@ Whether to memoize computed values (default: true)
 
 <MemberCard>
 
-##### SequenceDefinition.domain?
+##### SequenceDefinition.domain? {#domain-1}
 
 ```ts
 optional domain?: 
@@ -18293,7 +18807,7 @@ domain: { n: { min: 0 }, k: { min: 0 } }
 
 <MemberCard>
 
-##### SequenceDefinition.constraints?
+##### SequenceDefinition.constraints? {#constraints}
 
 ```ts
 optional constraints?: string | Expression;
@@ -18307,13 +18821,13 @@ Example: `'k <= n'` for Pascal's triangle (only valid when k ≤ n)
 
 </MemberCard>
 
-### SequenceStatus
+### SequenceStatus {#sequencestatus}
 
 Status of a sequence definition.
 
 <MemberCard>
 
-##### SequenceStatus.status
+##### SequenceStatus.status {#status}
 
 ```ts
 status: "complete" | "pending" | "not-a-sequence";
@@ -18328,7 +18842,7 @@ Status of the sequence:
 
 <MemberCard>
 
-##### SequenceStatus.hasBase
+##### SequenceStatus.hasBase {#hasbase}
 
 ```ts
 hasBase: boolean;
@@ -18340,7 +18854,7 @@ Whether at least one base case is defined
 
 <MemberCard>
 
-##### SequenceStatus.hasRecurrence
+##### SequenceStatus.hasRecurrence {#hasrecurrence}
 
 ```ts
 hasRecurrence: boolean;
@@ -18352,7 +18866,7 @@ Whether a recurrence relation is defined
 
 <MemberCard>
 
-##### SequenceStatus.baseIndices
+##### SequenceStatus.baseIndices {#baseindices}
 
 ```ts
 baseIndices: (string | number)[];
@@ -18366,7 +18880,7 @@ For multi-index: string keys including patterns (e.g., ['0,0', 'n,0', 'n,n'])
 
 <MemberCard>
 
-##### SequenceStatus.variable?
+##### SequenceStatus.variable? {#variable-1}
 
 ```ts
 optional variable?: string;
@@ -18378,7 +18892,7 @@ Index variable name if recurrence is defined (single-index)
 
 <MemberCard>
 
-##### SequenceStatus.variables?
+##### SequenceStatus.variables? {#variables-1}
 
 ```ts
 optional variables?: string[];
@@ -18388,13 +18902,13 @@ Index variable names if recurrence is defined (multi-index)
 
 </MemberCard>
 
-### SequenceInfo
+### SequenceInfo {#sequenceinfo}
 
 Information about a defined sequence for introspection.
 
 <MemberCard>
 
-##### SequenceInfo.name
+##### SequenceInfo.name {#name-1}
 
 ```ts
 name: string;
@@ -18406,7 +18920,7 @@ The sequence name
 
 <MemberCard>
 
-##### SequenceInfo.variable?
+##### SequenceInfo.variable? {#variable-2}
 
 ```ts
 optional variable?: string;
@@ -18418,7 +18932,7 @@ Index variable name for single-index sequences (e.g., `"n"`)
 
 <MemberCard>
 
-##### SequenceInfo.variables?
+##### SequenceInfo.variables? {#variables-2}
 
 ```ts
 optional variables?: string[];
@@ -18430,7 +18944,7 @@ Index variable names for multi-index sequences (e.g., `["n", "k"]`)
 
 <MemberCard>
 
-##### SequenceInfo.baseIndices
+##### SequenceInfo.baseIndices {#baseindices-1}
 
 ```ts
 baseIndices: (string | number)[];
@@ -18444,7 +18958,7 @@ For multi-index: string keys including patterns
 
 <MemberCard>
 
-##### SequenceInfo.memoize
+##### SequenceInfo.memoize {#memoize-1}
 
 ```ts
 memoize: boolean;
@@ -18456,7 +18970,7 @@ Whether memoization is enabled
 
 <MemberCard>
 
-##### SequenceInfo.domain
+##### SequenceInfo.domain {#domain-2}
 
 ```ts
 domain: 
@@ -18478,7 +18992,7 @@ For multi-index: per-variable constraints
 
 <MemberCard>
 
-##### SequenceInfo.cacheSize
+##### SequenceInfo.cacheSize {#cachesize}
 
 ```ts
 cacheSize: number;
@@ -18490,7 +19004,7 @@ Number of cached values
 
 <MemberCard>
 
-##### SequenceInfo.isMultiIndex
+##### SequenceInfo.isMultiIndex {#ismultiindex}
 
 ```ts
 isMultiIndex: boolean;
@@ -18502,408 +19016,391 @@ Whether this is a multi-index sequence
 
 <MemberCard>
 
-### OperatorDefinition
+### Tri {#tri}
 
 ```ts
-type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFlags> & {
-  signature:   | Type
-     | TypeString
-     | BoxedType;
-  inferredSignature: boolean;
-  type: (ops, options) => 
-     | Type
-     | TypeString
-     | BoxedType
-     | undefined;
-  sgn: (ops, options) => Sign | undefined;
-  isPositive: boolean;
-  isNonNegative: boolean;
-  isNegative: boolean;
-  isNonPositive: boolean;
-  even: (ops, options) => boolean | undefined;
-  complexity: number;
-  canonical: (ops, options) => Expression | null;
-  evaluate:   | ((ops, options) => Expression | undefined)
-     | Expression;
-  evaluateAsync: (ops, options) => Promise<Expression | undefined>;
-  evalDimension: (args, options) => Expression;
-  compile: OperatorCompileHandler;
-  eq: (a, b, prover?) => boolean | undefined;
-  neq: (a, b) => boolean | undefined;
-  collection: CollectionHandlers;
-  canEnumerate: (expr) => boolean | undefined;
-  elementCount: (expr) => number | undefined;
+type Tri = boolean | undefined;
+```
+
+A three-valued fact about an operand: `true` (provably yes), `false`
+(provably no), `undefined` (not decidable from what the descriptor knows).
+
+</MemberCard>
+
+<MemberCard>
+
+### OperandFacts {#operandfacts}
+
+```ts
+type OperandFacts = {
+  finite: Tri;
+  sgn: Sign;
+  closed: Tri;
+  collection: Tri;
+  finiteCollection: Tri;
+  indexed: Tri;
+  shape: readonly number[];
+  elementType: Type;
 };
 ```
 
-Definition record for a function.
+The facts a `type` handler in the `'types'` shape may read about one
+operand, beside the operand's type. Every fact is derived from pure
+sources — the operand's type, a literal's value, a symbol's held value or
+recorded assumptions, structural reads — never by canonicalizing,
+declaring, or evaluating anything.
 
-#### OperatorDefinition.signature?
+The set is deliberately minimal: a fact earns a field only when the
+operand's TYPE cannot carry it. Anything the type proves is read off
+`OperandDescriptor.type` directly — an error operand's type IS `'error'`
+(so there is no `valid` field), and a literal's value, sign, and
+finiteness normally travel in its value-carrying type. Each field below
+merges the type channel with the pure value channel, so a handler reads
+ONE place and never re-derives the combination; the doc of each field
+names the residue that justifies it.
 
-```ts
-optional signature?: 
-  | Type
-  | TypeString
-  | BoxedType;
-```
+</MemberCard>
 
-The function signature, describing the type of the arguments and the
-return type.
+<MemberCard>
 
-If a `type` handler is provided, the return type of the function should
-be a subtype of the return type in the signature.
-
-#### OperatorDefinition.inferredSignature?
-
-```ts
-optional inferredSignature?: boolean;
-```
-
-If `true`, the `signature` is a starting point to be refined, not a
-contract: assigning a function literal to this operator narrows the
-signature from the literal's body, and calls type from the narrowed
-signature.
-
-Declaring a `signature` normally pins it (`inferredSignature: false`),
-which is what you want for a fixed API. Set this to `true` to vouch
-that a name is an operator — so `f(x)` parses as an application rather
-than a multiplication — while leaving its types to be inferred from the
-body assigned later:
-
-```js
-ce.declare('q', { signature: '(unknown) -> unknown', inferredSignature: true });
-ce.assign('q', ce.parse('t \\mapsto 2t+1'));
-// signature is now `(unknown) -> finite_number`, so `q(x) < y` types
-// `boolean` and compiles, while `q(L) < y` over a list `L` still types
-// `list<boolean>` and fails closed.
-```
-
-A declaration that omits `signature` entirely behaves the same way.
-
-#### OperatorDefinition.type?
+### OperandStructure {#operandstructure}
 
 ```ts
-optional type?: (ops, options) => 
+type OperandStructure = 
+  | {
+  kind: "symbol";
+  name: string;
+  inferred: boolean;
+ }
+  | {
+  kind: "string";
+  text: string;
+ }
+  | {
+  kind: "number";
+  literal: 0 | 1;
+  rational: readonly [bigint, bigint];
+ }
+  | {
+  kind: "application";
+  head: string;
+  children: ReadonlyArray<OperandDescriptor>;
+ }
+  | {
+  kind: "function-literal";
+  parameters: ReadonlyArray<{
+     name: string;
+     annotated: Type;
+    }>;
+  body: OperandStructure;
+ }
+  | {
+  kind: "tuple";
+  arity: number;
+  elements: ReadonlyArray<OperandDescriptor>;
+ }
+  | {
+  kind: "list-literal";
+  shape: readonly number[];
+  elements: ReadonlyArray<OperandDescriptor>;
+};
+```
+
+An inert, expression-free structural view of an operand, for `type`
+handlers in the `'types'` shape that need more than the operand's type
+(is it a symbol? a string literal? an application of which operator?).
+Children appear as descriptors, so a handler can recurse without ever
+holding an expression.
+
+#### Type Declaration
+
+\{
+  `kind`: `"symbol"`;
+  `name`: `string`;
+  `inferred`: `boolean`;
+ \}
+
+#### OperandStructure.inferred?
+
+```ts
+optional inferred?: boolean;
+```
+
+Present (`true`) when the symbol's recorded type was INFERRED
+(subject to revision) rather than declared — the fact the
+`Multiply` and `List`-fold handlers consult when deciding how much
+to trust an operand's type. Lives on the structure node, not in
+`OperandFacts`: it is a property of this symbol, not of a type.
+
+\{
+  `kind`: `"string"`;
+  `text`: `string`;
+ \}
+
+\{
+  `kind`: `"number"`;
+  `literal`: `0` \| `1`;
+  `rational`: readonly \[`bigint`, `bigint`\];
+ \}
+
+#### OperandStructure.rational?
+
+```ts
+optional rational?: readonly [bigint, bigint];
+```
+
+The literal's exact value as a REDUCED fraction, when it is a
+rational with no radical part: `[numerator, denominator]`, the
+denominator positive. A literal's handler-visible type carries only
+an outward-rounded range for a rational no double represents
+exactly, so a handler that needs the exact terms (the parity of a
+power's exponent denominator decides real against complex) reads
+them here. Absent for a float, a complex, a radical, or a
+non-finite literal.
+
+\{
+  `kind`: `"application"`;
+  `head`: `string`;
+  `children`: `ReadonlyArray`\<[`OperandDescriptor`](#operanddescriptor)\>;
+ \}
+
+\{
+  `kind`: `"function-literal"`;
+  `parameters`: `ReadonlyArray`\<\{
+     `name`: `string`;
+     `annotated`: [`Type`](#type-3);
+    \}\>;
+  `body`: [`OperandStructure`](#operandstructure);
+ \}
+
+\{
+  `kind`: `"tuple"`;
+  `arity`: `number`;
+  `elements`: `ReadonlyArray`\<[`OperandDescriptor`](#operanddescriptor)\>;
+ \}
+
+#### OperandStructure.elements
+
+```ts
+elements: ReadonlyArray<OperandDescriptor>;
+```
+
+One descriptor per component, in order.
+
+\{
+  `kind`: `"list-literal"`;
+  `shape`: readonly `number`[];
+  `elements`: `ReadonlyArray`\<[`OperandDescriptor`](#operanddescriptor)\>;
+ \}
+
+#### OperandStructure.elements
+
+```ts
+elements: ReadonlyArray<OperandDescriptor>;
+```
+
+One descriptor per top-level element, in order. A nested row is
+itself a `list-literal` structure, reachable through its
+descriptor's `structureOf()`.
+
+</MemberCard>
+
+<MemberCard>
+
+### OperandDescriptor {#operanddescriptor}
+
+```ts
+type OperandDescriptor = {
+  type: Type;
+  facts: OperandFacts;
+  structureOf: () => OperandStructure | undefined;
+};
+```
+
+What a `type` handler in the `'types'` shape receives in place of an
+operand expression: the operand's handler-visible type (a number
+literal's value-carrying type included), a set of three-valued facts,
+and an optional on-demand structural view. Descriptors carry no
+expression, so a handler cannot canonicalize, declare, or evaluate its
+operands while deriving a type — which is the point of the shape: type
+derivation must not modify engine state.
+
+Built by `describe()` (from a real operand) and `describeType()` (from a
+type alone) in `boxed-expression/operand-descriptor.ts`; the design is
+`docs/plans/2026-08-22-type-handlers-on-types.md` §5.1.
+
+</MemberCard>
+
+<MemberCard>
+
+### ReadonlyDefinitionView {#readonlydefinitionview}
+
+```ts
+type ReadonlyDefinitionView = {
+  value: Readonly<BoxedValueDefinition>;
+  operator: Readonly<BoxedOperatorDefinition>;
+};
+```
+
+The definition view a `'types'`-shape `type` handler gets from
+`PureEngineView.lookupDefinition`: the tagged value/operator halves with
+every own property readonly. The shallow `Readonly` is compile-time
+protection against the direct field writes a type handler must never
+perform (`def.operator.signature = …`); the runtime purity guard remains
+the dynamic enforcement for anything the type system cannot see.
+
+</MemberCard>
+
+### PureEngineView {#pureengineview}
+
+The read-only slice of the engine available to a `type` handler in the
+`'types'` shape: enough to parse and resolve types, and to look up a
+definition — none of the mutating surface (`declare`, `assign`, `box`,
+`parse`, `evaluate`), and the definition lookup answers a read-only view
+([ReadonlyDefinitionView](#readonlydefinitionview)). The full `ComputeEngine` satisfies this
+interface structurally, so the restriction is compile-time only; the
+runtime purity guard (`CE_TYPE_PURITY_GUARD`, always on under test) is
+what enforces it dynamically.
+
+<MemberCard>
+
+##### PureEngineView.\_typeResolver {#_typeresolver}
+
+```ts
+readonly _typeResolver: TypeResolver;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### PureEngineView.tolerance {#tolerance}
+
+```ts
+readonly tolerance: number;
+```
+
+The engine's numeric tolerance, a read-only configuration value a
+membership handler consults (`Element` declines rather than refute a
+near-match inside it).
+
+</MemberCard>
+
+<MemberCard>
+
+##### PureEngineView.\_protocolRegistry {#_protocolregistry}
+
+```ts
+readonly _protocolRegistry: Readonly<Record<string, object>>;
+```
+
+The protocol registry, keyed by protocol name. Its records are typed
+opaquely here because the record type lives in `types-engine.ts`,
+which imports this file; the protocol readers in `engine-protocols.ts`
+(`protocolOfName`, `protocolMemberSignature`,
+`protocolPropertyTypeOfReceiver`) take this view and know the records'
+real shape. Read-only from a handler.
+
+</MemberCard>
+
+<MemberCard>
+
+##### PureEngineView.type() {#type-4}
+
+```ts
+type(type): BoxedType
+```
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+</MemberCard>
+
+<MemberCard>
+
+##### PureEngineView.lookupDefinition() {#lookupdefinition}
+
+```ts
+lookupDefinition(id): ReadonlyDefinitionView | undefined
+```
+
+####### id
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+### TypeHandlerContext {#typehandlercontext}
+
+```ts
+type TypeHandlerContext = {
+  engine: PureEngineView;
+  derive: (operator, operands) => Type | undefined;
+};
+```
+
+The context argument of a `type` handler in the `'types'` shape.
+
+`derive(operator, operands)` is the recursive entry point a handler needs
+to type an application it does not have in hand — the body of a mapping
+literal over the source's element type, say. It runs the named operator's
+own `type` handler on the given descriptors, falling back to the declared
+(instantiated) signature result, and reads nothing but definitions and
+types (`deriveApplicationType`, `boxed-expression/derive-application-type.ts`).
+It answers `undefined` for an unknown operator.
+
+</MemberCard>
+
+<MemberCard>
+
+### OperatorTypeHandlerOnTypes {#operatortypehandlerontypes}
+
+```ts
+type OperatorTypeHandlerOnTypes = (operands, context) => 
   | Type
   | TypeString
   | BoxedType
   | undefined;
 ```
 
-The type of the result (return type) based on the type of
-the arguments.
-
-Should be a subtype of the type indicated by the signature.
-
-For example, if the signature is `(number) -> real`, the type of the
-result could be `real` or `integer`, but not `complex`.
-
-:::info[Note]
-Do not evaluate the arguments.
-
-However, the type of the arguments can be used to determine the type of
-the result.
-:::
-
-#### OperatorDefinition.sgn?
-
-```ts
-optional sgn?: (ops, options) => Sign | undefined;
-```
-
-Return the sign of the function expression.
-
-If the sign cannot be determined, return `undefined`.
-
-When determining the sign, only literal values and the values of
-symbols, if they are literals, should be considered.
-
-Do not evaluate the arguments.
-
-However, the type and sign of the arguments can be used to determine the
-sign.
-
-#### OperatorDefinition.isPositive?
-
-```ts
-readonly optional isPositive?: boolean;
-```
-
-The value of this expression is > 0, same as `isGreater(0)`
-
-#### OperatorDefinition.isNonNegative?
-
-```ts
-readonly optional isNonNegative?: boolean;
-```
-
-The value of this expression is >= 0, same as `isGreaterEqual(0)`
-
-#### OperatorDefinition.isNegative?
-
-```ts
-readonly optional isNegative?: boolean;
-```
-
-The value of this expression is &lt; 0, same as `isLess(0)`
-
-#### OperatorDefinition.isNonPositive?
-
-```ts
-readonly optional isNonPositive?: boolean;
-```
-
-The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
-
-#### OperatorDefinition.even?
-
-```ts
-optional even?: (ops, options) => boolean | undefined;
-```
-
-Return `true` if the function expression is even, `false` if it is odd
-and `undefined` if it is neither (for example if it is not a number,
-or if it is a complex number).
-
-#### OperatorDefinition.complexity?
-
-```ts
-optional complexity?: number;
-```
-
-A number used to order arguments.
-
-Argument with higher complexity are placed after arguments with
-lower complexity when ordered canonically in commutative functions.
-
-- Additive functions: 1000-1999
-- Multiplicative functions: 2000-2999
-- Root and power functions: 3000-3999
-- Log functions: 4000-4999
-- Trigonometric functions: 5000-5999
-- Hypertrigonometric functions: 6000-6999
-- Special functions (factorial, Gamma, ...): 7000-7999
-- Collections: 8000-8999
-- Inert and styling:  9000-9999
-- Logic: 10000-10999
-- Relational: 11000-11999
-
-**Default**: 100,000
-
-#### OperatorDefinition.canonical?
-
-```ts
-optional canonical?: (ops, options) => Expression | null;
-```
-
-Return the canonical form of the expression with the arguments `args`.
-
-The arguments (`args`) may not be in canonical form. If necessary, they
-can be put in canonical form.
-
-This handler should validate the type and number of the arguments
-(arity).
-
-If a required argument is missing, it should be indicated with a
-`["Error", "'missing"]` expression. If more arguments than expected
-are present, this should be indicated with an
-`["Error", "'unexpected-argument'"]` error expression
-
-If the type of an argument is not compatible, it should be indicated
-with an `incompatible-type` error.
-
-`["Sequence"]` expressions are not folded and need to be handled
- explicitly.
-
-If the function is associative, idempotent or an involution,
-this handler should account for it. Notably, if it is commutative, the
-arguments should be sorted in canonical order.
-
-Values of symbols should not be substituted, unless they have
-a `holdUntil` attribute of `"never"`.
-
-The handler should not consider the value or any assumptions about any
-of the arguments that are symbols or functions (i.e. `arg.is(0)`,
-`arg.isInteger`, etc...) since those may change over time.
-
-The result of the handler should be a canonical expression.
-
-If the arguments do not match, they should be replaced with an
-appropriate `["Error"]` expression. If the expression cannot be put in
-canonical form, the handler should return `null`.
-
-#### OperatorDefinition.evaluate?
-
-```ts
-optional evaluate?: 
-  | ((ops, options) => Expression | undefined)
-  | Expression;
-```
-
-Evaluate a function expression.
-
-When the handler is invoked, the arguments have been evaluated, except
-if the `lazy` option is set to `true`.
-
-It is not necessary to further simplify or evaluate the arguments.
-
-If performing numerical calculations and `options.numericalApproximation`
-is `false` return an exact numeric value, for example return a rational
-number or a square root, rather than a floating point approximation.
-Use `ce.number()` to create the numeric value.
-
-If the expression cannot be evaluated, due to the values, types, or
-assumptions about its arguments, return `undefined` or
-an `["Error"]` expression.
-
-#### OperatorDefinition.evaluateAsync?
-
-```ts
-optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
-```
-
-An asynchronous version of `evaluate`.
-
-#### OperatorDefinition.evalDimension?
-
-```ts
-optional evalDimension?: (args, options) => Expression;
-```
-
-**`Experimental`**
-
-Dimensional analysis
-
-#### OperatorDefinition.compile?
-
-```ts
-optional compile?: OperatorCompileHandler;
-```
-
-A custom compilation handler for this operator: emit target-language
-source for a call to this operator. Takes precedence over the target's
-built-in operator/function mapping and its broadcast lowering, so it can
-override how a built-in operator compiles (e.g. a custom-tolerance `GCD`,
-or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
-
-It does NOT override the structural / control-flow heads, which have
-their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
-`Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
-`Comprehension`, `If`, `When`, `Match`, `Block`. A handler
-declared on one of those heads is ignored.
-
-Exception: `Which` IS overridable (it has no binding structure — its
-operands are plain condition/value pairs a handler can compile through
-the callback it is given). To customize how `Which` compiles while
-keeping its stock evaluation semantics, attach the handler to the
-engine's own definition rather than re-declaring the operator (a
-re-declaration replaces the stock `evaluate`/`canonical` handlers):
-
-```ts
-const def = ce.lookupDefinition('Which');
-if (def && 'operator' in def) def.operator.compile = myWhichHandler;
-```
-
-The override is per-engine (each `ComputeEngine` builds its own
-standard-library definitions), and the decline contract applies: a
-handler returning `undefined` falls back to the built-in `Which`
-lowering, coercion and frame-protocol wrapping included.
-
-Return `undefined` (or an empty string) to fall back to the
-default compilation (a `null` returned from untyped JavaScript is
-tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
-
-#### OperatorDefinition.eq?
-
-```ts
-optional eq?: (a, b, prover?) => boolean | undefined;
-```
-
-Custom equality handler.
-
-`prover` indicates the tier of the caller: `false` for the cheap
-arithmetic tier (`eq()` / `.isEqual()`), `true` for the prover tier
-(`eqIdentical()` / `.isIdenticallyEqual()`), and `undefined` when the
-caller does not distinguish (e.g. `cmp()`). A handler that does
-prover-tier work (sampling, expand/simplify, identity questions in the
-free variables) must decline — return `undefined` — when
-`prover === false`.
-
-#### OperatorDefinition.canEnumerate?
-
-```ts
-optional canEnumerate?: (expr) => boolean | undefined;
-```
-
-For an operator that RETURNS a collection but has no `collection`
-handlers (an EAGER producer — `Characters`, `Divisors`, `Eigenvalues`,
-…): can `evaluate()` produce the collection's elements in the current
-state?
-
-This is the operator's own decline test — the guard at the top of its
-`evaluate` handler — exposed so the enumerability facet
-(`isEnumerableCollection`) can answer without evaluating. Contract
-(see `docs/plans/2026-08-11-eager-collection-enumerability.md`):
-
-- MUST be O(1), evaluation-free and side-effect free. An impure
-  producer answers from its operands' facets, consuming no draws.
-- `false` means evaluation WOULD decline — callers stay inert without
-  paying for the evaluation.
-- `true` is a hard promise that evaluation produces the collection. An
-  operator whose success is not cheaply decidable (`Solve`,
-  `FindRoot`) must return `undefined`, never `true`.
-- The operand seen here is the CANONICAL operand, not the evaluated
-  one. An unevaluated compound operand (`Divisors(n + 1)`) whose value
-  cannot be read cheaply must yield `undefined` (undecidable), not
-  `false` — only a definitively unavailable operand (a valueless
-  symbol, a literal of the wrong kind) yields `false`. See
-  `canEnumerateOperand` (`collection-utils.ts`) for the shared
-  tri-state resolution.
-
-Ignored (never consulted) when the definition has `collection`
-handlers — those own enumerability via `collection.isEnumerable`.
-
-#### OperatorDefinition.elementCount?
-
-```ts
-optional elementCount?: (expr) => number | undefined;
-```
-
-For an operator that RETURNS a collection but has no `collection`
-handlers (an EAGER producer — `Sort`, `Chunk`, `Ordering`, …): how many
-elements would `evaluate()` produce?
-
-The `count` twin of [canEnumerate](#operatordefinition), and the honest replacement for
-the broadcast count fallback: `count` reads the operands' agreed length
-only for a `broadcastable` operator, where agreement IS the semantics
-(`docs/BROADCAST-MODEL.md`). A reshaping operator's length is its own
-business, so it must say so here or report `undefined`.
-
-Contract, mirroring `canEnumerate`:
-
-- MUST be O(1), evaluation-free and side-effect free. An impure producer
-  (`RandomShuffle`) answers from its operands' facets, consuming ZERO
-  draws.
-- The operands seen here are the CANONICAL ones. Anything not cheaply
-  knowable — a non-literal shape argument, an unknown source length —
-  must report `undefined` (decline), never a guess.
-- A returned number is a hard promise: it must equal
-  `expr.evaluate().count`. When evaluation would DECLINE (an infinite or
-  unknown-length source), report `undefined` — a count nobody can walk is
-  worse than no count (Tycho item-169 ruling).
-
-Consulted only when the definition has no `collection.count` handler —
-a declared `count` owns the answer, including its `undefined`.
+The `type` handler of an operator definition: a function of operand
+DESCRIPTORS. Such a handler never sees an operand expression, so
+deriving a type cannot declare, canonicalize, or evaluate anything — the
+state-purity contract of
+`docs/plans/2026-08-22-type-handlers-on-types.md`. Under test, and with
+`CE_TYPE_PURITY_GUARD` set elsewhere, a handler that writes engine state
+throws.
 
 </MemberCard>
 
-### BaseDefinition
+### BaseDefinition {#basedefinition}
 
 Metadata common to both symbols and functions.
 
 <MemberCard>
 
-##### BaseDefinition.description
+##### BaseDefinition.description {#description}
 
 ```ts
 description: string | string[];
@@ -18919,7 +19416,7 @@ May contain Markdown.
 
 <MemberCard>
 
-##### BaseDefinition.keywords?
+##### BaseDefinition.keywords? {#keywords}
 
 ```ts
 optional keywords?: string[];
@@ -18932,7 +19429,7 @@ Search keywords (synonyms, alternate names) used by
 
 <MemberCard>
 
-##### BaseDefinition.examples
+##### BaseDefinition.examples {#examples}
 
 ```ts
 examples: string | string[];
@@ -18947,7 +19444,7 @@ For example, `["Add", 1, 2]` or `$\\sin(\\pi/4)$`.
 
 <MemberCard>
 
-##### BaseDefinition.url
+##### BaseDefinition.url {#url-2}
 
 ```ts
 url: string;
@@ -18959,7 +19456,7 @@ A URL pointing to more information about this symbol or operator.
 
 <MemberCard>
 
-##### BaseDefinition.wikidata
+##### BaseDefinition.wikidata {#wikidata}
 
 ```ts
 wikidata: string;
@@ -18974,7 +19471,7 @@ for the `Pi` constant.
 
 <MemberCard>
 
-##### BaseDefinition.isConstant?
+##### BaseDefinition.isConstant? {#isconstant}
 
 ```ts
 readonly optional isConstant?: boolean;
@@ -18986,7 +19483,7 @@ If true, the value or type of the definition cannot be changed
 
 <MemberCard>
 
-### SymbolDefinition
+### SymbolDefinition {#symboldefinition}
 
 ```ts
 type SymbolDefinition = OneOf<[ValueDefinition, OperatorDefinition]>;
@@ -19005,15 +19502,48 @@ following rules are recommended:
 
 <MemberCard>
 
-### SymbolDefinitions
+### PartialSymbolDefinition {#partialsymboldefinition}
 
 ```ts
-type SymbolDefinitions = Readonly<{}>;
+type PartialSymbolDefinition<T> = T extends unknown ? Partial<T> : never;
+```
+
+`Partial` distributed over the [SymbolDefinition](#symboldefinition) union (a plain
+`Partial<A | B>` would merge the arms into one loose object type).
+
+#### Type Parameters
+
+• T = [`SymbolDefinition`](#symboldefinition)
+
+</MemberCard>
+
+<MemberCard>
+
+### SymbolDefinitionInput {#symboldefinitioninput}
+
+```ts
+type SymbolDefinitionInput = 
+  | PartialSymbolDefinition
+  | BoxedOperatorDefinition;
+```
+
+A definition as `ce.declare()` accepts it: a partial definition, or the
+boxed operator definition read back from `expr.operatorDefinition`.
+
+Admitting the boxed definition is what lets an operator be re-declared
+from its existing definition with some handlers replaced:
+
+```ts
+const sqrt = ce.expr('Sqrt').operatorDefinition!;
+ce.declare('Sqrt', {
+  ...sqrt,
+  evaluate: (ops, options) => sqrt.evaluate!(ops, options),
+});
 ```
 
 </MemberCard>
 
-### LibraryDefinition
+### LibraryDefinition {#librarydefinition}
 
 A library bundles symbol/operator definitions with their LaTeX dictionary
 entries and declares dependencies on other libraries.
@@ -19033,7 +19563,7 @@ const ce = new ComputeEngine({
 
 <MemberCard>
 
-##### LibraryDefinition.name
+##### LibraryDefinition.name {#name-4}
 
 ```ts
 name: string;
@@ -19045,7 +19575,7 @@ Library identifier
 
 <MemberCard>
 
-##### LibraryDefinition.requires?
+##### LibraryDefinition.requires? {#requires}
 
 ```ts
 optional requires?: string[];
@@ -19057,7 +19587,7 @@ Libraries that must be loaded before this one
 
 <MemberCard>
 
-##### LibraryDefinition.definitions?
+##### LibraryDefinition.definitions? {#definitions}
 
 ```ts
 optional definitions?: Readonly<{}> | Readonly<{}>[];
@@ -19067,7 +19597,7 @@ Symbol and operator definitions
 
 </MemberCard>
 
-### BaseCollectionHandlers
+### BaseCollectionHandlers {#basecollectionhandlers}
 
 These handlers are the primitive operations that can be performed on
 all collections, indexed or not.
@@ -19076,7 +19606,7 @@ all collections, indexed or not.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.iterator
+##### BaseCollectionHandlers.iterator {#iterator}
 
 ```ts
 iterator: (collection) => 
@@ -19096,7 +19626,7 @@ different order.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.count
+##### BaseCollectionHandlers.count {#count}
 
 ```ts
 count: (collection) => number | undefined;
@@ -19110,7 +19640,7 @@ An empty collection has a count of 0.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.isEmpty?
+##### BaseCollectionHandlers.isEmpty? {#isempty}
 
 ```ts
 optional isEmpty?: (collection) => boolean | undefined;
@@ -19122,7 +19652,7 @@ Optional flag to quickly check if the collection is empty, without having to cou
 
 <MemberCard>
 
-##### BaseCollectionHandlers.isFinite?
+##### BaseCollectionHandlers.isFinite? {#isfinite}
 
 ```ts
 optional isFinite?: (collection) => boolean | undefined;
@@ -19134,7 +19664,7 @@ Optional flag to quickly check if the collection is finite, without having to co
 
 <MemberCard>
 
-##### BaseCollectionHandlers.isEnumerable?
+##### BaseCollectionHandlers.isEnumerable? {#isenumerable}
 
 ```ts
 optional isEnumerable?: (collection) => boolean | undefined;
@@ -19165,7 +19695,7 @@ cheaply" and does not fall back to the default.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.isCollection?
+##### BaseCollectionHandlers.isCollection? {#iscollection}
 
 ```ts
 optional isCollection?: (collection) => boolean;
@@ -19184,7 +19714,7 @@ Default: `true` (an operator with a `collection` block is a collection).
 
 <MemberCard>
 
-##### BaseCollectionHandlers.isLazy?
+##### BaseCollectionHandlers.isLazy? {#islazy}
 
 ```ts
 optional isLazy?: (collection) => boolean;
@@ -19195,13 +19725,16 @@ If the collection is lazy, it means that the elements are not
 computed until they are needed, for example when iterating over the
 collection.
 
-Default: `true`
+Default: `false`. A collection is eager unless its definition says
+otherwise: the elements of a `List` are already materialized operands,
+so nothing is deferred. Lazy collections such as `Range` or `Map` declare
+this handler to opt in.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BaseCollectionHandlers.elementMemo?
+##### BaseCollectionHandlers.elementMemo? {#elementmemo}
 
 ```ts
 optional elementMemo?: boolean;
@@ -19223,7 +19756,7 @@ Default: `false`
 
 <MemberCard>
 
-##### BaseCollectionHandlers.contains?
+##### BaseCollectionHandlers.contains? {#contains}
 
 ```ts
 optional contains?: (collection, target) => boolean | undefined;
@@ -19238,7 +19771,7 @@ Return `undefined` if the membership cannot be determined.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.subsetOf?
+##### BaseCollectionHandlers.subsetOf? {#subsetof}
 
 ```ts
 optional subsetOf?: (collection, other, strict) => boolean | undefined;
@@ -19260,7 +19793,7 @@ that cannot see far enough to answer must return `undefined` rather than
 
 <MemberCard>
 
-##### BaseCollectionHandlers.eltsgn?
+##### BaseCollectionHandlers.eltsgn? {#eltsgn}
 
 ```ts
 optional eltsgn?: (collection) => Sign | undefined;
@@ -19272,7 +19805,7 @@ Return the sign of all the elements of the collection.
 
 <MemberCard>
 
-##### BaseCollectionHandlers.elttype?
+##### BaseCollectionHandlers.elttype? {#elttype}
 
 ```ts
 optional elttype?: (collection) => Type | undefined;
@@ -19282,7 +19815,7 @@ Return the widest type of all the elements in the collection
 
 </MemberCard>
 
-### IndexedCollectionHandlers
+### IndexedCollectionHandlers {#indexedcollectionhandlers}
 
 These additional collection handlers are applicable to indexed
 collections only.
@@ -19292,7 +19825,7 @@ the order of the elements is defined.
 
 <MemberCard>
 
-##### IndexedCollectionHandlers.at
+##### IndexedCollectionHandlers.at {#at}
 
 ```ts
 at: (collection, index) => Expression | undefined;
@@ -19304,8 +19837,10 @@ The first element is `at(1)`, the last element is `at(-1)`.
 
 If the index is &lt;0, return the element at index `count() + index + 1`.
 
-The index can also be a string for example for records. The set of valid
-keys is returned by the `keys()` handler.
+The index can also be a string, for example for records. There is no
+handler that enumerates the valid string keys: a handler that accepts
+them decides which ones it recognizes, and returns `undefined` for the
+rest.
 
 If the index is invalid, return `undefined`.
 
@@ -19313,7 +19848,7 @@ If the index is invalid, return `undefined`.
 
 <MemberCard>
 
-##### IndexedCollectionHandlers.indexWhere
+##### IndexedCollectionHandlers.indexWhere {#indexwhere}
 
 ```ts
 indexWhere: (collection, predicate) => number | undefined;
@@ -19327,7 +19862,7 @@ If no element matches the predicate, return `undefined`.
 
 <MemberCard>
 
-### CollectionHandlers
+### CollectionHandlers {#collectionhandlers}
 
 ```ts
 type CollectionHandlers = BaseCollectionHandlers & Partial<IndexedCollectionHandlers>;
@@ -19340,7 +19875,7 @@ performed on collections, such as lists, sets, tuples, etc...
 
 <MemberCard>
 
-### TaggedValueDefinition
+### TaggedValueDefinition {#taggedvaluedefinition}
 
 ```ts
 type TaggedValueDefinition = {
@@ -19354,7 +19889,7 @@ The definition for a value, represented as a tagged object literal.
 
 <MemberCard>
 
-### TaggedOperatorDefinition
+### TaggedOperatorDefinition {#taggedoperatordefinition}
 
 ```ts
 type TaggedOperatorDefinition = {
@@ -19368,7 +19903,7 @@ The definition for an operator, represented as a tagged object literal.
 
 <MemberCard>
 
-### BoxedDefinition
+### BoxedDefinition {#boxeddefinition}
 
 ```ts
 type BoxedDefinition = 
@@ -19386,12 +19921,12 @@ references to the definition in bound expressions.
 
 <MemberCard>
 
-### TypeProvenanceEntry
+### TypeProvenanceEntry {#typeprovenanceentry}
 
 ```ts
 type TypeProvenanceEntry = {
   type: BoxedType;
-  kind: "declared" | "auto-declared" | "inferred" | "assumed" | "value-derived";
+  kind: "declared" | "auto-declared" | "inferred" | "value-derived";
   axis: "type" | "effects";
   cause: Expression;
   epoch: number;
@@ -19413,11 +19948,11 @@ types are interned, deep-frozen, and shared across engines (the
 are the same object. The history therefore lives on the per-engine
 definition, next to `inferredType`.
 
-Design: `docs/plans/2026-08-13-inference-provenance-journal.md`, phase 1.
+Design: `docs/TYPE-SYSTEM.md`, phase 1.
 
 </MemberCard>
 
-### BoxedBaseDefinition
+### BoxedBaseDefinition {#boxedbasedefinition}
 
 #### Extends
 
@@ -19430,7 +19965,7 @@ Design: `docs/plans/2026-08-13-inference-provenance-journal.md`, phase 1.
 
 <MemberCard>
 
-##### BoxedBaseDefinition.collection?
+##### BoxedBaseDefinition.collection? {#collection-1}
 
 ```ts
 optional collection?: CollectionHandlers;
@@ -19442,7 +19977,7 @@ enumerating it, etc...).
 
 </MemberCard>
 
-### BoxedValueDefinition
+### BoxedValueDefinition {#boxedvaluedefinition}
 
 #### Extends
 
@@ -19450,7 +19985,7 @@ enumerating it, etc...).
 
 <MemberCard>
 
-##### BoxedValueDefinition.holdUntil
+##### BoxedValueDefinition.holdUntil {#holduntil}
 
 ```ts
 holdUntil: "never" | "evaluate" | "N";
@@ -19480,21 +20015,21 @@ Some examples:
 
 <MemberCard>
 
-##### BoxedValueDefinition.value
+##### BoxedValueDefinition.value {#value-3}
 
 ```ts
 value: Expression | undefined;
 ```
 
-The current value of the symbol. For constants, this is immutable.
- The definition object is the single source of truth — there is no
- separate evaluation-context values map.
+The current value of the symbol: the value an `assume(x = …)` puts in
+ force for the current context if there is one, else the stored value.
+ For constants, this is immutable.
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedValueDefinition.isSelfReferential
+##### BoxedValueDefinition.isSelfReferential {#isselfreferential}
 
 ```ts
 readonly isSelfReferential: boolean;
@@ -19511,7 +20046,7 @@ overflowing the stack. Computed once when the value is assigned.
 
 <MemberCard>
 
-##### BoxedValueDefinition.eq?
+##### BoxedValueDefinition.eq? {#eq-1}
 
 ```ts
 optional eq?: (a) => boolean | undefined;
@@ -19521,7 +20056,7 @@ optional eq?: (a) => boolean | undefined;
 
 <MemberCard>
 
-##### BoxedValueDefinition.neq?
+##### BoxedValueDefinition.neq? {#neq}
 
 ```ts
 optional neq?: (a) => boolean | undefined;
@@ -19531,7 +20066,7 @@ optional neq?: (a) => boolean | undefined;
 
 <MemberCard>
 
-##### BoxedValueDefinition.cmp?
+##### BoxedValueDefinition.cmp? {#cmp}
 
 ```ts
 optional cmp?: (a) => "<" | ">" | "=" | undefined;
@@ -19541,7 +20076,7 @@ optional cmp?: (a) => "<" | ">" | "=" | undefined;
 
 <MemberCard>
 
-##### BoxedValueDefinition.inferredType
+##### BoxedValueDefinition.inferredType {#inferredtype}
 
 ```ts
 inferredType: boolean;
@@ -19556,7 +20091,7 @@ A type that is not inferred, but has been set explicitly, cannot be updated.
 
 <MemberCard>
 
-##### BoxedValueDefinition.effectsDeclared
+##### BoxedValueDefinition.effectsDeclared {#effectsdeclared}
 
 ```ts
 effectsDeclared: boolean;
@@ -19574,17 +20109,22 @@ accepted and re-stamped, never checked against the declaration.
 
 <MemberCard>
 
-##### BoxedValueDefinition.type
+##### BoxedValueDefinition.type {#type-6}
 
 ```ts
 type: BoxedType;
 ```
 
+The type known in the CURRENT state: declaredType narrowed by
+everything the assumptions in force prove about this definition. Reading
+it is what makes a fact visible; nothing derived from it may be STORED
+(see declaredType).
+
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedValueDefinition.subscriptEvaluate?
+##### BoxedValueDefinition.subscriptEvaluate? {#subscriptevaluate-1}
 
 ```ts
 optional subscriptEvaluate?: (subscript, options) => Expression | undefined;
@@ -19597,7 +20137,7 @@ Called when evaluating `Subscript(symbol, index)`.
 
 <MemberCard>
 
-##### BoxedValueDefinition.dispose()
+##### BoxedValueDefinition.dispose() {#dispose}
 
 ```ts
 dispose(): void
@@ -19609,7 +20149,7 @@ Release resources owned by this definition when its scope is disposed.
 
 <MemberCard>
 
-### BindingSite
+### BindingSite {#bindingsite}
 
 ```ts
 type BindingSite = {
@@ -19626,7 +20166,7 @@ operator's **bound variables** sits, and how to declare it.
 
 <MemberCard>
 
-### BindingSiteSelector
+### BindingSiteSelector {#bindingsiteselector}
 
 ```ts
 type BindingSiteSelector = (ops, phase) => readonly BindingSite[];
@@ -19634,7 +20174,7 @@ type BindingSiteSelector = (ops, phase) => readonly BindingSite[];
 
 Locate an operator's binding sites among its operands.
 
-Used as the value of the [OperatorDefinitionFlags.scoped](#scoped) flag to
+Used as the value of the `scoped` flag of [OperatorDefinitionFlags](#operatordefinitionflags) to
 declare that an operator is a *binder*: the framework mints the operator's
 scope, declares each site's symbol in it before the `canonical` handler
 runs, and rebinds the sites (and same-named occurrences elsewhere in the
@@ -19650,20 +20190,51 @@ may return fewer sites than `'post'` — return nothing rather than guess.
 
 <MemberCard>
 
-### OperatorDefinitionFlags
+### BroadcastExemption {#broadcastexemption}
+
+```ts
+type BroadcastExemption = 
+  | "tensors"
+  | "tuples"
+  | "collection-result"
+  | "evaluated-operands"
+  | "whole-collection-compare"
+  | "single-collection-join";
+```
+
+A shape of operand (or result) whose broadcast handling an operator's own
+handlers provide, exempting it from the generic broadcast machinery. See
+[OperatorDefinitionFlags.broadcastExemptions](#broadcastexemptions) for the meaning of
+each label.
+
+</MemberCard>
+
+<MemberCard>
+
+### OperatorDefinitionFlags {#operatordefinitionflags}
 
 ```ts
 type OperatorDefinitionFlags = {
   lazy: boolean;
   scoped: boolean | BindingSiteSelector;
   broadcastable: boolean;
+  broadcastExemptions: ReadonlyArray<BroadcastExemption>;
   inspectsErrors: boolean;
+  selectsOperands: boolean;
   namedArgumentsRequired: boolean;
   missingBehavior: "reject" | "propagate" | "handle";
   missingStrip: "all" | number[];
+  nanBehavior:   | "reject"
+     | "propagate"
+     | "handle"
+     | ReadonlyArray<"reject" | "propagate" | "handle" | undefined>;
+  partiality: "total" | "may-marker";
+  definedWhen: (ops) => boolean | undefined;
+  requires: (ops) => boolean | undefined;
   associative: boolean;
   commutative: boolean;
   commutativeOrder: ((a, b) => number) | undefined;
+  commutativeMatch: boolean;
   idempotent: boolean;
   involution: boolean;
   pure: boolean;
@@ -19685,7 +20256,7 @@ properties of the operator.
 
 <MemberCard>
 
-### LambdaDefinition
+### LambdaDefinition {#lambdadefinition}
 
 ```ts
 type LambdaDefinition = {
@@ -19704,7 +20275,7 @@ its body as a boxed expression. Returned by
 
 </MemberCard>
 
-### BoxedOperatorDefinition
+### BoxedOperatorDefinition {#boxedoperatordefinition}
 
 The definition includes information specific about an operator, such as
 handlers to canonicalize or evaluate a function expression with this
@@ -19716,7 +20287,7 @@ operator.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.scoped
+##### BoxedOperatorDefinition.scoped {#scoped-1}
 
 ```ts
 scoped: boolean;
@@ -19730,7 +20301,7 @@ binding-site selector.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.bindingSites?
+##### BoxedOperatorDefinition.bindingSites? {#bindingsites}
 
 ```ts
 optional bindingSites?: BindingSiteSelector;
@@ -19744,7 +20315,7 @@ bound variables) and for an unscoped operator.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.complexity
+##### BoxedOperatorDefinition.complexity {#complexity}
 
 ```ts
 complexity: number;
@@ -19754,7 +20325,7 @@ complexity: number;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.inferredSignature
+##### BoxedOperatorDefinition.inferredSignature {#inferredsignature}
 
 ```ts
 inferredSignature: boolean;
@@ -19767,7 +20338,7 @@ as more information becomes available.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.signature
+##### BoxedOperatorDefinition.signature {#signature}
 
 ```ts
 signature: BoxedType;
@@ -19779,14 +20350,15 @@ The type of the arguments and return value of this function
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.resolvedMissingBehavior
+##### BoxedOperatorDefinition.resolvedMissingBehavior {#resolvedmissingbehavior}
 
 ```ts
 readonly resolvedMissingBehavior: "reject" | "propagate" | "handle" | "pass-through";
 ```
 
 The *resolved* missing-value behavior (§3.A of the missing-value typing
-design): the declared [missingBehavior](#missingbehavior) when present, otherwise
+design): the declared `missingBehavior` flag of [OperatorDefinitionFlags](#operatordefinitionflags)
+when present, otherwise
 `'propagate'` for a declared all-numeric signature and `'pass-through'`
 for everything else. Recomputed from the current signature — never cached
 across a signature mutation.
@@ -19795,7 +20367,38 @@ across a signature mutation.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.invokesNone
+##### BoxedOperatorDefinition.resolvedPartiality {#resolvedpartiality}
+
+```ts
+readonly resolvedPartiality: "total" | "may-marker" | "defined-when";
+```
+
+The *resolved* partiality of the declaration (Contract B): the
+declared `partiality`, `'defined-when'` when a `definedWhen` predicate
+is declared, and the sound `'may-marker'` default when nothing is.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.isUserFunctionDefinition {#isuserfunctiondefinition}
+
+```ts
+readonly isUserFunctionDefinition: boolean;
+```
+
+True for a USER-DEFINED callable — a lambda, or an unscoped strict
+multi-clause definition. The sanctioned opt-out of the Contract B
+machinery: its own application machinery owns every exceptional
+operand, and the higher-order conservative floor
+(`docs/ERROR-MODEL.md` §4) caps what a consumer may assume about it
+at `may-marker` with unknown NaN behavior.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.invokesNone {#invokesnone}
 
 ```ts
 readonly invokesNone: boolean;
@@ -19808,7 +20411,7 @@ pre-gate for the latent half of the projection rule.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.lambda
+##### BoxedOperatorDefinition.lambda {#lambda}
 
 ```ts
 readonly lambda: LambdaDefinition | undefined;
@@ -19828,42 +20431,21 @@ re-parsing or textually inlining its source.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.type?
+##### BoxedOperatorDefinition.type? {#type-8}
 
 ```ts
-optional type?: (ops, options) => 
-  | string
-  | AlgebraicType
-  | NegationType
-  | CollectionType
-  | ListType
-  | SetType
-  | BroadcastableType
-  | RecordType
-  | ObjectType
-  | DictionaryType
-  | TupleType
-  | SymbolType
-  | ExpressionType
-  | NumericType
-  | FunctionSignature
-  | CallbackType
-  | ValueType
-  | TypeVariable
-  | TypeReference
-  | BoxedType
-  | undefined;
+optional type?: OperatorTypeHandlerOnTypes;
 ```
 
-If present, this handler can be used to more precisely determine the
-return type based on the type of the arguments. The arguments themselves
-should *not* be evaluated, only their types should be used.
+If present, this handler determines the result type more precisely
+than the signature, from the operand DESCRIPTORS (types, facts and
+structure — never the operand expressions).
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.sgn?
+##### BoxedOperatorDefinition.sgn? {#sgn-2}
 
 ```ts
 optional sgn?: (ops, options) => Sign | undefined;
@@ -19879,11 +20461,20 @@ sign should be used.
 This can be used in some case for example to determine when certain
 simplifications are valid.
 
+The handler MUST be a pure function of the operands: no evaluation
+(`.evaluate()`, `.N()` — including indirectly, through helpers that
+numericize a bound or probe a collection element), no canonicalization
+of new expressions, no declarations. The type path dispatches `sgn`
+handlers while deriving an application's type (the `sgn` operand fact),
+so a handler that changes engine state invalidates the very caches the
+derivation is filling. Audit record: open item O7 of
+`docs/plans/2026-08-22-type-handlers-on-types.md`.
+
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.eq?
+##### BoxedOperatorDefinition.eq? {#eq-2}
 
 ```ts
 optional eq?: (a, b, prover?) => boolean | undefined;
@@ -19895,7 +20486,7 @@ See `OperatorDefinition.eq` for the meaning of `prover`.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.neq?
+##### BoxedOperatorDefinition.neq? {#neq-1}
 
 ```ts
 optional neq?: (a, b) => boolean | undefined;
@@ -19905,7 +20496,7 @@ optional neq?: (a, b) => boolean | undefined;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.canEnumerate?
+##### BoxedOperatorDefinition.canEnumerate? {#canenumerate}
 
 ```ts
 optional canEnumerate?: (expr) => boolean | undefined;
@@ -19918,7 +20509,7 @@ The eager producer's enumerability precondition — see the
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.elementCount?
+##### BoxedOperatorDefinition.elementCount? {#elementcount}
 
 ```ts
 optional elementCount?: (expr) => number | undefined;
@@ -19931,7 +20522,7 @@ The eager producer's element count — see the `elementCount` contract on
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.canonical?
+##### BoxedOperatorDefinition.canonical? {#canonical}
 
 ```ts
 optional canonical?: (ops, options) => Expression | null;
@@ -19941,7 +20532,7 @@ optional canonical?: (ops, options) => Expression | null;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.evaluate?
+##### BoxedOperatorDefinition.evaluate? {#evaluate}
 
 ```ts
 optional evaluate?: (ops, options) => Expression | undefined;
@@ -19951,7 +20542,7 @@ optional evaluate?: (ops, options) => Expression | undefined;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.evaluateAsync?
+##### BoxedOperatorDefinition.evaluateAsync? {#evaluateasync}
 
 ```ts
 optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
@@ -19961,7 +20552,7 @@ optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.evalDimension?
+##### BoxedOperatorDefinition.evalDimension? {#evaldimension}
 
 ```ts
 optional evalDimension?: (ops, options) => Expression;
@@ -19971,7 +20562,7 @@ optional evalDimension?: (ops, options) => Expression;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.compile?
+##### BoxedOperatorDefinition.compile? {#compile}
 
 ```ts
 optional compile?: OperatorCompileHandler;
@@ -19981,7 +20572,7 @@ optional compile?: OperatorCompileHandler;
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.stripsMissingAt()
+##### BoxedOperatorDefinition.stripsMissingAt() {#stripsmissingat}
 
 ```ts
 stripsMissingAt(i): boolean
@@ -19999,14 +20590,93 @@ selects the positions.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.invokesAt()
+##### BoxedOperatorDefinition.resolvedNanBehaviorAt() {#resolvednanbehaviorat}
+
+```ts
+resolvedNanBehaviorAt(i, armSignature?): "reject" | "propagate" | "handle" | "inert"
+```
+
+The *resolved* NaN policy for parameter position `i` (Contract B,
+`docs/ERROR-MODEL.md` §4). For a user-defined callable the answer is
+always `'inert'` — the higher-order conservative floor, absolute even
+over an explicit declaration (see `isUserFunctionDefinition`).
+Otherwise an explicit `nanBehavior` declaration wins.
+Otherwise, while the slot's declared carrier admits `nan` (bare
+`number`, an inferred signature, a union with `nan`) the answer is
+`'inert'` — `NaN` is an ordinary domain member and the handler owns
+it. For a precise carrier that excludes `nan`, the derived default is
+`'propagate'` when the carrier is a subtype of `complex` that is not a
+subtype of `integer` and the result type is numeric, `'reject'`
+otherwise. Recomputed from the current signature — never cached.
+
+####### i
+
+`number`
+
+####### armSignature?
+
+[`Type`](#type-3)
+
+The resolved overload arm to derive from, when the caller has one:
+per-arm carriers give per-arm derived policies. Explicit
+`nanBehavior` declarations remain operator-level.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.contractBResultAdjustment() {#contractbresultadjustment}
+
+```ts
+contractBResultAdjustment(ops, armSignature?): 
+  | "none"
+  | "is-nan"
+  | "widen-nan"
+  | "widen-nan-cells"
+  | "widen-marker"
+  | "is-marker"
+```
+
+The Contract B adjustment to a derived application result type for
+these arguments (`docs/ERROR-MODEL.md` §4): `'is-marker'` when the
+declared `definedWhen` is provably false — the value IS the codomain
+marker (§2 rule 4: `NaN` for a numeric codomain, `Missing` for a
+settled non-numeric one); `'widen-marker'` when a DECLARED partiality
+is undischarged (`definedWhen` undecided, or an explicit
+`may-marker`) — every cell of the result gains its marker arm;
+`'is-nan'` when a scalar argument in a `propagate` slot is a proven
+`NaN` — the value of the whole application is `NaN`, whatever the
+codomain's shape; `'widen-nan'` when such an argument may be `NaN` —
+the application gains a top-level `| nan` arm; `'widen-nan-cells'`
+when the NaN evidence rides in the cells of a broadcast lift — the
+lifted result's numeric cells gain `| nan`; `'none'` otherwise. The
+omitted `may-marker` default contributes no arm (see
+the implementation note in `boxed-operator-definition.ts`).
+
+####### ops
+
+readonly [`Expression`](#expression-5)[]
+
+####### armSignature?
+
+[`Type`](#type-3)
+
+The resolved overload arm, when the caller has one — the NaN
+evidence derives per-slot policies from its carriers.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.invokesAt() {#invokesat}
 
 ```ts
 invokesAt(i): boolean
 ```
 
 True if operand position `i` may INVOKE a function-valued operand — the
-per-position reader for [OperatorDefinitionFlags.invokes](#invokes). Missing
+per-position reader for the `invokes` flag of [OperatorDefinitionFlags](#operatordefinitionflags).
+Missing
 map indices default to `true`. Every consumer of the metadata goes
 through this accessor (or [invokesNone](#invokesnone)), never the raw field.
 
@@ -20016,7 +20686,7 @@ through this accessor (or [invokesNone](#invokesnone)), never the raw field.
 
 </MemberCard>
 
-### EqHandlers
+### EqHandlers {#eqhandlers}
 
 These handlers compare two expressions.
 
@@ -20026,7 +20696,7 @@ Having both may be useful if comparing non-equality is faster than equality.
 
 <MemberCard>
 
-##### EqHandlers.eq
+##### EqHandlers.eq {#eq-3}
 
 ```ts
 eq: (a, b) => boolean | undefined;
@@ -20036,7 +20706,7 @@ eq: (a, b) => boolean | undefined;
 
 <MemberCard>
 
-##### EqHandlers.neq
+##### EqHandlers.neq {#neq-2}
 
 ```ts
 neq: (a, b) => boolean | undefined;
@@ -20046,7 +20716,7 @@ neq: (a, b) => boolean | undefined;
 
 <MemberCard>
 
-### Hold
+### Hold {#hold-2}
 
 ```ts
 type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
@@ -20058,7 +20728,7 @@ type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
 
 <MemberCard>
 
-### LatexToken
+### LatexToken {#latextoken}
 
 ```ts
 type LatexToken = string | "<{>" | "<}>" | "<space>" | "<$>" | "<$$>";
@@ -20074,7 +20744,7 @@ letters and punctuation.
 
 <MemberCard>
 
-### LatexString
+### LatexString {#latexstring}
 
 ```ts
 type LatexString = string;
@@ -20087,7 +20757,7 @@ A LatexString is a regular string of LaTeX, for example:
 
 <MemberCard>
 
-### Delimiter
+### Delimiter {#delimiter}
 
 ```ts
 type Delimiter = 
@@ -20117,7 +20787,7 @@ record to define new LaTeX dictionary entries.
 
 <MemberCard>
 
-### DelimiterScale
+### DelimiterScale {#delimiterscale}
 
 ```ts
 type DelimiterScale = "normal" | "scaled" | "big" | "none";
@@ -20127,7 +20797,7 @@ type DelimiterScale = "normal" | "scaled" | "big" | "none";
 
 <MemberCard>
 
-### LibraryCategory
+### LibraryCategory {#librarycategory}
 
 ```ts
 type LibraryCategory = 
@@ -20154,7 +20824,7 @@ type LibraryCategory =
 
 <MemberCard>
 
-### Precedence
+### Precedence {#precedence}
 
 ```ts
 type Precedence = number;
@@ -20230,7 +20900,7 @@ The JavaScript operator precedence is documented
 
 <MemberCard>
 
-### Terminator
+### Terminator {#terminator}
 
 ```ts
 type Terminator = {
@@ -20248,7 +20918,7 @@ This indicates a condition under which parsing should stop:
 
 <MemberCard>
 
-### ParseHandler
+### ParseHandler {#parsehandler}
 
 ```ts
 type ParseHandler = 
@@ -20287,7 +20957,7 @@ return `Nothing`.
 
 <MemberCard>
 
-### ExpressionParseHandler
+### ExpressionParseHandler {#expressionparsehandler}
 
 ```ts
 type ExpressionParseHandler = (parser, until?) => MathJsonExpression | null;
@@ -20297,7 +20967,7 @@ type ExpressionParseHandler = (parser, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### PrefixParseHandler
+### PrefixParseHandler {#prefixparsehandler}
 
 ```ts
 type PrefixParseHandler = (parser, until?) => MathJsonExpression | null;
@@ -20307,7 +20977,7 @@ type PrefixParseHandler = (parser, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### SymbolParseHandler
+### SymbolParseHandler {#symbolparsehandler}
 
 ```ts
 type SymbolParseHandler = (parser, until?) => MathJsonExpression | null;
@@ -20317,7 +20987,7 @@ type SymbolParseHandler = (parser, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### FunctionParseHandler
+### FunctionParseHandler {#functionparsehandler}
 
 ```ts
 type FunctionParseHandler = (parser, until?) => MathJsonExpression | null;
@@ -20327,7 +20997,7 @@ type FunctionParseHandler = (parser, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### EnvironmentParseHandler
+### EnvironmentParseHandler {#environmentparsehandler}
 
 ```ts
 type EnvironmentParseHandler = (parser, until?) => MathJsonExpression | null;
@@ -20337,7 +21007,7 @@ type EnvironmentParseHandler = (parser, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### PostfixParseHandler
+### PostfixParseHandler {#postfixparsehandler}
 
 ```ts
 type PostfixParseHandler = (parser, lhs, until?) => MathJsonExpression | null;
@@ -20347,7 +21017,7 @@ type PostfixParseHandler = (parser, lhs, until?) => MathJsonExpression | null;
 
 <MemberCard>
 
-### InfixParseHandler
+### InfixParseHandler {#infixparsehandler}
 
 ```ts
 type InfixParseHandler = (parser, lhs, until) => MathJsonExpression | null;
@@ -20357,7 +21027,7 @@ type InfixParseHandler = (parser, lhs, until) => MathJsonExpression | null;
 
 <MemberCard>
 
-### MatchfixParseHandler
+### MatchfixParseHandler {#matchfixparsehandler}
 
 ```ts
 type MatchfixParseHandler = (parser, body) => MathJsonExpression | null;
@@ -20367,7 +21037,7 @@ type MatchfixParseHandler = (parser, body) => MathJsonExpression | null;
 
 <MemberCard>
 
-### LatexArgumentType
+### LatexArgumentType {#latexargumenttype}
 
 ```ts
 type LatexArgumentType = 
@@ -20389,7 +21059,7 @@ type LatexArgumentType =
 
 <MemberCard>
 
-### Trigger
+### Trigger {#trigger}
 
 ```ts
 type Trigger = {
@@ -20413,7 +21083,7 @@ LaTeX expressions that are equivalent, for example `\operatorname{gcd}` or
 
 <MemberCard>
 
-### BaseEntry
+### BaseEntry {#baseentry}
 
 ```ts
 type BaseEntry = {
@@ -20429,7 +21099,7 @@ Maps a string of LaTeX tokens to a function or symbol and vice-versa.
 
 <MemberCard>
 
-### DefaultEntry
+### DefaultEntry {#defaultentry}
 
 ```ts
 type DefaultEntry = BaseEntry & Trigger & {
@@ -20442,7 +21112,7 @@ type DefaultEntry = BaseEntry & Trigger & {
 
 <MemberCard>
 
-### ExpressionEntry
+### ExpressionEntry {#expressionentry}
 
 ```ts
 type ExpressionEntry = BaseEntry & Trigger & {
@@ -20457,7 +21127,7 @@ type ExpressionEntry = BaseEntry & Trigger & {
 
 <MemberCard>
 
-### MatchfixEntry
+### MatchfixEntry {#matchfixentry}
 
 ```ts
 type MatchfixEntry = BaseEntry & {
@@ -20491,7 +21161,7 @@ the open delimiter and the close delimiter.
 
 <MemberCard>
 
-### InfixEntry
+### InfixEntry {#infixentry}
 
 ```ts
 type InfixEntry = BaseEntry & Trigger & {
@@ -20530,7 +21200,7 @@ optional associativity?: "right" | "left" | "none" | "any";
 
 <MemberCard>
 
-### PostfixEntry
+### PostfixEntry {#postfixentry}
 
 ```ts
 type PostfixEntry = BaseEntry & Trigger & {
@@ -20554,7 +21224,7 @@ Example: `!`.
 
 <MemberCard>
 
-### PrefixEntry
+### PrefixEntry {#prefixentry}
 
 ```ts
 type PrefixEntry = BaseEntry & Trigger & {
@@ -20578,7 +21248,7 @@ Example: `-`, `\not`.
 
 <MemberCard>
 
-### EnvironmentEntry
+### EnvironmentEntry {#environmententry}
 
 ```ts
 type EnvironmentEntry = BaseEntry & {
@@ -20595,7 +21265,7 @@ construct using `\begin{...}...\end{...}`.
 
 <MemberCard>
 
-### SymbolEntry
+### SymbolEntry {#symbolentry}
 
 ```ts
 type SymbolEntry = BaseEntry & Trigger & {
@@ -20618,7 +21288,7 @@ Used for appropriate wrapping (i.e. when to surround it with parens)
 
 <MemberCard>
 
-### FunctionEntry
+### FunctionEntry {#functionentry}
 
 ```ts
 type FunctionEntry = BaseEntry & Trigger & {
@@ -20655,7 +21325,7 @@ How arguments are parsed:
 
 <MemberCard>
 
-### LatexDictionaryEntry
+### LatexDictionaryEntry {#latexdictionaryentry}
 
 ```ts
 type LatexDictionaryEntry = OneOf<[
@@ -20690,7 +21360,7 @@ const ce = new ComputeEngine({
 
 <MemberCard>
 
-### SymbolResolution
+### SymbolResolution {#symbolresolution}
 
 ```ts
 type SymbolResolution = {
@@ -20712,7 +21382,7 @@ type for an undeclared symbol.
 
 <MemberCard>
 
-### ParseLatexOptions
+### ParseLatexOptions {#parselatexoptions}
 
 ```ts
 type ParseLatexOptions = NumberFormat & {
@@ -20916,14 +21586,14 @@ Populated automatically from `ce.tolerance` by `ce.parse()`.
 
 </MemberCard>
 
-### Parser
+### Parser {#parser}
 
 An instance of `Parser` is provided to the `parse` handlers of custom
 LaTeX dictionary entries.
 
 <MemberCard>
 
-##### Parser.options
+##### Parser.options {#options}
 
 ```ts
 readonly options: Readonly<ParseLatexOptions>;
@@ -20933,7 +21603,7 @@ readonly options: Readonly<ParseLatexOptions>;
 
 <MemberCard>
 
-##### Parser.inQuantifierScope
+##### Parser.inQuantifierScope {#inquantifierscope}
 
 ```ts
 readonly inQuantifierScope: boolean;
@@ -20945,7 +21615,7 @@ True if currently parsing inside a quantifier body (ForAll, Exists, etc.)
 
 <MemberCard>
 
-##### Parser.index
+##### Parser.index {#index}
 
 ```ts
 index: number;
@@ -20957,7 +21627,7 @@ The index of the current token
 
 <MemberCard>
 
-##### Parser.atEnd
+##### Parser.atEnd {#atend}
 
 ```ts
 readonly atEnd: boolean;
@@ -20970,7 +21640,7 @@ Consider also `atTerminator()`.
 
 <MemberCard>
 
-##### Parser.peek
+##### Parser.peek {#peek}
 
 ```ts
 readonly peek: string;
@@ -20982,13 +21652,13 @@ Return the next token, without advancing the index
 
 <MemberCard>
 
-##### Parser.atBoundary
+##### Parser.atBoundary {#atboundary}
 
 </MemberCard>
 
 <MemberCard>
 
-##### Parser.resolveSymbol()
+##### Parser.resolveSymbol() {#resolvesymbol}
 
 ```ts
 resolveSymbol(id): 
@@ -21019,7 +21689,28 @@ resolves (with `type.isUnknown` true).
 
 <MemberCard>
 
-##### Parser.pushSymbolTable()
+##### Parser.isFunctionTriggerName() {#isfunctiontriggername}
+
+```ts
+isFunctionTriggerName(name): boolean
+```
+
+Whether `name` is claimed by a `kind: 'function'` dictionary entry's
+`symbolTrigger` (`log`, `lcm`, `var`, …). Such a name owns its call
+syntax — including any subscript, which its parser may bind as an
+argument (`\operatorname{log}_2(x)` is `Log(x, 2)`) — so subscript
+absorption must not fold `name_sub` into a plain symbol and preempt the
+function reading.
+
+####### name
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.pushSymbolTable() {#pushsymboltable}
 
 ```ts
 pushSymbolTable(): void
@@ -21029,7 +21720,7 @@ pushSymbolTable(): void
 
 <MemberCard>
 
-##### Parser.popSymbolTable()
+##### Parser.popSymbolTable() {#popsymboltable}
 
 ```ts
 popSymbolTable(): void
@@ -21039,7 +21730,7 @@ popSymbolTable(): void
 
 <MemberCard>
 
-##### Parser.addSymbol()
+##### Parser.addSymbol() {#addsymbol}
 
 ```ts
 addSymbol(id, type): void
@@ -21057,7 +21748,7 @@ addSymbol(id, type): void
 
 <MemberCard>
 
-##### Parser.enterQuantifierScope()
+##### Parser.enterQuantifierScope() {#enterquantifierscope}
 
 ```ts
 enterQuantifierScope(): void
@@ -21069,7 +21760,7 @@ Enter a quantifier scope for parsing the body of ForAll, Exists, etc.
 
 <MemberCard>
 
-##### Parser.exitQuantifierScope()
+##### Parser.exitQuantifierScope() {#exitquantifierscope}
 
 ```ts
 exitQuantifierScope(): void
@@ -21081,7 +21772,7 @@ Exit the current quantifier scope
 
 <MemberCard>
 
-##### Parser.atTerminator()
+##### Parser.atTerminator() {#atterminator}
 
 ```ts
 atTerminator(t): boolean
@@ -21098,7 +21789,7 @@ has been reached.
 
 <MemberCard>
 
-##### Parser.nextToken()
+##### Parser.nextToken() {#nexttoken}
 
 ```ts
 nextToken(): string
@@ -21110,7 +21801,7 @@ Return the next token and advance the index
 
 <MemberCard>
 
-##### Parser.latex()
+##### Parser.latex() {#latex}
 
 ```ts
 latex(start, end?): string
@@ -21131,7 +21822,7 @@ between `start` and `end` (default: the whole expression)
 
 <MemberCard>
 
-##### Parser.error()
+##### Parser.error() {#error}
 
 ```ts
 error(code, fromToken): MathJsonExpression
@@ -21156,7 +21847,7 @@ was expected.
 
 <MemberCard>
 
-##### Parser.sourceOffsets()
+##### Parser.sourceOffsets() {#sourceoffsets}
 
 ```ts
 sourceOffsets(startToken, endToken?): [number, number]
@@ -21179,7 +21870,7 @@ original input string.
 
 <MemberCard>
 
-##### Parser.skipSpace()
+##### Parser.skipSpace() {#skipspace}
 
 ```ts
 skipSpace(): boolean
@@ -21191,7 +21882,7 @@ If there are any space, advance the index until a non-space is encountered
 
 <MemberCard>
 
-##### Parser.skipVisualSpace()
+##### Parser.skipVisualSpace() {#skipvisualspace}
 
 ```ts
 skipVisualSpace(): void
@@ -21204,7 +21895,7 @@ includes space tokens, empty groups `{}`, and commands such as `\,` and `\!`
 
 <MemberCard>
 
-##### Parser.match()
+##### Parser.match() {#match}
 
 ```ts
 match(token): boolean
@@ -21221,7 +21912,7 @@ return false
 
 <MemberCard>
 
-##### Parser.matchAll()
+##### Parser.matchAll() {#matchall}
 
 ```ts
 matchAll(tokens): boolean
@@ -21237,7 +21928,7 @@ Return true if the next tokens match the argument, an array of tokens, or null o
 
 <MemberCard>
 
-##### Parser.matchAny()
+##### Parser.matchAny() {#matchany}
 
 ```ts
 matchAny(tokens): string
@@ -21253,7 +21944,7 @@ Return the next token if it matches any of the token in the argument or null oth
 
 <MemberCard>
 
-##### Parser.parseChar()
+##### Parser.parseChar() {#parsechar}
 
 ```ts
 parseChar(): string | null
@@ -21267,7 +21958,7 @@ defined in hex (^^ and ^^^^), the `\char` and `\unicode` command.
 
 <MemberCard>
 
-##### Parser.parseGroup()
+##### Parser.parseGroup() {#parsegroup}
 
 ```ts
 parseGroup(): MathJsonExpression | null
@@ -21284,7 +21975,7 @@ Return `Nothing` if an empty group `{}` was found
 
 <MemberCard>
 
-##### Parser.parseToken()
+##### Parser.parseToken() {#parsetoken}
 
 ```ts
 parseToken(): MathJsonExpression | null
@@ -21307,7 +21998,7 @@ The excluded tokens include `!"#$%&(),/;:?@[]`|~", `\left`, `\bigl`, etc...
 
 <MemberCard>
 
-##### Parser.parseOptionalGroup()
+##### Parser.parseOptionalGroup() {#parseoptionalgroup}
 
 ```ts
 parseOptionalGroup(): MathJsonExpression | null
@@ -21321,7 +22012,7 @@ Return `null` if none was found.
 
 <MemberCard>
 
-##### Parser.parseEnclosure()
+##### Parser.parseEnclosure() {#parseenclosure}
 
 ```ts
 parseEnclosure(): MathJsonExpression | null
@@ -21333,7 +22024,7 @@ Parse an enclosure (open paren/close paren, etc..) and return the expression ins
 
 <MemberCard>
 
-##### Parser.parseStringGroup()
+##### Parser.parseStringGroup() {#parsestringgroup}
 
 ```ts
 parseStringGroup(optional?, rawTokens?): string | null
@@ -21370,7 +22061,7 @@ to unicode, which is lossy).
 
 <MemberCard>
 
-##### Parser.parseSymbol()
+##### Parser.parseSymbol() {#parsesymbol}
 
 ```ts
 parseSymbol(until?): MathJsonExpression | null
@@ -21389,7 +22080,7 @@ A symbol can be:
 
 <MemberCard>
 
-##### Parser.parseTabular()
+##### Parser.parseTabular() {#parsetabular}
 
 ```ts
 parseTabular(): 
@@ -21407,7 +22098,7 @@ and empty cells are also indicated with `Nothing`.
 
 <MemberCard>
 
-##### Parser.parseArguments()
+##### Parser.parseArguments() {#parsearguments}
 
 ```ts
 parseArguments(kind?, until?): 
@@ -21437,7 +22128,7 @@ argument was found.
 
 <MemberCard>
 
-##### Parser.parseBraceArguments()
+##### Parser.parseBraceArguments() {#parsebracearguments}
 
 ```ts
 parseBraceArguments(): 
@@ -21462,7 +22153,7 @@ unambiguous even though the braces render invisibly.
 
 <MemberCard>
 
-##### Parser.parsePostfixOperator()
+##### Parser.parsePostfixOperator() {#parsepostfixoperator}
 
 ```ts
 parsePostfixOperator(lhs, until?): MathJsonExpression | null
@@ -21484,7 +22175,7 @@ Prefix, infix and matchfix operators are handled by `parseExpression()`
 
 <MemberCard>
 
-##### Parser.parseExpression()
+##### Parser.parseExpression() {#parseexpression}
 
 ```ts
 parseExpression(until?): MathJsonExpression | null
@@ -21523,7 +22214,7 @@ or the sequence of tokens `until.tokens` is encountered
 
 <MemberCard>
 
-##### Parser.parseNumber()
+##### Parser.parseNumber() {#parsenumber}
 
 ```ts
 parseNumber(): MathJsonExpression | null
@@ -21535,7 +22226,7 @@ Parse a number.
 
 <MemberCard>
 
-##### Parser.addBoundary()
+##### Parser.addBoundary() {#addboundary}
 
 ```ts
 addBoundary(boundary): void
@@ -21561,7 +22252,7 @@ parsing when it encounters the `\end{bmatrix}` boundary.
 
 <MemberCard>
 
-##### Parser.removeBoundary()
+##### Parser.removeBoundary() {#removeboundary}
 
 ```ts
 removeBoundary(): void
@@ -21571,7 +22262,7 @@ removeBoundary(): void
 
 <MemberCard>
 
-##### Parser.matchBoundary()
+##### Parser.matchBoundary() {#matchboundary}
 
 ```ts
 matchBoundary(): boolean
@@ -21581,7 +22272,7 @@ matchBoundary(): boolean
 
 <MemberCard>
 
-##### Parser.boundaryError()
+##### Parser.boundaryError() {#boundaryerror}
 
 ```ts
 boundaryError(msg): MathJsonExpression
@@ -21595,7 +22286,7 @@ boundaryError(msg): MathJsonExpression
 
 <MemberCard>
 
-### RootStyle
+### RootStyle {#rootstyle}
 
 ```ts
 type RootStyle = "radical" | "quotient" | "solidus";
@@ -21607,7 +22298,7 @@ How to serialize a root, i.e. `\sqrt{x}`, `x^{1/2}` or `x^\frac12`.
 
 <MemberCard>
 
-### FractionStyle
+### FractionStyle {#fractionstyle}
 
 ```ts
 type FractionStyle = 
@@ -21626,7 +22317,7 @@ How to serialize a fraction.
 
 <MemberCard>
 
-### LogicStyle
+### LogicStyle {#logicstyle}
 
 ```ts
 type LogicStyle = "word" | "boolean" | "uppercase-word" | "punctuation";
@@ -21638,7 +22329,7 @@ How to serialize the logic operators.
 
 <MemberCard>
 
-### PowerStyle
+### PowerStyle {#powerstyle}
 
 ```ts
 type PowerStyle = "root" | "solidus" | "quotient";
@@ -21650,7 +22341,7 @@ How to serialize a fractional power.
 
 <MemberCard>
 
-### NumericSetStyle
+### NumericSetStyle {#numericsetstyle}
 
 ```ts
 type NumericSetStyle = "compact" | "regular" | "interval" | "set-builder";
@@ -21662,7 +22353,7 @@ How to serialize a numeric set, i.e. `\R^*`, `\R \setminus \lbrace 0\rbrace`.
 
 <MemberCard>
 
-### IndexStyle
+### IndexStyle {#indexstyle}
 
 ```ts
 type IndexStyle = "subscript" | "bracket";
@@ -21674,7 +22365,7 @@ How to serialize collection indexing (the `At` operator).
 
 <MemberCard>
 
-### StyleOption
+### StyleOption {#styleoption}
 
 ```ts
 type StyleOption<T> = T | ((expr, level) => T);
@@ -21691,7 +22382,7 @@ expression and of its nesting level.
 
 <MemberCard>
 
-### SerializeLatexOptions
+### SerializeLatexOptions {#serializelatexoptions}
 
 ```ts
 type SerializeLatexOptions = NumberSerializationFormat & {
@@ -21947,7 +22638,7 @@ ce.expr(['Degrees', 370])
 
 <MemberCard>
 
-### ResolvedSerializeLatexOptions
+### ResolvedSerializeLatexOptions {#resolvedserializelatexoptions}
 
 ```ts
 type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions, 
@@ -21976,14 +22667,14 @@ to their function form.
 
 </MemberCard>
 
-### Serializer
+### Serializer {#serializer}
 
 An instance of `Serializer` is provided to the `serialize` handlers of custom
 LaTeX dictionary entries.
 
 <MemberCard>
 
-##### Serializer.options
+##### Serializer.options {#options-1}
 
 ```ts
 readonly options: Required<ResolvedSerializeLatexOptions>;
@@ -21993,7 +22684,7 @@ readonly options: Required<ResolvedSerializeLatexOptions>;
 
 <MemberCard>
 
-##### Serializer.dictionary
+##### Serializer.dictionary {#dictionary-1}
 
 ```ts
 readonly dictionary: SerializerDictionary;
@@ -22003,7 +22694,7 @@ readonly dictionary: SerializerDictionary;
 
 <MemberCard>
 
-##### Serializer.level
+##### Serializer.level {#level}
 
 ```ts
 level: number;
@@ -22024,7 +22715,7 @@ For example use `\Bigl(` for the top level, and `\bigl(` or `(` for others.
 
 <MemberCard>
 
-##### Serializer.serialize
+##### Serializer.serialize {#serialize-1}
 
 ```ts
 serialize: (expr) => string;
@@ -22036,7 +22727,7 @@ Output a LaTeX string representing the expression
 
 <MemberCard>
 
-##### Serializer.wrap
+##### Serializer.wrap {#wrap}
 
 ```ts
 wrap: (expr, prec?) => string;
@@ -22049,7 +22740,7 @@ an operator of precedence less than or equal to `prec`.
 
 <MemberCard>
 
-##### Serializer.applyFunctionStyle
+##### Serializer.applyFunctionStyle {#applyfunctionstyle}
 
 ```ts
 applyFunctionStyle: (expr, level) => DelimiterScale;
@@ -22061,7 +22752,7 @@ Styles
 
 <MemberCard>
 
-##### Serializer.groupStyle
+##### Serializer.groupStyle {#groupstyle}
 
 ```ts
 groupStyle: (expr, level) => DelimiterScale;
@@ -22071,7 +22762,7 @@ groupStyle: (expr, level) => DelimiterScale;
 
 <MemberCard>
 
-##### Serializer.rootStyle
+##### Serializer.rootStyle {#rootstyle-1}
 
 ```ts
 rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
@@ -22081,7 +22772,7 @@ rootStyle: (expr, level) => "radical" | "quotient" | "solidus";
 
 <MemberCard>
 
-##### Serializer.fractionStyle
+##### Serializer.fractionStyle {#fractionstyle-1}
 
 ```ts
 fractionStyle: (expr, level) => 
@@ -22098,7 +22789,7 @@ fractionStyle: (expr, level) =>
 
 <MemberCard>
 
-##### Serializer.logicStyle
+##### Serializer.logicStyle {#logicstyle-1}
 
 ```ts
 logicStyle: (expr, level) => "boolean" | "word" | "uppercase-word" | "punctuation";
@@ -22108,7 +22799,7 @@ logicStyle: (expr, level) => "boolean" | "word" | "uppercase-word" | "punctuatio
 
 <MemberCard>
 
-##### Serializer.powerStyle
+##### Serializer.powerStyle {#powerstyle-1}
 
 ```ts
 powerStyle: (expr, level) => "quotient" | "solidus" | "root";
@@ -22118,7 +22809,7 @@ powerStyle: (expr, level) => "quotient" | "solidus" | "root";
 
 <MemberCard>
 
-##### Serializer.numericSetStyle
+##### Serializer.numericSetStyle {#numericsetstyle-1}
 
 ```ts
 numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-builder";
@@ -22128,7 +22819,7 @@ numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-buil
 
 <MemberCard>
 
-##### Serializer.indexStyle
+##### Serializer.indexStyle {#indexstyle-1}
 
 ```ts
 indexStyle: (expr, level) => "subscript" | "bracket";
@@ -22138,7 +22829,7 @@ indexStyle: (expr, level) => "subscript" | "bracket";
 
 <MemberCard>
 
-##### Serializer.serializeFunction()
+##### Serializer.serializeFunction() {#serializefunction}
 
 ```ts
 serializeFunction(expr, def?): string
@@ -22156,7 +22847,7 @@ serializeFunction(expr, def?): string
 
 <MemberCard>
 
-##### Serializer.serializeSymbol()
+##### Serializer.serializeSymbol() {#serializesymbol}
 
 ```ts
 serializeSymbol(expr): string
@@ -22170,7 +22861,7 @@ serializeSymbol(expr): string
 
 <MemberCard>
 
-##### Serializer.wrapString()
+##### Serializer.wrapString() {#wrapstring}
 
 ```ts
 wrapString(s, style, delimiters?): string
@@ -22196,7 +22887,7 @@ If `delimiters` is not specified, use `()`
 
 <MemberCard>
 
-##### Serializer.wrapArguments()
+##### Serializer.wrapArguments() {#wraparguments}
 
 ```ts
 wrapArguments(expr): string
@@ -22213,7 +22904,7 @@ commas.
 
 <MemberCard>
 
-##### Serializer.wrapShort()
+##### Serializer.wrapShort() {#wrapshort}
 
 ```ts
 wrapShort(expr): string
@@ -22232,7 +22923,7 @@ short (not a function)
 
 <MemberCard>
 
-### SerializeHandler
+### SerializeHandler {#serializehandler}
 
 ```ts
 type SerializeHandler = (serializer, expr) => string;
@@ -22245,7 +22936,7 @@ a function of this type.
 
 <MemberCard>
 
-### ParseDiagnostic
+### ParseDiagnostic {#parsediagnostic}
 
 ```ts
 type ParseDiagnostic = {
@@ -22306,7 +22997,7 @@ on `code` + `detail`.
 
 <MemberCard>
 
-### ExactNumericValueData
+### ExactNumericValueData {#exactnumericvaluedata}
 
 ```ts
 type ExactNumericValueData = {
@@ -22331,7 +23022,7 @@ component (e.g. `√2 + √3·i`) is NOT representable exactly.
 
 <MemberCard>
 
-### NumericValueData
+### NumericValueData {#numericvaluedata}
 
 ```ts
 type NumericValueData = {
@@ -22344,7 +23035,7 @@ type NumericValueData = {
 
 <MemberCard>
 
-### NumericValueFactory
+### NumericValueFactory {#numericvaluefactory}
 
 ```ts
 type NumericValueFactory = (data) => NumericValue;
@@ -22352,7 +23043,7 @@ type NumericValueFactory = (data) => NumericValue;
 
 </MemberCard>
 
-### `abstract` NumericValue
+### `abstract` NumericValue {#abstract-numericvalue}
 
 <MemberCard>
 
@@ -22366,7 +23057,7 @@ new NumericValue(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.im
+##### NumericValue.im {#im-1}
 
 ```ts
 im: number;
@@ -22380,13 +23071,13 @@ Can be negative, zero or positive.
 
 <MemberCard>
 
-##### NumericValue.type
+##### NumericValue.type {#type-2}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isExact
+##### NumericValue.isExact {#isexact}
 
 True if numeric value is the product of a rational and the square root of an integer.
 
@@ -22398,7 +23089,7 @@ But it doesn't include 0.5, 3.141592, etc...
 
 <MemberCard>
 
-##### NumericValue.asExact
+##### NumericValue.asExact {#asexact}
 
 If `isExact()`, returns an ExactNumericValue, otherwise returns undefined.
 
@@ -22406,7 +23097,7 @@ If `isExact()`, returns an ExactNumericValue, otherwise returns undefined.
 
 <MemberCard>
 
-##### NumericValue.re
+##### NumericValue.re {#re-1}
 
 The real part of this numeric value.
 
@@ -22416,7 +23107,7 @@ Can be negative, 0 or positive.
 
 <MemberCard>
 
-##### NumericValue.bignumRe
+##### NumericValue.bignumRe {#bignumre}
 
 bignum version of .re, if available
 
@@ -22424,67 +23115,67 @@ bignum version of .re, if available
 
 <MemberCard>
 
-##### NumericValue.bignumIm
+##### NumericValue.bignumIm {#bignumim}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.numerator
+##### NumericValue.numerator {#numerator}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.denominator
+##### NumericValue.denominator {#denominator}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isNaN
+##### NumericValue.isNaN {#isnan}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isPositiveInfinity
+##### NumericValue.isPositiveInfinity {#ispositiveinfinity}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isNegativeInfinity
+##### NumericValue.isNegativeInfinity {#isnegativeinfinity}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isComplexInfinity
+##### NumericValue.isComplexInfinity {#iscomplexinfinity}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isZero
+##### NumericValue.isZero {#iszero}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isOne
+##### NumericValue.isOne {#isone}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isNegativeOne
+##### NumericValue.isNegativeOne {#isnegativeone}
 
 </MemberCard>
 
 <MemberCard>
 
-##### NumericValue.isZeroWithTolerance()
+##### NumericValue.isZeroWithTolerance() {#iszerowithtolerance}
 
 ```ts
 isZeroWithTolerance(_tolerance): boolean
@@ -22498,7 +23189,7 @@ isZeroWithTolerance(_tolerance): boolean
 
 <MemberCard>
 
-##### NumericValue.sgn()
+##### NumericValue.sgn() {#sgn}
 
 ```ts
 abstract sgn(): 0 | 1 | -1 | undefined
@@ -22510,7 +23201,7 @@ The sign of complex numbers is undefined
 
 <MemberCard>
 
-##### NumericValue.N()
+##### NumericValue.N() {#n}
 
 ```ts
 abstract N(): NumericValue
@@ -22522,7 +23213,7 @@ Return a non-exact representation of the numeric value
 
 <MemberCard>
 
-##### NumericValue.neg()
+##### NumericValue.neg() {#neg}
 
 ```ts
 abstract neg(): NumericValue
@@ -22532,7 +23223,7 @@ abstract neg(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.inv()
+##### NumericValue.inv() {#inv}
 
 ```ts
 abstract inv(): NumericValue
@@ -22542,7 +23233,7 @@ abstract inv(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.add()
+##### NumericValue.add() {#add}
 
 ```ts
 abstract add(other): NumericValue
@@ -22556,7 +23247,7 @@ abstract add(other): NumericValue
 
 <MemberCard>
 
-##### NumericValue.sub()
+##### NumericValue.sub() {#sub}
 
 ```ts
 abstract sub(other): NumericValue
@@ -22570,7 +23261,7 @@ abstract sub(other): NumericValue
 
 <MemberCard>
 
-##### NumericValue.mul()
+##### NumericValue.mul() {#mul}
 
 ```ts
 abstract mul(other): NumericValue
@@ -22584,7 +23275,7 @@ abstract mul(other): NumericValue
 
 <MemberCard>
 
-##### NumericValue.div()
+##### NumericValue.div() {#div}
 
 ```ts
 abstract div(other): NumericValue
@@ -22598,7 +23289,7 @@ abstract div(other): NumericValue
 
 <MemberCard>
 
-##### NumericValue.pow()
+##### NumericValue.pow() {#pow}
 
 ```ts
 abstract pow(n): NumericValue
@@ -22617,7 +23308,7 @@ abstract pow(n): NumericValue
 
 <MemberCard>
 
-##### NumericValue.root()
+##### NumericValue.root() {#root}
 
 ```ts
 abstract root(n): NumericValue
@@ -22631,7 +23322,7 @@ abstract root(n): NumericValue
 
 <MemberCard>
 
-##### NumericValue.sqrt()
+##### NumericValue.sqrt() {#sqrt}
 
 ```ts
 abstract sqrt(): NumericValue
@@ -22641,7 +23332,7 @@ abstract sqrt(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.gcd()
+##### NumericValue.gcd() {#gcd}
 
 ```ts
 abstract gcd(other): NumericValue
@@ -22655,7 +23346,7 @@ abstract gcd(other): NumericValue
 
 <MemberCard>
 
-##### NumericValue.abs()
+##### NumericValue.abs() {#abs}
 
 ```ts
 abstract abs(): NumericValue
@@ -22665,7 +23356,7 @@ abstract abs(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.ln()
+##### NumericValue.ln() {#ln}
 
 ```ts
 abstract ln(base?): NumericValue
@@ -22679,7 +23370,7 @@ abstract ln(base?): NumericValue
 
 <MemberCard>
 
-##### NumericValue.exp()
+##### NumericValue.exp() {#exp}
 
 ```ts
 abstract exp(): NumericValue
@@ -22689,7 +23380,7 @@ abstract exp(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.floor()
+##### NumericValue.floor() {#floor}
 
 ```ts
 abstract floor(): NumericValue
@@ -22699,7 +23390,7 @@ abstract floor(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.ceil()
+##### NumericValue.ceil() {#ceil}
 
 ```ts
 abstract ceil(): NumericValue
@@ -22709,7 +23400,7 @@ abstract ceil(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.round()
+##### NumericValue.round() {#round}
 
 ```ts
 abstract round(): NumericValue
@@ -22719,7 +23410,7 @@ abstract round(): NumericValue
 
 <MemberCard>
 
-##### NumericValue.eq()
+##### NumericValue.eq() {#eq}
 
 ```ts
 abstract eq(other): boolean
@@ -22733,7 +23424,7 @@ abstract eq(other): boolean
 
 <MemberCard>
 
-##### NumericValue.lt()
+##### NumericValue.lt() {#lt}
 
 ```ts
 abstract lt(other): boolean | undefined
@@ -22747,7 +23438,7 @@ abstract lt(other): boolean | undefined
 
 <MemberCard>
 
-##### NumericValue.lte()
+##### NumericValue.lte() {#lte}
 
 ```ts
 abstract lte(other): boolean | undefined
@@ -22761,7 +23452,7 @@ abstract lte(other): boolean | undefined
 
 <MemberCard>
 
-##### NumericValue.gt()
+##### NumericValue.gt() {#gt}
 
 ```ts
 abstract gt(other): boolean | undefined
@@ -22775,7 +23466,7 @@ abstract gt(other): boolean | undefined
 
 <MemberCard>
 
-##### NumericValue.gte()
+##### NumericValue.gte() {#gte}
 
 ```ts
 abstract gte(other): boolean | undefined
@@ -22789,7 +23480,7 @@ abstract gte(other): boolean | undefined
 
 <MemberCard>
 
-##### NumericValue.valueOf()
+##### NumericValue.valueOf() {#valueof-1}
 
 ```ts
 valueOf(): string | number
@@ -22802,7 +23493,7 @@ Object.valueOf(): returns a primitive value, preferably a JavaScript
 
 <MemberCard>
 
-##### NumericValue.\[toPrimitive\]()
+##### NumericValue.\[toPrimitive\]() {#toprimitive-1}
 
 ```ts
 toPrimitive: string | number | null
@@ -22818,7 +23509,7 @@ Object.toPrimitive()
 
 <MemberCard>
 
-##### NumericValue.toJSON()
+##### NumericValue.toJSON() {#tojson-1}
 
 ```ts
 toJSON(): unknown
@@ -22830,7 +23521,7 @@ Object.toJSON
 
 <MemberCard>
 
-##### NumericValue.print()
+##### NumericValue.print() {#print}
 
 ```ts
 print(): void
@@ -22840,7 +23531,7 @@ print(): void
 
 <MemberCard>
 
-### SmallInteger
+### SmallInteger {#smallinteger}
 
 ```ts
 type SmallInteger = IsInteger<number>;
@@ -22852,7 +23543,7 @@ A `SmallInteger` is an integer < 1e6
 
 <MemberCard>
 
-### Rational
+### Rational {#rational-1}
 
 ```ts
 type Rational = 
@@ -22870,7 +23561,7 @@ a pair of big integers.
 
 <MemberCard>
 
-### BigNum
+### BigNum {#bignum}
 
 ```ts
 type BigNum = BigDecimal;
@@ -22880,7 +23571,7 @@ type BigNum = BigDecimal;
 
 <MemberCard>
 
-### Sign
+### Sign {#sign}
 
 ```ts
 type Sign = 
@@ -22897,13 +23588,13 @@ type Sign =
 
 ## OEIS
 
-### OEISSequenceInfo
+### OEISSequenceInfo {#oeissequenceinfo}
 
 Result from an OEIS lookup operation.
 
 <MemberCard>
 
-##### OEISSequenceInfo.id
+##### OEISSequenceInfo.id {#id-1}
 
 ```ts
 id: string;
@@ -22915,7 +23606,7 @@ OEIS sequence ID (e.g., 'A000045')
 
 <MemberCard>
 
-##### OEISSequenceInfo.name
+##### OEISSequenceInfo.name {#name-2}
 
 ```ts
 name: string;
@@ -22927,7 +23618,7 @@ Sequence name/description
 
 <MemberCard>
 
-##### OEISSequenceInfo.terms
+##### OEISSequenceInfo.terms {#terms}
 
 ```ts
 terms: number[];
@@ -22939,7 +23630,7 @@ First several terms of the sequence
 
 <MemberCard>
 
-##### OEISSequenceInfo.formula?
+##### OEISSequenceInfo.formula? {#formula}
 
 ```ts
 optional formula?: string;
@@ -22951,7 +23642,7 @@ Formula or recurrence (if available) — the first formula line
 
 <MemberCard>
 
-##### OEISSequenceInfo.formulas?
+##### OEISSequenceInfo.formulas? {#formulas}
 
 ```ts
 optional formulas?: string[];
@@ -22963,7 +23654,7 @@ All free-text formula lines, as returned by OEIS (if available)
 
 <MemberCard>
 
-##### OEISSequenceInfo.comments?
+##### OEISSequenceInfo.comments? {#comments}
 
 ```ts
 optional comments?: string[];
@@ -22975,7 +23666,7 @@ Comments about the sequence
 
 <MemberCard>
 
-##### OEISSequenceInfo.url
+##### OEISSequenceInfo.url {#url}
 
 ```ts
 url: string;
@@ -22985,13 +23676,13 @@ URL to the OEIS page
 
 </MemberCard>
 
-### OEISOptions
+### OEISOptions {#oeisoptions}
 
 Options for OEIS operations.
 
 <MemberCard>
 
-##### OEISOptions.timeout?
+##### OEISOptions.timeout? {#timeout}
 
 ```ts
 optional timeout?: number;
@@ -23003,7 +23694,7 @@ Request timeout in milliseconds (default: 10000)
 
 <MemberCard>
 
-##### OEISOptions.maxResults?
+##### OEISOptions.maxResults? {#maxresults}
 
 ```ts
 optional maxResults?: number;
@@ -23013,7 +23704,7 @@ Maximum number of results to return for lookups (default: 5)
 
 </MemberCard>
 
-### OEISCandidate
+### OEISCandidate {#oeiscandidate}
 
 An OEIS-attributed closed-form proposal produced by `ce.interpret()`.
 
@@ -23023,7 +23714,7 @@ is CC BY-NC, so a candidate must always carry a link back to its source.
 
 <MemberCard>
 
-##### OEISCandidate.expression
+##### OEISCandidate.expression {#expression}
 
 ```ts
 expression: Expression;
@@ -23035,7 +23726,7 @@ The parsed and sample-verified closed-form expression.
 
 <MemberCard>
 
-##### OEISCandidate.id
+##### OEISCandidate.id {#id-2}
 
 ```ts
 id: string;
@@ -23047,7 +23738,7 @@ OEIS sequence ID (e.g., 'A000217').
 
 <MemberCard>
 
-##### OEISCandidate.name
+##### OEISCandidate.name {#name-3}
 
 ```ts
 name: string;
@@ -23059,7 +23750,7 @@ Sequence name/description.
 
 <MemberCard>
 
-##### OEISCandidate.url
+##### OEISCandidate.url {#url-1}
 
 ```ts
 url: string;
@@ -23071,7 +23762,7 @@ URL to the OEIS page.
 
 <MemberCard>
 
-##### OEISCandidate.formula
+##### OEISCandidate.formula {#formula-1}
 
 ```ts
 formula: string;
@@ -23081,14 +23772,14 @@ The free-text OEIS formula line the expression was parsed from.
 
 </MemberCard>
 
-### InterpretResult
+### InterpretResult {#interpretresult}
 
 Result of `ce.interpret()`: the sync-recognized form of the input (the same
 value the `Interpret` head returns), plus any OEIS-attributed candidates.
 
 <MemberCard>
 
-##### InterpretResult.expression
+##### InterpretResult.expression {#expression-1}
 
 ```ts
 expression: Expression;
@@ -23100,7 +23791,7 @@ The recognized expression, or the input unchanged when nothing fired.
 
 <MemberCard>
 
-##### InterpretResult.candidates
+##### InterpretResult.candidates {#candidates}
 
 ```ts
 candidates: OEISCandidate[];
@@ -23112,14 +23803,14 @@ Verified, OEIS-attributed closed-form proposals (possibly empty).
 
 ## Other
 
-### FunctionPropertyRecord
+### FunctionPropertyRecord {#functionpropertyrecord}
 
 A single analytic-property record for an operator. The MathJSON fields are
 raw (as translated from Fungrim); box them with `ce.expr` to query.
 
 <MemberCard>
 
-##### FunctionPropertyRecord.id
+##### FunctionPropertyRecord.id {#id}
 
 ```ts
 readonly id: string;
@@ -23131,7 +23822,7 @@ The Fungrim entry id (provenance).
 
 <MemberCard>
 
-##### FunctionPropertyRecord.property
+##### FunctionPropertyRecord.property {#property}
 
 ```ts
 readonly property: string;
@@ -23145,7 +23836,7 @@ One of `Poles`, `Zeros`, `BranchPoints`, `BranchCuts`, `Residue`,
 
 <MemberCard>
 
-##### FunctionPropertyRecord.var
+##### FunctionPropertyRecord.var {#var}
 
 ```ts
 readonly var: string | null;
@@ -23157,7 +23848,7 @@ The distinguished variable the property is stated in (e.g. `z`).
 
 <MemberCard>
 
-##### FunctionPropertyRecord.argIndex
+##### FunctionPropertyRecord.argIndex {#argindex}
 
 ```ts
 readonly argIndex: number | null;
@@ -23170,7 +23861,7 @@ single argument position (parametric / composite).
 
 <MemberCard>
 
-##### FunctionPropertyRecord.expr
+##### FunctionPropertyRecord.expr {#expr}
 
 ```ts
 readonly expr: ExpressionInput | null;
@@ -23180,7 +23871,7 @@ readonly expr: ExpressionInput | null;
 
 <MemberCard>
 
-##### FunctionPropertyRecord.domain
+##### FunctionPropertyRecord.domain {#domain}
 
 ```ts
 readonly domain: ExpressionInput | null;
@@ -23190,7 +23881,7 @@ readonly domain: ExpressionInput | null;
 
 <MemberCard>
 
-##### FunctionPropertyRecord.point
+##### FunctionPropertyRecord.point {#point}
 
 ```ts
 readonly point: ExpressionInput | null;
@@ -23200,7 +23891,7 @@ readonly point: ExpressionInput | null;
 
 <MemberCard>
 
-##### FunctionPropertyRecord.condition
+##### FunctionPropertyRecord.condition {#condition}
 
 ```ts
 readonly condition: ExpressionInput | null;
@@ -23210,7 +23901,7 @@ readonly condition: ExpressionInput | null;
 
 <MemberCard>
 
-##### FunctionPropertyRecord.value
+##### FunctionPropertyRecord.value {#value}
 
 ```ts
 readonly value: ExpressionInput | null;
@@ -23220,7 +23911,7 @@ readonly value: ExpressionInput | null;
 
 <MemberCard>
 
-##### FunctionPropertyRecord.assumptions
+##### FunctionPropertyRecord.assumptions {#assumptions}
 
 ```ts
 readonly assumptions: ExpressionInput | null;
@@ -23228,7 +23919,7 @@ readonly assumptions: ExpressionInput | null;
 
 </MemberCard>
 
-### FunctionProperties
+### FunctionProperties {#functionproperties}
 
 Queryable analytic properties of an operator, returned by
 `ce.functionProperties(name)`. The set-valued accessors return a boxed set
@@ -23238,7 +23929,7 @@ Queryable analytic properties of an operator, returned by
 
 <MemberCard>
 
-##### FunctionProperties.operator
+##### FunctionProperties.operator {#operator}
 
 ```ts
 readonly operator: string;
@@ -23248,7 +23939,7 @@ readonly operator: string;
 
 <MemberCard>
 
-##### FunctionProperties.entries
+##### FunctionProperties.entries {#entries}
 
 ```ts
 readonly entries: readonly FunctionPropertyRecord[];
@@ -23260,7 +23951,7 @@ All analytic-property records for this operator.
 
 <MemberCard>
 
-##### FunctionProperties.poles
+##### FunctionProperties.poles {#poles}
 
 ```ts
 readonly poles: Expression | undefined;
@@ -23270,7 +23961,7 @@ readonly poles: Expression | undefined;
 
 <MemberCard>
 
-##### FunctionProperties.zeros
+##### FunctionProperties.zeros {#zeros}
 
 ```ts
 readonly zeros: Expression | undefined;
@@ -23280,7 +23971,7 @@ readonly zeros: Expression | undefined;
 
 <MemberCard>
 
-##### FunctionProperties.branchPoints
+##### FunctionProperties.branchPoints {#branchpoints}
 
 ```ts
 readonly branchPoints: Expression | undefined;
@@ -23290,7 +23981,7 @@ readonly branchPoints: Expression | undefined;
 
 <MemberCard>
 
-##### FunctionProperties.branchCuts
+##### FunctionProperties.branchCuts {#branchcuts}
 
 ```ts
 readonly branchCuts: Expression | undefined;
@@ -23300,7 +23991,7 @@ readonly branchCuts: Expression | undefined;
 
 <MemberCard>
 
-##### FunctionProperties.essentialSingularities
+##### FunctionProperties.essentialSingularities {#essentialsingularities}
 
 ```ts
 readonly essentialSingularities: Expression | undefined;
@@ -23310,7 +24001,7 @@ readonly essentialSingularities: Expression | undefined;
 
 <MemberCard>
 
-##### FunctionProperties.holomorphicDomain
+##### FunctionProperties.holomorphicDomain {#holomorphicdomain}
 
 ```ts
 readonly holomorphicDomain: Expression | undefined;
@@ -23322,7 +24013,7 @@ The domain on which the function is holomorphic.
 
 <MemberCard>
 
-##### FunctionProperties.isMeromorphic
+##### FunctionProperties.isMeromorphic {#ismeromorphic}
 
 ```ts
 readonly isMeromorphic: boolean | undefined;
@@ -23334,7 +24025,7 @@ Whether the function is meromorphic, when the corpus records it.
 
 <MemberCard>
 
-### SymbolTable
+### SymbolTable {#symboltable}
 
 ```ts
 type SymbolTable = {
@@ -23345,14 +24036,473 @@ type SymbolTable = {
 
 </MemberCard>
 
-### ILatexSyntax
+<MemberCard>
+
+### newSymbolIds() {#newsymbolids}
+
+```ts
+function newSymbolIds(): {}
+```
+
+A prototype-free [SymbolTable.ids](#ids) map — see the note there.
+
+</MemberCard>
+
+<MemberCard>
+
+### OperatorDefinition {#operatordefinition}
+
+```ts
+type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFlags> & {
+  type: OperatorTypeHandlerOnTypes;
+  signature:   | Type
+     | TypeString
+     | BoxedType;
+  inferredSignature: boolean;
+  sgn: (ops, options) => Sign | undefined;
+  isPositive: boolean;
+  isNonNegative: boolean;
+  isNegative: boolean;
+  isNonPositive: boolean;
+  even: (ops, options) => boolean | undefined;
+  complexity: number;
+  canonical: (ops, options) => Expression | null;
+  evaluate:   | ((ops, options) => Expression | undefined)
+     | Expression;
+  evaluateAsync: (ops, options) => Promise<Expression | undefined>;
+  evalDimension: (args, options) => Expression;
+  compile: OperatorCompileHandler;
+  eq: (a, b, prover?) => boolean | undefined;
+  neq: (a, b) => boolean | undefined;
+  collection: CollectionHandlers;
+  canEnumerate: (expr) => boolean | undefined;
+  elementCount: (expr) => number | undefined;
+};
+```
+
+#### OperatorDefinition.type?
+
+```ts
+optional type?: OperatorTypeHandlerOnTypes;
+```
+
+The type of the result (return type) as a function of the operand
+DESCRIPTORS — their types, facts and structure, never the operand
+expressions. See [OperatorTypeHandlerOnTypes](#operatortypehandlerontypes).
+
+Should be a subtype of the type indicated by the signature: for a
+signature `(number) -> real` the result may be `real` or `integer`,
+never `complex`.
+
+#### OperatorDefinition.signature?
+
+```ts
+optional signature?: 
+  | Type
+  | TypeString
+  | BoxedType;
+```
+
+The function signature, describing the type of the arguments and the
+return type.
+
+If a `type` handler is provided, the return type of the function should
+be a subtype of the return type in the signature.
+
+#### OperatorDefinition.inferredSignature?
+
+```ts
+optional inferredSignature?: boolean;
+```
+
+If `true`, the `signature` is a starting point to be refined, not a
+contract: assigning a function literal to this operator narrows the
+signature from the literal's body, and calls type from the narrowed
+signature.
+
+Declaring a `signature` normally pins it (`inferredSignature: false`),
+which is what you want for a fixed API. Set this to `true` to vouch
+that a name is an operator — so `f(x)` parses as an application rather
+than a multiplication — while leaving its types to be inferred from the
+body assigned later:
+
+```js
+ce.declare('q', { signature: '(unknown) -> unknown', inferredSignature: true });
+ce.assign('q', ce.parse('t \\mapsto 2t+1'));
+// signature is now `(unknown) -> number`, so `q(x) < y` types
+// `boolean` and compiles, while `q(L) < y` over a list `L` still types
+// `list<boolean>` and fails closed.
+```
+
+A declaration that omits `signature` entirely behaves the same way.
+
+#### OperatorDefinition.sgn?
+
+```ts
+optional sgn?: (ops, options) => Sign | undefined;
+```
+
+Return the sign of the function expression.
+
+If the sign cannot be determined, return `undefined`.
+
+When determining the sign, only literal values and the values of
+symbols, if they are literals, should be considered.
+
+Do not evaluate the arguments.
+
+However, the type and sign of the arguments can be used to determine the
+sign.
+
+The handler must be a pure function of the operands — the type path
+dispatches it while deriving an application's type. See the purity
+contract on `OperatorDefinition.sgn`.
+
+#### OperatorDefinition.isPositive?
+
+```ts
+readonly optional isPositive?: boolean;
+```
+
+The value of this expression is > 0, same as `isGreater(0)`
+
+#### OperatorDefinition.isNonNegative?
+
+```ts
+readonly optional isNonNegative?: boolean;
+```
+
+The value of this expression is >= 0, same as `isGreaterEqual(0)`
+
+#### OperatorDefinition.isNegative?
+
+```ts
+readonly optional isNegative?: boolean;
+```
+
+The value of this expression is &lt; 0, same as `isLess(0)`
+
+#### OperatorDefinition.isNonPositive?
+
+```ts
+readonly optional isNonPositive?: boolean;
+```
+
+The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
+
+#### OperatorDefinition.even?
+
+```ts
+optional even?: (ops, options) => boolean | undefined;
+```
+
+Return `true` if the function expression is even, `false` if it is odd
+and `undefined` if it is neither (for example if it is not a number,
+or if it is a complex number).
+
+#### OperatorDefinition.complexity?
+
+```ts
+optional complexity?: number;
+```
+
+A number used to order arguments.
+
+Argument with higher complexity are placed after arguments with
+lower complexity when ordered canonically in commutative functions.
+
+- Additive functions: 1000-1999
+- Multiplicative functions: 2000-2999
+- Root and power functions: 3000-3999
+- Log functions: 4000-4999
+- Trigonometric functions: 5000-5999
+- Hypertrigonometric functions: 6000-6999
+- Special functions (factorial, Gamma, ...): 7000-7999
+- Collections: 8000-8999
+- Inert and styling:  9000-9999
+- Logic: 10000-10999
+- Relational: 11000-11999
+
+**Default**: 100,000
+
+#### OperatorDefinition.canonical?
+
+```ts
+optional canonical?: (ops, options) => Expression | null;
+```
+
+Return the canonical form of the expression with the arguments `args`.
+
+The arguments (`args`) may not be in canonical form. If necessary, they
+can be put in canonical form.
+
+This handler should validate the type and number of the arguments
+(arity).
+
+If a required argument is missing, it should be indicated with a
+`["Error", "'missing"]` expression. If more arguments than expected
+are present, this should be indicated with an
+`["Error", "'unexpected-argument'"]` error expression
+
+If the type of an argument is not compatible, it should be indicated
+with an `incompatible-type` error.
+
+`["Sequence"]` expressions are not folded and need to be handled
+ explicitly.
+
+If the function is associative, idempotent or an involution,
+this handler should account for it. Notably, if it is commutative, the
+arguments should be sorted in canonical order.
+
+Values of symbols should not be substituted, unless they have
+a `holdUntil` attribute of `"never"`.
+
+The handler should not consider the value or any assumptions about any
+of the arguments that are symbols or functions (i.e. `arg.is(0)`,
+`arg.isInteger`, etc...) since those may change over time.
+
+The result of the handler should be a canonical expression.
+
+If the arguments do not match, they should be replaced with an
+appropriate `["Error"]` expression. If the expression cannot be put in
+canonical form, the handler should return `null`.
+
+#### OperatorDefinition.evaluate?
+
+```ts
+optional evaluate?: 
+  | ((ops, options) => Expression | undefined)
+  | Expression;
+```
+
+Evaluate a function expression.
+
+When the handler is invoked, the arguments have been evaluated, except
+if the `lazy` option is set to `true`.
+
+It is not necessary to further simplify or evaluate the arguments.
+
+If performing numerical calculations and `options.numericalApproximation`
+is `false` return an exact numeric value, for example return a rational
+number or a square root, rather than a floating point approximation.
+Use `ce.number()` to create the numeric value.
+
+If the expression cannot be evaluated, due to the values, types, or
+assumptions about its arguments, return `undefined` or
+an `["Error"]` expression.
+
+#### OperatorDefinition.evaluateAsync?
+
+```ts
+optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
+```
+
+An asynchronous version of `evaluate`.
+
+#### OperatorDefinition.evalDimension?
+
+```ts
+optional evalDimension?: (args, options) => Expression;
+```
+
+**`Experimental`**
+
+Dimensional analysis
+
+#### OperatorDefinition.compile?
+
+```ts
+optional compile?: OperatorCompileHandler;
+```
+
+A custom compilation handler for this operator: emit target-language
+source for a call to this operator. Takes precedence over the target's
+built-in operator/function mapping and its broadcast lowering, so it can
+override how a built-in operator compiles (e.g. a custom-tolerance `GCD`,
+or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
+
+It does NOT override the structural / control-flow heads, which have
+their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
+`Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
+`Comprehension`, `If`, `When`, `Match`, `Block`. A handler
+declared on one of those heads is ignored.
+
+Exception: `Which` IS overridable (it has no binding structure — its
+operands are plain condition/value pairs a handler can compile through
+the callback it is given). To customize how `Which` compiles while
+keeping its stock evaluation semantics, attach the handler to the
+engine's own definition rather than re-declaring the operator (a
+re-declaration replaces the stock `evaluate`/`canonical` handlers):
+
+```ts
+const def = ce.lookupDefinition('Which');
+if (def && 'operator' in def) def.operator.compile = myWhichHandler;
+```
+
+The override is per-engine (each `ComputeEngine` builds its own
+standard-library definitions), and the decline contract applies: a
+handler returning `undefined` falls back to the built-in `Which`
+lowering, coercion and frame-protocol wrapping included.
+
+**Attaching in place is the supported route for EVERY operator the
+engine already defines, not only `Which`.** Three things follow from
+re-declaring instead, and all three are silent:
+
+- A re-declaration REPLACES the stock `evaluate`/`canonical` handlers.
+  Spreading the captured definition (`ce.declare(op, {...orig, compile})`)
+  is an attempt to carry them across by hand and is not equivalent —
+  attaching to the definition `lookupDefinition` returns keeps them by
+  construction, with nothing to carry.
+- A re-declaration also replaces the definition's EFFECTS declaration,
+  and that is what decides whether a compiled `Sum`/`Product` over a
+  body mentioning the operator keeps its NaN early exit — the
+  `if (acc !== acc) return NaN;` emitted between terms, valid because
+  NaN absorbs `+` and `*`, so once the accumulator is NaN no later
+  term can change the answer. An operator definition is GRANTED
+  purity, so a re-declaration that states no effects keeps the exit.
+  One that states any effects refuses it, since skipping terms would
+  skip the effects too — and the lever is the effect SET, not the
+  `pure` keyword: `pure` is a derived reading of `effects`, so
+  `effects: ['random']` or an effect-annotated signature loses the
+  exit exactly as `pure: false` does, while `effects: []` keeps it
+  exactly as an unspecified definition does. For this exit, carrying
+  a `compile` handler costs nothing by itself, whether it supplies
+  source or declines for the target at hand: the gate reads the
+  definition's declared effects, not who supplied the code. The one
+  shape it cannot catch is a handler emitting effectful source under
+  a definition that states no effects.
+
+  The exit this governs is the one the scalar `Sum`/`Product`
+  lowering emits through `BaseCompiler.isEmissionSkippable`. An
+  element-wise (collection-valued) body carries a separate,
+  UNCONDITIONAL latch of the same spelling, emitted so that a
+  length mismatch collapsing the fold to a scalar NaN cannot be
+  broadcast back over the next term's shape. That latch does not
+  consult the declared effects, so declaring effects does not buy
+  back the later iterations of an element-wise body.
+- Call-sharing is the one cost a handler still pays for being on a
+  re-declared definition, and the declared effects do not govern it. A
+  `compile` handler the engine did not install is a live-source
+  splice the CSE harvest cannot analyse, so every node under that
+  head is refused as a candidate and every callee body mentioning it
+  is refused with it. A self-recursive body loses the binding that
+  made its repeated self-call linear and compiles exponentially —
+  measured ×4 per two levels of `R(i,x,y) = R(i-1,x,y) +
+  0.5·S(x,y,R(i-1,x,y))`. Declaring `pure: true` on the
+  re-declaration does NOT restore sharing. Attaching in place is
+  exempt, because the definition is still the engine's own.
+
+The evaluate side is NOT symmetric with the decline contract above:
+returning `undefined` from an `evaluate` handler leaves the expression
+unevaluated rather than falling back, so a handler that means to
+delegate must call the captured original explicitly.
+
+Return `undefined` (or an empty string) to fall back to the
+default compilation (a `null` returned from untyped JavaScript is
+tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
+
+#### OperatorDefinition.eq?
+
+```ts
+optional eq?: (a, b, prover?) => boolean | undefined;
+```
+
+Custom equality handler.
+
+`prover` indicates the tier of the caller: `false` for the cheap
+arithmetic tier (`eq()` / `.isEqual()`), `true` for the prover tier
+(`eqIdentical()` / `.isIdenticallyEqual()`), and `undefined` when the
+caller does not distinguish (e.g. `cmp()`). A handler that does
+prover-tier work (sampling, expand/simplify, identity questions in the
+free variables) must decline — return `undefined` — when
+`prover === false`.
+
+#### OperatorDefinition.canEnumerate?
+
+```ts
+optional canEnumerate?: (expr) => boolean | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers (an EAGER producer — `Characters`, `Divisors`, `Eigenvalues`,
+…): can `evaluate()` produce the collection's elements in the current
+state?
+
+This is the operator's own decline test — the guard at the top of its
+`evaluate` handler — exposed so the enumerability facet
+(`isEnumerableCollection`) can answer without evaluating. Contract
+(see `docs/COLLECTIONS-MODEL.md`):
+
+- MUST be O(1), evaluation-free and side-effect free. An impure
+  producer answers from its operands' facets, consuming no draws.
+- `false` means evaluation WOULD decline — callers stay inert without
+  paying for the evaluation.
+- `true` is a hard promise that evaluation produces the collection. An
+  operator whose success is not cheaply decidable (`Solve`,
+  `FindRoot`) must return `undefined`, never `true`.
+- The operand seen here is the CANONICAL operand, not the evaluated
+  one. An unevaluated compound operand (`Divisors(n + 1)`) whose value
+  cannot be read cheaply must yield `undefined` (undecidable), not
+  `false` — only a definitively unavailable operand (a valueless
+  symbol, a literal of the wrong kind) yields `false`. See
+  `canEnumerateOperand` (`collection-utils.ts`) for the shared
+  tri-state resolution.
+
+Ignored (never consulted) when the definition has `collection`
+handlers — those own enumerability via `collection.isEnumerable`.
+
+#### OperatorDefinition.elementCount?
+
+```ts
+optional elementCount?: (expr) => number | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers (an EAGER producer — `Sort`, `Chunk`, `Ordering`, …): how many
+elements would `evaluate()` produce?
+
+The `count` twin of [canEnumerate](#operatordefinition), and the honest replacement for
+the broadcast count fallback: `count` reads the operands' agreed length
+only for a `broadcastable` operator, where agreement IS the semantics
+(`docs/BROADCAST-MODEL.md`). A reshaping operator's length is its own
+business, so it must say so here or report `undefined`.
+
+Contract, mirroring `canEnumerate`:
+
+- MUST be O(1), evaluation-free and side-effect free. An impure producer
+  (`RandomShuffle`) answers from its operands' facets, consuming ZERO
+  draws.
+- The operands seen here are the CANONICAL ones. Anything not cheaply
+  knowable — a non-literal shape argument, an unknown source length —
+  must report `undefined` (decline), never a guess.
+- A returned number is a hard promise: it must equal
+  `expr.evaluate().count`. When evaluation would DECLINE (an infinite or
+  unknown-length source), report `undefined` — a count nobody can walk is
+  worse than no count (Tycho item-169 ruling).
+
+Consulted only when the definition has no `collection.count` handler —
+a declared `count` owns the answer, including its `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+### SymbolDefinitions {#symboldefinitions}
+
+```ts
+type SymbolDefinitions = Readonly<{}>;
+```
+
+</MemberCard>
+
+### ILatexSyntax {#ilatexsyntax}
 
 Minimal interface for a LaTeX parser/serializer.
  Structurally compatible with `LatexSyntax` without importing it.
 
 <MemberCard>
 
-##### ILatexSyntax.parse()
+##### ILatexSyntax.parse() {#parse}
 
 ```ts
 parse(latex, options?): MathJsonExpression | null
@@ -23370,7 +24520,7 @@ parse(latex, options?): MathJsonExpression | null
 
 <MemberCard>
 
-##### ILatexSyntax.serialize()
+##### ILatexSyntax.serialize() {#serialize-2}
 
 ```ts
 serialize(expr, options?): string
@@ -23388,7 +24538,7 @@ serialize(expr, options?): string
 
 <MemberCard>
 
-##### ILatexSyntax.getNamedTriggers()?
+##### ILatexSyntax.getNamedTriggers()? {#getnamedtriggers}
 
 ```ts
 optional getNamedTriggers(): readonly {
@@ -23405,7 +24555,7 @@ Named dictionary entries with their LaTeX trigger strings, for reverse
 
 <MemberCard>
 
-### OperatorInfo
+### OperatorInfo {#operatorinfo}
 
 ```ts
 type OperatorInfo = {
@@ -23419,7 +24569,7 @@ type OperatorInfo = {
 
 <MemberCard>
 
-### SymbolInfo
+### SymbolInfo {#symbolinfo}
 
 ```ts
 type SymbolInfo = {
@@ -23432,7 +24582,7 @@ type SymbolInfo = {
 
 <MemberCard>
 
-### DefinitionSearchResult
+### DefinitionSearchResult {#definitionsearchresult}
 
 ```ts
 type DefinitionSearchResult = {
@@ -23447,7 +24597,7 @@ One result of `ce.searchDefinitions()`.
 
 <MemberCard>
 
-### IntegrationProvider
+### IntegrationProvider {#integrationprovider}
 
 ```ts
 type IntegrationProvider = (integrand, variable, trace?) => Expression | null;
@@ -23466,7 +24616,7 @@ antiderivative was found. The argument is backward-compatible: the plain
 
 <MemberCard>
 
-### ProtocolMember
+### ProtocolMember {#protocolmember}
 
 ```ts
 type ProtocolMember = 
@@ -23488,7 +24638,7 @@ VERBATIM, with `Self` unsubstituted: `Self` is a textual substitution token
 
 <MemberCard>
 
-### InferenceWriteEvent
+### InferenceWriteEvent {#inferencewriteevent}
 
 ```ts
 type InferenceWriteEvent = {
@@ -23499,21 +24649,21 @@ type InferenceWriteEvent = {
   valueDef: BoxedValueDefinition;
   from: BoxedType;
   to: BoxedType;
-  kind: "inferred" | "assumed";
+  kind: "inferred";
 };
 ```
 
 One write of inference evidence onto a definition, as delivered to
 `IComputeEngine._noteInferenceWrite` — the single emission point whose
 subscribers are the provenance history, the fresh-inference set, and the
-narrowing sink. See `docs/plans/2026-08-13-inference-provenance-journal.md`
+narrowing sink. See `docs/TYPE-SYSTEM.md`
 (phase 1).
 
 </MemberCard>
 
 <MemberCard>
 
-### InferenceCauseContext
+### InferenceCauseContext {#inferencecausecontext}
 
 ```ts
 type InferenceCauseContext = {
@@ -23535,7 +24685,7 @@ per canonicalization would not be).
 
 <MemberCard>
 
-### JSImplementation
+### JSImplementation {#jsimplementation}
 
 ```ts
 type JSImplementation = {
@@ -23553,7 +24703,7 @@ function literal (design P10).
 
 <MemberCard>
 
-### ProtocolHostHandler
+### ProtocolHostHandler {#protocolhosthandler}
 
 ```ts
 type ProtocolHostHandler = (...args) => unknown;
@@ -23568,7 +24718,7 @@ here.
 
 <MemberCard>
 
-### ConformanceRecord
+### ConformanceRecord {#conformancerecord}
 
 ```ts
 type ConformanceRecord = {
@@ -23594,7 +24744,7 @@ Conformances are add-only (monotone); only their implementations replace.
 
 <MemberCard>
 
-### ProtocolRecord
+### ProtocolRecord {#protocolrecord}
 
 ```ts
 type ProtocolRecord = {
@@ -23612,7 +24762,7 @@ A protocol declaration and every conformance registered against it.
 
 <MemberCard>
 
-### ProtocolMembersInput
+### ProtocolMembersInput {#protocolmembersinput}
 
 ```ts
 type ProtocolMembersInput = {
@@ -23630,7 +24780,7 @@ buckets (Appendix A "Host API").
 
 <MemberCard>
 
-### ProtocolImplementationInput
+### ProtocolImplementationInput {#protocolimplementationinput}
 
 ```ts
 type ProtocolImplementationInput = {
@@ -23647,7 +24797,41 @@ implementation detail, not part of the public surface).
 
 </MemberCard>
 
-### IComputeEngine
+### EngineCheckpoint {#enginecheckpoint}
+
+A handle on a saved engine state, from [IComputeEngine.checkpoint](#checkpoint).
+Deliberately opaque: `id` is for logging and `live` is the only state a
+client can act on. Declared here rather than in `checkpoint.ts` because it
+is part of the engine's public type surface — and because importing it from
+the implementation would make this file depend on it, closing a cycle
+through the sequence registry.
+
+<MemberCard>
+
+##### EngineCheckpoint.id {#id-4}
+
+```ts
+readonly id: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### EngineCheckpoint.live {#live}
+
+```ts
+readonly live: boolean;
+```
+
+False once invalidated — by a restore to an EARLIER checkpoint, by
+`discard()`, or by popping a scope this checkpoint was taken inside
+(the pop disposes the scope's bindings, so there is no world left to
+restore). A dead checkpoint can never be restored again.
+
+</MemberCard>
+
+### IComputeEngine {#icomputeengine}
 
 #### Extended by
 
@@ -23655,7 +24839,7 @@ implementation detail, not part of the public surface).
 
 <MemberCard>
 
-##### IComputeEngine.latexSyntax
+##### IComputeEngine.latexSyntax {#latexsyntax}
 
 ```ts
 readonly latexSyntax: ILatexSyntax | undefined;
@@ -23668,7 +24852,7 @@ The LatexSyntax instance used for LaTeX parsing/serialization.
 
 <MemberCard>
 
-##### IComputeEngine.latexOptions
+##### IComputeEngine.latexOptions {#latexoptions}
 
 ```ts
 latexOptions: Partial<ParseLatexOptions & SerializeLatexOptions>;
@@ -23682,7 +24866,7 @@ Engine-wide LaTeX parse/serialize options (e.g. `decimalSeparator`).
 
 <MemberCard>
 
-##### IComputeEngine.True
+##### IComputeEngine.True {#true}
 
 ```ts
 readonly True: Expression;
@@ -23692,7 +24876,7 @@ readonly True: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.False
+##### IComputeEngine.False {#false}
 
 ```ts
 readonly False: Expression;
@@ -23702,7 +24886,7 @@ readonly False: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.Pi
+##### IComputeEngine.Pi {#pi}
 
 ```ts
 readonly Pi: Expression;
@@ -23712,7 +24896,7 @@ readonly Pi: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.E
+##### IComputeEngine.E {#e}
 
 ```ts
 readonly E: Expression;
@@ -23722,7 +24906,7 @@ readonly E: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.Nothing
+##### IComputeEngine.Nothing {#nothing}
 
 ```ts
 readonly Nothing: Expression;
@@ -23732,7 +24916,7 @@ readonly Nothing: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.Missing
+##### IComputeEngine.Missing {#missing}
 
 ```ts
 readonly Missing: Expression;
@@ -23744,7 +24928,7 @@ The `Missing` symbol: an absent value whose position is preserved.
 
 <MemberCard>
 
-##### IComputeEngine.Zero
+##### IComputeEngine.Zero {#zero}
 
 ```ts
 readonly Zero: Expression;
@@ -23754,7 +24938,7 @@ readonly Zero: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.One
+##### IComputeEngine.One {#one}
 
 ```ts
 readonly One: Expression;
@@ -23764,7 +24948,7 @@ readonly One: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.Half
+##### IComputeEngine.Half {#half}
 
 ```ts
 readonly Half: Expression;
@@ -23774,7 +24958,7 @@ readonly Half: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.NegativeOne
+##### IComputeEngine.NegativeOne {#negativeone}
 
 ```ts
 readonly NegativeOne: Expression;
@@ -23784,7 +24968,7 @@ readonly NegativeOne: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.Two
+##### IComputeEngine.Two {#two}
 
 ```ts
 readonly Two: Expression;
@@ -23794,7 +24978,7 @@ readonly Two: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.I
+##### IComputeEngine.I {#i}
 
 ```ts
 readonly I: Expression;
@@ -23806,7 +24990,7 @@ ImaginaryUnit
 
 <MemberCard>
 
-##### IComputeEngine.NaN
+##### IComputeEngine.NaN {#nan-1}
 
 ```ts
 readonly NaN: Expression;
@@ -23816,7 +25000,7 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.PositiveInfinity
+##### IComputeEngine.PositiveInfinity {#positiveinfinity-1}
 
 ```ts
 readonly PositiveInfinity: Expression;
@@ -23826,7 +25010,7 @@ readonly PositiveInfinity: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.NegativeInfinity
+##### IComputeEngine.NegativeInfinity {#negativeinfinity-1}
 
 ```ts
 readonly NegativeInfinity: Expression;
@@ -23836,7 +25020,7 @@ readonly NegativeInfinity: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.ComplexInfinity
+##### IComputeEngine.ComplexInfinity {#complexinfinity}
 
 ```ts
 readonly ComplexInfinity: Expression;
@@ -23846,7 +25030,7 @@ readonly ComplexInfinity: Expression;
 
 <MemberCard>
 
-##### IComputeEngine.context
+##### IComputeEngine.context {#context}
 
 ```ts
 readonly context: EvalContext;
@@ -23856,7 +25040,7 @@ readonly context: EvalContext;
 
 <MemberCard>
 
-##### IComputeEngine.contextStack
+##### IComputeEngine.contextStack {#contextstack}
 
 ```ts
 contextStack: readonly EvalContext[];
@@ -23866,7 +25050,7 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
-##### IComputeEngine.iterationLimit
+##### IComputeEngine.iterationLimit {#iterationlimit}
 
 ```ts
 iterationLimit: number;
@@ -23876,7 +25060,7 @@ iterationLimit: number;
 
 <MemberCard>
 
-##### IComputeEngine.recursionLimit
+##### IComputeEngine.recursionLimit {#recursionlimit}
 
 ```ts
 recursionLimit: number;
@@ -23886,7 +25070,7 @@ recursionLimit: number;
 
 <MemberCard>
 
-##### IComputeEngine.maxCollectionSize
+##### IComputeEngine.maxCollectionSize {#maxcollectionsize}
 
 ```ts
 maxCollectionSize: number;
@@ -23896,7 +25080,7 @@ maxCollectionSize: number;
 
 <MemberCard>
 
-##### IComputeEngine.bignum
+##### IComputeEngine.bignum {#bignum-1}
 
 ```ts
 bignum: (a) => BigDecimal;
@@ -23906,7 +25090,7 @@ bignum: (a) => BigDecimal;
 
 <MemberCard>
 
-##### IComputeEngine.complex
+##### IComputeEngine.complex {#complex-1}
 
 ```ts
 complex: (a, b?) => Complex;
@@ -23916,7 +25100,7 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### IComputeEngine.tolerance
+##### IComputeEngine.tolerance {#tolerance-1}
 
 ```ts
 tolerance: number;
@@ -23926,7 +25110,7 @@ tolerance: number;
 
 <MemberCard>
 
-##### IComputeEngine.angularUnit
+##### IComputeEngine.angularUnit {#angularunit-1}
 
 ```ts
 angularUnit: AngularUnit;
@@ -23936,7 +25120,7 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
-##### IComputeEngine.costFunction
+##### IComputeEngine.costFunction {#costfunction-1}
 
 ```ts
 costFunction: (expr) => number;
@@ -23946,7 +25130,7 @@ costFunction: (expr) => number;
 
 <MemberCard>
 
-##### IComputeEngine.simplificationRules
+##### IComputeEngine.simplificationRules {#simplificationrules}
 
 ```ts
 simplificationRules: Rule[];
@@ -23960,7 +25144,7 @@ The rules used by `.simplify()` when no explicit `rules` option is passed.
 
 <MemberCard>
 
-##### IComputeEngine.solveRules
+##### IComputeEngine.solveRules {#solverules}
 
 ```ts
 solveRules: Rule[];
@@ -23979,7 +25163,7 @@ The rules used by `solve()` to find roots of univariate expressions.
 
 <MemberCard>
 
-##### IComputeEngine.harmonizationRules
+##### IComputeEngine.harmonizationRules {#harmonizationrules}
 
 ```ts
 harmonizationRules: Rule[];
@@ -23993,7 +25177,7 @@ The rules used by `solve()` to transform an equation into equivalent,
 
 <MemberCard>
 
-##### IComputeEngine.strict
+##### IComputeEngine.strict {#strict}
 
 ```ts
 strict: boolean;
@@ -24003,7 +25187,7 @@ strict: boolean;
 
 <MemberCard>
 
-##### IComputeEngine.jit
+##### IComputeEngine.jit {#jit}
 
 ```ts
 jit: "auto" | "off";
@@ -24019,7 +25203,7 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
-##### IComputeEngine.trace
+##### IComputeEngine.trace {#trace}
 
 ```ts
 trace: readonly string[];
@@ -24031,7 +25215,7 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
-##### IComputeEngine.precision
+##### IComputeEngine.precision {#precision}
 
 ```ts
 get precision(): number
@@ -24042,7 +25226,69 @@ set precision(p: number | "auto" | "machine"): void
 
 <MemberCard>
 
-##### IComputeEngine.declareProtocol()
+##### IComputeEngine.checkpoint() {#checkpoint}
+
+```ts
+checkpoint(label?): EngineCheckpoint
+```
+
+Take a checkpoint of the engine's state at a quiescent point — between
+statements, at any scope depth — so a later [restore](#restore) can rewind
+to it. Legal on a freshly constructed engine, which is how a client gets
+a `cp[0]` covering an edit of the first cell, and inside a host-pushed
+scope, which is how a notebook takes per-cell checkpoints within a pass.
+A checkpoint taken inside a scope dies when that scope pops. Throws a
+`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
+[restore](#restore) additionally requires the same scope stack the
+checkpoint was taken on.
+
+####### label?
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.restore() {#restore}
+
+```ts
+restore(cp): void
+```
+
+Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
+stays live and can be restored again. Expressions built BEFORE `cp` stay
+valid — their definitions are rewritten in place. Expressions built
+during the rewound window are not: cache cell outputs as serialized
+artifacts, never as live boxed nodes.
+
+####### cp
+
+[`EngineCheckpoint`](#enginecheckpoint)
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.discard() {#discard}
+
+```ts
+discard(cp): void
+```
+
+Release `cp`'s restore capability. Restoring past a discarded INTERIOR
+checkpoint stays possible through any earlier live one; discarding the
+OLDEST makes the state before the next-younger one unreachable.
+
+####### cp
+
+[`EngineCheckpoint`](#enginecheckpoint)
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.declareProtocol() {#declareprotocol}
 
 ```ts
 declareProtocol(name, members): void
@@ -24063,7 +25309,7 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 
 <MemberCard>
 
-##### IComputeEngine.declareProtocolImplementation()
+##### IComputeEngine.declareProtocolImplementation() {#declareprotocolimplementation}
 
 ```ts
 declareProtocolImplementation(
@@ -24113,7 +25359,7 @@ throws.
 
 <MemberCard>
 
-##### IComputeEngine.withTimeLimit()
+##### IComputeEngine.withTimeLimit() {#withtimelimit}
 
 ```ts
 withTimeLimit<T>(limit, fn): T
@@ -24149,7 +25395,7 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
-##### IComputeEngine.chop()
+##### IComputeEngine.chop() {#chop}
 
 ###### chop(n)
 
@@ -24185,7 +25431,7 @@ chop(n): number | BigDecimal
 
 <MemberCard>
 
-##### IComputeEngine.expr()
+##### IComputeEngine.expr() {#expr-2}
 
 ```ts
 expr(expr, options?): Expression
@@ -24210,7 +25456,7 @@ expr(expr, options?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.~~box()~~
+##### IComputeEngine.~~box()~~ {#box}
 
 ```ts
 box(expr, options?): Expression
@@ -24239,7 +25485,7 @@ Use `expr()` instead.
 
 <MemberCard>
 
-##### IComputeEngine.parse()
+##### IComputeEngine.parse() {#parse-1}
 
 ###### parse(latex, options)
 
@@ -24304,7 +25550,7 @@ parse(latex, options?): Expression | null
 
 <MemberCard>
 
-##### IComputeEngine.appliedNonFunctions()
+##### IComputeEngine.appliedNonFunctions() {#appliednonfunctions}
 
 ```ts
 appliedNonFunctions(latex): string[]
@@ -24330,7 +25576,7 @@ juxtaposition analysis.
 
 <MemberCard>
 
-##### IComputeEngine.function()
+##### IComputeEngine.function() {#function}
 
 ```ts
 function(name, ops, options?): Expression
@@ -24362,12 +25608,12 @@ readonly [`ExpressionInput`](#expressioninput)[]
 
 <MemberCard>
 
-##### IComputeEngine.\_getCompilationTarget()
+##### IComputeEngine.\_getCompilationTarget() {#_getcompilationtarget}
 
 ###### \_getCompilationTarget(name)
 
 ```ts
-_getCompilationTarget(name):
+_getCompilationTarget(name): 
   | JavaScriptCompilationTarget<Expression>
   | undefined
 ```
@@ -24379,7 +25625,7 @@ _getCompilationTarget(name):
 ###### \_getCompilationTarget(name)
 
 ```ts
-_getCompilationTarget(name):
+_getCompilationTarget(name): 
   | LanguageTarget<Expression, string, unknown, number>
   | undefined
 ```
@@ -24392,7 +25638,7 @@ _getCompilationTarget(name):
 
 <MemberCard>
 
-##### IComputeEngine.number()
+##### IComputeEngine.number() {#number-1}
 
 ```ts
 number(value, options?): Expression
@@ -24423,7 +25669,7 @@ number(value, options?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.symbol()
+##### IComputeEngine.symbol() {#symbol}
 
 ```ts
 symbol(sym, options?): Expression
@@ -24451,7 +25697,7 @@ symbol(sym, options?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.string()
+##### IComputeEngine.string() {#string-1}
 
 ```ts
 string(s, metadata?): Expression
@@ -24469,7 +25715,7 @@ string(s, metadata?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.character()
+##### IComputeEngine.character() {#character-1}
 
 ```ts
 character(s, metadata?): Expression
@@ -24493,7 +25739,7 @@ it reports a diagnostic instead.
 
 <MemberCard>
 
-##### IComputeEngine.error()
+##### IComputeEngine.error() {#error-1}
 
 ```ts
 error(message, where?): Expression
@@ -24511,7 +25757,7 @@ error(message, where?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.typeError()
+##### IComputeEngine.typeError() {#typeerror}
 
 ```ts
 typeError(expectedType, actualType, where?): Expression
@@ -24535,7 +25781,7 @@ typeError(expectedType, actualType, where?): Expression
 
 <MemberCard>
 
-##### IComputeEngine.hold()
+##### IComputeEngine.hold() {#hold}
 
 ```ts
 hold(expr): Expression
@@ -24549,7 +25795,7 @@ hold(expr): Expression
 
 <MemberCard>
 
-##### IComputeEngine.tuple()
+##### IComputeEngine.tuple() {#tuple}
 
 ###### tuple(elements)
 
@@ -24575,7 +25821,7 @@ tuple(...elements): Expression
 
 <MemberCard>
 
-##### IComputeEngine.type()
+##### IComputeEngine.type() {#type-10}
 
 ```ts
 type(type): BoxedType
@@ -24598,7 +25844,6 @@ type(type): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -24608,7 +25853,7 @@ type(type): BoxedType
 
 <MemberCard>
 
-##### IComputeEngine.rules()
+##### IComputeEngine.rules() {#rules-1}
 
 ```ts
 rules(rules, options?): BoxedRuleSet
@@ -24635,7 +25880,7 @@ Default purpose applied to any rule in the set that doesn't carry
 
 <MemberCard>
 
-##### IComputeEngine.getRuleSet()
+##### IComputeEngine.getRuleSet() {#getruleset}
 
 ```ts
 getRuleSet(id?): BoxedRuleSet | undefined
@@ -24649,7 +25894,7 @@ getRuleSet(id?): BoxedRuleSet | undefined
 
 <MemberCard>
 
-##### IComputeEngine.pushScope()
+##### IComputeEngine.pushScope() {#pushscope}
 
 ```ts
 pushScope(scope?, name?): void
@@ -24667,7 +25912,7 @@ pushScope(scope?, name?): void
 
 <MemberCard>
 
-##### IComputeEngine.popScope()
+##### IComputeEngine.popScope() {#popscope}
 
 ```ts
 popScope(): void
@@ -24677,7 +25922,7 @@ popScope(): void
 
 <MemberCard>
 
-##### IComputeEngine.createScope()
+##### IComputeEngine.createScope() {#createscope}
 
 ```ts
 createScope(bindings?, parent?): InspectableScope
@@ -24701,7 +25946,6 @@ createScope(bindings?, parent?): InspectableScope
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -24716,7 +25960,7 @@ createScope(bindings?, parent?): InspectableScope
 
 <MemberCard>
 
-##### IComputeEngine.lookupDefinition()
+##### IComputeEngine.lookupDefinition() {#lookupdefinition-1}
 
 ```ts
 lookupDefinition(id): BoxedDefinition | undefined
@@ -24730,7 +25974,7 @@ lookupDefinition(id): BoxedDefinition | undefined
 
 <MemberCard>
 
-##### IComputeEngine.assign()
+##### IComputeEngine.assign() {#assign}
 
 ###### assign(ids)
 
@@ -24772,7 +26016,7 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
-##### IComputeEngine.declareType()
+##### IComputeEngine.declareType() {#declaretype}
 
 ```ts
 declareType(name, type, options?): void
@@ -24799,7 +26043,6 @@ declareType(name, type, options?): void
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -24827,7 +26070,7 @@ declareType(name, type, options?): void
 
 <MemberCard>
 
-##### IComputeEngine.declare()
+##### IComputeEngine.declare() {#declare}
 
 ###### declare(symbols)
 
@@ -24837,17 +26080,17 @@ declare(symbols): IComputeEngine
 
 ####### symbols
 
-###### declare(id, def, scope)
+###### declare(id, type, scope)
 
 ```ts
-declare(id, def, scope?): IComputeEngine
+declare(id, type, scope?): IComputeEngine
 ```
 
 ####### id
 
 `string`
 
-####### def
+####### type
 
   \| `string`
   \| [`AlgebraicType`](#algebraictype)
@@ -24864,198 +26107,27 @@ declare(id, def, scope?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
-  \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
-  `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-  `type`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferred`: `boolean`;
-  `effectsDeclared`: `boolean`;
-  `value`:   \| [`ExpressionInput`](#expressioninput)
-     \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
-  `eq`: (`a`) => `boolean` \| `undefined`;
-  `neq`: (`a`) => `boolean` \| `undefined`;
-  `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
- \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-  `signature`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
-  `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
-  `isPositive`: `boolean`;
-  `isNonNegative`: `boolean`;
-  `isNegative`: `boolean`;
-  `isNonPositive`: `boolean`;
-  `even`: (`ops`, `options`) => `boolean` \| `undefined`;
-  `complexity`: `number`;
-  `canonical`: (`ops`, `options`) => [`Expression`](#expression-5) \| `null`;
-  `evaluate`:   \| [`Expression`](#expression-5)
-     \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
-  `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
-  `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
-  `neq`: (`a`, `b`) => `boolean` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
-  `elementCount`: (`expr`) => `number` \| `undefined`;
- \}\>\>
-  \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
-  `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
-  `type`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferred`: `boolean`;
-  `effectsDeclared`: `boolean`;
-  `value`:   \| [`ExpressionInput`](#expressioninput)
-     \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
-  `eq`: (`a`) => `boolean` \| `undefined`;
-  `neq`: (`a`) => `boolean` \| `undefined`;
-  `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
- \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
-  `signature`:   \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype);
-  `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
-  `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
-  `isPositive`: `boolean`;
-  `isNonNegative`: `boolean`;
-  `isNegative`: `boolean`;
-  `isNonPositive`: `boolean`;
-  `even`: (`ops`, `options`) => `boolean` \| `undefined`;
-  `complexity`: `number`;
-  `canonical`: (`ops`, `options`) => [`Expression`](#expression-5) \| `null`;
-  `evaluate`:   \| [`Expression`](#expression-5)
-     \| ((`ops`, `options`) => [`Expression`](#expression-5) \| `undefined`);
-  `evaluateAsync`: (`ops`, `options`) => `Promise`\<[`Expression`](#expression-5) \| `undefined`\>;
-  `evalDimension`: (`args`, `options`) => [`Expression`](#expression-5);
-  `compile`: [`OperatorCompileHandler`](#operatorcompilehandler);
-  `eq`: (`a`, `b`, `prover?`) => `boolean` \| `undefined`;
-  `neq`: (`a`, `b`) => `boolean` \| `undefined`;
-  `collection`: [`CollectionHandlers`](#collectionhandlers);
-  `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
-  `elementCount`: (`expr`) => `number` \| `undefined`;
- \}\>\>
+
+####### scope?
+
+`Scope`
+
+###### declare(id, def, scope)
+
+```ts
+declare(id, def, scope?): IComputeEngine
+```
+
+####### id
+
+`string`
+
+####### def
+
+[`SymbolDefinitionInput`](#symboldefinitioninput)
 
 ####### scope?
 
@@ -25088,7 +26160,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -25109,7 +26180,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -25124,6 +26194,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+  `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
@@ -25139,34 +26210,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
   `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
   `isPositive`: `boolean`;
   `isNonNegative`: `boolean`;
@@ -25203,7 +26251,6 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
@@ -25218,6 +26265,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `subscriptEvaluate`: (`subscript`, `options`) => [`Expression`](#expression-5) \| `undefined`;
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
+  `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
@@ -25233,34 +26281,11 @@ declare(arg1, arg2?, arg3?): IComputeEngine
      \| [`ExpressionType`](#expressiontype)
      \| [`NumericType`](#numerictype)
      \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
      \| [`ValueType`](#valuetype)
      \| [`TypeVariable`](#typevariable)
      \| [`TypeReference`](#typereference)
      \| [`BoxedType`](#boxedtype);
   `inferredSignature`: `boolean`;
-  `type`: (`ops`, `options`) => 
-     \| `string`
-     \| [`AlgebraicType`](#algebraictype)
-     \| [`NegationType`](#negationtype)
-     \| [`CollectionType`](#collectiontype)
-     \| [`ListType`](#listtype)
-     \| [`SetType`](#settype)
-     \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
-     \| [`ObjectType`](#objecttype)
-     \| [`DictionaryType`](#dictionarytype)
-     \| [`TupleType`](#tupletype)
-     \| [`SymbolType`](#symboltype)
-     \| [`ExpressionType`](#expressiontype)
-     \| [`NumericType`](#numerictype)
-     \| [`FunctionSignature`](#functionsignature)
-     \| [`CallbackType`](#callbacktype)
-     \| [`ValueType`](#valuetype)
-     \| [`TypeVariable`](#typevariable)
-     \| [`TypeReference`](#typereference)
-     \| [`BoxedType`](#boxedtype)
-     \| `undefined`;
   `sgn`: (`ops`, `options`) => [`Sign`](#sign) \| `undefined`;
   `isPositive`: `boolean`;
   `isNonNegative`: `boolean`;
@@ -25280,6 +26305,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
  \}\>\>
+  \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
 ####### arg3?
 
@@ -25289,7 +26315,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 
 <MemberCard>
 
-##### IComputeEngine.assume()
+##### IComputeEngine.assume() {#assume}
 
 ```ts
 assume(predicate): AssumeResult
@@ -25303,7 +26329,7 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
-##### IComputeEngine.declareSequence()
+##### IComputeEngine.declareSequence() {#declaresequence}
 
 ```ts
 declareSequence(name, def): IComputeEngine
@@ -25334,7 +26360,7 @@ ce.parse('F_{10}').evaluate();  // → 55
 
 <MemberCard>
 
-##### IComputeEngine.getSequenceStatus()
+##### IComputeEngine.getSequenceStatus() {#getsequencestatus}
 
 ```ts
 getSequenceStatus(name): SequenceStatus
@@ -25358,7 +26384,7 @@ ce.getSequenceStatus('F');
 
 <MemberCard>
 
-##### IComputeEngine.getSequence()
+##### IComputeEngine.getSequence() {#getsequence}
 
 ```ts
 getSequence(name): SequenceInfo | undefined
@@ -25375,7 +26401,7 @@ Returns `undefined` if the symbol is not a sequence.
 
 <MemberCard>
 
-##### IComputeEngine.listSequences()
+##### IComputeEngine.listSequences() {#listsequences}
 
 ```ts
 listSequences(): string[]
@@ -25388,7 +26414,7 @@ Returns an array of sequence names.
 
 <MemberCard>
 
-##### IComputeEngine.isSequence()
+##### IComputeEngine.isSequence() {#issequence}
 
 ```ts
 isSequence(name): boolean
@@ -25404,7 +26430,7 @@ Check if a symbol is a defined sequence.
 
 <MemberCard>
 
-##### IComputeEngine.clearSequenceCache()
+##### IComputeEngine.clearSequenceCache() {#clearsequencecache}
 
 ```ts
 clearSequenceCache(name?): void
@@ -25421,7 +26447,7 @@ If no name is provided, clears caches for all sequences.
 
 <MemberCard>
 
-##### IComputeEngine.getSequenceCache()
+##### IComputeEngine.getSequenceCache() {#getsequencecache}
 
 ```ts
 getSequenceCache(name): 
@@ -25443,7 +26469,7 @@ For multi-index sequences, keys are comma-separated strings (e.g., '5,2').
 
 <MemberCard>
 
-##### IComputeEngine.getSequenceTerms()
+##### IComputeEngine.getSequenceTerms() {#getsequenceterms}
 
 ```ts
 getSequenceTerms(
@@ -25491,7 +26517,7 @@ ce.getSequenceTerms('F', 0, 10);
 
 <MemberCard>
 
-##### IComputeEngine.lookupOEIS()
+##### IComputeEngine.lookupOEIS() {#lookupoeis}
 
 ```ts
 lookupOEIS(terms, options?): Promise<OEISSequenceInfo[]>
@@ -25522,7 +26548,7 @@ const results = await ce.lookupOEIS([0, 1, 1, 2, 3, 5, 8, 13]);
 
 <MemberCard>
 
-##### IComputeEngine.checkSequenceOEIS()
+##### IComputeEngine.checkSequenceOEIS() {#checksequenceoeis}
 
 ```ts
 checkSequenceOEIS(name, count?, options?): Promise<{
@@ -25563,7 +26589,7 @@ const result = await ce.checkSequenceOEIS('F', 10);
 
 <MemberCard>
 
-##### IComputeEngine.interpret()
+##### IComputeEngine.interpret() {#interpret}
 
 ```ts
 interpret(expr, options?): Promise<InterpretResult>
@@ -25603,7 +26629,7 @@ const { expression, candidates } = await ce.interpret(
 
 <MemberCard>
 
-##### IComputeEngine.forget()
+##### IComputeEngine.forget() {#forget}
 
 ```ts
 forget(symbol?): void
@@ -25617,7 +26643,7 @@ forget(symbol?): void
 
 <MemberCard>
 
-##### IComputeEngine.ask()
+##### IComputeEngine.ask() {#ask}
 
 ```ts
 ask(pattern): BoxedSubstitution[]
@@ -25631,7 +26657,7 @@ ask(pattern): BoxedSubstitution[]
 
 <MemberCard>
 
-##### IComputeEngine.verify()
+##### IComputeEngine.verify() {#verify}
 
 ```ts
 verify(query): boolean | undefined
@@ -25645,7 +26671,7 @@ verify(query): boolean | undefined
 
 <MemberCard>
 
-##### IComputeEngine.operatorInfo()
+##### IComputeEngine.operatorInfo() {#operatorinfo-1}
 
 ```ts
 operatorInfo(head): OperatorInfo | undefined
@@ -25670,7 +26696,7 @@ maintaining a parallel list of "known" operators.
 
 <MemberCard>
 
-##### IComputeEngine.normalizeIdentifier()
+##### IComputeEngine.normalizeIdentifier() {#normalizeidentifier}
 
 ```ts
 normalizeIdentifier(latex): string
@@ -25696,7 +26722,7 @@ name without the side-effect of auto-declaring the symbol.
 
 <MemberCard>
 
-##### IComputeEngine.symbolInfo()
+##### IComputeEngine.symbolInfo() {#symbolinfo-1}
 
 ```ts
 symbolInfo(name): SymbolInfo | undefined
@@ -25722,7 +26748,7 @@ two methods are non-overlapping).
 
 <MemberCard>
 
-##### IComputeEngine.searchDefinitions()
+##### IComputeEngine.searchDefinitions() {#searchdefinitions}
 
 ```ts
 searchDefinitions(query, options?): DefinitionSearchResult[]
@@ -25754,7 +26780,7 @@ call for full detail.
 
 <MemberCard>
 
-##### IComputeEngine.suggestOperatorName()
+##### IComputeEngine.suggestOperatorName() {#suggestoperatorname}
 
 ```ts
 suggestOperatorName(name): string | undefined
@@ -25783,7 +26809,7 @@ ce.suggestOperatorName('foo');      // → undefined
 
 <MemberCard>
 
-##### IComputeEngine.functionProperties()
+##### IComputeEngine.functionProperties() {#functionproperties-1}
 
 ```ts
 functionProperties(name): FunctionProperties | undefined
@@ -25809,7 +26835,7 @@ residues that depend on parameters) are available via `entries`.
 
 <MemberCard>
 
-##### IComputeEngine.toJSON()
+##### IComputeEngine.toJSON() {#tojson-2}
 
 ```ts
 toJSON(): string
@@ -25821,7 +26847,7 @@ Debug representation, e.g. for `JSON.stringify()`.
 
 <MemberCard>
 
-### RuleStep
+### RuleStep {#rulestep}
 
 ```ts
 type RuleStep = KernelRuleStep<Expression>;
@@ -25833,7 +26859,7 @@ A single rule application step with provenance.
 
 <MemberCard>
 
-### RuleSteps
+### RuleSteps {#rulesteps}
 
 ```ts
 type RuleSteps = KernelRuleSteps<Expression>;
@@ -25845,7 +26871,7 @@ A list of rule application steps.
 
 <MemberCard>
 
-### ExplainStep
+### ExplainStep {#explainstep}
 
 ```ts
 type ExplainStep = KernelExplainStep<Expression>;
@@ -25857,7 +26883,7 @@ One step of an `Explanation`. See `expr.explain()`.
 
 <MemberCard>
 
-### Explanation
+### Explanation {#explanation}
 
 ```ts
 type Explanation = KernelExplanation<Expression>;
@@ -25869,7 +26895,7 @@ A structured step-by-step explanation. See `expr.explain()`.
 
 <MemberCard>
 
-### BoxedRule
+### BoxedRule {#boxedrule}
 
 ```ts
 type BoxedRule = KernelBoxedRule<Expression, IComputeEngine>;
@@ -25881,7 +26907,7 @@ A boxed/normalized rule form.
 
 <MemberCard>
 
-### BoxedRuleSet
+### BoxedRuleSet {#boxedruleset}
 
 ```ts
 type BoxedRuleSet = KernelBoxedRuleSet<Expression, IComputeEngine>;
@@ -25893,7 +26919,7 @@ Collection of boxed rules.
 
 <MemberCard>
 
-### Scope
+### Scope {#scope}
 
 ```ts
 type Scope = KernelScope<BoxedDefinition>;
@@ -25905,7 +26931,7 @@ Lexical scope specialized to boxed definitions.
 
 <MemberCard>
 
-### InspectableScope
+### InspectableScope {#inspectablescope}
 
 ```ts
 type InspectableScope = KernelInspectableScope<BoxedDefinition>;
@@ -25918,7 +26944,7 @@ A caller-owned, readable lexical scope — the product of
 
 <MemberCard>
 
-### ScopeDeclaration
+### ScopeDeclaration {#scopedeclaration}
 
 ```ts
 type ScopeDeclaration = KernelScopeDeclaration<BoxedDefinition>;
@@ -25930,7 +26956,7 @@ One entry of an [InspectableScope](#inspectablescope) harvest.
 
 <MemberCard>
 
-### ScopeNarrowing
+### ScopeNarrowing {#scopenarrowing}
 
 ```ts
 type ScopeNarrowing = KernelScopeNarrowing<BoxedDefinition>;
@@ -25942,23 +26968,23 @@ One outer-definition narrowing observed by an [InspectableScope](#inspectablesco
 
 <MemberCard>
 
-### EvalContext
+### EvalContext {#evalcontext}
 
 ```ts
-type EvalContext = KernelEvalContext<Expression, BoxedDefinition>;
+type EvalContext = KernelEvalContext<Expression, BoxedDefinition, BoxedValueDefinition>;
 ```
 
 Evaluation context specialized to this engine/runtime model.
 
 </MemberCard>
 
-### Expression
+### Expression {#expression-5}
 
 #### Function Expression
 
 <MemberCard>
 
-##### Expression.operator
+##### Expression.operator {#operator-4}
 
 ```ts
 readonly operator: string;
@@ -25982,7 +27008,7 @@ collapse to `"Number"`.
 
 <MemberCard>
 
-##### Expression.parseDiagnostics?
+##### Expression.parseDiagnostics? {#parsediagnostics}
 
 ```ts
 optional parseDiagnostics?: readonly ParseDiagnostic[];
@@ -26005,7 +27031,7 @@ See [ParseDiagnostic](#parsediagnostic) for the code enumeration and span conven
 
 <MemberCard>
 
-##### Expression.isEven
+##### Expression.isEven {#iseven}
 
 ```ts
 readonly isEven: boolean | undefined;
@@ -26017,7 +27043,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### Expression.isOdd
+##### Expression.isOdd {#isodd}
 
 ```ts
 readonly isOdd: boolean | undefined;
@@ -26029,7 +27055,7 @@ If the value of this expression is not an **integer** return `undefined`.
 
 <MemberCard>
 
-##### Expression.re
+##### Expression.re {#re-2}
 
 ```ts
 readonly re: number;
@@ -26043,7 +27069,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### Expression.im
+##### Expression.im {#im-2}
 
 ```ts
 readonly im: number;
@@ -26058,7 +27084,7 @@ Otherwise, return `NaN` (not a number).
 
 <MemberCard>
 
-##### Expression.bignumRe
+##### Expression.bignumRe {#bignumre-1}
 
 ```ts
 readonly bignumRe: BigDecimal | undefined;
@@ -26080,7 +27106,7 @@ otherwise as a number or `NaN` if the value is not a number.
 
 <MemberCard>
 
-##### Expression.bignumIm
+##### Expression.bignumIm {#bignumim-1}
 
 ```ts
 readonly bignumIm: BigDecimal | undefined;
@@ -26104,7 +27130,7 @@ When using this pattern, the value is returned as a bignum if available, otherwi
 
 <MemberCard>
 
-##### Expression.sgn
+##### Expression.sgn {#sgn-3}
 
 ```ts
 readonly sgn: Sign | undefined;
@@ -26126,7 +27152,7 @@ Non-canonical expressions return `undefined`.
 
 <MemberCard>
 
-##### Expression.isPositive
+##### Expression.isPositive {#ispositive}
 
 ```ts
 readonly isPositive: boolean | undefined;
@@ -26138,7 +27164,7 @@ The value of this expression is > 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### Expression.isNonNegative
+##### Expression.isNonNegative {#isnonnegative}
 
 ```ts
 readonly isNonNegative: boolean | undefined;
@@ -26150,7 +27176,7 @@ The value of this expression is >= 0, same as `isGreaterEqual(0)`
 
 <MemberCard>
 
-##### Expression.isNegative
+##### Expression.isNegative {#isnegative}
 
 ```ts
 readonly isNegative: boolean | undefined;
@@ -26162,7 +27188,7 @@ The value of this expression is &lt; 0, same as `isLess(0)`
 
 <MemberCard>
 
-##### Expression.isNonPositive
+##### Expression.isNonPositive {#isnonpositive}
 
 ```ts
 readonly isNonPositive: boolean | undefined;
@@ -26174,7 +27200,7 @@ The  value of this expression is &lt;= 0, same as `isLessEqual(0)`
 
 <MemberCard>
 
-##### Expression.isNaN
+##### Expression.isNaN {#isnan-1}
 
 ```ts
 readonly isNaN: boolean | undefined;
@@ -26192,7 +27218,7 @@ number).
 
 <MemberCard>
 
-##### Expression.isInfinity
+##### Expression.isInfinity {#isinfinity}
 
 ```ts
 readonly isInfinity: boolean | undefined;
@@ -26204,7 +27230,7 @@ The numeric value of this expression is `±Infinity` or ComplexInfinity.
 
 <MemberCard>
 
-##### Expression.isFinite
+##### Expression.isFinite {#isfinite-1}
 
 ```ts
 readonly isFinite: boolean | undefined;
@@ -26219,7 +27245,7 @@ This expression is a number, but not `±Infinity`, `ComplexInfinity` or
 
 <MemberCard>
 
-##### Expression.hash
+##### Expression.hash {#hash}
 
 ```ts
 readonly hash: number;
@@ -26255,7 +27281,7 @@ The contract:
 
 <MemberCard>
 
-##### Expression.engine
+##### Expression.engine {#engine-1}
 
 ```ts
 readonly engine: ExpressionComputeEngine;
@@ -26269,7 +27295,7 @@ and functions.
 
 <MemberCard>
 
-##### Expression.toMathJson()
+##### Expression.toMathJson() {#tomathjson}
 
 ```ts
 toMathJson(options?): MathJsonExpression
@@ -26289,7 +27315,7 @@ numbers to `ce.precision` significant digits. The default
 
 <MemberCard>
 
-##### Expression.json
+##### Expression.json {#json}
 
 ```ts
 readonly json: MathJsonExpression;
@@ -26323,7 +27349,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.latex
+##### Expression.latex {#latex-1}
 
 ```ts
 readonly latex: string;
@@ -26342,7 +27368,7 @@ transcendentals) are not displayed.
 
 <MemberCard>
 
-##### Expression.toLatex()
+##### Expression.toLatex() {#tolatex}
 
 ```ts
 toLatex(options?): string
@@ -26361,7 +27387,7 @@ Numeric values are rounded to `ce.precision` significant digits.
 
 <MemberCard>
 
-##### Expression.print()
+##### Expression.print() {#print-1}
 
 ```ts
 print(): void
@@ -26375,7 +27401,7 @@ Note that lazy collections are eagerly evaluated when printed.
 
 <MemberCard>
 
-##### Expression.verbatimLatex?
+##### Expression.verbatimLatex? {#verbatimlatex}
 
 ```ts
 optional verbatimLatex?: string;
@@ -26388,7 +27414,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
-##### Expression.sourceOffsets?
+##### Expression.sourceOffsets? {#sourceoffsets-1}
 
 ```ts
 optional sourceOffsets?: [number, number];
@@ -26400,7 +27426,7 @@ Source offsets in the original source string, when available.
 
 <MemberCard>
 
-##### Expression.isCanonical
+##### Expression.isCanonical {#iscanonical}
 
 If `true`, this expression is in a canonical form.
 
@@ -26408,7 +27434,7 @@ If `true`, this expression is in a canonical form.
 
 <MemberCard>
 
-##### Expression.isStructural
+##### Expression.isStructural {#isstructural}
 
 If `true`, this expression is in a structural form.
 
@@ -26420,7 +27446,7 @@ function expression instead of a `Expression` object.
 
 <MemberCard>
 
-##### Expression.canonical
+##### Expression.canonical {#canonical-1}
 
 Return the canonical form of this expression.
 
@@ -26454,7 +27480,7 @@ This means that, likewise for partially canonical expressions, the
 
 <MemberCard>
 
-##### Expression.structural
+##### Expression.structural {#structural}
 
 Return the structural form of this expression.
 
@@ -26471,7 +27497,7 @@ otherwise return `this`.
 
 <MemberCard>
 
-##### Expression.isValid
+##### Expression.isValid {#isvalid}
 
 ```ts
 readonly isValid: boolean;
@@ -26511,7 +27537,7 @@ an error code and the offending operand.
 
 <MemberCard>
 
-##### Expression.isPure
+##### Expression.isPure {#ispure}
 
 ```ts
 readonly isPure: boolean;
@@ -26547,7 +27573,7 @@ effect channel: "no impurity label in `effectsOf(expr)`" (see
 
 <MemberCard>
 
-##### Expression.effects
+##### Expression.effects {#effects-2}
 
 ```ts
 readonly effects: 
@@ -26586,7 +27612,7 @@ application's effects are computed from its operator and operands.
 
 <MemberCard>
 
-##### Expression.isConstant
+##### Expression.isConstant {#isconstant-1}
 
 ```ts
 readonly isConstant: boolean;
@@ -26609,7 +27635,7 @@ with constant arguments are all *constant*, i.e.:
 
 <MemberCard>
 
-##### Expression.errors
+##### Expression.errors {#errors}
 
 ```ts
 readonly errors: readonly Expression[];
@@ -26628,7 +27654,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.getSubexpressions()
+##### Expression.getSubexpressions() {#getsubexpressions}
 
 ```ts
 getSubexpressions(operator): readonly Expression[]
@@ -26656,7 +27682,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.subexpressions
+##### Expression.subexpressions {#subexpressions}
 
 ```ts
 readonly subexpressions: readonly Expression[];
@@ -26680,7 +27706,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.symbols
+##### Expression.symbols {#symbols}
 
 ```ts
 readonly symbols: readonly string[];
@@ -26706,7 +27732,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.unknowns
+##### Expression.unknowns {#unknowns}
 
 ```ts
 readonly unknowns: readonly string[];
@@ -26719,7 +27745,7 @@ associated with them, i.e. they are declared but not defined.
 
 <MemberCard>
 
-##### Expression.freeVariables
+##### Expression.freeVariables {#freevariables}
 
 ```ts
 readonly freeVariables: readonly string[];
@@ -26735,7 +27761,7 @@ This is an alias for [unknowns](#unknowns).
 
 <MemberCard>
 
-##### Expression.defines
+##### Expression.defines {#defines}
 
 ```ts
 readonly defines: readonly string[];
@@ -26759,7 +27785,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.referencedFunctions
+##### Expression.referencedFunctions {#referencedfunctions}
 
 ```ts
 readonly referencedFunctions: readonly string[];
@@ -26784,7 +27810,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.references
+##### Expression.references {#references}
 
 ```ts
 readonly references: readonly string[];
@@ -26814,7 +27840,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.toNumericValue()
+##### Expression.toNumericValue() {#tonumericvalue}
 
 ```ts
 toNumericValue(): [NumericValue, Expression]
@@ -26837,7 +27863,7 @@ Attempts to make `rest` a positive value (i.e. pulls out negative sign).
 
 <MemberCard>
 
-##### Expression.neg()
+##### Expression.neg() {#neg-2}
 
 ```ts
 neg(): Expression
@@ -26849,7 +27875,7 @@ Negate (additive inverse)
 
 <MemberCard>
 
-##### Expression.inv()
+##### Expression.inv() {#inv-1}
 
 ```ts
 inv(): Expression
@@ -26861,7 +27887,7 @@ Inverse (multiplicative inverse)
 
 <MemberCard>
 
-##### Expression.abs()
+##### Expression.abs() {#abs-1}
 
 ```ts
 abs(): Expression
@@ -26873,7 +27899,7 @@ Absolute value
 
 <MemberCard>
 
-##### Expression.add()
+##### Expression.add() {#add-3}
 
 ```ts
 add(rhs): Expression
@@ -26889,7 +27915,7 @@ Addition
 
 <MemberCard>
 
-##### Expression.sub()
+##### Expression.sub() {#sub-2}
 
 ```ts
 sub(rhs): Expression
@@ -26905,7 +27931,7 @@ Subtraction
 
 <MemberCard>
 
-##### Expression.mul()
+##### Expression.mul() {#mul-2}
 
 ```ts
 mul(rhs): Expression
@@ -26923,7 +27949,7 @@ Multiplication
 
 <MemberCard>
 
-##### Expression.div()
+##### Expression.div() {#div-2}
 
 ```ts
 div(rhs): Expression
@@ -26939,7 +27965,7 @@ Division
 
 <MemberCard>
 
-##### Expression.pow()
+##### Expression.pow() {#pow-2}
 
 ```ts
 pow(exp): Expression
@@ -26955,7 +27981,7 @@ Power
 
 <MemberCard>
 
-##### Expression.root()
+##### Expression.root() {#root-1}
 
 ```ts
 root(exp): Expression
@@ -26971,7 +27997,7 @@ Exponentiation
 
 <MemberCard>
 
-##### Expression.sqrt()
+##### Expression.sqrt() {#sqrt-1}
 
 ```ts
 sqrt(): Expression
@@ -26983,7 +28009,7 @@ Square root
 
 <MemberCard>
 
-##### Expression.ln()
+##### Expression.ln() {#ln-1}
 
 ```ts
 ln(base?): Expression
@@ -26999,7 +28025,7 @@ Logarithm (natural by default)
 
 <MemberCard>
 
-##### Expression.numerator
+##### Expression.numerator {#numerator-1}
 
 Return this expression expressed as a numerator.
 
@@ -27007,7 +28033,7 @@ Return this expression expressed as a numerator.
 
 <MemberCard>
 
-##### Expression.denominator
+##### Expression.denominator {#denominator-1}
 
 Return this expression expressed as a denominator.
 
@@ -27015,7 +28041,7 @@ Return this expression expressed as a denominator.
 
 <MemberCard>
 
-##### Expression.numeratorDenominator
+##### Expression.numeratorDenominator {#numeratordenominator}
 
 Return this expression expressed as a numerator and denominator.
 
@@ -27023,7 +28049,7 @@ Return this expression expressed as a numerator and denominator.
 
 <MemberCard>
 
-##### Expression.toRational()
+##### Expression.toRational() {#torational}
 
 ```ts
 toRational(): [number, number] | null
@@ -27052,7 +28078,7 @@ ce.number(1.5).toRational()             // null (machine float)
 
 <MemberCard>
 
-##### Expression.factors()
+##### Expression.factors() {#factors}
 
 ```ts
 factors(): readonly Expression[]
@@ -27077,7 +28103,7 @@ ce.parse('x + 1').factors()    // [x + 1]
 
 <MemberCard>
 
-##### Expression.polynomialCoefficients()
+##### Expression.polynomialCoefficients() {#polynomialcoefficients}
 
 ```ts
 polynomialCoefficients(variable?): readonly Expression[] | undefined
@@ -27124,7 +28150,7 @@ ce.parse('x^2*y + 3x + y^2').polynomialCoefficients(['x', 'y'])
 
 <MemberCard>
 
-##### Expression.polynomialRoots()
+##### Expression.polynomialRoots() {#polynomialroots}
 
 ```ts
 polynomialRoots(variable?): readonly Expression[] | undefined
@@ -27151,7 +28177,7 @@ ce.parse('sin(x)').polynomialRoots('x')           // undefined
 
 <MemberCard>
 
-##### Expression.isScoped
+##### Expression.isScoped {#isscoped}
 
 ```ts
 readonly isScoped: boolean;
@@ -27165,7 +28191,7 @@ function expression.
 
 <MemberCard>
 
-##### Expression.localScope
+##### Expression.localScope {#localscope}
 
 If this expression has a local scope, return it.
 
@@ -27173,7 +28199,7 @@ If this expression has a local scope, return it.
 
 <MemberCard>
 
-##### Expression.subs()
+##### Expression.subs() {#subs}
 
 ```ts
 subs(sub, options?): Expression
@@ -27185,7 +28211,11 @@ Note the same effect can be achieved with `this.replace()`, but
 using `this.subs()` is more efficient and simpler, but limited
 to replacing symbols.
 
-The result is bound to the current scope, not to `this.scope`.
+The free symbols of the result are bound in the CURRENT scope, not in the
+scope the receiver was built in. A node that owns a local scope keeps
+that scope, so a binder's bound variables go on denoting the binder's own
+bindings — including for a binder nested inside another one, whose scope
+chain would otherwise no longer reach the outer binder's index.
 
 If `options.canonical` is not set, the result is canonical if `this`
 is canonical.
@@ -27212,7 +28242,7 @@ does not differ from that of this expr.: then a call this method is analagous to
 
 <MemberCard>
 
-##### Expression.map()
+##### Expression.map() {#map}
 
 ```ts
 map(fn, options?): Expression
@@ -27252,7 +28282,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.replace()
+##### Expression.replace() {#replace}
 
 ```ts
 replace(rules, options?): Expression | null
@@ -27303,7 +28333,7 @@ For simple symbol substitution, consider using `subs()` instead.
 
 <MemberCard>
 
-##### Expression.has()
+##### Expression.has() {#has}
 
 ```ts
 has(v): boolean
@@ -27323,7 +28353,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.match()
+##### Expression.match() {#match-1}
 
 ```ts
 match(pattern, options?): BoxedSubstitution<Expression> | null
@@ -27366,7 +28396,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.wikidata
+##### Expression.wikidata {#wikidata-1}
 
 ```ts
 readonly wikidata: string | undefined;
@@ -27380,7 +28410,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### Expression.description
+##### Expression.description {#description-1}
 
 ```ts
 readonly description: string[] | undefined;
@@ -27396,7 +28426,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### Expression.url
+##### Expression.url {#url-3}
 
 ```ts
 readonly url: string | undefined;
@@ -27411,7 +28441,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### Expression.complexity
+##### Expression.complexity {#complexity-1}
 
 ```ts
 readonly complexity: number | undefined;
@@ -27426,7 +28456,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### Expression.baseDefinition
+##### Expression.baseDefinition {#basedefinition-1}
 
 ```ts
 readonly baseDefinition: BoxedBaseDefinition | undefined;
@@ -27442,7 +28472,7 @@ If not a canonical expression, return `undefined`.
 
 <MemberCard>
 
-##### Expression.operatorDefinition
+##### Expression.operatorDefinition {#operatordefinition-1}
 
 ```ts
 readonly operatorDefinition: BoxedOperatorDefinition | undefined;
@@ -27459,7 +28489,7 @@ its value is `undefined`.
 
 <MemberCard>
 
-##### Expression.valueDefinition
+##### Expression.valueDefinition {#valuedefinition-1}
 
 ```ts
 readonly valueDefinition: BoxedValueDefinition | undefined;
@@ -27474,7 +28504,7 @@ If not a canonical expression, or not a value, its value is `undefined`.
 
 <MemberCard>
 
-##### Expression.simplify()
+##### Expression.simplify() {#simplify}
 
 ```ts
 simplify(options?): Expression
@@ -27506,7 +28536,7 @@ To manipulate symbolically non-canonical expressions, use `expr.replace()`.
 
 <MemberCard>
 
-##### Expression.explain()
+##### Expression.explain() {#explain}
 
 ```ts
 explain(operation?, options?): Explanation
@@ -27556,7 +28586,7 @@ debugging and rule authoring).
 
 <MemberCard>
 
-##### Expression.toSignedFunction()
+##### Expression.toSignedFunction() {#tosignedfunction}
 
 ```ts
 toSignedFunction(): Expression | undefined
@@ -27597,7 +28627,7 @@ Notes:
 
 <MemberCard>
 
-##### Expression.getInterval()
+##### Expression.getInterval() {#getinterval}
 
 ```ts
 getInterval(symbol): IntervalBounds | undefined
@@ -27630,7 +28660,7 @@ constraints, comparisons over multiple symbols, disjunctions).
 
 <MemberCard>
 
-##### Expression.evaluate()
+##### Expression.evaluate() {#evaluate-2}
 
 ```ts
 evaluate(options?): Expression
@@ -27668,7 +28698,7 @@ an interrupted evaluation from a symbolic (inert) result.
 
 <MemberCard>
 
-##### Expression.evaluateAsync()
+##### Expression.evaluateAsync() {#evaluateasync-1}
 
 ```ts
 evaluateAsync(options?): Promise<Expression>
@@ -27687,7 +28717,7 @@ The `options` argument can include a `signal` property, which is an
 
 <MemberCard>
 
-##### Expression.N()
+##### Expression.N() {#n-1}
 
 ```ts
 N(): Expression
@@ -27710,15 +28740,15 @@ The result is in canonical form.
 
 Note on typing (SYMBOLIC P2-24, by design): `N()` produces a float
 literal, so its `type` can widen relative to the exact input's — e.g.
-`1/3` has type `finite_rational` while `(1/3).N()` has type
-`finite_real`. The result type reflects the representation produced,
+`1/3` has type `rational` while `(1/3).N()` has type
+`real`. The result type reflects the representation produced,
 not the mathematical value's tightest type.
 
 </MemberCard>
 
 <MemberCard>
 
-##### Expression.solve()
+##### Expression.solve() {#solve}
 
 ```ts
 solve(vars?): 
@@ -27762,16 +28792,13 @@ console.log(nonlinear.solve(["x", "y"])); // Returns [{ x: 2, y: 3 }, { x: 3, y:
 
 <MemberCard>
 
-##### Expression.value
+##### Expression.value {#value-4}
 
 ```ts
 get value(): Expression | undefined
 set value(value: 
-  | string
-  | number
-  | boolean
   | number[]
-  | BigDecimal
+  | ExpressionInput
   | OnlyFirst<{
   re: number;
   im: number;
@@ -27822,7 +28849,7 @@ about it in the current scope.
 
 <MemberCard>
 
-##### Expression.isCollection
+##### Expression.isCollection {#iscollection-1}
 
 ```ts
 isCollection: boolean;
@@ -27839,7 +28866,7 @@ When `isCollection` is `true`, the expression:
 - has a `contains(other)` method that returns `true` if the `other`
   expression is in the collection.
 
-### `isCollection` is a CAPABILITY, `type.matches('collection')` is a SHAPE
+### `isCollection` is a CAPABILITY, `type.matches('collection<any>')` is a SHAPE
 
 This is the single most common source of collection-handling bugs in the
 engine, so it is worth stating precisely. The two predicates answer
@@ -27850,10 +28877,17 @@ different questions and neither implies the other:
   yet, and for an application whose head returns a collection (`L(1)`
   under `L: (number) -> vector<2>`): both are collection-shaped, but
   there is nothing to walk.
-- `type.matches('collection')` — "is this operand collection-**shaped**?"
-  It is `true` for those valueless cases, and `false` for a materialized
-  collection whose type is top (`unknown`/`any`), which `isCollection`
-  reports `true`.
+- `type.matches('collection<any>')` — "is this operand
+  collection-**shaped**?" It is `true` for those valueless cases, and
+  `false` for a materialized collection whose type is top
+  (`unknown`/`any`), which `isCollection` reports `true`.
+
+A shape test must spell the `<any>` FAMILY TOP, never the bare name:
+since the bare-synonym ruling (2026-08-17) bare `collection` is the
+values-only `collection<unknown>`, so `list<any>`, `list<nothing>` and
+`list<integer|missing>` — all collection-shaped — do NOT match it.
+(`COLLECTION_SHAPE_TYPE` and friends in `common/type/primitive.ts` are
+the same tops as `Type` constants, for `isSubtype` call sites.)
 
 Pick by the question you are actually asking:
 
@@ -27861,7 +28895,7 @@ Pick by the question you are actually asking:
   a capability question. Use `isCollection`.
 - Deciding whether an operand takes the SCALAR path or the
   collection/broadcast path — that is a shape question. Test
-  `isCollection || type.matches('collection')`, or the operand class
+  `isCollection || type.matches('collection<any>')`, or the operand class
   alone with `isValuelessCollectionTyped()` (`collection-utils.ts`).
 
 Getting this wrong has a characteristic signature: the operator takes its
@@ -27880,11 +28914,23 @@ A third predicate covers a distinct case: `isPossiblyCollectionTyped()`
 at runtime — a top-typed application, or a `broadcastable<T>` — where the
 honest answer is that the shape is not statically visible at all.
 
+One more operand class answers a confident `false` to BOTH `isCollection`
+and `type.matches('collection<any>')` while still being able to hold a
+collection: a union of a scalar branch and a collection branch — a
+valueless `u: number | list<number>`, and the `2u` lifted over it, since a
+broadcast over such an operand carries the union through rather than
+claiming a definite list. The scalar branch defeats the match, so a gate
+that must decline for a MAYBE-collection has to ask one of the two
+union predicates in `collection-utils.ts` as well:
+`unionMayHoldACollection()` for an ENUMERATION gate (a big op folding its
+body — tuple, string and fixed-shape branches enumerate too), or
+`scalarOrCollectionUnionBranches()` for a BROADCAST gate.
+
 </MemberCard>
 
 <MemberCard>
 
-##### Expression.isIndexedCollection
+##### Expression.isIndexedCollection {#isindexedcollection}
 
 ```ts
 isIndexedCollection: boolean;
@@ -27909,7 +28955,7 @@ When `isIndexedCollection` is `true`, the expression:
 
 <MemberCard>
 
-##### Expression.isLazyCollection
+##### Expression.isLazyCollection {#islazycollection}
 
 ```ts
 isLazyCollection: boolean;
@@ -27928,7 +28974,7 @@ lazy collections.
 
 <MemberCard>
 
-##### Expression.each()
+##### Expression.each() {#each}
 
 ```ts
 each(): Generator<Expression>
@@ -27948,7 +28994,7 @@ for (const e of expr.each()) {
 
 <MemberCard>
 
-##### Expression.contains()
+##### Expression.contains() {#contains-1}
 
 ```ts
 contains(rhs): boolean | undefined
@@ -27968,7 +29014,7 @@ iterating over the collection.
 
 <MemberCard>
 
-##### Expression.subsetOf()
+##### Expression.subsetOf() {#subsetof-1}
 
 ```ts
 subsetOf(other, strict): boolean | undefined
@@ -27996,7 +29042,7 @@ If true, the subset relation is strict (i.e., proper subset).
 
 <MemberCard>
 
-##### Expression.count
+##### Expression.count {#count-1}
 
 If this is a collection, return the number of elements in the collection.
 
@@ -28016,7 +29062,7 @@ be determined without iterating over the collection.
 
 <MemberCard>
 
-##### Expression.isFiniteCollection
+##### Expression.isFiniteCollection {#isfinitecollection}
 
 ```ts
 isFiniteCollection: boolean | undefined;
@@ -28028,7 +29074,7 @@ If this is a finite collection, return true.
 
 <MemberCard>
 
-##### Expression.isEmptyCollection
+##### Expression.isEmptyCollection {#isemptycollection}
 
 ```ts
 isEmptyCollection: boolean | undefined;
@@ -28042,7 +29088,7 @@ An empty collection has a size of 0.
 
 <MemberCard>
 
-##### Expression.isEnumerableCollection
+##### Expression.isEnumerableCollection {#isenumerablecollection}
 
 ```ts
 isEnumerableCollection: boolean | undefined;
@@ -28090,7 +29136,7 @@ a chain of wrappers.
 
 <MemberCard>
 
-##### Expression.at()
+##### Expression.at() {#at-2}
 
 ```ts
 at(index): Expression | undefined
@@ -28111,7 +29157,7 @@ The last element is at index -1.
 
 <MemberCard>
 
-##### Expression.get()
+##### Expression.get() {#get}
 
 ```ts
 get(key): Expression | undefined
@@ -28130,7 +29176,7 @@ If `key` is a `Expression`, it should be a string.
 
 <MemberCard>
 
-##### Expression.indexWhere()
+##### Expression.indexWhere() {#indexwhere-1}
 
 ```ts
 indexWhere(predicate): number | undefined
@@ -28149,7 +29195,7 @@ that matches the predicate.
 
 <MemberCard>
 
-##### Expression.valueOf()
+##### Expression.valueOf() {#valueof-2}
 
 ```ts
 valueOf(): string | number | boolean | number[] | number[][] | number[][][]
@@ -28185,7 +29231,7 @@ of the expression.
 
 <MemberCard>
 
-##### Expression.\[toPrimitive\]()
+##### Expression.\[toPrimitive\]() {#toprimitive-2}
 
 ```ts
 toPrimitive: string | number | null
@@ -28201,7 +29247,7 @@ Similar to`expr.valueOf()` but includes a hint.
 
 <MemberCard>
 
-##### Expression.toString()
+##### Expression.toString() {#tostring-1}
 
 ```ts
 toString(): string
@@ -28228,7 +29274,7 @@ their native `Number.toString()`.
 
 <MemberCard>
 
-##### Expression.toJSON()
+##### Expression.toJSON() {#tojson-4}
 
 ```ts
 toJSON(): MathJsonExpression
@@ -28252,7 +29298,7 @@ MathJSON output.
 
 <MemberCard>
 
-##### Expression.is()
+##### Expression.is() {#is-1}
 
 ```ts
 is(other, tolerance?): boolean
@@ -28299,7 +29345,7 @@ numeric comparison. Has no effect when the comparison is structural
 
 <MemberCard>
 
-##### Expression.isSame()
+##### Expression.isSame() {#issame}
 
 ```ts
 isSame(rhs): boolean
@@ -28332,7 +29378,7 @@ Applicable to canonical and non-canonical expressions.
 
 <MemberCard>
 
-##### Expression.isLess()
+##### Expression.isLess() {#isless}
 
 ```ts
 isLess(other): boolean | undefined
@@ -28350,7 +29396,7 @@ If the expressions cannot be compared, return `undefined`
 
 <MemberCard>
 
-##### Expression.isLessEqual()
+##### Expression.isLessEqual() {#islessequal}
 
 ```ts
 isLessEqual(other): boolean | undefined
@@ -28368,7 +29414,7 @@ If the expressions cannot be compared, return `undefined`
 
 <MemberCard>
 
-##### Expression.isGreater()
+##### Expression.isGreater() {#isgreater}
 
 ```ts
 isGreater(other): boolean | undefined
@@ -28386,7 +29432,7 @@ If the expressions cannot be compared, return `undefined`
 
 <MemberCard>
 
-##### Expression.isGreaterEqual()
+##### Expression.isGreaterEqual() {#isgreaterequal}
 
 ```ts
 isGreaterEqual(other): boolean | undefined
@@ -28404,7 +29450,7 @@ If the expressions cannot be compared, return `undefined`
 
 <MemberCard>
 
-##### Expression.isEqual()
+##### Expression.isEqual() {#isequal}
 
 ```ts
 isEqual(other): boolean | undefined
@@ -28457,7 +29503,7 @@ as `x = 4` could make true — is `undefined`, never a definitive
 
 <MemberCard>
 
-##### Expression.isIdenticallyEqual()
+##### Expression.isIdenticallyEqual() {#isidenticallyequal}
 
 ```ts
 isIdenticallyEqual(other): boolean | undefined
@@ -28499,7 +29545,7 @@ in LaTeX).
 
 <MemberCard>
 
-##### Expression.shape
+##### Expression.shape {#shape-3}
 
 ```ts
 readonly shape: number[];
@@ -28518,7 +29564,7 @@ When the expression is a `n` by `m` matrix, the shape is `[n, m]`.
 
 <MemberCard>
 
-##### Expression.rank
+##### Expression.rank {#rank-2}
 
 ```ts
 readonly rank: number;
@@ -28545,7 +29591,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### Expression.type
+##### Expression.type {#type-12}
 
 ```ts
 get type(): BoxedType
@@ -28565,7 +29611,6 @@ set type(type:
   | ExpressionType
   | NumericType
   | FunctionSignature
-  | CallbackType
   | ValueType
   | TypeVariable
   | TypeReference
@@ -28590,7 +29635,7 @@ If the type is not known, return `"unknown"`.
 
 <MemberCard>
 
-##### Expression.isNumber
+##### Expression.isNumber {#isnumber}
 
 ```ts
 readonly isNumber: boolean | undefined;
@@ -28614,7 +29659,7 @@ number and `expr.isNumber` is `true`, but `isNumberLiteral` is `false`.
 
 <MemberCard>
 
-##### Expression.isInteger
+##### Expression.isInteger {#isinteger}
 
 ```ts
 readonly isInteger: boolean | undefined;
@@ -28628,7 +29673,7 @@ Note that ±∞ and NaN are not integers.
 
 <MemberCard>
 
-##### Expression.isRational
+##### Expression.isRational {#isrational}
 
 ```ts
 readonly isRational: boolean | undefined;
@@ -28646,23 +29691,29 @@ Note that ±∞ and NaN are not rationals.
 
 <MemberCard>
 
-##### Expression.isReal
+##### Expression.isExtendedReal {#isextendedreal}
 
 ```ts
-readonly isReal: boolean | undefined;
+readonly isExtendedReal: boolean | undefined;
 ```
 
-The value of this expression is a real number.
+The value of this expression is on the **extended real line**: a finite
+real number, or one of the two signed infinities `+∞` and `-∞`.
 
-This is equivalent to `this.type === "rational" || this.type === "integer" || this.type === "real"`
+The unsigned complex infinity `~∞` is **not** on the extended real line,
+and neither is `NaN`; both answer `false`. A number with a non-zero
+imaginary part answers `false`.
 
-Note that ±∞ and NaN are not real numbers.
+Use this predicate for a gate that must also hold at `±∞` — sign
+reasoning, the `1/±∞ = 0` fold, a claim that a result is a signed
+infinity. For a **finite** real, test `this.type.matches("real")`
+instead: the bare type name `real` denotes the finite reals.
 
 </MemberCard>
 
 <MemberCard>
 
-##### Expression.isFunction
+##### Expression.isFunction {#isfunction}
 
 ```ts
 readonly isFunction: boolean | undefined;
@@ -28684,7 +29735,7 @@ as `["Add", 1, 2]`).
 
 <MemberCard>
 
-##### Expression.constantValue
+##### Expression.constantValue {#constantvalue}
 
 ```ts
 readonly constantValue: string | number | boolean | object | undefined;
@@ -28695,32 +29746,32 @@ otherwise `undefined`.
 
 </MemberCard>
 
-### DictionaryInterface
+### DictionaryInterface {#dictionaryinterface}
 
 Interface for dictionary-like structures.
 Use `isDictionary()` to check if an expression is a dictionary.
 
 <MemberCard>
 
-##### DictionaryInterface.keys
+##### DictionaryInterface.keys {#keys}
 
 </MemberCard>
 
 <MemberCard>
 
-##### DictionaryInterface.entries
+##### DictionaryInterface.entries {#entries-1}
 
 </MemberCard>
 
 <MemberCard>
 
-##### DictionaryInterface.values
+##### DictionaryInterface.values {#values}
 
 </MemberCard>
 
 <MemberCard>
 
-##### DictionaryInterface.get()
+##### DictionaryInterface.get() {#get-1}
 
 ```ts
 get(key): Expression | undefined
@@ -28734,7 +29785,7 @@ get(key): Expression | undefined
 
 <MemberCard>
 
-##### DictionaryInterface.has()
+##### DictionaryInterface.has() {#has-1}
 
 ```ts
 has(key): boolean
@@ -28748,7 +29799,7 @@ has(key): boolean
 
 <MemberCard>
 
-### ~~BoxedExpression~~
+### ~~BoxedExpression~~ {#boxedexpression}
 
 ```ts
 type BoxedExpression = Expression;
@@ -28762,7 +29813,7 @@ Use `Expression` instead.
 
 <MemberCard>
 
-### ~~SemiBoxedExpression~~
+### ~~SemiBoxedExpression~~ {#semiboxedexpression}
 
 ```ts
 type SemiBoxedExpression = ExpressionInput;
@@ -28778,7 +29829,7 @@ Use `ExpressionInput` instead.
 
 <MemberCard>
 
-### NumberFormat
+### NumberFormat {#numberformat}
 
 ```ts
 type NumberFormat = {
@@ -28804,7 +29855,7 @@ These options control how numbers are parsed and serialized.
 
 <MemberCard>
 
-### NumberSerializationFormat
+### NumberSerializationFormat {#numberserializationformat}
 
 ```ts
 type NumberSerializationFormat = NumberFormat & {
@@ -28848,7 +29899,7 @@ Use [digits](#numberserializationformat) instead.
 
 <MemberCard>
 
-### DisplayDigits
+### DisplayDigits {#displaydigits}
 
 ```ts
 type DisplayDigits = 
@@ -28886,7 +29937,7 @@ controlled by the `notation` / `avoidExponentsInRange` options.
 
 <MemberCard>
 
-### JsonSerializationOptions
+### JsonSerializationOptions {#jsonserializationoptions}
 
 ```ts
 type JsonSerializationOptions = {
@@ -28909,7 +29960,7 @@ Options to control serialization to MathJSON when using
 
 <MemberCard>
 
-### DataTypeMap
+### DataTypeMap {#datatypemap}
 
 ```ts
 type DataTypeMap = {
@@ -28930,7 +29981,7 @@ Map of `TensorDataType` to JavaScript type.
 
 <MemberCard>
 
-### TensorDataType
+### TensorDataType {#tensordatatype}
 
 ```ts
 type TensorDataType = keyof DataTypeMap;
@@ -28940,7 +29991,7 @@ The type of the cells in a tensor.
 
 </MemberCard>
 
-### TensorData
+### TensorData {#tensordata}
 
 A record representing the type, shape and data of a tensor.
 
@@ -28950,7 +30001,7 @@ A record representing the type, shape and data of a tensor.
 
 <MemberCard>
 
-##### TensorData.dtype
+##### TensorData.dtype {#dtype}
 
 ```ts
 dtype: DT;
@@ -28960,7 +30011,7 @@ dtype: DT;
 
 <MemberCard>
 
-##### TensorData.shape
+##### TensorData.shape {#shape-1}
 
 ```ts
 shape: number[];
@@ -28970,7 +30021,7 @@ shape: number[];
 
 <MemberCard>
 
-##### TensorData.rank?
+##### TensorData.rank? {#rank}
 
 ```ts
 optional rank?: number;
@@ -28980,7 +30031,7 @@ optional rank?: number;
 
 <MemberCard>
 
-##### TensorData.data
+##### TensorData.data {#data}
 
 ```ts
 data: DataTypeMap[DT][];
@@ -28988,11 +30039,11 @@ data: DataTypeMap[DT][];
 
 </MemberCard>
 
-### TensorField
+### TensorField {#tensorfield}
 
 <MemberCard>
 
-##### TensorField.one
+##### TensorField.one {#one-2}
 
 ```ts
 readonly one: T;
@@ -29002,7 +30053,7 @@ readonly one: T;
 
 <MemberCard>
 
-##### TensorField.zero
+##### TensorField.zero {#zero-2}
 
 ```ts
 readonly zero: T;
@@ -29012,7 +30063,7 @@ readonly zero: T;
 
 <MemberCard>
 
-##### TensorField.nan
+##### TensorField.nan {#nan-3}
 
 ```ts
 readonly nan: T;
@@ -29022,7 +30073,7 @@ readonly nan: T;
 
 <MemberCard>
 
-##### TensorField.cast()
+##### TensorField.cast() {#cast}
 
 ###### cast(x, dtype)
 
@@ -29275,7 +30326,7 @@ keyof [`DataTypeMap`](#datatypemap)
 
 <MemberCard>
 
-##### TensorField.expression()
+##### TensorField.expression() {#expression-3}
 
 ```ts
 expression(x): Expression
@@ -29289,7 +30340,7 @@ expression(x): Expression
 
 <MemberCard>
 
-##### TensorField.isZero()
+##### TensorField.isZero() {#iszero-1}
 
 ```ts
 isZero(x): boolean
@@ -29303,7 +30354,7 @@ isZero(x): boolean
 
 <MemberCard>
 
-##### TensorField.isOne()
+##### TensorField.isOne() {#isone-1}
 
 ```ts
 isOne(x): boolean
@@ -29317,7 +30368,7 @@ isOne(x): boolean
 
 <MemberCard>
 
-##### TensorField.equals()
+##### TensorField.equals() {#equals}
 
 ```ts
 equals(lhs, rhs): boolean
@@ -29335,7 +30386,7 @@ equals(lhs, rhs): boolean
 
 <MemberCard>
 
-##### TensorField.add()
+##### TensorField.add() {#add-1}
 
 ```ts
 add(lhs, rhs): T
@@ -29353,7 +30404,7 @@ add(lhs, rhs): T
 
 <MemberCard>
 
-##### TensorField.addn()
+##### TensorField.addn() {#addn}
 
 ```ts
 addn(...xs): T
@@ -29367,7 +30418,7 @@ addn(...xs): T
 
 <MemberCard>
 
-##### TensorField.neg()
+##### TensorField.neg() {#neg-1}
 
 ```ts
 neg(x): T
@@ -29381,7 +30432,7 @@ neg(x): T
 
 <MemberCard>
 
-##### TensorField.sub()
+##### TensorField.sub() {#sub-1}
 
 ```ts
 sub(lhs, rhs): T
@@ -29399,7 +30450,7 @@ sub(lhs, rhs): T
 
 <MemberCard>
 
-##### TensorField.mul()
+##### TensorField.mul() {#mul-1}
 
 ```ts
 mul(lhs, rhs): T
@@ -29417,7 +30468,7 @@ mul(lhs, rhs): T
 
 <MemberCard>
 
-##### TensorField.muln()
+##### TensorField.muln() {#muln}
 
 ```ts
 muln(...xs): T
@@ -29431,7 +30482,7 @@ muln(...xs): T
 
 <MemberCard>
 
-##### TensorField.div()
+##### TensorField.div() {#div-1}
 
 ```ts
 div(lhs, rhs): T
@@ -29449,7 +30500,7 @@ div(lhs, rhs): T
 
 <MemberCard>
 
-##### TensorField.pow()
+##### TensorField.pow() {#pow-1}
 
 ```ts
 pow(rhs, n): T
@@ -29467,7 +30518,7 @@ pow(rhs, n): T
 
 <MemberCard>
 
-##### TensorField.conjugate()
+##### TensorField.conjugate() {#conjugate}
 
 ```ts
 conjugate(x): T
@@ -29479,7 +30530,7 @@ conjugate(x): T
 
 </MemberCard>
 
-### Tensor
+### Tensor {#tensor}
 
 #### Extends
 
@@ -29487,7 +30538,7 @@ conjugate(x): T
 
 <MemberCard>
 
-##### Tensor.dtype
+##### Tensor.dtype {#dtype-1}
 
 ```ts
 dtype: DT;
@@ -29497,7 +30548,7 @@ dtype: DT;
 
 <MemberCard>
 
-##### Tensor.shape
+##### Tensor.shape {#shape-2}
 
 ```ts
 shape: number[];
@@ -29507,7 +30558,7 @@ shape: number[];
 
 <MemberCard>
 
-##### Tensor.rank
+##### Tensor.rank {#rank-1}
 
 ```ts
 rank: number;
@@ -29517,7 +30568,7 @@ rank: number;
 
 <MemberCard>
 
-##### Tensor.data
+##### Tensor.data {#data-1}
 
 ```ts
 data: DataTypeMap[DT][];
@@ -29527,7 +30578,7 @@ data: DataTypeMap[DT][];
 
 <MemberCard>
 
-##### Tensor.field
+##### Tensor.field {#field}
 
 ```ts
 readonly field: TensorField<DataTypeMap[DT]>;
@@ -29537,7 +30588,7 @@ readonly field: TensorField<DataTypeMap[DT]>;
 
 <MemberCard>
 
-##### Tensor.expression
+##### Tensor.expression {#expression-4}
 
 ```ts
 readonly expression: Expression;
@@ -29547,7 +30598,7 @@ readonly expression: Expression;
 
 <MemberCard>
 
-##### Tensor.array
+##### Tensor.array {#array}
 
 ```ts
 readonly array: NestedArray<DataTypeMap[DT]>;
@@ -29557,7 +30608,7 @@ readonly array: NestedArray<DataTypeMap[DT]>;
 
 <MemberCard>
 
-##### Tensor.isSquare
+##### Tensor.isSquare {#issquare}
 
 ```ts
 readonly isSquare: boolean;
@@ -29567,7 +30618,7 @@ readonly isSquare: boolean;
 
 <MemberCard>
 
-##### Tensor.isSymmetric
+##### Tensor.isSymmetric {#issymmetric}
 
 ```ts
 readonly isSymmetric: boolean;
@@ -29577,7 +30628,7 @@ readonly isSymmetric: boolean;
 
 <MemberCard>
 
-##### Tensor.isSkewSymmetric
+##### Tensor.isSkewSymmetric {#isskewsymmetric}
 
 ```ts
 readonly isSkewSymmetric: boolean;
@@ -29587,7 +30638,7 @@ readonly isSkewSymmetric: boolean;
 
 <MemberCard>
 
-##### Tensor.isDiagonal
+##### Tensor.isDiagonal {#isdiagonal}
 
 ```ts
 readonly isDiagonal: boolean;
@@ -29597,7 +30648,7 @@ readonly isDiagonal: boolean;
 
 <MemberCard>
 
-##### Tensor.isUpperTriangular
+##### Tensor.isUpperTriangular {#isuppertriangular}
 
 ```ts
 readonly isUpperTriangular: boolean;
@@ -29607,7 +30658,7 @@ readonly isUpperTriangular: boolean;
 
 <MemberCard>
 
-##### Tensor.isLowerTriangular
+##### Tensor.isLowerTriangular {#islowertriangular}
 
 ```ts
 readonly isLowerTriangular: boolean;
@@ -29617,7 +30668,7 @@ readonly isLowerTriangular: boolean;
 
 <MemberCard>
 
-##### Tensor.isTriangular
+##### Tensor.isTriangular {#istriangular}
 
 ```ts
 readonly isTriangular: boolean;
@@ -29627,7 +30678,7 @@ readonly isTriangular: boolean;
 
 <MemberCard>
 
-##### Tensor.isIdentity
+##### Tensor.isIdentity {#isidentity}
 
 ```ts
 readonly isIdentity: boolean;
@@ -29637,7 +30688,7 @@ readonly isIdentity: boolean;
 
 <MemberCard>
 
-##### Tensor.isZero
+##### Tensor.isZero {#iszero-2}
 
 ```ts
 readonly isZero: boolean;
@@ -29647,7 +30698,7 @@ readonly isZero: boolean;
 
 <MemberCard>
 
-##### Tensor.at()
+##### Tensor.at() {#at-1}
 
 ```ts
 at(...indices): DataTypeMap[DT] | undefined
@@ -29661,7 +30712,7 @@ at(...indices): DataTypeMap[DT] | undefined
 
 <MemberCard>
 
-##### Tensor.diagonal()
+##### Tensor.diagonal() {#diagonal}
 
 ```ts
 diagonal(axis1?, axis2?): DataTypeMap[DT][] | undefined
@@ -29679,7 +30730,7 @@ diagonal(axis1?, axis2?): DataTypeMap[DT][] | undefined
 
 <MemberCard>
 
-##### Tensor.trace()
+##### Tensor.trace() {#trace-2}
 
 ```ts
 trace(axis1?, axis2?): 
@@ -29700,7 +30751,7 @@ trace(axis1?, axis2?):
 
 <MemberCard>
 
-##### Tensor.reshape()
+##### Tensor.reshape() {#reshape}
 
 ```ts
 reshape(...shape): Tensor<DT>
@@ -29714,7 +30765,7 @@ reshape(...shape): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.slice()
+##### Tensor.slice() {#slice}
 
 ```ts
 slice(index): Tensor<DT>
@@ -29728,7 +30779,7 @@ slice(index): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.flatten()
+##### Tensor.flatten() {#flatten}
 
 ```ts
 flatten(): DataTypeMap[DT][]
@@ -29738,7 +30789,7 @@ flatten(): DataTypeMap[DT][]
 
 <MemberCard>
 
-##### Tensor.upcast()
+##### Tensor.upcast() {#upcast}
 
 ```ts
 upcast<DT>(dtype): Tensor<DT>
@@ -29754,7 +30805,7 @@ upcast<DT>(dtype): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.transpose()
+##### Tensor.transpose() {#transpose}
 
 ```ts
 transpose(axis1?, axis2?): Tensor<DT> | undefined
@@ -29772,7 +30823,7 @@ transpose(axis1?, axis2?): Tensor<DT> | undefined
 
 <MemberCard>
 
-##### Tensor.conjugateTranspose()
+##### Tensor.conjugateTranspose() {#conjugatetranspose}
 
 ```ts
 conjugateTranspose(axis1?, axis2?): Tensor<DT> | undefined
@@ -29790,7 +30841,7 @@ conjugateTranspose(axis1?, axis2?): Tensor<DT> | undefined
 
 <MemberCard>
 
-##### Tensor.determinant()
+##### Tensor.determinant() {#determinant}
 
 ```ts
 determinant(): DataTypeMap[DT] | undefined
@@ -29800,7 +30851,7 @@ determinant(): DataTypeMap[DT] | undefined
 
 <MemberCard>
 
-##### Tensor.inverse()
+##### Tensor.inverse() {#inverse}
 
 ```ts
 inverse(): Tensor<DT> | undefined
@@ -29810,7 +30861,7 @@ inverse(): Tensor<DT> | undefined
 
 <MemberCard>
 
-##### Tensor.pseudoInverse()
+##### Tensor.pseudoInverse() {#pseudoinverse}
 
 ```ts
 pseudoInverse(): Tensor<DT> | undefined
@@ -29820,7 +30871,7 @@ pseudoInverse(): Tensor<DT> | undefined
 
 <MemberCard>
 
-##### Tensor.adjugateMatrix()
+##### Tensor.adjugateMatrix() {#adjugatematrix}
 
 ```ts
 adjugateMatrix(): Tensor<DT> | undefined
@@ -29830,7 +30881,7 @@ adjugateMatrix(): Tensor<DT> | undefined
 
 <MemberCard>
 
-##### Tensor.minor()
+##### Tensor.minor() {#minor}
 
 ```ts
 minor(axis1, axis2): DataTypeMap[DT] | undefined
@@ -29848,7 +30899,7 @@ minor(axis1, axis2): DataTypeMap[DT] | undefined
 
 <MemberCard>
 
-##### Tensor.map1()
+##### Tensor.map1() {#map1}
 
 ```ts
 map1(fn, scalar): Tensor<DT>
@@ -29866,7 +30917,7 @@ map1(fn, scalar): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.map2()
+##### Tensor.map2() {#map2}
 
 ```ts
 map2(fn, rhs): Tensor<DT>
@@ -29884,7 +30935,7 @@ map2(fn, rhs): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.add()
+##### Tensor.add() {#add-2}
 
 ```ts
 add(other): Tensor<DT>
@@ -29898,7 +30949,7 @@ add(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.subtract()
+##### Tensor.subtract() {#subtract}
 
 ```ts
 subtract(other): Tensor<DT>
@@ -29912,7 +30963,7 @@ subtract(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.multiply()
+##### Tensor.multiply() {#multiply}
 
 ```ts
 multiply(other): Tensor<DT>
@@ -29926,7 +30977,7 @@ multiply(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.divide()
+##### Tensor.divide() {#divide}
 
 ```ts
 divide(other): Tensor<DT>
@@ -29940,7 +30991,7 @@ divide(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.power()
+##### Tensor.power() {#power}
 
 ```ts
 power(other): Tensor<DT>
@@ -29954,7 +31005,7 @@ power(other): Tensor<DT>
 
 <MemberCard>
 
-##### Tensor.equals()
+##### Tensor.equals() {#equals-1}
 
 ```ts
 equals(other): boolean
@@ -29968,7 +31019,7 @@ equals(other): boolean
 
 ## Type
 
-### BoxedType
+### BoxedType {#boxedtype}
 
 <MemberCard>
 
@@ -29995,7 +31046,6 @@ new BoxedType(type, typeResolver?): BoxedType
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -30008,7 +31058,7 @@ new BoxedType(type, typeResolver?): BoxedType
 
 <MemberCard>
 
-##### BoxedType.unknown
+##### BoxedType.unknown {#unknown}
 
 ```ts
 static unknown: BoxedType;
@@ -30018,7 +31068,7 @@ static unknown: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.number
+##### BoxedType.number {#number}
 
 ```ts
 static number: BoxedType;
@@ -30028,47 +31078,67 @@ static number: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.non\_finite\_number
+##### BoxedType.signed\_infinity {#signed_infinity}
 
 ```ts
-static non_finite_number: BoxedType;
+static signed_infinity: BoxedType;
 ```
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedType.finite\_number
+##### BoxedType.infinity {#infinity}
 
 ```ts
-static finite_number: BoxedType;
+static infinity: BoxedType;
 ```
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedType.finite\_integer
+##### BoxedType.nan {#nan}
 
 ```ts
-static finite_integer: BoxedType;
+static nan: BoxedType;
 ```
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedType.finite\_real
+##### BoxedType.complex {#complex}
 
 ```ts
-static finite_real: BoxedType;
+static complex: BoxedType;
 ```
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedType.string
+##### BoxedType.real {#real}
+
+```ts
+static real: BoxedType;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.integer {#integer}
+
+```ts
+static integer: BoxedType;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.string {#string}
 
 ```ts
 static string: BoxedType;
@@ -30078,7 +31148,7 @@ static string: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.character
+##### BoxedType.character {#character}
 
 ```ts
 static character: BoxedType;
@@ -30088,7 +31158,7 @@ static character: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.dictionary
+##### BoxedType.dictionary {#dictionary}
 
 ```ts
 static dictionary: BoxedType;
@@ -30098,7 +31168,7 @@ static dictionary: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setNumber
+##### BoxedType.setNumber {#setnumber}
 
 ```ts
 static setNumber: BoxedType;
@@ -30108,7 +31178,7 @@ static setNumber: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setComplex
+##### BoxedType.setComplex {#setcomplex}
 
 ```ts
 static setComplex: BoxedType;
@@ -30118,7 +31188,7 @@ static setComplex: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setImaginary
+##### BoxedType.setImaginary {#setimaginary}
 
 ```ts
 static setImaginary: BoxedType;
@@ -30128,7 +31198,7 @@ static setImaginary: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setReal
+##### BoxedType.setReal {#setreal}
 
 ```ts
 static setReal: BoxedType;
@@ -30138,7 +31208,7 @@ static setReal: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setRational
+##### BoxedType.setRational {#setrational}
 
 ```ts
 static setRational: BoxedType;
@@ -30148,17 +31218,7 @@ static setRational: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.setFiniteInteger
-
-```ts
-static setFiniteInteger: BoxedType;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedType.setInteger
+##### BoxedType.setInteger {#setinteger}
 
 ```ts
 static setInteger: BoxedType;
@@ -30168,7 +31228,7 @@ static setInteger: BoxedType;
 
 <MemberCard>
 
-##### BoxedType.type
+##### BoxedType.type {#type}
 
 ```ts
 type: Type;
@@ -30178,7 +31238,7 @@ type: Type;
 
 <MemberCard>
 
-##### BoxedType.isPolymorphic
+##### BoxedType.isPolymorphic {#ispolymorphic}
 
 ```ts
 readonly isPolymorphic: boolean;
@@ -30196,7 +31256,7 @@ the computation itself is a shallow field test.
 
 <MemberCard>
 
-##### BoxedType.typeResolver
+##### BoxedType.typeResolver {#typeresolver}
 
 The resolver this type was created with, so a DERIVED boxed type (a
 projection of this one) can be built without losing the ability to name a
@@ -30206,7 +31266,7 @@ user-declared type.
 
 <MemberCard>
 
-##### BoxedType.unionMembers
+##### BoxedType.unionMembers {#unionmembers}
 
 The members of a union type, each boxed, or `[this]` for any other type.
 
@@ -30219,7 +31279,7 @@ usually what an arm walk was reaching for.
 
 <MemberCard>
 
-##### BoxedType.effects
+##### BoxedType.effects {#effects}
 
 The **latent** effects on this type's arrow: what fires if a value of this
 type is invoked. `undefined` when the type is not callable, or when its
@@ -30246,13 +31306,13 @@ ce.type('number').effects;                 // ➔ undefined
 
 <MemberCard>
 
-##### BoxedType.isUnknown
+##### BoxedType.isUnknown {#isunknown}
 
 </MemberCard>
 
 <MemberCard>
 
-##### BoxedType.widen()
+##### BoxedType.widen() {#widen}
 
 ```ts
 static widen(...types): BoxedType
@@ -30266,7 +31326,7 @@ static widen(...types): BoxedType
 
 <MemberCard>
 
-##### BoxedType.narrow()
+##### BoxedType.narrow() {#narrow}
 
 ```ts
 static narrow(...types): BoxedType
@@ -30280,7 +31340,7 @@ static narrow(...types): BoxedType
 
 <MemberCard>
 
-##### BoxedType.matches()
+##### BoxedType.matches() {#matches}
 
 ```ts
 matches(other): boolean
@@ -30317,7 +31377,6 @@ polymorphic one.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -30327,7 +31386,7 @@ polymorphic one.
 
 <MemberCard>
 
-##### BoxedType.is()
+##### BoxedType.is() {#is}
 
 ```ts
 is(other): boolean
@@ -30350,7 +31409,6 @@ is(other): boolean
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -30360,7 +31418,7 @@ is(other): boolean
 
 <MemberCard>
 
-##### BoxedType.isDisjointFrom()
+##### BoxedType.isDisjointFrom() {#isdisjointfrom}
 
 ```ts
 isDisjointFrom(other): boolean
@@ -30397,7 +31455,6 @@ Throws if `other` is a string that is not a valid type.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -30407,7 +31464,7 @@ Throws if `other` is a string that is not a valid type.
 
 <MemberCard>
 
-##### BoxedType.couldMatch()
+##### BoxedType.couldMatch() {#couldmatch}
 
 ```ts
 couldMatch(other): boolean
@@ -30460,7 +31517,6 @@ Throws if `other` is a string that is not a valid type.
   \| [`ExpressionType`](#expressiontype)
   \| [`NumericType`](#numerictype)
   \| [`FunctionSignature`](#functionsignature)
-  \| [`CallbackType`](#callbacktype)
   \| [`ValueType`](#valuetype)
   \| [`TypeVariable`](#typevariable)
   \| [`TypeReference`](#typereference)
@@ -30470,37 +31526,7 @@ Throws if `other` is a string that is not a valid type.
 
 <MemberCard>
 
-##### BoxedType.withDisplayString()
-
-```ts
-withDisplayString(display): BoxedType
-```
-
-A twin of this type that PRINTS as `display()` while remaining, in every
-other respect, byte-identical to this one — same `Type` object, same
-`isPolymorphic`, same subtype/`matches` answers.
-
-This is the whole seam of the R-D5 display projection (Design D §9 item 4):
-the projection is a property of the STRING a type shows a human, never of
-the type itself. Applying it to the `Type` instead — building a boxed type
-around the projected AST — made it semantics-visible: a callback-bearing
-overload set collapsed to `nothing` through `reduceType`, dropping the
-a `where` clause flipped `isPolymorphic` (and with it every `Ground <: Poly`
-answer), and re-validating the projected polytype could THROW out of a
-getter. Deferring to stringification makes all three impossible by
-construction.
-
-`display` is called at most once, on the first print.
-
-####### display
-
-() => `string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedType.toString()
+##### BoxedType.toString() {#tostring}
 
 ```ts
 toString(): string
@@ -30510,7 +31536,7 @@ toString(): string
 
 <MemberCard>
 
-##### BoxedType.toJSON()
+##### BoxedType.toJSON() {#tojson}
 
 ```ts
 toJSON(): string
@@ -30520,7 +31546,7 @@ toJSON(): string
 
 <MemberCard>
 
-##### BoxedType.\[toPrimitive\]()
+##### BoxedType.\[toPrimitive\]() {#toprimitive}
 
 ```ts
 toPrimitive: string | null
@@ -30534,7 +31560,7 @@ toPrimitive: string | null
 
 <MemberCard>
 
-##### BoxedType.valueOf()
+##### BoxedType.valueOf() {#valueof}
 
 ```ts
 valueOf(): string
@@ -30548,7 +31574,7 @@ valueOf(): string
 
 <MemberCard>
 
-### MathJsonAttributes
+### MathJsonAttributes {#mathjsonattributes}
 
 ```ts
 type MathJsonAttributes = {
@@ -30572,7 +31598,7 @@ to provide additional information about the expression.
 
 <MemberCard>
 
-### MathJsonSymbol
+### MathJsonSymbol {#mathjsonsymbol}
 
 ```ts
 type MathJsonSymbol = string;
@@ -30582,7 +31608,7 @@ type MathJsonSymbol = string;
 
 <MemberCard>
 
-### MathJsonNumberObject
+### MathJsonNumberObject {#mathjsonnumberobject}
 
 ```ts
 type MathJsonNumberObject = {
@@ -30617,7 +31643,7 @@ For example:
 
 <MemberCard>
 
-### MathJsonSymbolObject
+### MathJsonSymbolObject {#mathjsonsymbolobject}
 
 ```ts
 type MathJsonSymbolObject = {
@@ -30629,7 +31655,7 @@ type MathJsonSymbolObject = {
 
 <MemberCard>
 
-### MathJsonStringObject
+### MathJsonStringObject {#mathjsonstringobject}
 
 ```ts
 type MathJsonStringObject = {
@@ -30641,7 +31667,7 @@ type MathJsonStringObject = {
 
 <MemberCard>
 
-### MathJsonFunctionObject
+### MathJsonFunctionObject {#mathjsonfunctionobject}
 
 ```ts
 type MathJsonFunctionObject = {
@@ -30653,7 +31679,7 @@ type MathJsonFunctionObject = {
 
 <MemberCard>
 
-### DictionaryValue
+### DictionaryValue {#dictionaryvalue}
 
 ```ts
 type DictionaryValue = 
@@ -30668,7 +31694,7 @@ type DictionaryValue =
 
 <MemberCard>
 
-### MathJsonDictionaryObject
+### MathJsonDictionaryObject {#mathjsondictionaryobject}
 
 ```ts
 type MathJsonDictionaryObject = {
@@ -30680,7 +31706,7 @@ type MathJsonDictionaryObject = {
 
 <MemberCard>
 
-### ExpressionObject
+### ExpressionObject {#expressionobject}
 
 ```ts
 type ExpressionObject = 
@@ -30695,7 +31721,7 @@ type ExpressionObject =
 
 <MemberCard>
 
-### MathJsonExpression
+### MathJsonExpression {#mathjsonexpression}
 
 ```ts
 type MathJsonExpression = 
@@ -30719,7 +31745,7 @@ The dictionary and function nodes can contain expressions themselves.
 
 <MemberCard>
 
-### PrimitiveType
+### PrimitiveType {#primitivetype}
 
 ```ts
 type PrimitiveType = 
@@ -30740,7 +31766,9 @@ type PrimitiveType =
   | "boolean"
   | "string"
   | "character"
+  | "regexp"
   | "color"
+  | "type"
   | "expression"
   | "unknown"
   | "error"
@@ -30794,46 +31822,80 @@ A primitive type is a simple type that represents a concrete value.
 
 <MemberCard>
 
-### NumericPrimitiveType
+### NumericPrimitiveType {#numericprimitivetype}
 
 ```ts
 type NumericPrimitiveType = 
   | "number"
-  | "finite_number"
   | "complex"
-  | "finite_complex"
   | "imaginary"
   | "real"
-  | "finite_real"
   | "rational"
-  | "finite_rational"
   | "integer"
-  | "finite_integer"
-  | "non_finite_number";
+  | "infinity"
+  | "nan";
 ```
 
-The numeric tower (D10, 2026-07-02): `integer ⊂ rational ⊂ real ⊂ complex ⊂
-number`, with a parallel `finite_*` tower and a shared `non_finite_number`
-(±∞). `real` is a proper subtype of `complex`; both admit ±∞.
+The numeric tree is FINITE BY DEFAULT and DISJOINT: every numeric VALUE is a
+finite number, a number of infinite magnitude, or the not-a-number marker,
+and no value is two of those — `number = complex ⊔ infinity ⊔ nan` as a
+partition of the values. Every bare name below `complex` contains only
+finite values. A bare `real` result type is therefore a promise of
+finiteness, and the extended real line is spelled
+`real | signed_infinity` — `signed_infinity` being the named union of
+the two signed-infinity value types (equivalently `real | +oo | -oo`),
+so it excludes the unsigned `~∞` that `infinity` would bring in. That
+spelling is shared as the frozen `EXTENDED_REAL_TYPE` constant in
+`common/type/primitive.ts`; use it rather than rebuilding the union.
 
-- `number`: any numeric value = `complex` plus `NaN`
-- `complex`: a complex number (`real ⊂ complex`) = `finite_complex` + `non_finite_number`
-- `finite_complex`: a finite complex number = `imaginary` + `finite_real`
-- `imaginary`: a complex number with a real part of 0 (pure imaginary)
-- `finite_number`: a finite numeric value = `finite_complex`
-- `finite_real`: a finite real number = `finite_rational` + `finite_integer`
-- `finite_rational`: a finite rational number (includes the finite integers)
-- `finite_integer`: a finite whole number
-- `real`: a real number (imaginary part 0), admits ±∞ = `finite_real` + `non_finite_number`
-- `non_finite_number`: `PositiveInfinity`, `NegativeInfinity`
-- `integer`: a whole number, admits ±∞ = `finite_integer` + `non_finite_number`
-- `rational`: a rational number (includes the integers), admits ±∞ = `finite_rational` + `non_finite_number`
+The partition is a statement about values, NOT one the SUBTYPE RELATION
+closes over. `isSubtype('complex | infinity | nan', 'number')` is true, but
+the converse `isSubtype('number', 'complex | infinity | nan')` is FALSE: a
+union is a supertype only of types below one of its members, and `number` is
+above all three rather than inside any one of them. Deciding the converse
+needs covering-union machinery that the type checker does not have. So do
+not use a three-way union as a stand-in for `number` in a signature, and do
+not read the `⊔` above as a subtyping identity.
+
+- `number`: any numeric value — a finite number, a number of infinite
+  magnitude, or the not-a-number marker.
+- `complex`: a FINITE complex number = `imaginary` + `real`.
+- `imaginary`: a finite complex number with a real part of 0 (pure
+  imaginary).
+- `real`: a finite real number (imaginary part 0) = `rational` plus the
+  finite irrationals.
+- `rational`: a finite rational number (includes the integers).
+- `integer`: a finite whole number.
+- `infinity`: a number of infinite magnitude, of any direction — the signed
+  `+∞` and `−∞`, the unsigned complex infinity `~∞`, and mixed directed
+  values such as `∞ + i`. Disjoint from `complex`: an infinity is not a
+  finite number.
+- `nan`: the not-a-number marker. Its only supertype is `number`, so it is
+  disjoint from `complex`, `infinity` and every type below them.
+
+The SIGNED pair `+∞`/`−∞` has no one-word name: spell it `+oo | -oo`
+(the union of the two value types) where the sign-aware guarantee
+matters — the `1/±∞ = 0` folds, the sign-reading gates — and `infinity`
+where any infinite value is acceptable. The former one-word name
+`non_finite_number` was retired 2026-08-31 (ruling L5 executed): the
+name was misleading — `~∞` and `∞ + i` are non-finite numbers, yet
+neither was a member.
+
+RETIRED SPELLINGS. The five names that prefixed a tier with `finite_` are
+no longer members of this union. Each denoted exactly the same set of values
+as one of the bare names above, because every bare name under `number` is
+finite: the four per-tier spellings each meant their own tier, and the
+widest of them meant `complex` ("any finite number" IS the finite complex
+type). The type PARSER still accepts all five as input aliases for one
+release cycle and normalizes each to the name it denotes
+(`RETIRED_NUMERIC_ALIASES` in `parser.ts`), but an alias never reaches a
+`Type` node and is never serialized back out.
 
 </MemberCard>
 
 <MemberCard>
 
-### NamedElement
+### NamedElement {#namedelement}
 
 ```ts
 type NamedElement = {
@@ -30846,7 +31908,7 @@ type NamedElement = {
 
 <MemberCard>
 
-### EffectLabel
+### EffectLabel {#effectlabel}
 
 ```ts
 type EffectLabel = 
@@ -30876,7 +31938,7 @@ incomparable (in particular `fs_write` does not imply `fs_read`).
 
 <MemberCard>
 
-### EffectSet
+### EffectSet {#effectset}
 
 ```ts
 type EffectSet = "any" | EffectLabel[];
@@ -30905,7 +31967,7 @@ result stays `[]`).
 
 <MemberCard>
 
-### TypeVariable
+### TypeVariable {#typevariable}
 
 ```ts
 type TypeVariable = {
@@ -30917,7 +31979,7 @@ type TypeVariable = {
 A universally quantified type variable (rank-1).
 
 Only legal inside a function signature; declared and scoped by its arm's
-`where` clause ([FunctionSignature.typeParams](#typeparams)). A variable is
+`where` clause (the `typeParams` field of [FunctionSignature](#functionsignature)). A variable is
 **atomic and opaque**: it is never reduced, distributed or collapsed, and it
 is substituted away by instantiation at a call site.
 
@@ -30925,14 +31987,14 @@ is substituted away by instantiation at a call site.
 
 <MemberCard>
 
-### TypeVariance
+### TypeVariance {#typevariance}
 
 ```ts
 type TypeVariance = "in" | "out" | "inout";
 ```
 
 How a parameterized NOMINAL type relates two of its applications
-(`docs/plans/2026-08-06-parameterized-nominal-types-design.md` §4).
+(`docs/TYPE-SYSTEM.md`).
 
 Declared inside a type-parameter clause (`type tree<out T> = …`); the words
 are contextual there and are never reserved. Only a nominal declaration
@@ -30943,7 +32005,7 @@ carries one — a transparent alias has no declaration-level variance, and a
 
 <MemberCard>
 
-### TypeParameter
+### TypeParameter {#typeparameter}
 
 ```ts
 type TypeParameter = {
@@ -30965,7 +32027,7 @@ declared type is boxed. An unbounded variable's implicit bound is `any`.
 
 <MemberCard>
 
-### TypeParamsOption
+### TypeParamsOption {#typeparamsoption}
 
 ```ts
 type TypeParamsOption = 
@@ -30994,7 +32056,7 @@ object-array form is validated directly by `normalizeDeclaredTypeParams`
 
 <MemberCard>
 
-### FunctionSignature
+### FunctionSignature {#functionsignature}
 
 ```ts
 type FunctionSignature = {
@@ -31013,49 +32075,7 @@ type FunctionSignature = {
 
 <MemberCard>
 
-### CallbackType
-
-```ts
-type CallbackType = {
-  kind: "callback";
-  signature: FunctionSignature;
-};
-```
-
-A **contextual callback** parameter type, spelled `callback<(T) -> boolean>`.
-
-It is the primitive `function` for every admission and subtyping decision,
-and carries — for CONTEXTUAL TYPING only — the signature `S` an INLINE
-`Function` literal at that slot is stamped with
-(`docs/plans/2026-08-09-design-d-generic-callback-signatures.md` §4). Its
-five-clause contract:
-
-1. **Ordinary admission and subtyping see only `function`.** Every subtype
-   query, `.matches` and argument-validation decision treats `callback<S>`
-   as the primitive `function`; `S` plays NO role in admission, so a named
-   callback narrower (or broader) than `S` enters exactly as it does today
-   and errors — or not — per element at application time.
-2. **The contextual domain solve traverses only `S`'s PARAMETER types.**
-3. **Inference from the operand traverses only `S`'s RESULT type** — a named
-   callback's own parameter types must never constrain a type variable.
-4. **Free-variable discovery and substitution retain variables inside `S`**:
-   `callback<(T) -> U>` contributes `T` and `U` to its signature's `where`
-   accounting, and instantiation substitutes inside `S` normally.
-5. **Internal serialization preserves it** (`typeToString`/`parseType`
-   round-trip, dedup keys), even where user-facing display erases it.
-
-Intended for a signature PARAMETER, where it replaces the bare `function`
-primitive a builtin callback slot declares — that is the only position in
-which `S` can do anything, contextual typing being its whole purpose. The
-position is NOT enforced: written anywhere else (a result type, a value's
-declared type, a collection's element type) the constructor simply behaves
-as `function`, by clause 1, and stamps nothing.
-
-</MemberCard>
-
-<MemberCard>
-
-### AlgebraicType
+### AlgebraicType {#algebraictype}
 
 ```ts
 type AlgebraicType = {
@@ -31068,7 +32088,7 @@ type AlgebraicType = {
 
 <MemberCard>
 
-### NegationType
+### NegationType {#negationtype}
 
 ```ts
 type NegationType = {
@@ -31081,7 +32101,7 @@ type NegationType = {
 
 <MemberCard>
 
-### ValueType
+### ValueType {#valuetype}
 
 ```ts
 type ValueType = {
@@ -31094,7 +32114,7 @@ type ValueType = {
 
 <MemberCard>
 
-### RecordType
+### RecordType {#recordtype}
 
 ```ts
 type RecordType = {
@@ -31115,7 +32135,7 @@ subtyping). It may contain additional keys.
 
 <MemberCard>
 
-### ObjectType
+### ObjectType {#objecttype}
 
 ```ts
 type ObjectType = {
@@ -31156,7 +32176,7 @@ and the lattice bullet of "The rest of the system" (ruling B6).
 
 <MemberCard>
 
-### DictionaryType
+### DictionaryType {#dictionarytype}
 
 ```ts
 type DictionaryType = {
@@ -31176,7 +32196,7 @@ A dictionary is suitable for use as cache or data storage.
 
 <MemberCard>
 
-### CollectionType
+### CollectionType {#collectiontype}
 
 ```ts
 type CollectionType = {
@@ -31194,7 +32214,7 @@ type CollectionType = {
 
 <MemberCard>
 
-### ListType
+### ListType {#listtype}
 
 ```ts
 type ListType = {
@@ -31218,7 +32238,7 @@ dimensions 2x3x4 is a 3D tensor with 2 layers, 3 rows and 4 columns.
 
 <MemberCard>
 
-### SymbolType
+### SymbolType {#symboltype}
 
 ```ts
 type SymbolType = {
@@ -31231,7 +32251,7 @@ type SymbolType = {
 
 <MemberCard>
 
-### ExpressionType
+### ExpressionType {#expressiontype}
 
 ```ts
 type ExpressionType = {
@@ -31244,7 +32264,7 @@ type ExpressionType = {
 
 <MemberCard>
 
-### NumericType
+### NumericType {#numerictype}
 
 ```ts
 type NumericType = {
@@ -31252,6 +32272,8 @@ type NumericType = {
   type: NumericPrimitiveType;
   lower: number;
   upper: number;
+  lowerOpen: boolean;
+  upperOpen: boolean;
 };
 ```
 
@@ -31259,7 +32281,7 @@ type NumericType = {
 
 <MemberCard>
 
-### SetType
+### SetType {#settype}
 
 ```ts
 type SetType = {
@@ -31275,7 +32297,7 @@ The elements of a set are not indexed.
 
 <MemberCard>
 
-### BroadcastableType
+### BroadcastableType {#broadcastabletype}
 
 ```ts
 type BroadcastableType = {
@@ -31297,7 +32319,7 @@ scalar). See `subtype.ts` for the full relation.
 
 <MemberCard>
 
-### TupleType
+### TupleType {#tupletype}
 
 ```ts
 type TupleType = {
@@ -31313,7 +32335,7 @@ If one element is named, all elements must be named.
 
 <MemberCard>
 
-### TypeReference
+### TypeReference {#typereference}
 
 ```ts
 type TypeReference = {
@@ -31340,7 +32362,7 @@ Nominal typing
 
 <MemberCard>
 
-### DeclarationOrigin
+### DeclarationOrigin {#declarationorigin}
 
 ```ts
 type DeclarationOrigin = {
@@ -31352,7 +32374,7 @@ type DeclarationOrigin = {
 
 Which compilation unit and which declaring statement a registry record came
 from — the runtime half of the redefinition discipline
-(`docs/plans/2026-08-14-redefinition-discipline.md`, "Mechanics").
+(`docs/TYPE-SYSTEM.md`, "Mechanics").
 
 A second declaration of a name with the SAME `batch` and a DIFFERENT
 `statementId` is a within-unit redefinition and is refused; the same
@@ -31370,7 +32392,7 @@ thread from their canonical handler into their evaluate handler. It is typed
 
 <MemberCard>
 
-### Type
+### Type {#type-3}
 
 ```ts
 type Type = 
@@ -31390,7 +32412,6 @@ type Type =
   | NumericType
   | NumericPrimitiveType
   | FunctionSignature
-  | CallbackType
   | ValueType
   | TypeVariable
   | TypeReference;
@@ -31400,7 +32421,7 @@ type Type =
 
 <MemberCard>
 
-### TypeString
+### TypeString {#typestring}
 
 ```ts
 type TypeString = string;
@@ -31423,7 +32444,6 @@ Types are described using the following BNF grammar:
 <primary_type> ::=  <primitive>
                | <tuple_type>
                | <signature>
-               | <callback>
                | <list_type>
                | <set>
                | <broadcastable>
@@ -31501,15 +32521,10 @@ spelling that round-trips through serialization. See {@link EffectSet}.)
 
 <multi_dimensional_size> ::= <positive-integer_literal> "x" <positive-integer_literal> ("x" <positive-integer_literal>)*
 
-<callback> ::= "callback<" <signature> ">"
-
-(A contextual callback slot. Semantically the primitive `function`; the
-signature it wraps types an inline literal at that position. See
-{@link CallbackType}. Like every other constructor keyword — `list`, `set`,
-`tuple`, `collection`, … — `callback` is RESERVED in APPLIED position: a
-user-declared generic type of that name can be declared but never referenced,
-since `callback<…>` always parses as this production. The BARE spelling is
-unaffected, so `type alias callback = integer` remains usable.)
+(The `callback<…>` constructor of Design D was RETIRED by Design E
+(`docs/TYPE-SYSTEM.md`): callback
+slots are ordinary arrow types, admitted by COMPATIBILITY rather than
+subtyping. The spelling now fails to parse, with a migration hint.)
 
 <set> ::= "set<" <type> ">"
 
@@ -31552,7 +32567,7 @@ Examples of types strings:
 
 <MemberCard>
 
-### TypeCompatibility
+### TypeCompatibility {#typecompatibility}
 
 ```ts
 type TypeCompatibility = "covariant" | "contravariant" | "bivariant" | "invariant";
@@ -31562,7 +32577,7 @@ type TypeCompatibility = "covariant" | "contravariant" | "bivariant" | "invarian
 
 <MemberCard>
 
-### TypeResolver
+### TypeResolver {#typeresolver}
 
 ```ts
 type TypeResolver = {
@@ -31574,6 +32589,48 @@ type TypeResolver = {
 ```
 
 A type resolver should return a definition for a given type name.
+
+</MemberCard>
+
+----
+
+<MemberCard>
+
+### COMPLEX\_INFINITY\_VALUE {#complex_infinity_value}
+
+```ts
+const COMPLEX_INFINITY_VALUE: Readonly<{
+  complexInfinity: true;
+}>;
+```
+
+The value carried by the type of the unsigned complex infinity `~oo`, which
+has no JavaScript number to stand for it: `Infinity` and `-Infinity` are the
+signed pair, and `NaN` is a different value altogether.
+
+A value-literal type holds an arbitrary runtime value (see [`ValueType`](#valuetype)), so this frozen tagged object is that value. Test for it with
+[`isComplexInfinityValue`](#iscomplexinfinityvalue), which reads the TAG: a `Type` node can be
+rebuilt or re-frozen on its way through the parser and the reducers, so
+object identity is not a reliable test.
+
+</MemberCard>
+
+----
+
+<MemberCard>
+
+### isComplexInfinityValue() {#iscomplexinfinityvalue}
+
+```ts
+function isComplexInfinityValue(v): v is Readonly<{ complexInfinity: true }>
+```
+
+True if `v` is the [`COMPLEX_INFINITY_VALUE`](#complex_infinity_value) sentinel, i.e. the
+value of the `~oo` value-literal type. Reads the tag, never the identity.
+
+##### v
+
+`unknown`
 
 </MemberCard>
 
@@ -31702,6 +32759,61 @@ See also **Complex** for `ImaginaryUnit`<Icon name="chevron-right-bold" />
 | `Square`   | $$x^2$$                     |                                                           |
 
 </div>
+
+### Non-Finite Results
+
+Arithmetic can leave the finite numbers in two ways, and the engine keeps the
+two apart.
+
+**A pole** — a finite non-zero value divided by zero — evaluates to
+`ComplexInfinity` ($\tilde\infty$), an infinity of unspecified direction. The
+signed infinities `PositiveInfinity` and `NegativeInfinity` arise from
+arithmetic on infinite operands.
+
+**An indeterminate form** evaluates to `NaN`: $0/0$, $\infty - \infty$ and
+$\infty \times 0$ have no value that the surrounding expression could rely on.
+
+```json example
+["Divide", 1, 0]
+// ➔ "ComplexInfinity"
+["Divide", 0, 0]
+// ➔ "NaN"
+["Add", "PositiveInfinity", 1]
+// ➔ "PositiveInfinity"
+["Subtract", "PositiveInfinity", "PositiveInfinity"]
+// ➔ "NaN"
+["Multiply", "PositiveInfinity", 0]
+// ➔ "NaN"
+["Divide", 1, "PositiveInfinity"]
+// ➔ 0
+```
+
+These results are outside the bare numeric types. `integer`, `rational`, `real`
+and `complex` each denote a **finite** value, so an infinity matches neither
+`real` nor `complex`; it matches `infinity`, and `NaN` matches `nan`. All three
+are still `number`, which is the union of the finite numbers with the
+infinities and `NaN`.
+
+**`NaN` propagates.** Any numeric function of `NaN` is `NaN`, under plain
+`evaluate()` and not only under `N()` — `NaN` is not an exact value, so there is
+nothing to hold symbolically:
+
+```json example
+["Add", 1, "NaN"]
+// ➔ "NaN"
+["Sqrt", "NaN"]
+// ➔ "NaN"
+["Mod", "NaN", 2]
+// ➔ "NaN"
+["GCD", "NaN", 2]
+// ➔ "NaN"
+```
+
+An **infinity**, by contrast, *is* an exact value. A function of an infinity
+with no closed form therefore stays symbolic rather than numericizing:
+`["Sin", "PositiveInfinity"]` evaluates to itself. Heads whose result is
+required to be finite reject an infinite argument outright — see
+[Number Theory](/compute-engine/reference/number-theory/).
 
 ### Sums and Products
 
@@ -32088,21 +33200,17 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 
 <FunctionDefinition name="Clamp">
 
-<Signature name="Clamp">_value_</Signature>
-
 <Signature name="Clamp">_value_, _lower_, _upper_</Signature>
 
 - If `value` is less than `lower`, evaluate to `lower`
 - If `value` is greater than `upper`, evaluate to `upper`
 - Otherwise, evaluate to `value`
 
-If `lower`and `upper`are not provided, they take the default values of -1 and
-+1.
+All three arguments are required. (A single-argument form with default
+bounds is on the roadmap; today `["Clamp", 0.42]` is an arity error.)
 
 ```json example
-["Clamp", 0.42]
-// ➔ 1
-["Clamp", 4.2]
+["Clamp", 4.2, -1, 1]
 // ➔ 1
 ["Clamp", -5, 0, "+Infinity"]
 // ➔ 0
@@ -32118,17 +33226,26 @@ If `lower`and `upper`are not provided, they take the default values of -1 and
 
 <Signature name="Max">_list_</Signature>
 
-If all the arguments are real numbers, excluding `NaN`, evaluate to the largest
-of the arguments.
+If all the arguments are numbers, evaluate to the largest of them. The
+infinities take part in the comparison like any other value, so
+`["Max", 1, "PositiveInfinity"]` is `PositiveInfinity`.
+
+If any argument is `NaN`, the whole expression is `NaN`. An undefined value
+absorbs the comparison, and it does so even when other arguments are still
+unknown — there is no ordering that could rule it out.
 
 Otherwise, simplify the expression by removing values that are smaller than or
-equal to the largest real number.
+equal to the largest known number.
 
 ```json example
 ["Max", 5, 2, -1]
 // ➔ 5
+["Max", 1, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Max", 0, 7.1, "x", 3]
+// ➔ ["Max", 7.1, "x"]
 ["Max", 0, 7.1, "NaN", "x", 3]
-// ➔ ["Max", 7.1, "NaN", "x"]
+// ➔ "NaN"
 ```
 
 </FunctionDefinition>
@@ -32139,19 +33256,24 @@ equal to the largest real number.
 
 <Signature name="Max">_list_</Signature>
 
-If all the arguments are real numbers, excluding `NaN`, evaluate to the smallest
-of the arguments.
+If all the arguments are numbers, evaluate to the smallest of them. As with
+`Max`, the infinities take part in the comparison, and a `NaN` argument makes
+the whole expression `NaN`.
 
 Otherwise, simplify the expression by removing values that are greater than or
-equal to the smallest real number.
+equal to the smallest known number.
 
 <Latex value=" \min(0, 7.1, 3) = 0"/>
 
 ```json example
 ["Min", 5, 2, -1]
 // ➔ -1
+["Min", 1, "NegativeInfinity"]
+// ➔ "NegativeInfinity"
 ["Min", 0, 7.1, "x", 3]
 // ➔ ["Min", 0, "x"]
+["Min", 0, 7.1, "NaN", "x", 3]
+// ➔ "NaN"
 ```
 
 
@@ -32309,11 +33431,23 @@ difference — `RandomChoice` returns a list.
 
 <FunctionDefinition name="WithRandomSeed">
 
-<Signature name="WithRandomSeed">_seed_: finite\_real | string, _body_: any</Signature>
+<Signature name="WithRandomSeed">_seed_: real | string, _body_: any</Signature>
 
 Evaluate _body_ with a random seed frame installed. Every draw inside the frame
 is deterministic, and the whole block replays identically on re-evaluation,
 while repeated draws **within** the frame still differ.
+
+The seed must be a **finite** real number: `real` excludes $\pm\infty$ and
+`NaN`, so an infinite or undefined seed is rejected with an `out-of-range`
+error rather than silently hashed. (Earlier releases spelled this parameter
+type `finite_real`. That name is retired; bare `real` now carries the same
+finiteness guarantee.)
+
+```json example
+["WithRandomSeed", "PositiveInfinity", ["Random"]]
+// ➔ ["Error", ["ErrorCode", "'out-of-range'",
+//              "'a finite real number or a string'", "'+oo'"]]
+```
 
 ```json example
 ["WithRandomSeed", 42, ["Random"]]
@@ -33085,7 +34219,10 @@ is inferred from the first argument:
 | `f'''(x)`             | Third derivative with nested `D` |
 | `\sin'(x)`            | `["D", ["Sin", "x"], "x"]` |
 
-When the prime notation is used without arguments, it represents a derivative operator:
+When the prime notation is used without arguments on a **function** — a
+symbol whose type is a function, such as one declared with `ce.declare("f",
+"(number) -> number")` or assigned a function literal — it represents a
+derivative operator:
 
 | LaTeX                 | MathJSON          |
 | :-------------------- | :---------------- |
@@ -33094,6 +34231,26 @@ When the prime notation is used without arguments, it represents a derivative op
 | `f^{\prime}`          | `["Derivative", "f"]` |
 | `f''`                 | `["Derivative", "f", 2]` |
 | `f^{(n)}`             | `["Derivative", "f", n]` |
+
+A symbolic order (`f^{(n)}` with `n` unassigned) stays symbolic until `n` is
+assigned, and `["Derivative", "f", 0]` is `f` itself.
+
+On anything that is **not** a function — an undeclared symbol, a number-valued
+symbol, a subscripted name whose subscript does not fold into the symbol
+(`\alpha_{i+1}`, `A_{i,j}`) — a prime without arguments is the **primed
+variable** `Prime`, a distinct value of the same kind as its base (`x'` as a
+coordinate, `A'` as a point in geometry, `\sin a'` as a function of a primed
+variable):
+
+| LaTeX                 | MathJSON          |
+| :-------------------- | :---------------- |
+| `x'`                  | `["Prime", "x"]` |
+| `x''`                 | `["Prime", "x", 2]` |
+| `A_1'`                | `["Prime", "A_1"]` |
+| `\alpha_{i+1}'`       | `["Prime", ["Subscript", "alpha", ["Add", "i", 1]]]` |
+
+A parenthesized expression is always differentiated, with or without a
+subscript: `(x^2)'` is `["Derivative", ["Delimiter", ["Square", "x"]]]`.
 
 <b>Newton Notation (Dot Notation)</b>
 
@@ -34867,6 +36024,22 @@ Every other case keeps the `indexed_collection` types above.
 ["Range", 1, 10, 2]  // type: indexed_collection<integer>  (stepped: a gather, not a span)
 ["Range", 5, 2]      // type: indexed_collection<integer>  (descending)
 ["Range", 0, 5]      // type: indexed_collection<integer>  (0 is not an index)
+["Range", 1, "PositiveInfinity"]
+                     // type: indexed_collection<integer>  (unbounded)
+```
+
+An **infinite upper bound** is allowed and produces a lazy, unbounded
+collection. It does not take the `range` type: an index span is a finite run of
+positions, and $\infty$ describes how far the range extends rather than being
+one of its values. The elements are still integers, and `Length` reports the
+extent:
+
+```js
+ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
+// ➔ +oo
+
+ce.expr(['Take', ['Range', 1, 'PositiveInfinity'], 3]).evaluate().print();
+// ➔ [1,2,3]
 ```
 
 The narrowing loses no information — a `range` is still an
@@ -35218,6 +36391,35 @@ than `xs`, the iteration stops at the end of the mask.
 ["At", ["List", 10, 20, 30, 40], ["List", "True", "False", "True", "False"]]
 // ➔ ["List", 10, 30]
 ```
+
+#### Out-of-Range Index
+
+A single index that falls outside the collection — including the index `0`,
+since indexing is 1-based — is not an error. `At` answers an **absence marker**,
+and the marker is drawn from the element type: a numeric collection answers
+`NaN`, any other collection answers `Missing`.
+
+```js
+ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
+// ➔ NaN
+
+ce.expr(['At', ['List', "'a'", "'b'"], 99]).evaluate().print();
+// ➔ "Missing"
+```
+
+The marker is part of the static type of the access, because the engine cannot
+in general know that an index is in range:
+
+```js
+ce.expr(['At', ['List', 5, 2, 10, 18], 99]).type;
+// ➔ "integer | nan"
+
+ce.expr(['At', ['List', "'a'", "'b'"], 99]).type;
+// ➔ "missing | string"
+```
+
+For a numeric collection the union often collapses on its own, since `nan` is
+already part of `number`: indexing a `list<number>` has type `number`.
 
 #### Filtering with a Condition
 
@@ -35767,6 +36969,15 @@ The optional function is interpreted by its **arity**:
   // ➔ ["List", 3, 2, 1]
   ```
 
+  A comparator may also return a **boolean**, in which case `True` means the
+  first argument sorts first — the form a predicate such as `Less` or a body
+  like `a > b` naturally produces:
+
+  ```json example
+  ["Sort", ["List", 1, 2, 3], ["Function", ["Greater", "a", "b"], "a", "b"]]
+  // ➔ ["List", 3, 2, 1]
+  ```
+
 - A **one-argument key function** `f(x)` sorts the elements **ascending** by
   the key value `f(x)`. The sort is **stable**: elements with equal keys keep
   their original relative order.
@@ -35915,14 +37126,22 @@ comparison is undetermined.
 
 <FunctionDefinition name="Length">
 
-<Signature name="Length" returns="integer">_xs_:any</Signature>
+<Signature name="Length" returns="infinity | integer">_xs_:any</Signature>
 
-Return the number of elements in a finite collection. If the argument is not a
-collection or is infinite, the expression remains unevaluated.
+Return the number of elements in a collection. If the argument is not a
+collection, the expression remains unevaluated.
 
 ```json example
 ["Length", ["List", 5, 2, 10, 18]]
 // ➔ 4
+```
+
+An **unbounded** collection has an infinite length, which is why the return type
+is `infinity | integer` rather than `integer`: a bare `integer` is finite.
+
+```js
+ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
+// ➔ +oo
 ```
 
 For collections, `Length` and [`Count`](#count) produce the same result;
@@ -37559,6 +38778,27 @@ the duration of the inner block.
 // ➔ 10
 ```
 
+### Translating simultaneous assignments
+
+`Block` is sequential: a later assignment observes changes made by every
+earlier expression. A source language with simultaneous action tuples must
+therefore snapshot all right-hand sides before committing any left-hand side.
+
+For example, if `(a → 1, b → a + 1)` means that `b` reads the value of `a`
+from before the tuple, translate it as:
+
+```json example
+["Block",
+  ["Assign", "_next_a", 1],
+  ["Assign", "_next_b", ["Add", "a", 1]],
+  ["Assign", "a", "_next_a"],
+  ["Assign", "b", "_next_b"]]
+```
+
+The temporary names must be fresh. The first pass evaluates every right-hand
+side against the old state; the second pass commits the results. Commit order
+then does not matter because no temporary depends on a newly assigned value.
+
 ```json example
 ["Block",
   ["Declare", "counter", "integer"],
@@ -37585,12 +38825,31 @@ the duration of the inner block.
 <Signature name="If">_condition_, _expr-1_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
-expression is `expr-1`, otherwise `Nothing`.
+expression is `expr-1`. Without an else-branch there is nothing to select when
+`condition` is `False`, and the value is the `Missing` marker.
+
+```json example
+["If", "False", 5]
+// ➔ Missing
+```
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
+
+Only the selected branch is evaluated. The branch that is not selected is
+**dead code**: if it contains an error, that error never reaches the value.
+
+```json example
+["If", "True", 5, ["Divide", "x"]]
+// ➔ 5           — the malformed branch is never evaluated
+```
+
+Only *evaluation* skips the branch. The boxed expression still carries the
+diagnostic — the JSON above boxes as
+`["If", "True", 5, ["Divide", "x", ["Error", "'missing'"]]]` — so the error is
+still reportable to the user.
 
 Here's an example of a function that returns the absolute value of a number:
 
@@ -37608,7 +38867,15 @@ Here's an example of a function that returns the absolute value of a number:
 _expr-n_</Signature>
 
 The value of the `["Which"]` expression is the value of the first expression
-`expr-n` for which the corresponding condition `condition-n` is `True`.
+`expr-n` for which the corresponding condition `condition-n` is `True`. When no
+condition is `True` — including the no-operand case `["Which"]` — there is
+nothing to select, and the value is the `Missing` marker.
+
+Only the selected expression is evaluated. The expressions that are not
+selected are **dead code**: an error in one of them never reaches the value.
+`["Which", "False", ["Divide", "x"], "True", 7]` evaluates to `7`. As with
+`["If"]`, only *evaluation* skips them; the boxed expression still carries the
+diagnostic.
 
 <Latex value="\begin{cases} x &amp; \text{if } x &gt; 0 \\ -x &amp; \text{if } x &lt; 0 \\ 0 &amp; \text{otherwise} \end{cases}"/>
 
@@ -37627,7 +38894,7 @@ A `["Which"]` expression is equivalent to the following `["If"]` expression:
     ["If", ["Equal", condition-2, "True"], _expr-2,
     ... ["If", ["Equal", condition-n, "True"],
           expr-n,
-          "Nothing"
+          "Missing"
     ]
   ]
 ]
@@ -38477,12 +39744,19 @@ entries present depend on what the operand is; keys include:
 ```json example
 ["About", "Pi"]
 
-// ➔ {kind: "constant", name: "Pi", type: "finite_real",
+// ➔ {kind: "constant", name: "Pi",
+//    type: "real<3.141592653589793..3.141592653589794>",
 //    description: "The constant π ≈ 3.14159…", wikidata: "Q167"}
 ```
 
+The `type` entry is the constant's precise static type, so a numeric constant
+reports the `real` tier narrowed to the range that encloses its value, not a
+bare tier name. Note that `real` here means a **finite** real: the numeric
+types are finite by default, and the spelling `finite_real` has been retired.
+
 Since the result is a dictionary, individual entries are addressable:
-`["At", ["About", "Pi"], "'type'"]` evaluates to `"finite_real"`.
+`["At", ["About", "Pi"], "'type'"]` evaluates to the string
+`"real<3.141592653589793..3.141592653589794>"`.
 
 To get just the type of an expression as a string, use ["Type"](#type).
 
@@ -38578,13 +39852,18 @@ The following functions can be used to obtain information about an expression.
 
 <Signature name="Type">_expression_</Signature>
 
-Evaluate to the type of _expression_, as a string.
+Evaluate to the type of _expression_, as a type value.
 
 ```json example
 ["Type", 2.4531]
 
-// ➔ "finite_real"
+// ➔ ["TypeFrom", "'2.4531'"]
 ```
+
+The result is the expression's **literal type** — the most precise claim
+available about the value, here the number itself. Its widening tier is
+`real`, which since the finite-by-default flip denotes a *finite* real; the
+retired spelling `finite_real` is no longer produced.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>
@@ -41894,6 +43173,24 @@ reason their operands are not reordered at canonicalization. (`Xor` and
 is the exception: every operand is evaluated once and the result is a list.
 See the [Logic guide](/compute-engine/guides/logic/).
 
+An operand that is skipped is **dead code**: if it contains an error, that
+error never reaches the value. Because operands are evaluated in the order
+written, this is order-dependent.
+
+```json example
+["And", "False", ["Divide", "x"]]
+// ➔ False       — the malformed operand is never evaluated
+
+["And", ["Divide", "x"], "False"]
+// ➔ Error       — the malformed operand is reached first
+```
+
+Only *evaluation* skips the operand. The boxed expression still carries the
+diagnostic, so `ce.box(["And", "False", ["Divide", "x"]]).json` is
+`["And", "False", ["Divide", "x", ["Error", "'missing'"]]]` and the error is
+still reportable to the user. Operators that cannot short-circuit have no dead
+operands: `["Xor", "False", ["Divide", "x"]]` evaluates to an `Error`.
+
 ### Operator Precedence
 
 Logical operators have lower precedence than comparison and arithmetic operators,
@@ -42520,17 +43817,30 @@ ce.parse("42 \\in \\Z").evaluate().print();
 ```
 
 `Element` and `NotElement` can also be used with a **type name** on the right
-hand side (e.g. `integer`, `real`, `finite_real`, `number`, `any`), in which
+hand side (e.g. `integer`, `real`, `complex`, `number`, `any`), in which
 case the check is done against the expression type.
 
 ```js
-ce.declare('x', 'finite_real');
+ce.declare('x', 'real');
 ce.expr(['Element', 'x', 'real']).evaluate().print();
 // ➔ True
 
 ce.expr(['Element', 'x', 'integer']).evaluate().print();
 // ➔ False
 ```
+
+Every bare numeric type name — `integer`, `rational`, `real`, `complex` — denotes
+a **finite** value. So a type-name membership test agrees with the set constant of
+the same name: neither `real` nor `RealNumbers` admits $\pm\infty$. To include the
+infinities, use an extended set (`ExtendedRealNumbers`) or the type `number`,
+which covers the finite numbers, the infinities and NaN.
+
+:::info[Deprecated spellings]
+The type names `finite_integer`, `finite_rational`, `finite_real`,
+`finite_complex` and `finite_number` are **retired**. They are still accepted on
+input for one release cycle and normalize to the bare name — `finite_real`
+becomes `real`, `finite_number` becomes `complex` — but they are never emitted.
+:::
 
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
@@ -42539,7 +43849,7 @@ element matches the type associated with the set.
 const x = ce.expr(42);
 
 x.type;
-// ➔ "finite_integer"
+// ➔ "42"  — the literal type of the number itself
 
 x.type.matches("integer");
 // ➔ true
@@ -42562,8 +43872,8 @@ ce.parse("42 \\in \\Z").evaluate().print();
 | Symbol     | Notation                                 | &nbsp; | Definition |
 | :--------- | :--------------------------------------- | :--------- | :--------- |
 | `EmptySet` | `\varnothing` or `\emptyset`| $$ \varnothing $$ or $$ \emptyset $$ | A set that has no elements           |
-| `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number, real, imaginary, or complex |
-| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers |
+| `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number — real, imaginary or complex — together with $$+\infty$$, $$-\infty$$, $$\tilde\infty$$ and $$\mathrm{NaN}$$. It corresponds to the type `number` |
+| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
 | `ExtendedComplexNumbers`        | `\overline\C` | $$ \overline\C $$ | Real or imaginary numbers, including $$+\infty$$, $$-\infty$$ and $$\tilde\infty$$ |
 | `ImaginaryNumbers`           | `\imaginaryI\R` | $$ \imaginaryI\R $$ | Complex numbers with a non-zero imaginary part and no real part |
 | `RealNumbers`           | `\R` | $$ \R $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
@@ -42680,10 +43990,10 @@ constructed ring. They do carry a type, formed by joining the base ring's
 element type with the types of the adjoined elements:
 
 ```js
-ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<finite_real>
-ce.parse("\\Z[i]").type;           // ➔ set<finite_complex>
+ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<real>
+ce.parse("\\Z[i]").type;           // ➔ set<complex>
 ce.parse("\\Z[x]").type;           // ➔ set<unknown>
-ce.parse("\\Z_n").type;            // ➔ set<finite_integer>
+ce.parse("\\Z_n").type;            // ➔ set<integer>
 ```
 
 ## Relations
@@ -42751,6 +44061,35 @@ ce.parse('[0, 1)').json;
 
 ce.parse('(-\\infty, 0]').json;
 // ➔ ["Interval", ["Open", ["Negate", "PositiveInfinity"]], 0]
+```
+
+### Infinite Endpoints
+
+An interval is a set of **real** numbers, and the reals are finite. An infinite
+endpoint therefore describes how far the interval *extends* — it is never one of
+its members, whether it is written open or closed:
+
+```js
+ce.expr(['Contains', ['Interval', 0, 'PositiveInfinity'], 'PositiveInfinity']).evaluate().print();
+// ➔ False
+
+ce.expr(['Contains', ['Interval', 0, 'PositiveInfinity'], 1000000]).evaluate().print();
+// ➔ True
+
+ce.parse('-\\infty \\in (-\\infty, 0]').evaluate().print();
+// ➔ False
+```
+
+To talk about a set that does contain $\pm\infty$, use one of the extended set
+constants (`ExtendedRealNumbers`, `ExtendedIntegers`, `ExtendedRationalNumbers`,
+`ExtendedComplexNumbers`) rather than an interval:
+
+```js
+ce.expr(['Element', 'PositiveInfinity', 'ExtendedRealNumbers']).evaluate().print();
+// ➔ True
+
+ce.expr(['Element', 'PositiveInfinity', 'RealNumbers']).evaluate().print();
+// ➔ False
 ```
 
 ### Contextual Interval Parsing
@@ -42825,9 +44164,25 @@ would be undetectable downstream.
 
 Source: https://mathlive.io/compute-engine/reference/special-functions/
 
+The functions in this section take a `number` argument, the type that includes
+$\pm\infty$ and `NaN` alongside the finite numbers. They are not restricted to
+finite input the way the [number theory](/compute-engine/reference/number-theory/)
+functions are:
+
+- An **infinite** argument is accepted. Where the function has a limit there,
+  that limit is the value — $\operatorname{erf}(\infty) = 1$,
+  $\operatorname{erfc}(\infty) = 0$. Otherwise the expression stays symbolic,
+  as `["Gamma", "PositiveInfinity"]` does.
+- A **`NaN`** argument gives `NaN`. This happens under plain `evaluate()`, not
+  only under `N()`: `NaN` is not an exact value, so there is nothing to hold
+  symbolically.
+
+A function may still be infinite at a finite point — $K(1) = \infty$ — in which
+case the result is `PositiveInfinity`.
+
 <FunctionDefinition name="Erf">
 
-<Signature name="Erf">_z:complex_</Signature>
+<Signature name="Erf">_z:number_</Signature>
 
 Evaluate to the **error function** of a complex number.
 
@@ -42845,7 +44200,7 @@ where $$z$$ is a complex number.
 
 <FunctionDefinition name="Erfc">
 
-<Signature name="Erfc">_z:complex_</Signature>
+<Signature name="Erfc">_z:number_</Signature>
 
 Evaluate to the **complementary error function** of a complex number.
 
@@ -42856,9 +44211,12 @@ It is defined as $$ \operatorname{erfc} z = 1 - \operatorname {erf} z $$.
 
 <FunctionDefinition name="ErfInv">
 
-<Signature name="ErfInv">_x:real_</Signature>
+<Signature name="ErfInv">_x:number_</Signature>
 
 Evaluate to the **inverse error function** of a real number $$ -1 < x < 1 $$
+
+Outside that interval the value is not defined: `["ErfInv", 2]` and
+`["ErfInv", "PositiveInfinity"]` both evaluate to `NaN`.
 
 It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 = x $$.
@@ -44313,7 +45671,7 @@ Step 1: Calculate factorials: $$5! = 120, 2! = 2, (5-2)! = 3! = 6$$
 Step 2: Apply formula: $$5! / (2! \times 3!) = 120 / (2 \times 6) = 10$$  
 So, there are 10 different ways to choose 2 items from 5.
 
-The function returns <code>NaN</code> if <code>n &lt; 0</code>, <code>m &lt; 0</code>, or <code>m &gt; n</code>.
+The function implements the generalized binomial coefficient: <code>m &lt; 0</code> or <code>m &gt; n</code> (for non-negative integer <code>n</code>) answers <code>0</code>, and a negative <code>n</code> follows the falling-factorial extension (for example <code>Choose(-1, 0)</code> is <code>1</code>).
 
 ```json
 ["Choose", 5, 2]
@@ -44551,6 +45909,26 @@ Source: https://mathlive.io/compute-engine/reference/number-theory/
 The functions in this section provide tools for number-theoretic computations:  
 prime numbers and integer factorization, divisor functions, partitions, polygonal numbers, perfect/happy numbers, and special combinatorial counts (Eulerian, Stirling).
 
+## Finite Arguments
+
+The functions below are **finite-result** functions: there is no meaningful
+$φ(\infty)$ or $\sqrt{\mathrm{NaN}}$ to return. The parameter types in the
+signatures say so. `integer` and `real` denote **finite** values, so $\pm\infty$
+and `NaN` are not members of either. Where a signature declares one of them,
+passing a non-finite argument is a type error rather than a symbolic or
+infinite result:
+
+```json example
+["NthPrime", "PositiveInfinity"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'Infinity'"], …]
+
+["IntegerSqrt", "NaN"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'NaN'"], …]
+```
+
+This is the same check that rejects a non-integer — `["IntegerSqrt", 2.5]`
+reports `'incompatible-type'` in exactly the same way. The argument has to
+inhabit the declared type before the function is applied.
 
 ## Function Definitions
 
@@ -46949,7 +48327,7 @@ value.
 
 The number denoted by the string _s_. Unlike
 [`DigitsFrom`](#digitsfrom), which is integer-only, `NumberFrom` accepts
-fractions, exponents and the non-finite spellings.
+fractions, exponents and the infinity and NaN spellings.
 
 ```json example
 ["NumberFrom", {str: "42"}]
@@ -46973,7 +48351,7 @@ fraction and an optional `e`/`E` exponent — or one of the exact spellings
 | `"42"`, `"-42"`, `"+7"`, `" 42 "` | `42`, `-42`, `7`, `42` | Integer numeral, sign and surrounding whitespace allowed |
 | `"3.14"`, `"1e-3"`, `"1.5e3"` | `3.14`, `0.001`, `1500` | Fraction and exponent |
 | `".5"` | `0.5` | A leading `.` needs no integer part |
-| `"oo"`, `"+oo"`, `"-oo"`, `"NaN"` | `+oo`, `+oo`, `-oo`, `NaN` | The engine's own spellings for the non-finite values |
+| `"oo"`, `"+oo"`, `"-oo"`, `"NaN"` | `+oo`, `+oo`, `-oo`, `NaN` | The engine's own spellings for the infinities and NaN |
 | `"5."` | Error `invalid-number` | A trailing `.` with no fraction digits is not a numeral |
 | `""` | Error `invalid-number` | The empty string denotes no number |
 | `"abc"`, `"12abc"` | Error `invalid-number` | The **whole** string must be a numeral — a numeric prefix is not enough |
@@ -49062,7 +50440,8 @@ design:
 ce.declare('g', '(string) -> number');
 
 console.log(ce.expr(['g', 42]).isValid);
-// ➔ false  — ["g", ["Error", ["ErrorCode", "'incompatible-type'", "'string'", "'finite_integer'"]]]
+// ➔ false  — ["g", ["Error", ["ErrorCode", "'incompatible-type'", "'string'", "'42'"], 42]]
+//            the offending type is reported as the literal type `42`, not as `integer`
 
 console.log(ce.expr(['g', ['List', 1, 2]]).isValid);
 // ➔ true   — the lift makes it a broadcast application
@@ -49263,7 +50642,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-bessel-hypergeometr
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **115 identities** for bessel and hypergeometric functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -50261,7 +51640,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-complex/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **36 identities** for complex numbers.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -50561,10 +51940,10 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-elementary/
 
 # Elementary functions
 
-Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **211 identities** for elementary functions.
+Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **210 identities** for elementary functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -50575,7 +51954,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 - [Lambert W-function](#lambert-w-function) (15)
 - [Natural logarithm](#natural-logarithm) (11)
 - [Pi](#pi) (4)
-- [Powers](#powers) (8)
+- [Powers](#powers) (7)
 - [Sinc function](#sinc-function) (24)
 - [Sine](#sine) (59)
 - [Square roots](#square-roots) (25)
@@ -51348,14 +52727,6 @@ $$(xy)^{a}=x^{a}y^{a}\exp(2\pi\imaginaryI a\lfloor\frac{\pi-\arg(x)-\arg(y)}{2\p
 **Holds when** $x\in\C\setminus\lbrace0\rbrace\land y\in\C\setminus\lbrace0\rbrace\land a\in\C$.
 Used by the Compute Engine for simplification.
 [`2090c3` · Fungrim entry ↗](https://fungrim.org/entry/2090c3)
-
----
-
-$$z^0=1$$
-
-**Holds when** $z\in\C$.
-Used by the Compute Engine for simplification.
-[`310f36` · Fungrim entry ↗](https://fungrim.org/entry/310f36)
 
 ---
 
@@ -52257,7 +53628,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-elliptic-integrals/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **304 identities** for elliptic integrals.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -54833,7 +56204,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-gamma/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **162 identities** for gamma and related functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -56186,7 +57557,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-modular-theta/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **318 identities** for modular forms and theta functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -58794,7 +60165,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-number-theory/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **70 identities** for number theory.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -59384,7 +60755,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomi
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **74 identities** for orthogonal polynomials.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -60056,7 +61427,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-sequences/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **65 identities** for combinatorial and integer sequences.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -60628,7 +61999,7 @@ Source: https://mathlive.io/compute-engine/reference/fungrim-zeta/
 Part of the [Fungrim Identities](/compute-engine/reference/fungrim/) reference — **80 identities** for zeta and l-functions.
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Contents
@@ -61345,17 +62716,17 @@ Source: https://mathlive.io/compute-engine/reference/fungrim/
 
 The Compute Engine ships a library of **special-function identities** derived from the [Fungrim](https://fungrim.org/) "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation solving for functions such as the elliptic integrals, Jacobi theta functions, Bessel functions, the Riemann zeta function, and many more.
 
-This reference catalogues the **1435 identities** behind the engine's **1445 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
+This reference catalogues the **1434 identities** behind the engine's **1444 Fungrim rules** (a few identities back both a simplification and a solving rule), organized into the areas below. Each identity shows the formula, the conditions under which it holds, the symbols it involves, how the engine uses it, and a link to the authoritative upstream Fungrim entry (whose page carries the full prose description, proof sketch, and references).
 
 :::info[Generated reference]
-This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `3a299164c683`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
+This page is generated from the compiled Fungrim artifact by `scripts/fungrim/gen-reference-doc.ts` (upstream snapshot `9ac399f742e3`, translator `grim2mathjson 0.1.0`). Do not edit it by hand. The corpus is MIT-licensed; see `data/fungrim/LICENSE`.
 :::
 
 ## Areas
 
-### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (211)
+### [Elementary functions](/compute-engine/reference/fungrim-elementary/) (210)
 
-Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (8) · Sinc function (24) · Sine (59) · Square roots (25)
+Exponential function (16) · Golden ratio (5) · Inverse tangent (44) · Lambert W-function (15) · Natural logarithm (11) · Pi (4) · Powers (7) · Sinc function (24) · Sine (59) · Square roots (25)
 
 ### [Complex numbers](/compute-engine/reference/fungrim-complex/) (36)
 

@@ -19,9 +19,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.a0d89006.css">
-<script src="/assets/js/runtime~main.b8cf4556.js" defer="defer"></script>
-<script src="/assets/js/main.fd881ca3.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
+<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
+<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -68,8 +68,21 @@ explicitly.</p></div></div>
 <p>When the prime notation is followed by arguments, the differentiation variable
 is inferred from the first argument:</p>
 <table><thead><tr><th style="text-align:left">LaTeX</th><th style="text-align:left">MathJSON</th></tr></thead><tbody><tr><td style="text-align:left"><code>f&#x27;(x)</code></td><td style="text-align:left"><code>[&quot;D&quot;, [&quot;f&quot;, &quot;x&quot;], &quot;x&quot;]</code></td></tr><tr><td style="text-align:left"><code>f&#x27;&#x27;(x)</code></td><td style="text-align:left"><code>[&quot;D&quot;, [&quot;D&quot;, [&quot;f&quot;, &quot;x&quot;], &quot;x&quot;], &quot;x&quot;]</code></td></tr><tr><td style="text-align:left"><code>f&#x27;&#x27;&#x27;(x)</code></td><td style="text-align:left">Third derivative with nested <code>D</code></td></tr><tr><td style="text-align:left"><code>\sin&#x27;(x)</code></td><td style="text-align:left"><code>[&quot;D&quot;, [&quot;Sin&quot;, &quot;x&quot;], &quot;x&quot;]</code></td></tr></tbody></table>
-<p>When the prime notation is used without arguments, it represents a derivative operator:</p>
+<p>When the prime notation is used without arguments on a <strong>function</strong> — a
+symbol whose type is a function, such as one declared with <code>ce.declare(&quot;f&quot;, &quot;(number) -&gt; number&quot;)</code> or assigned a function literal — it represents a
+derivative operator:</p>
 <table><thead><tr><th style="text-align:left">LaTeX</th><th style="text-align:left">MathJSON</th></tr></thead><tbody><tr><td style="text-align:left"><code>f&#x27;</code></td><td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;]</code></td></tr><tr><td style="text-align:left"><code>f\prime</code></td><td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;]</code></td></tr><tr><td style="text-align:left"><code>f^{\prime}</code></td><td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;]</code></td></tr><tr><td style="text-align:left"><code>f&#x27;&#x27;</code></td><td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, 2]</code></td></tr><tr><td style="text-align:left"><code>f^{(n)}</code></td><td style="text-align:left"><code>[&quot;Derivative&quot;, &quot;f&quot;, n]</code></td></tr></tbody></table>
+<p>A symbolic order (<code>f^{(n)}</code> with <code>n</code> unassigned) stays symbolic until <code>n</code> is
+assigned, and <code>[&quot;Derivative&quot;, &quot;f&quot;, 0]</code> is <code>f</code> itself.</p>
+<p>On anything that is <strong>not</strong> a function — an undeclared symbol, a number-valued
+symbol, a subscripted name whose subscript does not fold into the symbol
+(<code>\alpha_{i+1}</code>, <code>A_{i,j}</code>) — a prime without arguments is the <strong>primed
+variable</strong> <code>Prime</code>, a distinct value of the same kind as its base (<code>x&#x27;</code> as a
+coordinate, <code>A&#x27;</code> as a point in geometry, <code>\sin a&#x27;</code> as a function of a primed
+variable):</p>
+<table><thead><tr><th style="text-align:left">LaTeX</th><th style="text-align:left">MathJSON</th></tr></thead><tbody><tr><td style="text-align:left"><code>x&#x27;</code></td><td style="text-align:left"><code>[&quot;Prime&quot;, &quot;x&quot;]</code></td></tr><tr><td style="text-align:left"><code>x&#x27;&#x27;</code></td><td style="text-align:left"><code>[&quot;Prime&quot;, &quot;x&quot;, 2]</code></td></tr><tr><td style="text-align:left"><code>A_1&#x27;</code></td><td style="text-align:left"><code>[&quot;Prime&quot;, &quot;A_1&quot;]</code></td></tr><tr><td style="text-align:left"><code>\alpha_{i+1}&#x27;</code></td><td style="text-align:left"><code>[&quot;Prime&quot;, [&quot;Subscript&quot;, &quot;alpha&quot;, [&quot;Add&quot;, &quot;i&quot;, 1]]]</code></td></tr></tbody></table>
+<p>A parenthesized expression is always differentiated, with or without a
+subscript: <code>(x^2)&#x27;</code> is <code>[&quot;Derivative&quot;, [&quot;Delimiter&quot;, [&quot;Square&quot;, &quot;x&quot;]]]</code>.</p>
 <b>Newton Notation (Dot Notation)</b>
 <p>Newton&#x27;s notation uses dots above the variable to indicate time derivatives.
 This is common in physics for derivatives with respect to time.</p>

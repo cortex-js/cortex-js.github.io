@@ -9,3073 +9,2972 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Breaking Changes
 
-- **The minimum supported Node version is now 22.3.0** (previously 21.7.3;
-  Node 21 has been end-of-life since June 2024). The new `Input` operator's
-  synchronous stdin reader relies on `process.getBuiltinModule`, introduced
-  in Node 22.3.
+- **A `type` handler in an operator definition now receives operand
+  DESCRIPTORS, never operand expressions.** The handler signature is
+  `(operands: OperandDescriptor[], context: TypeHandlerContext) => Type`:
+  each descriptor carries the operand's handler-visible type, a small set of
+  three-valued facts (finiteness, sign, closedness, the collection facets, a
+  static shape, the element type its own collection handler proves) and an
+  on-demand structural view (`structureOf()`: symbol, string, number with
+  its exact rational terms, application with child descriptors, function
+  literal, tuple and list literal with element descriptors). The context
+  carries a read-only engine view (`engine.type()`, the type resolver,
+  `lookupDefinition()`, `tolerance`, the protocol registry) and
+  `derive(operator, operands)`, which types an application the handler does
+  not hold. A handler therefore cannot declare, canonicalize, evaluate, or
+  read a symbol's held value while deriving a type; under test, a handler
+  that writes engine state throws. The `typeHandlerKind` flag that selected
+  between the two handler shapes is gone (a definition that still sets it
+  fails to type-check), and so are `OperatorTypeHandlerOnExpressions` and the
+  `operandTypes` option the old shape received. Every built-in handler has
+  been converted and proven equivalent by a differential run of both shapes
+  across the test suite; a user-defined `type` handler must be rewritten
+  against the descriptor. Migration, read for read: `ops[i].type.type` →
+  `operands[i].type`; `isInteger`/`isReal` → `typeFact(type, 'integer')`
+  (three-valued); `isFinite` → `facts.finite`; `sgn` → `facts.sgn`;
+  `isSame(k)` → `operandLiteralValue`; `.ops`/`.operator`/`.string` →
+  `structureOf()`; an `elttype` read → `facts.elementType`.
 
-- **Dictionaries now print as their literal form.** `toString()` (and the
-  Epsil REPL output) renders a dictionary as `{"key" -> value, …}` — `{->}`
-  when empty — instead of falling back to the raw MathJSON structure
-  (`{"dict":{…}}`). The `.json` MathJSON serialization is unchanged.
-  Alongside this, string literals printed by `toString()` now escape
-  backslashes and control characters (`\\`, `\n`, `\t`, …), not just the
-  double quote, so the printed form parses back to the same string.
-
-- **`About` now returns a dictionary, not a string** — matching its
-  documented contract. Entries include `kind` (`"symbol"`, `"constant"`,
-  `"function"`, `"multi-clause function (n clauses)"`, `"number"`, …),
-  `type` (the static type, as a string — the same report as `Type`, and
-  previously missing from the output entirely), `name`, `value`,
-  `signature`, `clauses`, `attributes`, `description`, `wikidata` and `url`,
-  each present only when applicable. Individual entries are addressable:
-  `About(Pi)["type"]` evaluates to `"finite_real"`. Code that treated the
-  result as a string should use the dictionary entries (or `Type(expr)` if
-  it only wanted the type).
-
-- **Bare collection types are now synonyms for their `<unknown>` form, and
-  `any` sits strictly above `unknown`.** A bare `list` (likewise `set`,
-  `dictionary`, `collection`, `indexed_collection`) means "some collection of
-  **values**, element type not stated" — exactly `list<unknown>`, and the two
-  spellings normalize to the bare form. Previously the docs equated bare
-  `list` with `list<any>`; that is now a **different, strictly wider type**:
-  `any` additionally admits the absence markers (`Nothing`, `Missing`), so a
-  `list<any>` accepts a `Missing`-bearing list while the bare `list` does
-  not. Consequences:
-  - `any <: unknown` is now **false** (it was true, which made the subtype
-    relation intransitive: `list<nothing> <: list<any> <: list<unknown>`
-    both held while `list<nothing> <: list<unknown>` did not).
-  - `list<nothing>` and `list<integer|missing>` are no longer `<: list`;
-    they are `<: list<any>`. Code that uses a bare collection name as a
-    *shape* test ("is this operand collection-shaped?") should test against
-    `collection<any>` / `indexed_collection<any>` instead — the engine's own
-    gates were converted.
-  - An unbounded type variable (`where T`) now reads as bound `unknown`
-    ("some value type"), not `any`; an explicit `: any` bound survives
-    serialization instead of being elided.
-  - `dictionary<any>`, `collection<any>` and `indexed_collection<any>` no
-    longer collapse to the bare name at parse time (that collapse now
-    silently *narrowed* them); `tensor<any>` normalizes to `list<any>`, and
-    it is `tensor<unknown>` that normalizes to bare `list`.
-  - `tuple<nothing>` reduces to `nothing` (a `nothing` slot collapses, and
-    the empty tuple is `nothing`) rather than widening to bare `tuple`.
-  - `couldMatch` now sees the overlap between a bare collection subject and
-    a parameterized target (`indexed_collection` couldMatch
-    `collection<number>` was false while the *more* specific
-    `list<tuple<…>>` was true).
-  - An inferred function literal such as `(x) => x` (typed
-    `(unknown) -> unknown`) is still accepted at a parameter declared
-    `(any) -> any` — placeholder slots reconcile at the argument boundary
-    (previously this worked only by riding on the erroneous
-    `any <: unknown` edge).
+  Types that moved with the conversion, all in the narrowing-and-sound or
+  widening direction: a set comprehension's element type is now DERIVED
+  from its body instead of enumerated (`{n² : n ∈ ℤ}` has elements
+  `integer<0..>` where it had `unknown`; `{n/2 : n ∈ {1,2,3}}` has `real`
+  where enumeration saw `rational`); an `Interval` with a symbolic endpoint
+  has `real` elements instead of `never`; `JacobianMatrix` of an operand
+  neither its structure nor a definition decides types the declared
+  `value`; the static type of an implicit-map pipe (`xs |> p ↦ …`) binds
+  the stage parameter to the element type and equals the explicit `Map`'s
+  type; `Element` declines to `boolean` for a radical literal (`√2 ∈ [√2, 1]`) whose exact value the descriptor does not carry; a `Range` whose
+  bound is a `Sum` no longer evaluates that bound when its sign or type is
+  read.
 
 ### New Features
 
-- **`And`/`Or` are value-commutative again at the symbolic entry points.**
-  The short-circuit conversion made `And`/`Or` ordered — operands evaluate
-  left to right and the canonical form preserves written order — which had
-  cost two symbolic properties. Both are restored at the value level, where
-  commutativity belongs: `isEqual()`/`isIdenticallyEqual()` now compare
-  `And`/`Or` expressions modulo permutation and nesting of their operands
-  (`(A && B) == (B && A)` is `true`; a failed operand pairing stays
-  undecided, never `false`, since `A && B` and `A && C` coincide whenever
-  `A` is false), and `match()` tries operand permutations again, so a rule
-  pattern `p ∧ ¬p` matches `¬p ∧ p`. Operand ORDER remains part of the
-  program: `isSame()` stays strictly syntactic, the canonical form keeps
-  written order, and evaluation still short-circuits left to right.
-  Operator authors get the underlying mechanism as a new definition flag,
-  `commutativeMatch` — permutation matching decoupled from the canonical
-  operand sort that `commutative` implies (it defaults to `commutative`).
+- **Epsil `if let`.** `if let pattern = subject { … } else { … }` binds the
+  pattern's names when the subject matches and runs the `else` branch
+  otherwise. The pattern is any `match` pattern, so a typed binding takes
+  apart a result that may have failed:
+  `if let v: !error = f(x) { v } else { 0 }`. The statement chains with
+  `else if` in either direction, and without an `else` a refuted `if let`
+  evaluates to `Missing`, like a false `if`. It is sugar over `match` (a
+  two-case `Match` with a wildcard fallback) and the serializer spells that
+  shape back as `if let`. A pattern that cannot fail (a bare name or `_` with
+  no type) is reported by the new `if-let-irrefutable` warning; a missing `=`
+  is `if-let-equal-expected`.
+- **Epsil `while let`.** `while let pattern = subject { … }` is the loop form
+  of `if let`: each turn matches the subject and runs the body with the
+  pattern's bindings, and the first refutation ends the loop —
+  `while let [h, ...t] = xs { s = s + h; xs = [t] }` consumes a list, and
+  `while let h: !error = head(xs) { … }` drains a function that may fail.
+  `break` and `continue` in the body apply to this loop. It is sugar over
+  `Loop` and `Match` (the wildcard arm breaks) and the serializer spells that
+  shape back as `while let`. A pattern that cannot fail is the
+  `while-let-irrefutable` warning; a missing `=` is `while-let-equal-expected`.
+  Neither compile target lowers the shape yet: the JavaScript target declines
+  it (a `Match` arm cannot break out of its compiled arrow) and the program
+  runs in the interpreter, and the Python target fails closed on the `Match`.
 
-- **Applying a non-function errors instead of going inert.** A symbol whose
-  declared type is a concrete non-function — `Pi(2)`, `Nothing()`, a
-  `number`-declared variable applied as a call — now produces an
-  `expected-function` error at canonicalization (and a static diagnostic in
-  the Epsil pre-run check) instead of silently staying inert with type
-  `unknown`. Undeclared heads and inferred-type symbols are untouched: they
-  may still become functions.
 
-- **Declared bare collection types refine their element type from
-  assignments.** A bare constructor annotation (`let a: list` — likewise
-  `set`, `dictionary`, `collection`, `indexed_collection`) declares the
-  *constructor* as the contract and the element slot as a placeholder:
-  `a = [1, 2, 3]` refines `a` to `list<finite_integer>` (element only —
-  rank and length stay open), `a = ["x"]` re-refines to `list<string>`,
-  and `a = 42` is still rejected against the `list` contract. An explicit
-  element type (`list<integer>`, `list<any>`) is a full contract and never
-  moves. Collection parameters also distribute their element type onto
-  symbol elements of a list literal: `f([a, b])` against
-  `(list<number>) -> number` infers `a` and `b` as `number`, matching what
-  `f(a)` alone always did.
+### Resolved Issues
 
-- **Uses of an assigned symbol are checked, not inferred — statically.**
-  A use of a *valueless* symbol still declares its type (`k(n)` with
-  `k: (integer) -> integer` infers `n: integer`, as documented). But once a
-  symbol has assignment evidence, a use is a requirement checked against
-  that evidence: `x = g()` (a `number`) followed by `k(x)` is now an
-  `incompatible-type` error at canonicalization instead of silently
-  narrowing `x` and failing later at evaluation. The Epsil pre-run check
-  tracks declaration and assignment type effects through a whole program
-  (without evaluating anything), so the mismatch above — and a typed
-  declaration's initializer conflicting with a later use — are reported as
-  static diagnostics before anything runs. Assignment is last-write-wins:
-  re-ordering the assignments makes the program correct and the check
-  accepts it.
+- Fixed a user-defined function whose body evaluates to an error value
+  leaving the call unevaluated. `len := x ↦ Length(x)` then `len(5)` answered
+  `len(5)`, where `Length(5)` itself is the `incompatible-type` error, and an
+  Epsil function could never return an error value (a `match` with no
+  matching case inside a function body answered the call, not the
+  `match-no-case` error). A user function now answers with the error its
+  body produced, as a library operator does; a result that merely embeds an
+  error inside a collection or an undecided `If` is returned as it is.
+- **`match` sees a lazy list value.** A list pattern (`[h, ...t]`) needs a
+  `List` node to descend into, but `Rest(xs)`, `Drop(xs, 1)` or `Range(1, 3)`
+  evaluate to a lazy collection whose operator is not `List`, so
+  `match Rest([1, 2, 3]) { [h, ...] => h; _ => "no" }` took the wildcard (and
+  a `while let [h, ...] = xs { xs = Rest(xs) }` loop ended after one turn).
+  The case holding the list pattern now reads such a finite subject (up to
+  100 000 elements) as a list: a fixed-shape pattern reads the positions it
+  names in place and copies only a named `...rest`, and an earlier case still
+  sees the subject as it is, so a pin ahead of the list case compares
+  verbatim. Tuples stay atomic and a string is text, not a list.
+- **Compiling a `Match` whose arm breaks fails closed with a named cause.**
+  The JavaScript `Match` emission is an arrow function, so a `break`,
+  `continue` or `Return` in a case body cannot reach the enclosing loop; it
+  used to surface as a late `Unexpected token 'break'` syntax error when the
+  unit was instantiated. The target now declines the `Match` up front, naming
+  the control operator, and the fallback runs the program in the interpreter.
+- **A scalar function over a list of points keeps the point shape in its
+  type.** With `P: list<tuple<number, number>>`, `Sqrt(P)`, `Sin(P)`,
+  `Exp(P)` and `Power(P, 2)` typed `list<number>` while their values are
+  lists of points; they now type `list<tuple<number, number>>`, the arity
+  following the point. A head whose tuple semantics is whole-point (`Abs`
+  of a point is its norm) keeps its scalar cell. The JavaScript target's
+  `PointX`/`PointY` lowering, which routes on the type, read such a list as
+  a flat list of numbers.
+- **A comprehension binder's type is fixed by its binding site.** The
+  binder of `[q.x + 1 for q in L]` over `L: list<number>` was rewritten to
+  `matrix` by the body's `PointX(q)` use (through the fresh-inference
+  matrix repair), so the form boxed valid and failed only when evaluated.
+  A body use that contradicts the element type of the iterated collection
+  is now a type error at boxing, as it is for a `Sum` index.
+- Fixed `Reshape` with a non-literal target extent (`Reshape([1,2,3,4], (n, 2))`) throwing `Failed to parse type` on any read of the result's
+  type: the handler serialized the extent into a type string. An extent that
+  is not a literal now drops the shape claim and the result types
+  `list<number>`.
 
-- **Console I/O: `Print` and `Input`** (Epsil commands `print` and
-  `input`). `Print(x, …)` writes its evaluated operands to the host
-  console — space-separated, strings without their quotes — and evaluates
-  to `Nothing`. `Input(prompt?)` reads one line of text and evaluates to it
-  as a string: from the terminal (or piped standard input) in a
-  command-line host, via the `prompt()` dialog in a browser; `Nothing` at
-  end-of-input or on a canceled dialog, and the call stays symbolic on a
-  host with no interactive input. Both carry the `console` effect label,
-  so they are never constant-folded or eliminated as common
-  subexpressions. The lowercase Epsil spellings are ordinary library
-  aliases that canonicalize to `Print`/`Input`, so a local declaration of
-  `print` shadows the command like any other library name. In a
-  command-line host, `Input`'s stdin reader requires Node ≥ 22.3 — now the
-  package's minimum (see Breaking Changes); on an unsupported older Node
-  the call degrades to staying symbolic. The Epsil MCP server captures `print` output into the `evaluate` tool
-  result (its stdio transport carries JSON-RPC, so program output cannot
-  share standard output) and keeps `input()` symbolic during evaluation.
+- **`toLatex({ materialization: false })` no longer evaluates anything.** On
+  a lazy collection such as `Join(p)`, the opt-out still called `evaluate()`
+  with materialization off, which evaluated the operands' bound values: with
+  `p` bound to an unevaluated chain `m(m(m(p_0)))`, printing the
+  18-character `\mathrm{Join}(p)` cost seconds, then minutes, per level of
+  the chain. The option now serializes the expression as it stands
+  (Tycho item 247).
+- **The `javascript` target refuses the point arithmetic the interpreter
+  rejects.** A product of two point lists (`P·P`), a point list plus or minus
+  a scalar or a list of scalars (`P + 2`, `P − L`), and a scalar divided by a
+  point list compiled to plausible values (`[(1,2),(3,4)]·[(1,2),(3,4)]` ran
+  to `[(1,4),(9,16)]`) where `evaluate()` answers an error per element. They
+  now fail closed to the interpreter. A comprehension whose binder occurs in
+  the collection it iterates (`[P.x + 1 for P in P]`) and one whose binder
+  type contradicts the collection's element type used to compile and then
+  throw at run time; both are refused at compile time (Tycho item 245).
+- **A radical or logarithm over a list is a list operand of the
+  `javascript` target's list arithmetic.** `L + √L`, `−√L`, `2·√L`,
+  `L + ln L` and `L + L^{0.5}` failed closed ("cannot compile scalar
+  arithmetic over a list-valued operand") while `√L` alone and `L + sin L`
+  compiled: the element analysis could not attribute the radical's complex
+  verdict to its elements. A broadcast emission's elements now share its
+  closure's lane, so a list body with a square root inside a sum compiles
+  (Tycho item 246).
+- **List arithmetic over elements that mix real and complex values
+  compiles.** `Add`, `Subtract`, `Multiply` and `Negate` over a list whose
+  elements disagree about being complex — `2·[1+i, 2]`, a declared
+  `list<complex>` parameter, a point list whose column carries `√-1` as
+  Desmos's "undefined vertex" separator — lower through the run-time
+  dispatching helpers (`_SYS.sadd`, `_SYS.smul`) instead of failing closed.
+  Other heads over such a list still fail closed (Tycho item 246).
+- **`point + (list, list)` types as a tuple of lists.** With
+  `G: tuple<number, number>` and `L`, `L₂: list<number>`, `G + (L, L₂)`
+  typed the union `tuple<list<number>, list<number>> | tuple<number, number>`, a type no evaluated value has; it is now the component-wise
+  `tuple<list<number>, list<number>>` (Tycho item 246).
+- Fixed the LaTeX serializer recursing without end (`RangeError: Maximum call stack size exceeded`) on a product with a factor of the empty type `never`,
+  such as `f(f(b)) - f(f(a)) = (f'(c))^2 (b - a)`, where the left side reads
+  `f` as a symbol and the right side declares it a function. `Divide(x, 1)`
+  and `Divide(x, -1)` now reduce to `x` and `-x` for a `never`-typed `x`, and
+  the serializer no longer rewrites a product as a fraction over `1`.
+- Fixed an ellipsis over an indexed family being read as an arithmetic
+  progression. `\{\frac{x_1}{1+x_1}, \frac{x_2}{1+x_1+x_2}, \dots, \frac{x_n}{1+\dots+x_n}\}` parsed to a `Range` whose step was the
+  difference of the first two terms; it now stays a set with a
+  `ContinuationPlaceholder`, like `\{x_1, x_2, \dots, x_n\}`. Two ellipsis
+  anchors form a progression only when they mention the same subscripted
+  symbols.
+- Fixed a two-element `Tuple` in a set position (the right side of `\in`,
+  an operand of `\cup`, …) serializing as `(a, b)`, which reads back as an
+  open interval. It is now spelled `\operatorname{Tuple}(a, b)`, as a
+  two-element `List` is already spelled `\operatorname{List}(a, b)` there.
+- Fixed a stack overflow when canonicalizing `Length`, `Element` or any other
+  operation over a nested list literal whose sub-lists are shared objects (a
+  list built as `List(t, t)` 18 or more levels deep). The `List` type handler
+  analyzed the shape once per path and spread every leaf into one call;
+  it now visits each distinct sub-list once. The `Hold` type handler's
+  structure read of such a list is linear too.
 
-- **Regular expressions (Strings Phase 3).** A new primitive type `regexp`,
-  built with `RegExp(pattern, flags?)`, plus `IsMatch`, `StringMatch`,
-  `StringMatchAll`, and pattern forms of `StringSplit` and `StringReplace`
-  (including a **function replacement** called with the match record):
+## 0.121.1 _2026-09-03_
+
+### New Features
+
+- **`Join` accepts scalar operands.** A scalar operand is appended as a single
+  element, like a tuple: `Join([1, 2], 3)` is `[1, 2, 3]` and `Join(1, 2, 3)` is
+  `[1, 2, 3]`. The scalar is wrapped as a one-element list at canonicalization
+  (`Join(L, 5)` canonicalizes to `Join(L, [5])`); it used to be an
+  `incompatible-type` error. The `javascript` and `python` targets append a
+  tuple operand as one element too (it used to be spread into its components on
+  those targets).
+- **`Sign` extends to the complex plane.** `Sign(z)` is `z/|z|`, the point of
+  the unit circle in the direction of `z`: `Sign(i)` is `i` and `Sign(3 + 4i)`
+  is `3/5 + 4i/5`, the convention Fungrim, SymPy and Mathematica share. On the
+  extended real line the result stays exactly −1, 0 or 1 with its ranged
+  integer type; `Sign(~oo)` remains an error and `Sign(NaN)` is `NaN`. A
+  complex operand used to be an `incompatible-type` error. The `javascript`
+  target compiles the complex case.
+
+### Resolved Issues
+
+- Fixed a compiled coordinate accessor (`PointX`/`PointY`/`PointZ`) reading an
+  operand of undecided shape as a single point. The parameter of a function
+  literal such as `f(v) := PointX(v) + 1` types `collection<any> | tuple`, and a
+  call `f(P)` over a list of points compiled to the first point's components
+  (`[2, 3, 4]` where the interpreter answers `[2, 5]`), or threw inside a
+  `PointList` body. The `javascript` target now decides at run time, as the
+  interpreter does, and a `PointList` component of `broadcastable` type is a zip
+  source or a scalar slot by its value instead of being replaced by `NaN`.
+  (Tycho item 238.)
+- Base-10 and base-2 logarithms now compile through one kernel per base on every
+  path of a target (`Math.log10`/`Math.log2` on `javascript`, on both the real
+  and the complex lane; `np.log10`/`np.log2`; the shader `log2`;
+  `_IA.log10`/`_IA.log2`). A runtime `Log(x)` was spelled `ln(x) / ln(10)`, one
+  ulp away from the folded `Log(2)`, so `log(x) / log(2)` at `x = 4` ran to
+  `1.9999999999999996` and a "power of two" selector kept only `i = 1`. (Tycho
+  item 240.)
+- A broadcastable operator applied to an operand of unproven shape no longer
+  counts as a proven scalar when a sum with a tuple is validated:
+  `["Function", ["Add", ["Negate", "q"], ["Tuple", 1, 2]], "q"]` boxed an
+  `incompatible-type` error while `q + (1, 2)` bound. Both bind now, and
+  `(1, 2) - q` applied to a point subtracts component-wise. (Tycho item 241.)
+- The `glsl` and `wgsl` targets parenthesize a compound operand before a
+  swizzle: `PointX((x, y) + (1, 2))` emitted `vec2(x, y) + vec2(1.0, 2.0).x`,
+  legal shader source that computed `(x + 1, y + 1)`. `First`/`Second`/`Third`
+  had the same defect. (Tycho item 242.)
+- A compiled color constructor (`Rgb`, `Hsv`, `Hsl`, `Oklab`, `Oklch`) with a
+  non-finite channel now yields the `NaN` triple, the numeric projection of the
+  `incompatible-type` error the interpreter reports for it. An infinite
+  saturation or value was clamped into `[0, 1]` on the `javascript` target, so
+  `Hsv(90, 1, ~oo)` compiled to the same color as `Hsv(90, 1, 1)`. (Tycho item
+  243.)
+- Fixed the fold-size walk of the compiler taking exponential time on a
+  DAG-shaped value: a binder's bound-name gatherer walked a shared
+  sub-expression once per path, so a comprehension whose range bound read a
+  deeply shared value threw `Invalid array length` inside `compile()` after
+  minutes and gigabytes, where the fold-size refusal used to answer in seconds.
+  The purity and mention walkers over a value, and the size memo, had the same
+  per-path cost. (Tycho item 225.)
+
+## 0.121.0 _2026-09-03_
+
+### Breaking Changes
+
+- **Numeric types now distinguish finite values, infinities, and `NaN`.**
+  `integer`, `rational`, `real`, and `complex` contain only finite values;
+  `number` is now `complex | infinity | nan`. The new `infinity` type contains
+  `+oo`, `-oo`, and `~oo`, while `signed_infinity` contains only `+oo | -oo`.
+  The previous name `non_finite_number` is accepted temporarily as an alias for
+  `signed_infinity`, but is no longer emitted. The `finite_*` type names are
+  also accepted temporarily as aliases for their bare numeric types;
+  `finite_number` maps to `complex`.
+
+  Update code to use `BoxedType.complex`, `BoxedType.integer`, `BoxedType.real`,
+  and `BoxedType.setInteger` instead of their `finite_*` counterparts. Use
+  `isExtendedReal` instead of the removed `isReal` property.
+
+- **Infinity and `NaN` now have precise types and matching runtime behavior.**
+  Arithmetic, functions, assignments, collection accessors, and compiled code
+  now report or propagate `infinity`, `signed_infinity`, and `nan` where
+  appropriate. Bare finite numeric types no longer accept infinite arguments,
+  and infinite endpoints describe the extent of intervals and ranges without
+  being members themselves.
+
+- **Assumptions refine values only while they are in scope.** They no longer
+  permanently change declarations or inferred signatures. `forget()` and leaving
+  a scope remove the corresponding refinement or assumed value, and assignments
+  that contradict active assumptions are rejected. Stored values retain their
+  declared or inferred type independently of temporary facts.
+
+  The assumption API now exposes `assumedValues`, and `ce.context.assumptions`
+  contains immutable fact arrays instead of booleans. `assumptionBindings`,
+  `ContextAssumptions.bindings`, `TypeProvenanceEntry.previousType`, and the
+  `assumed` provenance kind have been removed.
+
+- **Numeric predicates are consistently three-valued.** `isNumber`, `isInteger`,
+  `isRational`, and `isExtendedReal` return `true` when membership is proven,
+  `false` when it is impossible, and `undefined` when the type does not decide
+  the question.
+
+- **Mathematical functions now enforce their declared domains.** Operations that
+  require an ordered value, including `Heaviside`, `Sign`, rounding, `Clamp`,
+  `ElementMin`, and `ElementMax`, accept only finite reals and signed
+  infinities. Complex values and `~oo` are rejected where the operation has no
+  mathematical value. `NaN` propagates through numeric evaluation.
+
+- **Elementary and special functions now handle infinities consistently.**
+  Trigonometric, hyperbolic, logarithmic, root, power, error, gamma, Bessel,
+  Airy, elliptic, zeta, Lambert W, polylogarithmic, and hypergeometric functions
+  now return their defined limits at infinities, reject arguments outside their
+  mathematical domain, and remain symbolic when a finite value cannot currently
+  be evaluated numerically. `evaluate()`, `N()`, and simplification now agree
+  more closely at exceptional points. Notable changes include
+  `Sqrt(~oo) = Ln(~oo) = ~oo`, `(+oo)^(+oo) = +oo`, IEEE values for `Arctan2` at
+  infinite corners, and `NaN` for indeterminate forms.
+
+- **Complex value accessors use consistent exceptional values.** `Real`,
+  `Imaginary`, `Argument`, `AbsArg`, and `Conjugate` now propagate `NaN`.
+  Because `~oo` has a modulus but no components or direction, its real part,
+  imaginary part, and argument are `NaN`.
+
+- **`Power` and `Root` use consistent extended-number semantics.** A base may be
+  any number, but `~oo` is not a valid exponent. `Root(x, n)` follows
+  `Power(x, 1/n)`; a zero root index is an error, and infinite indices and
+  operands resolve according to the same indeterminate-form rules as `Power`.
+
+- **Arithmetic and number-theory operators now validate their domains.** `Mod`,
+  `Fract`, `Rationalize`, `ContinuedFraction`, parity predicates, prime
+  predicates, and numerator/denominator accessors reject invalid arguments
+  instead of silently using partial values or remaining indefinitely inert.
+  Continued fractions of inexact values are based on their best rational
+  approximation at the current precision. `IsEven` is now preserved as its own
+  operator.
+
+- **Linear-algebra operations now validate numeric inputs.** `Norm`, `Trace`,
+  `MatrixPower`, and `Determinant` reject incompatible operands and provide more
+  precise result types. Frobenius norms work for vectors and higher-rank
+  tensors, empty norms are `0`, and numerical half-integer matrix powers are
+  supported for suitable exact 2×2 positive-semidefinite matrices.
+
+- **Combinatorial and regularized functions have corrected domains and
+  exceptional values.** `Binomial`, `Choose`, `Pochhammer`, `GammaRegularized`,
+  and `BetaRegularized` now handle supported infinite limits consistently and
+  correct several results involving negative arguments and gamma poles.
+
+- **Probability distributions validate their parameters and arguments.** Normal,
+  uniform, Poisson, exponential, and binomial distributions reject invalid
+  parameters. Their `PDF`, `CDF`, and `Quantile` functions use the appropriate
+  real domains. Uniform and exponential functions are correctly piecewise,
+  discrete distributions return the correct values outside their support, and
+  numerical binomial and Poisson quantiles are now computed by `N()`.
+
+- **Statistics functions reject invalid sample data and have sharper result
+  types.** Non-numeric or nested sample values now produce an
+  `incompatible-type` error. `NaN` and `Missing` propagate consistently,
+  single-value quartiles are supported, quartile tuple fields are ordered as
+  `lower`, `mid`, `upper`, and paired statistics distinguish missing data from
+  genuine shape errors.
+
+- **Selections are lazy and undecided conditions remain undecided.** `If`,
+  `Which`, `And`, and `Or` evaluate only operands needed for the result, so an
+  error in an unselected branch does not replace the selected value. A provably
+  non-boolean condition is an `incompatible-type` error; a condition that may
+  later become decidable remains unevaluated. A selection with no
+  matching/default branch returns `Missing`. Custom lazy operators can opt in to
+  the same behavior with `selectsOperands`.
+
+- **Compiled branch conditions now preserve three-valued logic.** JavaScript
+  selections and Python statement-form conditionals no longer choose a branch
+  for `NaN`, absent inputs, or otherwise undecided conditions. JavaScript and
+  Python `And`, `Or`, and `Not` preserve short-circuiting while following the
+  same three-valued behavior.
+
+- **Compiled float-only targets represent `~oo` as `Infinity`.** These targets
+  preserve infinite magnitude but cannot retain the distinction between signed
+  and complex infinity. Functions that dispatch specifically on non-finite types
+  or values continue to use the interpreter.
+
+- **Result types now reflect possible exceptional results more accurately.**
+  Partial numeric operations can include `nan` or `infinity`; declared
+  non-numeric domain failures return `Missing`. Division and negative powers
+  report possible non-finite results when zero is possible, collection
+  operations preserve their shape, and expressions with an empty-range operand
+  retain the type `never`.
+
+### New Features
+
+- **Operator definitions can declare their error behavior.** The new
+  `nanBehavior`, `partiality`, `definedWhen`, and `requires` fields specify how
+  `NaN` is handled, whether an operation is partial, its mathematical domain,
+  and required preconditions. Application types use these declarations to
+  include `nan` or `missing` only when appropriate.
+
+- **`Hypot` accepts infinite arguments with IEEE semantics.** An infinite leg
+  produces `+oo` even when another leg is `NaN`; without an infinite leg, `NaN`
+  propagates. Euclidean norms and distances follow the same rule.
+
+- **`Factorial`, `Factorial2`, `Gamma`, and `GammaLn` resolve signed-infinite
+  arguments.** Positive infinity produces `+oo`; negative infinity produces
+  `NaN`.
+
+- **Piecewise expressions can be differentiated.** `D` differentiates each value
+  branch of `If` and `Which` while preserving its condition.
+
+- **Componentwise functions broadcast over tuples in the interpreter.** For
+  example, `Sin((1, 2))` evaluates componentwise. Operations that treat tuples
+  as points, such as `Abs`, retain their existing behavior.
+
+- **JavaScript compilation supports more user functions.** Bounded generic
+  functions, tuple-returning functions, runtime broadcasting of array arguments,
+  complex-valued callbacks, and element-wise selections with complex-valued
+  branches are now supported.
+
+- **Python compilation supports statement-form conditionals.** `If` with an
+  `else` branch emits valid statement syntax inside blocks and loops, while
+  unsupported value-returning forms decline compilation safely.
+
+- **The `interval-js` target supports more expressions.** Added support includes
+  `Choose`, direct application of function literals, bounded random draws, and
+  sums over supported collections. Finite jump discontinuities now produce a
+  `singular` result with a sound `value` enclosure, allowing downstream
+  comparisons and integration to continue without treating every jump as an
+  unbounded pole.
+
+- **Predicates can produce boolean value types.** When operand types prove a
+  predicate, its type is `true` or `false`; otherwise it remains `boolean`.
+  Compilers can use proven predicates to eliminate unreachable branches.
+
+- **Numeric ranges support open endpoints.** For example, `real<0<..>` means
+  `x > 0`, `real<..<3>` means `x < 3`, and `real<0<..<3>` means `0 < x < 3`.
+  Assumptions and arithmetic preserve strict bounds, and empty ranges produce
+  `never`.
+
+- **Numeric result types include computed bounds.** `Add`, `Multiply`, `Abs`,
+  `Divide`, and integer powers preserve useful interval bounds. Inexact literals
+  also receive compact enclosing range types.
+
+- **Added `infinity` and `nan` primitive types.** They are supported in type
+  strings, declarations, signatures, `matches()`, and `isSubtype()`; `~oo` and
+  `~∞` can be used as the singleton complex-infinity type.
+
+- **Added directed decimal rounding.**
+  `BigDecimal.toPrecisionToward(n, direction)` rounds to `n` significant digits
+  toward either negative or positive infinity.
+
+### Resolved Issues
+
+- Fixed the TypeScript signature of `ce.declare()` rejecting a boxed operator
+  definition, so re-declaring an operator from its existing definition
+  (`ce.declare('Sqrt', { ...ce.expr('Sqrt').operatorDefinition!, evaluate })`)
+  type-checks again. An inline `type` handler passed to the two-argument form
+  now gets typed parameters instead of implicit `any`. The accepted definition
+  shape is exported as `SymbolDefinitionInput`.
+- Unexpected failures during built-in evaluation now use the `internal-error`
+  code and retain a useful stack trace instead of appearing as ordinary
+  `evaluation-error` results.
+- Fixed `Length` and `Count` returning inert expressions for values known not to
+  be collections.
+- Fixed Euclidean norms and distances involving infinities and `NaN`, including
+  matrix norms that previously ignored a `NaN` row or column.
+- Fixed type inference and broadcasting through transparent and nominal type
+  aliases, including collection access and recursive aliases that could overflow
+  the stack.
+- Fixed assumptions leaving declarations behind after rollback, losing strict
+  set-membership inference, or attaching facts to an obsolete binding.
+- Fixed an annotated function parameter named `i` or `e` failing to shadow the
+  corresponding library constant.
+- Fixed one-sided limits at jump discontinuities and incorrect rewrites inside
+  fast-growing functions. Constant symbolic limits compile to their resolved
+  value again, including their direction.
+- Made compilation deterministic and prevented extremely large prime, Lucas, and
+  Catalan computations from running indefinitely.
+- Fixed assignment of a function signature through `.type` corrupting later type
+  reads.
+- Fixed type results that depended on temporary assumptions, and fixed compiled
+  `Block` locals losing their declared or assigned types.
+- Improved JavaScript compilation performance for expressions that repeatedly
+  reference assigned values, and prevented stack overflows for self-referential
+  assignments.
+- Fixed JavaScript evaluation of a point added to a list of points and of
+  collection arguments passed to compiled functions.
+- Fixed OKLCh conversion producing negative hue angles; generated hues are now
+  normalized to `[0, 360)`.
+- Fixed numerical integration discarding the imaginary part of complex-valued
+  integrands. Complex measurements now preserve their value and error bound.
+- Fixed special functions silently discarding the imaginary part of complex
+  arguments; unsupported complex evaluations now remain symbolic.
+- Fixed non-finite arithmetic in scalar and collection operations, including
+  zero times infinity, division of collections by zero or infinity, and the
+  reciprocal of infinity.
+- Fixed compiled `Heaviside(NaN)` and `Sign(NaN)` returning non-`NaN` results.
+- Fixed unions containing `broadcastable<T>` failing to broadcast.
+- Fixed exact literal types changing with configured precision.
+- Reduced temporary memory use when serializing very large integers.
+
+## 0.120.0 _2026-08-27_
+
+### Breaking Changes
+
+- **The bivariate statistics reject complex data instead of silently using its
+  real part.** `Covariance`, `PopulationCovariance`, `Correlation`,
+  `LinearRegression` and `PolynomialFit` previously projected every data point
+  through its real part, so `Covariance([1, 1+2i], [2, 3])` returned `0` — the
+  answer for the data `[1, 1]`. A non-real data point now returns a structured
+  `incompatible-type` error naming the operator and the offending datum. A
+  complex literal with a zero imaginary part (`Complex(2, 0)`) still
+  canonicalizes to a real and participates normally, and the complex infinity
+  `~oo` is not complex data in this sense: it is the single point at infinity
+  rather than a sample point off the real line, so it propagates `NaN`.
+  Additionally, `Correlation` now propagates `NaN` for any data it has no real
+  value for — `NaN`, `±∞` and `~oo` — matching `Covariance`, instead of
+  misreporting it as `"zero variance"`. That error is now raised only when a
+  column is genuinely constant, so at `ce.precision = 'machine'` it also no
+  longer appears for finite data whose sums of squares overflow the double range
+  (values around `1e200`), which now yields `NaN`. (At the default precision the
+  bignum kernel handles such data without overflowing.) (Complex covariance —
+  `E[(X−μX)·conj(Y−μY)]` — is not implemented; if you need it, compute it from
+  `Mean` directly.)
+
+- **The one-sample statistics no longer silently use the real part of complex
+  data: they either compute the complex answer or reject it.** Every one of them
+  used to project each datum through its real part, so `Mean([1, 1+2i, 5])`
+  answered `2.333…`, the mean of `[1, 1, 5]`. Now:
+  - `Mean` returns the COMPLEX mean — `Mean([1, 1+2i])` is `1 + i` — with no
+    convention involved, since the mean is linear. Exact data still gives an
+    exact answer: `Mean([1, i])` is `(1 + i)/2`, not `0.5 + 0.5i`.
+  - `Variance`, `PopulationVariance`, `StandardDeviation` and
+    `PopulationStandardDeviation` compute `E[|X − μ|²]` — the mean squared
+    MAGNITUDE of the deviations, with the same sample (`n − 1`) or population
+    (`n`) divisor as before. The result is a real, non-negative number:
+    `Variance([1+i, 1−i])` is `2` and `PopulationVariance([1+i, 1−i])` is `1`.
+  - `Median`, `Mode`, `Quartiles`, `InterquartileRange`, `Skewness`, `Kurtosis`,
+    `Histogram`, `BinCounts` and the empirical data form of `Quantile` return
+    the same `incompatible-type` error the bivariate statistics use. Order
+    statistics need a total order, and the complex plane has no canonical one;
+    the standardized moments have only convention-laden, branch-dependent
+    complex extensions. `Histogram`/`BinCounts` reject a complex bin EDGE for
+    the same reason. (`Quantile` of a DISTRIBUTION is unaffected.)
+
+  Real data is unaffected, including the exact results (`Mean([1, 1, 5])` is
+  still `7/3`), and `NaN` and a real `±∞` keep the readings they have always had
+  in these heads (`Mean([1, +∞, 5])` is `+∞`, `Median([1, +∞, 5])` is `5`).
+
+- **The complex infinity `~oo` now reads as `NaN` in the one-sample statistics,
+  under both of its spellings.** The real part `~oo` reports is an artifact of
+  how it was written — `ComplexInfinity` reports `Infinity`,
+  `Complex(1, Infinity)` reports `1` — so the same value produced different
+  statistics depending on the spelling: `Mean([1, ~oo, 5])` answered `+∞` one
+  way and `2.333…` the other, and `Median` answered `5` one way and `1` the
+  other. Every one-sample head now projects it to `NaN`, which is what the
+  bivariate heads already did, so both spellings agree: `Mean`, `Median`,
+  `Mode`, the variance family, `Skewness`, `Kurtosis` and `InterquartileRange`
+  return `NaN`, `Quartiles` returns `(NaN, NaN, NaN)`, and the empirical
+  `Quantile` returns `NaN`. A real `±∞` is unaffected.
+
+- **`Mean` and the variance family return `NaN` for complex data mixed with a
+  non-finite value.** `Variance([1+2i, +∞])` returned `+∞`, an accident of boxed
+  arithmetic that contradicted the real-only path (`Variance([1, +∞])` is
+  `NaN`). A complex sample point together with a point at infinity has no
+  reading — `+∞` is a limit along the real axis, and no direction in the plane
+  makes it a value a complex number can be averaged with — so `NaN` is what
+  these now answer. The real-only paths are unchanged.
+
+- **`Histogram` and `BinCounts` stay inert on data (or bin edges) that is not a
+  number literal, instead of silently dropping it.** A `Sqrt(-2)` datum has no
+  real value, and it used to be filtered out of the sample:
+  `BinCounts([1, Sqrt(-2), 5], 2)` reported the counts of `[1, 5]`. It now
+  leaves the expression unevaluated, the same way the empirical `Quantile` does;
+  under `.N()` the datum numericizes to a complex literal and is rejected with
+  the `incompatible-type` error.
+
+- **A `PolynomialFit` degree that is not an integer is reported as a bad
+  degree.** The degree was read with a helper that takes a number's real part
+  and rounds it, so `PolynomialFit(xs, ys, Complex(1, 2))` silently fitted a
+  degree-1 polynomial and `PolynomialFit(xs, ys, 2.5)` a degree-3 one, while a
+  `NaN` or `±∞` degree was blamed on the argument list as `invalid arguments`.
+  Every number in the degree position is now answered by the
+  `degree must be an integer in [0, 12]` error unless it is exactly an integer.
+
+- **`Histogram` and `BinCounts` reject non-finite data and non-finite bin edges
+  instead of silently dropping them.** A data point with no finite real reading
+  — `NaN`, a real `±∞`, or the complex infinity `~oo` under either spelling —
+  used to be filtered out of the sample, so `BinCounts([1, +∞, 5], 2)` reported
+  the counts of the two-point dataset `[1, 5]` with no hint that a value had
+  been discarded. A non-finite explicit bin EDGE was worse: every interval
+  comparison against it is false, so the head fabricated a row of zero counts
+  (`BinCounts([1, 2, 3], [0, NaN, 10])` returned `[0, 0]`). Both now return the
+  same structured `incompatible-type` error the complex rejection uses, naming
+  the `finite_real` constraint, the operator, and the offending value. These two
+  heads cannot absorb a non-finite value the way `Mean([1, NaN, 5])` returns
+  `NaN` does: their result is a vector of COUNTS, and no count means "there was
+  no reading". Finite real data and explicit finite edge lists are unaffected.
+
+  A finite real too large for a machine float — `10^400`, an exact integer — is
+  refused too, but as an `out-of-range` error naming the machine floating-point
+  range, because the limit belongs to the binning arithmetic and not to the
+  value: the bin width and every interval comparison are computed in doubles,
+  where such a datum reads as infinity. The statistics that sum their data
+  exactly (`Mean`, `Covariance`, the least-squares fits) have no such limit and
+  accept it.
+
+- **`LinearRegression` and `PolynomialFit` propagate `NaN` for non-finite data
+  instead of misdiagnosing it.** A `NaN`, `±∞` or `~oo` value in the X column
+  made the least-squares pivot search fail, and the heads reported
+  `unexpected-argument: "degenerate data"` — a claim about the geometry of the
+  sample that the data does not support — or, when the elimination happened to
+  pivot on a later row, returned the half-`NaN` tuple `(NaN, 0)` whose `0` slope
+  is not a fit of anything. Both now answer with every coefficient `NaN`, in the
+  shape each head declares: `(NaN, NaN)` for `LinearRegression`, a `NaN`-filled
+  list of `degree + 1` coefficients for `PolynomialFit`, and the fitted
+  expression with `NaN` coefficients when a trailing variable symbol is given.
+  This is what both already answered when the non-finite value sat in the Y
+  column, and it matches `Covariance`/`Correlation`. The `"degenerate data"`
+  error remains for rank-deficient finite real data —
+  `LinearRegression([2, 2, 2], [1, 2, 3])` still reports it.
+
+- **Two collections of different lengths are a dimension error in the fits.**
+  `LinearRegression([1, 2], [1, 2, 3])` and the corresponding `PolynomialFit`
+  call fell through to the least-squares rank guard and were misdiagnosed as
+  `"degenerate data"`; they now report `incompatible-dimensions 2 vs 3`, the
+  error `Covariance` and every other pairwise head already used for a length
+  disagreement.
+
+- **`LinearRegression` reports a sample with fewer than two points as such.**
+  One point determines no line whatever its value is, but the head answered
+  `(NaN, NaN)` for `LinearRegression([NaN], [2])` and `"degenerate data"` for
+  `LinearRegression([1], [2])`, while `PolynomialFit([NaN], [2], 1)` said there
+  were not enough data points. `LinearRegression` now reports
+  `not enough data points` for any sample shorter than two, ahead of anything
+  the values could say.
+
+- **`Re`, `Im` and `Arg` reject the argument lists their targets reject.** These
+  aliases rewrote to `Real`/`Imaginary`/`Argument` through a construction path
+  that skips signature validation, so `Arg(1, 2)` silently dropped the second
+  operand and answered `0` where `Argument(1, 2)` reported the unexpected
+  argument. They also declared a narrower type than their targets, so `Re(NaN)`
+  claimed the type `real`, which does not admit NaN, wherever the expression was
+  left uncanonicalized. Each alias now validates and types exactly as the name
+  it stands for.
+
+### New Features
+
+- **`Re` and `Im` are now defined, as aliases of `Real` and `Imaginary`.**
+  `["Re", z]` and `["Im", z]` used to stay inert as unknown operators; they now
+  canonicalize to `Real`/`Imaginary` (the preferred names) and evaluate,
+  exactness included: `Re(1/3 + 2/5i)` is `1/3`. The `\Re` and `\Im` LaTeX
+  commands already parsed to `Real`/`Imaginary` and are what the serializer
+  emits, and `\operatorname{Re}(z)` now resolves too.
+
+- **A `type` handler can now be declared as a function of operand DESCRIPTORS
+  instead of operand expressions.** An operator definition that sets
+  `typeHandlerKind: 'types'` receives, in place of each operand, an
+  `OperandDescriptor`: the operand's handler-visible type, a deliberately
+  minimal set of three-valued facts carrying only what the type cannot
+  (finiteness — for the `NaN` literal, whose type is `number`; sign from pure
+  value sources such as a held numeric value; closedness; the collection
+  capability facets; a static shape) and an on-demand structural view — never
+  the operand expression itself, so deriving a type cannot declare,
+  canonicalize, or evaluate anything. Validity has no fact: an error operand's
+  type is `'error'`. The legacy expressions shape remains the default and is
+  unchanged; the flag — never the handler's parameter count — selects the shape.
+  Under test (and with `CE_TYPE_PURITY_GUARD` elsewhere) a runtime guard turns
+  any engine-state write from a `'types'` handler into an immediate error. The
+  built-in `Coalesce`, `Hold` and `ReleaseHold` definitions were the first to
+  use the new shape, with byte-identical derived types; `DigitCount`, `Block`
+  and `When` have since converted the same way, each proven equivalent by a
+  differential shadow that runs both shapes side by side across the test suite.
+  34 further operators (the number-theory and combinatorics constants) went one
+  better: their constant `type` handler was retired outright and its result
+  moved into the declared signature — `NthPrime` now declares
+  `(integer) -> finite_integer` instead of pairing a wide signature with a
+  narrowing handler, with byte-identical derived types.
+
+- **`GammaRegularized` and `BetaRegularized` no longer claim a finite real
+  result unconditionally.** Their old constant claim was unsound off the proven
+  domain (`GammaRegularized(-1, 2)` evaluates to NaN). They now claim
+  `finite_real` only when the domain is proven — `a > 0` and `z ≥ 0` for the
+  gamma; `x ∈ [0, 1]`, `a > 0`, `b > 0` for the beta — and answer `number`
+  otherwise, per the non-finite typing convention.
+
+### Resolved Issues
+
+- **Square roots of large exact perfect squares are exact at every precision.**
+  `Sqrt(10^402)` returned `+oo` at machine precision (the radicand was narrowed
+  to the numeric format before rooting) and `Sqrt(10^12/9)` stayed unevaluated
+  where `10^6/3` exists. Exact integer and rational radicands now reduce exactly
+  — perfect squares fold, negative radicands give exact imaginary results —
+  regardless of the precision setting. `Sqrt(1000000/49)` now evaluates to
+  `1000/7`.
+
+- **`Conjugate`, `Real` and `Imaginary` preserve exactness.**
+  `Conjugate(1/3 + 2/5i)` returned machine floats (so `z·Conjugate(z)` answered
+  `0.2711…` where `61/225` is available); `Real(1/3 + 2/5i)` returned a 21-digit
+  approximation. All three now read the exact components: `Real(1/3 + 2/5i)` is
+  `1/3`, `Imaginary(√2 i)` is `√2`, and `z·Conjugate(z)` is `61/225`.
+
+- **A fence-less `Delimiter` around a bracketed or braced collection serializes
+  to valid, round-trippable LaTeX.** `Delimiter(List(x, y))` — the parse of
+  `([x,y])`, and the operand shape a call `f([x,y])` carries — serialized as
+  `\lbrackx,y\rbrack`: the `[` fence maps to the `\lbrack` command, plain
+  concatenation glued it onto the first operand (an unknown command, so the
+  output did not re-parse), and the Delimiter's recorded parentheses were
+  dropped. Fences are now joined with `joinLatex`, which separates a command
+  from a following letter (this also fixes the same glue for `\lbrace` and
+  custom bracket delimiters), and a fence-less `Delimiter` keeps its parentheses
+  around an operand that carries its own fences: `Delimiter(List(x, y))` emits
+  `(\bigl\lbrack x, y\bigr\rbrack)`, which re-parses to the same structure, and
+  `f([x,y])` round-trips to the call. The same rule covers the tuple family —
+  `Delimiter(Tuple(x, y))` used to emit `f(x,y)` under a call, which re-parsed
+  as TWO scalar arguments where the source had one tuple argument; it now emits
+  `f((x,y))`. A `Sequence` operand still fuses with the parentheses, since a
+  sequence IS a bare argument list. (Tycho item 230; the Desmos importer's
+  persisted rows were corrupted by the glued form.)
+
+- **`Negate` distributes over a tuple whose components are collections, and a
+  tuple divides by a scalar under the same rule that multiplies it.** A "zipped"
+  point list — a `Tuple` of coordinate lists, `([1,2], [3,4])` — negated
+  component-wise only when every component TYPE was a scalar number, so `-P`
+  stayed an inert `Negate`, and `P − P` or the interpolation `(1−t)·P − t·P`
+  (with `t` substituted later) never reduced, while `2·P` and `P + P` folded
+  fine. The negate arm now uses the same structural tuple test as the
+  `Add`/`Multiply` dispatch. The `tuple / scalar` arm had the sibling gap plus
+  one more: it now admits the same tuples as the `Divide` type handler
+  (transparent type aliases included), and each component quotient is evaluated
+  the way the multiply and add arms already evaluate theirs — so `P / s` folds
+  once `s` has a value, and `P / 0` answers `(~oo, ~oo)` with the point shape
+  kept. Dividing BY a tuple still errors (`no-division-by-point`), and a
+  non-numeric tuple still rejects with the same error the multiply path gives.
+  (Tycho item 229 — the interpreted fallback of the declined rows painted
+  nothing because the difference of two evaluated tuples stayed symbolic.)
+
+- **The JavaScript compile target no longer withdraws a value-correct kernel
+  because a tuple holds an exact constant with a complex-hedged type.**
+  `√(5−√5)` — an exact value of `cos`/`sin`(π·rational), ordinary in Desmos
+  documents — types the `finite_complex` hedge (the engine does not prove
+  `5−√5 ≥ 0` at type time) though its value is the plain real `1.6625…`. The
+  broadcast lowering's per-element shape analysis read that element complex, the
+  element verdicts of `(√(5−√5), 0)` disagreed, and every `Add`/`Multiply` over
+  such tuples failed closed with a misleading "list-valued operand" diagnostic.
+  The complexness oracle (`isComplexValued`) now answers fold-first inside a
+  JavaScript compilation: a closed pure scalar whose memoized constant fold is a
+  real number reports real, and the constant folder's complex-shape gate —
+  reading the same oracle — then inlines that folded literal, so every analysis
+  and the emitted code describe the same plain number (an indexed read of such a
+  broadcast result computes correctly rather than reading `.re` off a plain
+  number). The fold-first verdict stands down where the emission cannot fold:
+  under `constantFold: false`, in a `symbolDeps` capture, on the shader targets,
+  and outside a compilation — there the previous fail-closed decline is
+  unchanged, as it is for genuinely complex or symbolic elements. (Tycho item
+  229; 80 of the witness document's 201 line members were declined this way, all
+  value-correct.)
+
+- **Interpreted broadcast evaluation no longer pays the literal-type cost per
+  element.** Since a number literal's public `.type` became its literal value
+  (`ce.box(21).type` is `21`), every intermediate result of an interpreted
+  broadcast carried a structured type, and each per-element type query walked
+  that structure instead of comparing interned tier strings — about 2,000
+  subtype queries per element on the witness workload, roughly doubling the cost
+  of evaluating and draining a large computed collection (a 7,225-element Desmos
+  color chain went from ~5.5 s to ~12.7 s and blew through the consumer's
+  materialization budget). Ruled: a broadcast CELL is a storage-like position
+  and may widen. A re-entrant widening window now makes a literal report its
+  bare tier for the duration of the interpreter's own per-cell computation —
+  opened around each element step of a broadcast map and in the shape classifier
+  that provably discards the precision anyway. Everything user-visible keeps the
+  literal type: the public `.type` of any expression, tuple components read at
+  classification time, and the types named in per-element error messages (a
+  diagnostic minted inside a cell re-reads the precise type outside the window).
+  The widening recovers the drain cost to within ~5% of the pre-literal-types
+  baseline and costs nothing on ordinary small expressions. (Tycho item 228.)
+
+- **The shader targets lower `Power` over a vector base, so the
+  min-distance-field family compiles on the GPU lane.** `min` over squared
+  distances to a literal point list — `(x−P.x)² + (y−P.y)²` after vectorization
+  — stopped at `Power`: the sign-preserving integer-power helper `_gpu_powi` is
+  declared over scalar floats, and `pow(vecN, scalar)` is invalid in both shader
+  languages (no scalar promotion). The targets now emit a per-width helper
+  family `_gpu_powi2/3/4` (WGSL has no overloading, so the width is in the name;
+  the sign is restored per component), select it from the operands' vector
+  width, widen the scalar side of `pow` explicitly, and answer `vecN(1.0)` for a
+  vector base raised to the zero power — which previously emitted a shape-wrong
+  scalar `1.0`. Found and fixed alongside, on WGSL only: the emitted-call
+  argument counter treated the comma inside a type template (`array<f32, 1>`) as
+  an argument separator, so every one-for-one operand-shape check stepped aside
+  and an invalid emission passed as `success: true`. Component reduction for
+  `Min`/`Max` over a vector already existed and is unchanged. (Tycho item 231,
+  face (a); the symbolic-length face (b) still fails closed by design — a
+  host-side per-values substitution makes the count static, which is the
+  supported route.)
+
+## 0.119.0 _2026_08_23_
+
+### Breaking Changes
+
+- **A number literal's `.type` is now its literal type.** `ce.box(42).type` is
+  `42` — a value type, a subtype of `finite_integer` — and `ce.box(0.5).type` is
+  `0.5`. An exact rational carries its tier through a singleton range
+  (`ce.parse('\frac12').type` is `finite_rational<0.5..0.5>`), and an exact
+  value no machine number represents carries its sign on its tier
+  (`ce.parse('\sqrt2').type` is `(finite_real<0..>) & !0`). `NaN`, `±∞` and
+  complex literals keep their tier types, as do string and boolean literals.
+  Subtype tests are unaffected — `ce.box(42).type.matches('integer')` is still
+  `true` — but code that compares `.type.toString()` against a tier name must
+  switch to `.matches()`. Stored types still widen to tiers: `k := 42` infers
+  `k: integer`, a generic call `identity(5)` types `finite_integer` (the solver
+  never binds a type variable to a literal type), `[[1, 2]]` types
+  `matrix<finite_integer^(1x2)>`, and `{x -> 1}` types
+  `record{x: finite_integer}`. Type errors now name the offending literal:
+  "expected `integer`, got `2.5`" instead of "got `finite_real`".
+
+- **Declared signatures admit by overlap; conformance is checked at
+  evaluation.** An operator with a declared signature now follows the same
+  admission model as arithmetic: an argument is refused at boxing only when it
+  is _provably_ incompatible — a concrete value that fails membership
+  (`FactorInteger("abc")` is still an error at boxing), or a symbolic argument
+  whose type shares no inhabitant with the parameter (`string` at an `integer`
+  slot). A symbolic argument whose type merely OVERLAPS the parameter is
+  admitted provisionally: `FactorInteger(n)` with `n: number` now boxes, works
+  when `n` turns out to be 12, and errors at evaluation when it does not. On a
+  strict engine, a generic runtime conformance check at non-lazy dispatch
+  enforces the declared parameter on each evaluated concrete operand, producing
+  the same `incompatible-type` error value the static gate mints for a literal —
+  so the literal and symbol routes now agree. Consequences to note: a wrong-kind
+  concrete value that a handler previously absorbed silently is now an error
+  (see Resolved Issues); a diagnostic for a call like `k(x)` with `x` merely
+  _typed_ incompatibly (no value yet) moves from box time to run time, and the
+  Epsil static pre-pass no longer flags it (ROADMAP: "Epsil static evidence
+  diagnostics lost to overlap admission"). Collection-kind and function-kind
+  parameters, and operators with a custom `canonical` handler, keep their
+  existing handler-owned admission unchanged. On a non-strict engine
+  (`strict: false`) nothing changes. (R1/R8 — §4.4 of
+  `docs/plans/2026-08-22-type-handlers-on-types.md`; pinned by
+  `runtime-conformance-fuzz.test.ts` and `runtime-conformance.test.ts`.)
+
+- **`Sqrt` no longer evaluates a closed radicand to decide its type.**
+  `√(1 − 0.2²)` — a machine-float radicand, which canonicalization deliberately
+  does not fold — now types `finite_complex`, the same hedge as any other real
+  radicand of statically unknown sign, instead of `finite_real`: the type
+  handler used to numericize such radicands (`closedRealSign`, now deleted) for
+  the sole benefit of the compile targets, and a type derivation must not
+  evaluate. Values are unchanged (`evaluate()`, `.N()`, `solve()` fold the float
+  as before) and compiled output is byte-identical: the compile targets fold
+  constant subtrees themselves before any lowering decision reads a type (the
+  item-137 GLSL band is pinned byte-for-byte in `type-handler-audit.test.ts`). A
+  literal radicand still types precisely — `√0.96` stays `finite_real`, its sign
+  being statically known. Measured blast radius: 3 pinned type assertions, all
+  in `type-handler-audit.test.ts`; zero snapshot changes in the full suite.
+  (§5.4 `Sqrt` row and §5.8 A5 of
+  `docs/plans/2026-08-22-type-handlers-on-types.md`.)
+
+### New Features
+
+- **Ranged result types: `Abs`, even powers and `Exp` carry their sign in the
+  type.** `|x|` types `real<0..>` (each real tier keeps its non-negative range),
+  `x²` types `finite_real<0..>`, and `e^x` — every `Power` with a provably
+  positive real base — types `(finite_real<0..>) & !0`, so a consumer that reads
+  the TYPE sees the sign the `sgn` handlers always knew: `√(x²)`, `√|x|` and
+  `ln(2^x)` now type `finite_real` instead of hedging complex. `Negate` reflects
+  a range instead of echoing it (`−|x|` is `real<..0>`). The scope stops at
+  these heads: `Add`/`Multiply` deliberately still join bare tiers (see the Bug
+  Fixes note below); general interval arithmetic is tracked separately in
+  `ROADMAP.md`.
+
+- **Number literals carry their value in their handler-visible type.** A type
+  handler now sees `21`, `0.5` (value types), an exact rational as a singleton
+  range (`finite_rational<0.5..0.5>`), and a value no machine number holds
+  exactly as a sign-carrying range (`(finite_real<0..>) & !0` for `√2`) — so the
+  sign and value questions handlers used to answer from the value channel
+  (`Power`'s integer-vs-rational claim for `10^21`, `arcsin(0.5)`'s domain
+  classification, `Range(2, 3)`'s index-span test, an even root of a negative
+  constant) are now answered by the type alone. The PUBLIC `.type` of a literal
+  is unchanged (`ce.box(21).type` is still `finite_integer`), and a handler
+  result is widened back to ordinary types before it is stored, so literal types
+  never leak into an expression's type. The constants `e` and `π` now declare
+  value-bracket ranged types
+  (`finite_real<2.718281828459045..2.718281828459046>`), so their positivity is
+  a type fact as well. (Ruling O9 first half,
+  `docs/plans/2026-08-22-type-handlers-on-types.md` §4.3/§6.)
+
+- **The `interval-js` target sizes — or declines — dynamically nested integrals
+  at compile time.** An inner integral runs once per enclosing piece, so
+  `Integrate` nodes nested inside each other's integrands or bounds multiply the
+  enclosure's work by their piece count per level — a class the per-node sizing
+  (which only sees one node's limits) could not bound. The outermost integral of
+  a nest now measures its whole subtree (`integrateStats`: how many integral
+  runs, how deeply they nest — a pure function of the tree, memoized per node,
+  no clock anywhere) and picks one uniform per-level count keeping
+  `runs·count^depth` within the 65 536 evaluation budget; inner lowerings
+  inherit that count through the compile target. Below 4 pieces per level the
+  enclosure would be as uninformative as `entire` at full cost, so such an
+  integral fails closed instead and the caller falls back (in a two-lane
+  consumer, to its scalar estimate) — restoring, for the macro-expanded Tycho
+  item-226 witness, exactly the pre-0.118.2 decline behavior at ~zero probe
+  cost: the witness document's member sweep runs in ~25 s against 44 s on
+  0.118.1 and 90 s with the runtime budget alone. Visible chains that fit are
+  now genuinely cheaper AND honest: a three-deep chain that formerly ran 256³
+  evaluations into the runtime budget's `entire` now answers a real (coarse)
+  enclosure at ~28 pieces per level in milliseconds. Composition through
+  by-reference function calls shows no `Integrate` node in the tree and is still
+  bounded at run time by `INTERVAL_NESTED_QUADRATURE_BUDGET`. A `Sum`/`Product`
+  with literal bounds multiplies its body's integral runs by its iteration count
+  in the sizing; with symbolic bounds the body is counted once and that shape,
+  too, is runtime-backstopped. Both mechanisms are pinned in
+  `compile-interval-integrate.test.ts`. (Tycho item 226)
+
+### Resolved Issues
+
+- **`Rational(n, d)` is an integer-pair constructor again: a proven non-integer
+  argument is rejected instead of silently dividing.** The two-argument form
+  canonicalizes to `Divide`, which erased the declared integer contract, so
+  `Rational(3, 2.5)` — and `Rational(3, x)` with `x := 2.5` — evaluated to
+  `1.2`. The signature is now the overload
+  `((real) -> rational) | ((integer, integer) -> rational)` and a non-integer
+  literal, or a symbol holding one, errors with `incompatible-type` on every
+  construction route. A valueless symbol is still admitted and rewrites to
+  `Divide` as before, and the `Divide` spelling itself is unchanged
+  (`Divide(3, 2.5)` is still `1.2`).
+
+- **`Divides` no longer answers a rounded question.** `Divides(2.5, 3)` returned
+  `True` — the handler converted operands with the rounding `toBigint`, so it
+  actually tested `3 | 3` — and `NotDivides(2.5, 3)` returned `False` (the truth
+  is `True`). Non-integer operands now stay symbolic, as the operator's
+  documentation always stated. The same integrality gate protects
+  `FromContinuedFraction`, which used to reconstruct a value from a rounded
+  non-integer term, and `NotDivides`' declared signature now matches `Divides`'
+  (`(number, number)`).
+
+- **The unary `Multiply`/`Subtract` fold no longer lets a held non-numeric value
+  through unexamined.** `Multiply(s)` with `s := "str"` folded to the lone
+  operand — the operator vanished before any check could run — and evaluated to
+  `"str"`, while the literal `Multiply("str")` refused. A lone operand holding a
+  concrete string, boolean, or character now errors with `incompatible-type`; a
+  lone collection still folds (the broadcast identity) and a valueless symbol
+  still folds.
+
+- **`Intersection` of a single collection is that collection as a set, not the
+  empty set.** `Intersection([1, 2, 2])` evaluates to `Set(1, 2)` (symmetric
+  with `Union`), and a set-shaped operand returns itself without enumeration —
+  `Intersection(Integers)` is `Integers`. Nullary `Intersection()` is still
+  `EmptySet`.
+
+- **`Vector` declares the content leniency it always had.** Its signature is now
+  `(any+) -> vector`, matching the tensor family (`Matrix` accepts non-numeric
+  entries on every route), and its type handler claims the numeric `vector<n>`
+  only when every element is provably a number.
+
+- **The Epsil linter is now deliberately stricter than engine admission for
+  assignment evidence.** `let x; x = g(); k(x)` with `g: () -> number` and
+  `k: (integer) -> integer` flags a `static-type-error` again: the pre-pass
+  refuses a call whose recorded evidence type does not FIT the parameter, even
+  when it merely overlaps — the way TypeScript flags code that would run.
+  Lint-only by construction (the evidence exists only while a pre-pass runs);
+  the executed program is unchanged, overload verdicts stay per-arm, and an
+  exact-rational initializer now flags too. One adjacent lint gap is recorded in
+  `ROADMAP.md`: a LAMBDA-valued callee's argument errors are deferred to run
+  time by design, so the pre-pass does not surface them yet.
+
+- **Folding an assigned value that would explode the emitted source now fails
+  closed.** A DAG-shared value tower unfolds once per reference path in
+  generated text, so compiling a member could grind through megabytes of source;
+  `tryFoldKnownSymbol` now refuses above 20,000 expanded nodes (a DAG-linear
+  identity-memoized size sum — the compile corpus's largest legitimate fold is 4
+  nodes) with a message that says why. The default `fallback: true` route
+  degrades to interpreted evaluation with correct values; the direct
+  registered-target route throws. The CSE initiative remains the general fix.
+
+- **Nested quadrature is bounded through Monte-Carlo composition, and compiled
+  multiple integrals cost what the interpreter's do.** `_SYS.integrateMC` joins
+  the nested-evaluation budget (a runaway by-reference composition under
+  Monte-Carlo, previously unbounded, now answers `NaN` in seconds; a nested
+  Monte-Carlo integral that previously never returned now answers `NaN` too),
+  and the `Integrate` emitter seeds starting panels by the statically visible
+  nesting depth using the interpreter's own sizing — a compiled triple integral
+  dropped from 1.38·10⁷ integrand evaluations (~0.9 s) to 9.1·10⁴ (~12 ms) with
+  accuracy equal or better on every probed closed form.
+
+- **A runaway dynamically-composed scalar integral now answers `NaN` instead of
+  hanging.** The scalar `javascript` target's `_SYS.integrate` carries the same
+  per-outermost-integration evaluation budget the interval target already had
+  (2²⁵ nested integrand evaluations — ~70× headroom over the hardest measured
+  double integral, 2.4× over a smooth genuine triple): by-reference composition
+  no tree walk can see is cut after a few seconds, an exhausted run cannot fall
+  through to the Monte-Carlo fallback, and a fresh outermost integral re-arms.
+  Choosing `NaN` as the exhausted result follows the ROADMAP entry's own
+  analysis (the scalar result is an estimate, not an enclosure).
+
+- **`structural` of an object-holding shared tree is no longer exponential.**
+  The per-node memo cannot persist a payload containing a mutable object (cache
+  rulings B12/B22), so such trees rebuilt once per path; a transient map scoped
+  to the outermost read — retaining nothing, validating nothing — now preserves
+  sharing within one read (depth 18 cost 8.5 s before; depth 30 is now
+  `depth + 1` rebuilds).
+
+- **The Epsil pre-pass flags a concrete literal initializer that cannot inhabit
+  a call's parameter again.** Overlap admission had silenced `let x = 1.5; k(x)`
+  for `k: (integer) -> integer` (the widened `number` overlaps `integer`); the
+  pre-pass now records the initializer's exact literal type as its assignment
+  evidence, which provably refutes the parameter, restoring the
+  `static-type-error` — while `let x = 2` stays clean and a symbolic `x = g()`
+  stays admitted (that half is an open product decision recorded in
+  `ROADMAP.md`).
+
+- **Every irrational standard-library constant declares a value-bracket ranged
+  type** (`e`/`ExponentialE`, `π`, `γ`, Catalan's G, and φ), so sign and
+  magnitude are type facts — `√φ` and `ln π` type `finite_real` off the
+  declarations alone. `GoldenRatio`'s value is an unevaluated expression whose
+  static type cannot witness a bracket; such standard-library declarations are
+  now TRUSTED (the throwing value-vs-type check is user-`declare`-only) and
+  validated empirically under a development-build `console.assert` plus the
+  suite pin `constant-declared-brackets.test.ts`. The remaining literal-value
+  type handlers (`ErfInv`, `PolyLog`, `Subscript`'s numeral base) read the
+  literal's handler-visible type first.
+
+- **A compilation that exhausts the shared antiderivative pool no longer starves
+  later compilations of closed forms.** The per-compilation pool bounding
+  symbolic antiderivative-first attempts (added with the item-226 fix) was reset
+  only in `compileRoot` and the public `compile()` entry — but registered
+  targets invoked directly
+  (`ce._getCompilationTarget('javascript').compile(...)`) enter through
+  `compileCseRoot`, which reset nothing. Once any compilation drained the pool,
+  every later direct-target compilation skipped the symbolic attempt permanently
+  and emitted runtime quadrature (`_SYS.integrate(…)`) where a closed form
+  exists (`∫₀ᵗ 2x dx` compiled to a quadrature call instead of `t²`). The reset
+  now lives at the one choke point every route crosses — the depth-0 boundary of
+  `BaseCompiler.compile` — which also gives each auto-mode escalation attempt
+  its own pool. Nested compilations now consume the outer pool instead of
+  re-granting themselves a fresh one, so the aggregate stays bounded by one pool
+  per depth-0 compilation entry (a multi-statement shader body, which compiles
+  each statement as its own root, gets one pool per statement). Pinned in
+  `compile-antiderivative-budget.test.ts`. (Surfaced by the dual review of the
+  constant-fold-before-type-read change.)
+
+- **`Histogram`/`BinCounts` no longer round a non-integer scalar bin spec.** The
+  scalar bin spec is a bin COUNT, but it was read with a rounding conversion, so
+  `BinCounts(data, 2.5)` silently answered the 3-bin question. A non-integer
+  scalar now stays INERT — the documented contract, which lets Desmos-style
+  bin-WIDTH spellings (`histogram(L, .05)`) parse and remain for the importer to
+  translate. A string bin spec, reachable through a permissively-typed symbol,
+  is now an `incompatible-type` error instead of being iterated
+  character-by-character into `NaN` bin edges.
+
+- **Integer-domain operators no longer silently round a non-integer operand
+  delivered through a permissively-typed symbol.** With `u: any` and `u := 2.5`,
+  `FactorInteger(u)` answered `[(3, 1)]`, `NextPrime(u)` `5`, `IsTriangular(u)`
+  `True`, and `Fibonacci(1 + 2i)` `1` — the ~45 operators of the number-theory
+  and combinatorics families trusted the boxing gate to never hand them a
+  non-integer, and `toBigint` rounds by contract. All of them now produce an
+  `incompatible-type` error value at evaluation, from the generic runtime
+  conformance check (no handler was changed).
+
+- **An unknown rule-condition name no longer crashes.**
+  `Condition(x, "nonsense")` threw a raw `TypeError` out of `evaluate()` (an
+  unguarded `CONDITIONS[name]` lookup); `checkConditions` now fails closed on an
+  unknown condition name. More generally, a native-fault crash
+  (`TypeError`/`RangeError`/`ReferenceError`) escaping a built-in non-lazy
+  `evaluate` handler is converted into an `evaluation-error` value on the
+  expression instead of crashing the caller; deliberate throws — cancellation,
+  redefinition discipline, predicate contracts, user-function arity — still
+  propagate unchanged.
+
+- **A promoted radical arm in a branch is no longer double-wrapped on the
+  JavaScript target.** Under the complex discipline (the default
+  `mode: 'auto'`), `If(c, √−4, √(1 − 0.2²))` promotes the unknown-sign radical
+  arm to `_SYS.csqrt(…)` — already a `{re, im}` object — while the branch
+  coercion classified that arm by its static type and wrapped it a second time
+  (`{re: {re, im}, im: 0}`), NaN-poisoning every slot read. The JavaScript
+  target's static complex-wrap sites (`BaseCompiler.isProvablyRealValued`:
+  branch-arm coercion, the `Typed` ascription lift, the complex-argument
+  delivery) now consult the shape analysis (`isComplexValued`) before the static
+  type, and — where the type is imprecise — the constant fold's value
+  (`constantFoldValue`, split out of `tryConstantFold` behind every gate except
+  the `constantFold` emission opt-out). A closed constant arm beside a complex
+  arm therefore keeps the complex convention under every mode, including
+  `mode: 'strict'` with `constantFold: false`, where only the fold-informed
+  analysis can prove the structurally-emitted arm real. Pinned in
+  `compile-complex.test.ts` ("coercion reads the value SHAPE" block).
+
+- **The runtime effects projection honors its memo for pure applications, and an
+  expression's structural form is memoized per node.** Two independent defeats
+  of per-node caching made every walk over a DAG-shared tree — a document
+  function applied to its own previous result embeds that result once per
+  parameter mention, so a few levels unfold to millions of paths — exponential,
+  which surfaced as a consumer document evaluating at 4 GB and aborting on the
+  heap limit (Tycho item 225). First, `effectsOf`'s memo consultation was
+  spelled `expr._effectsOf?.() ?? applicationEffects(expr)`, and `undefined` is
+  the memo's legitimate answer for a PURE application — so every read of every
+  pure node fell through and recomputed its entire subtree: 24 million
+  recomputes in one document evaluation, 1.5 million once the memo is honored.
+  Second, `BoxedFunction.structural` rebuilt through every operand's
+  `structural` with no per-node memo, so a shared tree was rebuilt once per path
+  — exponential time and fresh allocation for every copy; it now caches per node
+  (generation-guarded, like `type`), and the rebuilt form preserves the sharing.
+  Both pinned on the depth-30 shared tower in `dag-shared-walks.test.ts`. The
+  witness document no longer OOMs; its remaining cost is a separate compile-time
+  issue (baking a DAG-shared symbol value into compiled source is exponential in
+  the OUTPUT without CSE) tracked in `ROADMAP.md`. Found in review and fixed
+  with it: once any mutable object exists, two more walks re-scanned a shared
+  tree once per path — the cache commit points' payload-containment scan
+  (`containsObject`), and the cross-engine ingress guard that runs on EVERY
+  function boxing (`containsForeignEngineObject` — constructing a depth-n shared
+  tree cost 2^n scans). Both now carry a per-question memo and are linear in
+  distinct nodes; pinned by the armed-scan test in `dag-shared-walks.test.ts`. A
+  shared tree that CONTAINS an object still rebuilds its structural form per
+  read (the cache commit rule refuses object-holding payloads by ruling);
+  tracked in `ROADMAP.md`. (Tycho item 225, partial)
+
+- **A dynamically nested interval integral can no longer run away.** The
+  compiler sizes an integral's piece count only for the nesting it can see — the
+  limits of one `Integrate` node (256 pieces for a single or double integral,
+  fewer per level beyond that, so one node never exceeds its 65 536 evaluation
+  budget). But integrals also nest DYNAMICALLY: a distinct `Integrate` node
+  inside another's integrand, or a compiled user function that computes an
+  integral, runs once per enclosing piece, multiplying the work by 256 per level
+  with no syntactic trace. The Tycho item-226 witness — a six-level Newton
+  iteration `w − k·E(w)/d_E(w)` whose macro-expansion substituted each level
+  into `E`'s integrand — emitted 728 `_IA.integrate` calls nested inside each
+  other's integrands, ~256⁶ integrand evaluations, and never returned. The
+  interval runtime now enforces its own budget
+  (`INTERVAL_NESTED_QUADRATURE_BUDGET`, 4× the per-node compile-time budget):
+  each outermost integral entry resets it, every integrand evaluation performed
+  by a nested integral consumes it, and a nested integral that finds it
+  exhausted answers `entire` — sound, since the entire line contains the true
+  value — so the enclosure widens instead of spinning and the caller degrades to
+  its non-interval fallback. Integrals the compiler did size are untouched (a
+  double consumes 65 536 of the 262 144 budget, a triple about the same), pinned
+  alongside the regression in `compile-interval-integrate.test.ts`. The
+  consumer's document that hit this completes its member sweep in ~90 s where it
+  previously never returned. With it, the antiderivative-first symbolic attempts
+  of one compilation now share a single 4 s wall-clock pool instead of arming a
+  fresh 2 s span per `Integrate` node, so a many-hundred-node emission degrades
+  to its numeric emitters at bounded compile-time cost. The pool resets at every
+  compilation entry — the public `compile()`, `compileRoot` (raw custom
+  targets), and `compileCseRoot` (every registered target's root) — so no
+  compilation inherits an earlier one's depleted pool; pinned by draining the
+  pool and compiling on each route. (Tycho item 226)
+
+- **An `assume()` range no longer leaks through `Add` and `Negate`.** After
+  `assume(x > -1); assume(y > -1)`, `x + y` typed `real<-1..>` — but the sum can
+  be as small as −2 — and `-x` echoed `real<-1..>` verbatim. Join-based result
+  computations now strip range decorations from their inputs (a join is a set
+  union, and a sum does not lie in the union of its terms' ranges), and `Negate`
+  reflects a range about zero (`-x` under that assumption is `real<..1>`).
+
+## 0.118.2 _2026-08-22_
+
+### New Features
+
+- **The `interval-js` target now lowers `Integrate`, `At`, `Length` and
+  `PointX`/`PointY`/`PointZ`.** Each compiled on the `javascript` target and
+  declined on `interval-js` with "the operator is known to the engine but target
+  'interval-javascript' has no lowering for it", so every plotted band over one
+  of them fell from the interval lane to the scalar fallback. Four of the six
+  had a common cause: the interval target had no collection value model at all —
+  a `List`/`Tuple` literal had no lowering, and an array handed to a compiled
+  function was flattened into an object keyed `"0"`, `"1"`, …, losing its
+  length. A collection is now a JavaScript array of intervals in the OPERAND
+  position of an accessor, and the accessor projects it back to one interval:
+  `Length` answers the count as a point interval; `At` applies the interpreter's
+  1-based, negative-from-the-end convention, and since the index is itself an
+  interval it stands for a set of indices — the result is the hull of every
+  element the integers in it select, `partial` when some of them fall outside
+  the collection, and the numeric absence marker (`{ lo: NaN, hi: NaN }`) when
+  none selects anything; `PointX`/`PointY`/ `PointZ` read one coordinate of a
+  single point. A literal collection — or a symbol assigned one — folds at
+  compile time. The gates mirror the `javascript` target's: a string base, a
+  gather or mask index, a list of points under a coordinate accessor, and a
+  collection-valued RESULT all still decline, each with a message saying why
+  (the target's value is one interval). `Integrate` is a different algorithm
+  rather than a table entry: the antiderivative-first step is now shared with
+  the `javascript` target (`BaseCompiler.closedFormIntegral`), so `∫₀ˣ sin t dt`
+  compiles to the closed form `1 − cos x` on both — except that on the interval
+  target a DEFINITE integral's closed form is guarded at run time
+  (`_IA.integrateClosed`): the symbolic step differences an antiderivative at
+  the bounds without checking that the integrand is bounded between them
+  (`∫₋₁¹ dt/t²` closes to `−2`), and on this target that would be a zero-width
+  "enclosure" of a divergent integral, so a coarse interval scan of the
+  integrand over the range withholds the closed form — the scan cannot miss a
+  pole, since interval arithmetic encloses — and hands such an integral to the
+  enclosure, which answers `singular`. An integral that does not close compiles
+  to `_IA.integrate`, an enclosure — a Riemann bracket over a uniform partition,
+  with interval-valued bounds handled by the mean-value correction
+  `[0, b₂−b₁]·f([b₁, b₂])` on each side, and the accumulation's own
+  round-to-nearest error added back by the standard dot-product bound — rather
+  than the scalar target's Gauss–Kronrod estimate. Its width is first order in
+  the piece size (≈ 2.5·10⁻³ on `∫₀¹ e^{−t²x} dt` at 256 pieces); nested limits
+  share one evaluation budget of 65 536 integrand calls (256 pieces per level
+  for a single or double integral, 40 for a triple, 16 for a quadruple), so a
+  deeper integral gets a coarser enclosure instead of a runaway cost. A pole
+  inside the range answers `singular`, an undefined integrand `empty`, and an
+  infinite bound `entire` (no finite partition exists; the scalar target's
+  variable transform is not interval-tight). An indefinite integral with no
+  closed form still fails closed, as on the `javascript` target. Found and fixed
+  alongside, on BOTH targets: a `Function` integrand's parameters were paired to
+  the limits by position, where the interpreter pairs them by name —
+  `Function(a·x·y², y, x)` under `(x, 0, 1), (y, 0, 2)` compiled to ∫∫ a·y·x²
+  (`2a/3`) instead of ∫∫ a·x·y² (`4a/3`), and a spare parameter
+  (`Function(x + q, x, q)` under one limit) compiled as a read of an input the
+  integral never supplies; both now fail closed unless the parameters match the
+  integration variables one to one. And the interval target never populated
+  `varsKeys`, so a symbol the caller pinned through `vars` was not protected
+  from the closed-form fold (`∫₀ᵏ t dt` with `k` mapped baked `k²/2` instead of
+  reading `k` at run time). Two contract points were settled with it: the
+  interval target's result is one interval per quantity, so a collection-valued
+  expression (a comprehension) returns an ARRAY of interval values
+  (`IntervalValue`) — which comprehension roots already did, now typed and
+  honored by the interpreter fallback too, which used to collapse any list to
+  `entire`; and every scalar kernel now fails closed on a provably
+  collection-valued operand, where `Add(L, 1)` used to answer
+  `{ lo: NaN, hi: NaN }` and `Less(xs, 3)` `'maybe'` behind `success: true`. The
+  runner's variable type is `IntervalInput` — a number, an interval, or an array
+  of these for a collection-valued variable. (Tycho item 220)
+
+### Resolved Issues
+
+- **Evaluating a user function over its own previous result no longer takes
+  exponential time.** A document function applied to its own result — Tycho's
+  `detail(smooth(upSample(…)))` heightmap chain, evaluated while its sliders are
+  still valueless — produces an inert value that EMBEDS the previous level once
+  per mention of the parameter: four levels hold about 16 000 distinct nodes
+  that unfold to over a million. Every walk that descended each operand
+  independently paid for the unfolded tree — the `Add` ordering key (`revlex`, a
+  string of every symbol in the term, so the key itself grew to gigabytes), the
+  free-variable scan (`unknowns`, `freeVariables`, `symbols`), the binder
+  rewrite behind parameter substitution, symbol dereference and
+  `Sum`/`Comprehension` canonicalization (`rewriteWithBinders`), closure
+  capture, the element memo's dependency snapshot, `has()` and the ordering
+  tie-breaker's leaf count — and none of them reached a deadline check, so a
+  consumer's per-evaluation time budget never fired: one document ran for more
+  than twenty minutes at 100 % CPU and 3 GB (Tycho item 220's sweep stall).
+  0.118.1 finished the same document in about 12 s only because its `Add`
+  broadcast over the operand; the item-221 fix keeps that `Add` inert, which is
+  right, and exposed the walks. Each walk now memoizes per node within a call,
+  so it is linear in the number of distinct nodes, and the ordering key is
+  bounded to the trailing 1 024 characters of the symbol sequence. The bounded
+  key is a function of the unbounded one, so every sum whose terms' keys fit
+  orders exactly as before; a sum whose terms carry more than 1 024 characters
+  of symbol names AND share that whole tail now breaks the tie by the structural
+  `order` rather than by the longer key — deterministic, and only reachable from
+  expressions of that size. The heightmap document evaluates in 3.7 s (78–199 s
+  before); the engine-only replica at three levels takes 0.2 s (more than two
+  minutes before). Pinned in `dag-shared-walks.test.ts` on a depth-30 shared
+  tower (31 distinct nodes, 2³⁰ unfolded): the free-variable and symbol scans,
+  the bounded ordering key, the degree walks on a shared polynomial spine, the
+  leaf-count tie-breaker, `has()`, a `Sum` binder over the tower, the
+  application of a literal holding it, and a lazy collection's dependency
+  snapshot over it. Two walks on the way to ASSIGNING such a literal remain
+  exponential and are tracked in `ROADMAP.md` ("Assigning a function literal
+  whose body shares operands").
+
+- **A compound factor of a vector `Multiply` keeps its parentheses on the `glsl`
+  and `wgsl` targets.** `Multiply(Add(t, 1), Tuple(x, 0))` compiled to
+  `t + 1.0 * vec2(x, 0.0)`, which the shader reads as `t + (1.0 * vec2(x, 0.0))`
+  — the float broadcast into the vector rather than scaling it, so a
+  Desmos-style lerp `t·P₁ + (1−t)·P₀` rendered as `t·P₁ − t + P₀`. A `Multiply`
+  with a collection operand is lowered by the shader target's function handler,
+  and the `compile` callback such a handler receives carries no precedence
+  context, so the factor arrived unparenthesized and was joined with a bare `*`.
+  Each factor is now compiled at the binding power of `*`. Two more instances of
+  the same dropped grouping are fixed with it: a function handler's emission
+  spliced into an enclosing infix operator now obeys the same `op[1] < prec`
+  rule the infix path applies to its own operands (`s·(P + Q)` over two points
+  emitted `s * vec2(a, b) + vec2(c, d)`), and a single-statement `Block` used as
+  a sub-expression is compiled at the enclosing precedence on every target
+  (`Multiply(Block(Add(t, 1)), x)` emitted `x * t + 1` on `javascript`,
+  `python`, `glsl` and `wgsl`). The scalar multiply, `Divide`, and the
+  `javascript`/`python` lowerings of the vector shape were already correct and
+  are unchanged. (Tycho item 224)
+- **A bare `Nothing` fails closed on every compile target.** `Nothing` is the
+  erasure marker, not a value; it can still reach a compiler as a bare symbol (a
+  malformed `Which` with a dangling clause canonicalizes to it). Only the
+  `javascript` target refused it — `glsl` and `wgsl` emitted the undefined
+  identifier `Nothing` behind `success: true`, `python` the undefined name, and
+  `interval-js` a `_.Nothing` read that is `undefined` at run time. All five
+  targets now decline with the same diagnostic ("the erasure marker is not a
+  value … Fail closed (D6)"). A `Nothing` arithmetic operand is still erased at
+  canonicalization (`Add(Nothing, x)` compiles to `x`), as before.
+- **An element-wise broadcast no longer captures a collection-typed but still
+  valueless operand as a per-element scalar.** With `A` an unknown-length view
+  (`Range(0, n)/n`, `n` unassigned) and `s` declared `list<number>` but not yet
+  assigned, `Multiply(A, s)` evaluated to `Map(_ ↦ _·s, A)`; once
+  `s := [10,20,30]` and `n := 2` bound, that stored form materialized as the
+  outer product `[[0,0,0],[5,10,15],[10,20,30]]` while a fresh `Multiply(A, s)`
+  zipped to `[0,10,30]`. The known-length form `[1,2,3]·s` → `[s, 2s, 3s]` was
+  the same splice. A collection-typed operand that is not yet a collection value
+  now leaves the operator inert — `s·[1,2,3]`, typed `list<number>`, the zip's
+  element type — and re-evaluating it after the assignment zips. The decline
+  reaches every route: `Add`/`Multiply`/ `Divide`/`Mod`, user lambdas and
+  declared `broadcastable<…>` parameters (the application is held rather than
+  inlined — `g(a,b) = (a,b)` no longer stores `([1,2], s)`), the relational
+  operators (`[1,2,3] < s`), `When`'s mask, `PointList` components, tuple
+  scaling (`(1,2)·s` no longer stores `(s, 2s)`), and operands typed
+  `number | list<number>` or `broadcastable<number>`. A definite length mismatch
+  among the resolved operands still errors (`[1,2] + [3,4,5] + s` →
+  `incompatible-dimensions 2 vs 3`), and a symbol declared bare `tuple` keeps
+  scaling a list (`[1,2,3]·r` → `[r, 2r, 3r]`). (Tycho item 221)
+- **`PointList` over unknown-length lazy views is a point VIEW, with a type that
+  carries the point arity.** `PointList(−√(1−A²), A)` with `A = Range(0,n)/n`
+  and `n` unassigned evaluated to an inert `PointList` head — `isCollection`
+  false, no `count`, typed `list<tuple>` with no component arity — while the
+  sibling `A·(1,0)` already produced a lazy point view. An unknown-length
+  indexed component (a symbolic-length `Range`, a lazy `Map` over one, a
+  `Filter`) now transposes lazily, exactly as the arithmetic route does: the
+  result is a collection, resolves to the eager list of points as soon as the
+  length does, and the stored lazy form re-evaluates to the same points a fresh
+  evaluation gives. A provably infinite component or a non-indexed one (a `Set`)
+  still fails closed; a string component is an atomic coordinate rather than a
+  fail-closed trigger, so `PointList("ab", 3)` now evaluates to the point
+  `("ab", 3)` its type already promised. The static type is
+  `list<tuple<T₁, …, Tₖ>>` (each list component contributes its element type,
+  any other component its own type) instead of the arity-less `list<tuple>`.
+  **Consumer-visible consequence:** because a two-component point list now
+  statically has no third coordinate, `PointZ(PointList(-6, n))` is a typed
+  `incompatible-dimensions` error at box time on every route, where the
+  `javascript` target used to emit a kernel of `NaN` absence markers and the
+  GLSL target its own arity decline. (Tycho item 222)
+- **A zipped `Divide(list<tuple>, list<number>)` folds each element.**
+  `[T, U] / √(PointX([T,U])² + PointY([T,U])²)` evaluated to
+  `[0.999999999999999835·(0.943…, −0.331…), (0.6, 0.8)]`: the value-level
+  `div()` had no tuple arm, and the broadcast zip builds each element with
+  `ce._fn('Divide', …)`, which bypasses the `canonicalDivide` fold the
+  single-tuple form `T / √(…)` takes. An inexact divisor left an inert
+  `number × Tuple`; an exact integer divisor (`[T, U] / [2, 5]`) left a tuple of
+  unevaluated `Divide` components. A numeric tuple divided by a numeric scalar
+  now scales component-wise on the value route too, and `tuple.div(0)` on that
+  route answers `(~oo, ~oo)`, as the box route always has. (Tycho item 223)
+- **Arithmetic admits a symbol declared through a transparent type alias of a
+  tuple, list or vector.**
+  `ce.declareType('pt', 'tuple<number, number>', { alias: true })` then
+  `ce.declare('p', 'pt')`: `2·p`, `[1,2,3]·p`, `Divide(p, 2)` and `Negate(p)`
+  all errored `incompatible-type "number" vs "pt"`, as did an alias of
+  `list<number>` or `vector<2>`, while the direct spelling was accepted — the
+  shape gates read the type's kind directly and saw an opaque reference, where
+  `isSubtype` already unfolded it (so an alias of a scalar worked). Transparent
+  aliases are now unfolded at every shape gate and in the quotient's type. A
+  NOMINAL declaration (`declareType`'s default) stays opaque by design and is
+  still refused.
+- **A lone `scalar | list<…>`-typed operand keeps its union in the result type,
+  and a big operator over a body that may be a collection stays inert.** With
+  `u` declared `number | list<number>` and not yet assigned, `2u`, `u + 2`,
+  `−u`, `sin(u)` and a user lambda `f(u)` all typed a definite `list<…>` —
+  `type.matches('collection')` answered `true` — yet `u := 5` evaluated `2u` to
+  the scalar `10`. The result now carries the union through,
+  `finite_number | list<finite_number>`, each branch wrapped back in its own
+  collection kind (`number | range` →
+  `finite_number | indexed_collection<finite_number>`), and a definite
+  collection sibling (`[1,2] + u`) still gives `list<number>` — the union's list
+  branch zips and its scalar branch lifts. Two folds that committed such a body
+  to a scalar are closed by the same rule: `Sum(2u)` evaluated to `2u` (and
+  `Sum(u)` to `u`) where `u := [1,2]` makes the sum `6`; and `Sum(2 + h(x))`
+  with `h` not yet defined evaluated to `h(x) + 2`, which re-evaluated to
+  `[5, 8]` once `h := x ↦ [x, 2x]`, where the sum is `13`. `Sum`/`Product` with
+  no index now stay inert over a body typed as a scalar-or-collection union (any
+  branch a list, vector, set, tuple, string or `broadcastable<…>`), a
+  `broadcastable<…>` body, or the application of an undeclared head; a bare
+  undeclared symbol still folds (`Sum(y)` → `y`).
+
+- **A definite integral with a pole strictly inside its bounds no longer
+  evaluates to a finite number.** `∫₋₁¹ dt/t` evaluated to `0` and `∫₋₁¹ dt/t²`
+  to `−2`: the antiderivative was differenced at the bounds with no check that
+  the integrand is bounded between them, which the fundamental theorem of
+  calculus requires — both integrals diverge. The `Integrate` evaluate handler
+  now answers what the integral actually is: `+∞` or `−∞` when the integrand
+  keeps one sign across every interior pole (`∫₋₁¹ dt/t² → +∞`, as
+  `∫₀¹ dt/t → +∞` already did), and inert (unevaluated, as it already was when
+  no antiderivative was found) when the integrand changes sign across a pole and
+  the integral has no value at all (`∫₋₁¹ dt/t`, whose principal value is 0 but
+  whose integral is undefined). `.N()` follows suit — `±∞`, or `NaN` for the
+  sign-changing case, on either bound order and in the iterated form for a
+  dimension with constant bounds — where it used to hand back a confident
+  quadrature `Measurement` (`∫₀² sec t dt` → `8.316585 ± 0.000016`, `∫₋₁¹ dt/t`
+  → `−1.4 ± 3.6`): the adaptive Gauss–Kronrod error estimate is blind to a
+  singularity it straddles. A pole is reported only when it is PROVEN: located
+  exactly — as a real root of a polynomial denominator (`1/t`, `1/(t² − 1)`,
+  `t⁻³`), a pole of `tan`/`cot`/`sec`/`csc` or `csch`/`coth` of a linear
+  argument, or a zero of a `sin`/`cos`/`tan`/`cot`/ `sinh`/`tanh` divisor (a
+  reciprocal such as `1/tan t` is not canonicalized to `cot t`, so it is read as
+  written) — and then confirmed by sampling the integrand on both sides of it to
+  grow at least as fast as `1/|t − r|`. A root is told apart from a bound by the
+  denominator's residual there, not by a distance, so `∫₀¹ (t − 10⁻¹⁰)⁻² dt` is
+  recognized as divergent while a double root exactly at a bound stays an
+  endpoint case. That confirmation is what keeps a cancelling denominator
+  (`∫ (t² − 1)/(t − 1)`), an integrable singularity (`∫₀¹ dt/√t = 2`), a pole AT
+  a bound (`∫₀¹ dt/t = +∞`), and every integral with a symbolic or infinite
+  bound exactly as they were. The compile targets' antiderivative- first step
+  inherits the fix: `∫₋₁¹ dt/t²` no longer compiles to the constant `−2`.
+
+- **The sign of a circular function of an exact argument was off by one
+  quadrant.** `sgn` of `cos 1`, `sec 1`, `tan 1` (first quadrant) and `sin 2`
+  (second quadrant) answered `negative`: the quadrant helper numbers the
+  quadrants 1..4 and the sign table was indexed 0..3 with that number. Every
+  consumer of the sign was affected — `|sec 1|` evaluated to `-sec(1)`, so
+  `∫₀¹ tan t dt` (= `ln|sec 1|`) came out as `ln(−sec 1)`, a complex number for
+  a real integral. All six functions now report the sign of their value in every
+  quadrant (verified against the numeric value at 90 sample points).
+
+- **`∫ cot(ax + b) dx` had the wrong sign.** The pattern rule answered
+  `−ln|sin(ax + b)|/a`; the antiderivative of `cot` is `+ln|sin x|` (its
+  derivative is `cos x / sin x`). `∫₀² cot t dt`, divergent at the lower bound,
+  evaluated to `−∞` instead of `+∞`. The power-reduction route (`∫cot³x dx`)
+  already used the correct base case and is unchanged.
+
+- **Eight more rules of the built-in antiderivative table were wrong** (the
+  table the `Integrate` evaluate handler uses when no integration provider is
+  loaded; the Rubi provider was unaffected). `∫ sinh` and `∫ cosh` answered
+  `ln|cosh|` and `ln|sinh|` (the antiderivatives of `tanh` and `coth`); `∫ tanh`
+  answered `ln|sech|`, the negative of the correct `ln(cosh)`; `∫ sech` answered
+  `ln|tanh|` where it is `arctan(sinh)`; `∫ csch` kept the full argument in
+  `−ln|coth|` where it must be halved; and all six inverse hyperbolic rules
+  (`arsinh`, `arcosh`, `artanh`, `arcoth`, `arsech`, `arcsch`) answered the
+  function's own logarithmic definition — `∫ arsinh t dt` evaluated to
+  `arsinh t`. Each is now the by-parts form
+  (`∫ arsinh t dt = t·arsinh t − √(t² + 1)`, …), and every rule of the table is
+  pinned by differentiating its answer back to the integrand at several points
+  of its domain.
+
+## 0.118.1 _2026-08-22_
+
+### Resolved Issues
+
+- **The `javascript` and `python` targets now compile the multi-collection
+  (zipWith) form of `Map` over symbolic sources.**
+  `Map((_1,_2) ↦ _1+_2, 1..N, 2..N)` with `N` a free input declined with "Map:
+  multi-collection form is not compiled" — which a plotting document met through
+  Desmos' element-wise list difference `c = (1..N) − Join([0], 1..(N−1))`, whose
+  bound value is exactly that zip `Map`, so every compiled expression reading
+  `c` declined with it. The same shape with literal bounds const-folded away
+  before reaching the lowering, which is why it looked as if every minimal zip
+  compiled. The form now lowers like the single-collection one: each source is
+  materialized once, the callback receives one element from each source per
+  position, and the result is as long as the SHORTEST source — the interpreter's
+  `count` for the form, and what `Zip` does. A parameter annotation on the
+  callback is checked against ITS source, position by position, with the same
+  fail-closed rule the unary form has (an `integer` annotation over a
+  `number`-typed source declines, naming the parameter). Three shapes stay with
+  the interpreter, by a compile-time decline rather than a wrong value: a source
+  whose elements are not provably real numbers (`list<complex>`,
+  `list<list<number>>`, strings, a bare `list`) — the callback's parameters are
+  compiled untyped and its body treats them as real numbers; a source with
+  observable effects (one that draws `Random`) — the compiled code materializes
+  every source in full where the interpreter stops at the shortest; and a bare
+  `Add`/`Subtract`/`Multiply`/`Divide` symbol as the mapping over anything but
+  exactly two sources — it compiles to a two-argument function. The effects
+  decline now guards `Zip` on both targets too, which had the same gap. The
+  constant fold's cost estimate prices a zip by its shortest resolvable source
+  instead of its first. (Tycho item 218)
+
+- **Reading the type of a nested lazy collection view is no longer exponential
+  in its nesting depth.** A view built over a collection whose length is not
+  statically known — `L := Range(0,n)/n` with `n` a free input, then
+  `Y_0 := Y + 0·(2L−1)` — nests one `Map` per arithmetic step, and asking such
+  an expression for its type cost 2^depth type-handler invocations.
+  `Sqrt(1 − Y_0²)` took 3.6 s, and `PointList(−√(1 − Y_0²), Y_0)` did not return
+  at all. A bound list was affected too, superlinearly in its length: parsing an
+  `rgb(…)` row over a 301-element list took 12.9 s. All are now single-digit
+  milliseconds.
+
+  Two causes compounded, both in `Map`'s type handler. It read each source's
+  type twice per level, which doubles per level when the source is itself a
+  `Map`. And the element-type derivation added in 0.118.0 declares stand-in
+  symbols in a scratch scope, which advanced the engine's `any` cache generation
+  — the generation `BoxedFunction.type` keys its memo on — so every read retired
+  the type cache of every expression in the engine, including the sources the
+  same walk was mid-way through reading. One `PointList` evaluation made 998K
+  handler calls and 2.0M cache invalidations.
+
+  A declaration whose target scope is one the computation itself pushed and pops
+  now advances no cache generation, since the binding cannot outlive that
+  computation and nothing outside can depend on it. The test is on the
+  declaration's resolved target scope, not on whether a derivation is running,
+  so a declaration aimed at a longer-lived scope — a function literal's block
+  scope, a protocol member's scope — still invalidates as before. (Tycho
+  item 219)
+
+- **A compiled `Sum`/`Product` over a COLLECTION-valued body no longer skips
+  iterations of an effectful body.** 0.118.0 made the NaN early exit depend on
+  effects rather than on who supplied the code, but only for scalar bodies; the
+  element-wise fold kept an unconditional exit, so
+  `Sum(Random()·[1,1], n=1..31)` stopped drawing at the first NaN while its
+  scalar twin `Sum(Random()+n, n=1..31)` ran every term. The exit did two jobs
+  at once, and only one of them may skip work: projecting a length mismatch to a
+  scalar NaN is what makes the result independent of which term came last, and
+  is now unconditional, while STOPPING the loop is an optimization and is now
+  taken only when the skipped terms have no observable effect. An effectful body
+  runs every iteration and answers the same value.
+
+## 0.118.0 _2026-08-21_
+
+### Breaking Changes
+
+- **`.N()` now leaves a product of sums FACTORED, like `evaluate()`.** Since
+  0.117.0 `2(x+1)` evaluated to `2(x + 1)` but `.N()` of the same expression
+  still came back `2x + 2`: the numeric route of the `Multiply` handler kept
+  distributing. `.N()` is `evaluate()` with floats, so the two now agree on
+  shape and differ only in the numbers — `√2(x+1).N()` is `1.414… * (x + 1)`,
+  `((a+b)/c)·d` keeps its quotient shape `(d(a + b))/c` on both routes, and a
+  closed constant such as `2.5(√2+1)` still folds to a single float. The same
+  rule now reaches the tuple and tensor arms of the handler on BOTH routes:
+  `(1,2)·(x+1)` is `(x + 1, 2(x + 1))` and `[1,2]·(x+1)` is `[x + 1, 2(x + 1)]`
+  where the components used to be distributed even under `evaluate()`. A
+  component product also now honors the closed-inexact-constant rule a scalar
+  product has: `0.5 · [π, 1]`, `0.5 · (π, 1)` and the element-wise
+  `[0.5, 1] · [π, 1]` all evaluate their `π` cell to `1.57…`, as `0.5 · π` does,
+  instead of leaving `0.5π`. `Expand` reproduces the previous output;
+  `simplify()` and the internal normalization paths still expand. The values are
+  unchanged.
+
+- **A compiled `Sum`/`Product` now decides its NaN early exit on EFFECTS rather
+  than on who supplied the code.** The exit — `if (acc !== acc) return NaN;`
+  between terms, valid because NaN absorbs `+` and `*` — used to be suppressed
+  whenever the body contained caller-supplied source, on the reasoning that such
+  code might count its own calls or mutate shared state. That test asked the
+  wrong question, and got two answers wrong in opposite directions:
+
+  - **An impure operator of the engine's own no longer keeps the exit.** A sum
+    containing `Random()` was skippable, because `Random` is not
+    caller-supplied. Skipping terms draws from the generator fewer times, and a
+    later draw observes that, so `Sum(Random() + n, n=1..31)` now emits no exit.
+    This is the user-visible half of the change: such a sum evaluates every term
+    again, as it did before the exit existed.
+  - **A caller `compile` handler no longer costs the exit by existing.** Whether
+    the handler supplies source or declines for the target at hand, the
+    suppression fired on the handler being present. The operator definition's
+    `pure` / `effects` now governs: a definition declaring no effects keeps the
+    exit, `pure: false` refuses it. A consumer measured ~33x on a 31-term sum
+    from a handler that had explicitly declined.
+
+  The rule holds for a piece written directly in the body. It does NOT yet reach
+  one used through a user-defined function: `wrap(t) := s(t) + 1` summed over
+  still refuses, because the user-function admission gate reads the body's own
+  purity and a signature-only declaration — which is what a name implemented
+  through `functions` has — reports impure. That refusal is conservative, never
+  unsound.
+
+  The rule is now one sentence — an emission may be skipped when nothing in it
+  has observable effects — with one oracle per spelling: a `functions` entry
+  through its declared or inferred purity, an operator with a caller `compile`
+  handler through its definition, everything else through the effects model. A
+  spelling with no oracle is refused, which is where an `operators` entry
+  (`[op, prec]`, no body and no declaration slot) and a string-valued `vars`
+  symbol land.
+
+  Note the two oracles have deliberately opposite defaults. A `functions` entry
+  must EARN purity — it is inferred from the source, and anything the analysis
+  cannot model is refused — while an operator definition is GRANTED it, since
+  `pure` defaults to true. A declaration is an assertion its author made; a bare
+  source string is not. An operator whose handler emits effectful code while its
+  definition declares none is the one shape this cannot catch, and it is the
+  same mis-declaration that already misleads common-subexpression elimination.
+
+- **A function type must now cover every call its target type permits.**
+  Signature subtyping asked only whether a function had _enough_ parameters; it
+  never asked whether it could handle every call the declared type allows. So a
+  name declared `(integer, string+) -> string` accepted a
+  `(integer, string) -> string` function, and the mismatch surfaced later, at a
+  call the declaration explicitly permits:
 
   ```
-  IsMatch("abc123", RegExp("[0-9]+"))                    // True
-  StringReplace("a1b22c", RegExp("[0-9]+"), "#")         // "a#b#c"
-  StringSplit("a1b22c", RegExp("[0-9]+"))                // ["a", "b", "c"]
+  declare join: (integer, string+) -> string
+  join := narrow          // narrow: (integer, string) -> string — was ACCEPTED
+  join(1, "a", "b")       // permitted by the declaration → unexpected-argument
   ```
 
-  The dialect is the host JavaScript engine's, in full — backreferences,
-  lookahead and lookbehind all work, and there is no restricted subset.
-  Compiled JavaScript uses the same engine, so compiled and interpreted
-  results agree. Patterns are most readable as a raw string literal:
-  `RegExp(#"[0-9]+(\.[0-9]+)?"#)`.
+  The error is now raised where the mistake is, at the assignment. A declaration
+  is a contract in both directions — it tells callers which calls are legal, and
+  it constrains what may be stored under that name — and assigning checks
+  against that contract rather than rewriting it. Concretely, a function is a
+  subtype only when it accepts the target's shortest AND longest permitted call,
+  so no fixed-arity function satisfies a `*` or `+` tail (which has no longest
+  call): only a variadic function can.
 
-  **`regexp` is disjoint from `string`**: a plain string cannot be passed
-  where a pattern is expected, so ordinary string arguments never become
-  silently pattern-sensitive. The `g` and `y` flags are rejected because they
-  carry a mutable scan position; use `StringMatchAll`.
+  This affects storing and substituting a function, not calling one. `+` and `*`
+  still mean one-or-more and zero-or-more at every call site, and **passing** a
+  fixed-arity function to a variadic callback slot is unchanged — that admits
+  when the two arities overlap, which is a different question. The engine
+  already enforced this rule for function LITERALS ("takes 1 parameter(s), but
+  the declared signature accepts 0 or more"); only the named-function path
+  slipped through.
 
-  `StringMatch` returns a record with `match`, `range`, `groups` and `names`.
-  `range` counts **characters** (grapheme clusters) like every other string
-  operation, so `Slice(subject, m.range)` returns the matched text. A pattern
-  can match part of a character — `👩` inside `👨‍👩‍👧` — and there is no
-  span of whole characters naming exactly that, so `range` is absent for such
-  a match rather than being subtly wrong.
+- **A compiled runner's declared return type now covers everything it can
+  return.** `run()` was typed `number | ComplexResult`, but a compiled predicate
+  returns a `boolean` (`Greater(x, 0)` runs to `true`, never `1`), a
+  string-valued expression returns a `string`, and a collection-valued one
+  returns a (possibly nested) array. TypeScript therefore accepted
+  `result.run({ x }) * 2` on an expression that could never be a number. The
+  default is now the new exported `CompiledValue` union — which also covers a
+  function-valued expression, since `Derivative(Sin)` runs to the callable
+  `(x) => Math.cos(x)` — so such a call is a build-time error. The `interval-js`
+  target keeps its own result type (an `IntervalResult`, or a bare `Interval`
+  for a constant) rather than being folded into that union.
 
-  **Matching cannot be interrupted.** Regular-expression matching backtracks,
-  and some patterns take time exponential in the subject length; a single
-  match is one evaluation step, so no timeout, span or abort signal ends it.
-  Matching a pattern you wrote against data you control is fine; a pattern or
-  subject from an untrusted source is a denial-of-service path with no
-  protection from the engine. See `doc/97-reference-strings.md`.
+  **Migration:** a caller doing arithmetic on the result declares the narrow
+  type it expects — `compile<'javascript', number>(expr)` — and gets a `number`
+  back. This is the type-level replacement for the `realOnly: true` option
+  removed in the previous release, which was the only remaining way to obtain a
+  narrow numeric result; unlike `realOnly` it is purely a type assertion and
+  projects nothing at run time.
 
-  Compilation covers `IsMatch` and `StringReplace` with a literal pattern and
-  a string replacement. `StringMatch`, `StringMatchAll`, function
-  replacements and computed patterns fail closed, as does every regular
-  expression on the Python and shader targets.
+  The same call's VARIABLES widened too, and that direction only ever accepts
+  more: `run()` now takes `number | ComplexResult` on a JavaScript target, so a
+  complex-mode call such as `run({ z: { re: 2, im: 3 } })` type-checks instead
+  of needing a cast. It was previously typed `number` alone, which refused the
+  one shape complex mode exists to accept — while the
+  `_getCompilationTarget('javascript')` route had always typed it the wider way.
+  `interval-js` widened by the same step, from `number` alone to
+  `number | Interval`; there too the `_getCompilationTarget('interval-js')`
+  route had always used the wider type. Neither widening requires any change
+  from a caller — both only ever accept more than before. A complex value handed
+  to a REAL-mode runner is still rejected at run time, with an error naming the
+  variable, unless the call passes `entryChecks: false`, which disables that
+  guard along with the others and lets the value reach real arithmetic, yielding
+  `NaN`.
 
-  Note for consumers that switch on a type's `.kind`: `regexp` is a PRIMITIVE,
-  a bare string in the type AST with no `.kind`, exactly like `string` and
-  `character`.
+- **`~oo` (`ComplexInfinity`) now types `number`, not `complex`.** The
+  non-finite typing convention admits an undirected infinity at the top type
+  only — which is how every derived pole already typed (`Gamma(-2)`, `Zeta(1)`,
+  `(-1)!`, `sqrt(-oo)`) — but the constant itself was the exception, so two
+  expressions with the same `~oo` value could type differently depending on
+  whether the constant survived canonicalization (`Divide(~oo, 5)` answered
+  `complex`, `Add(1, ~oo)` answered `number`). `expr.type.matches('complex')` is
+  now `false` for `~oo`, exactly as it is for `NaN`. A value carrying an
+  infinite IMAGINARY part is `~oo` for this purpose — the set the engine renders
+  as `~oo` — while an infinite real part with a finite imaginary part (`∞ + i`)
+  is unchanged.
+
+- **A pole compiles to `NaN` on a real-valued lane.** `(-1)!`, `1 + (-1)!` and
+  `1 + \tilde\infty` compiled to the object `{re: Infinity, im: Infinity}`; they
+  now run to `NaN`. A pole has no real value, and `NaN` is how the real lane
+  spells that — the same projection `_SYS.factorial` already applied at a
+  negative integer. Previously the constant fold emitted the value's own complex
+  shape while the surrounding code was lowered from the node's `number` type, so
+  a parent added an object to a number (`1 + {…}` → `"1[object Object]"`) and
+  the folded and structural paths disagreed with each other. A pole and a pole
+  under a parent now answer `NaN` on both paths, and on the shader targets too,
+  where the `vec2` this produced was also a shape mismatch wherever a float was
+  expected. A real-valued FUNCTION of a pole still differs between the two:
+  `Re(~oo)` folds to `Infinity` (the fold evaluates symbolically, and the
+  interpreter answers `+oo`) but lowers structurally to `NaN`, because on the
+  real lane the pole is already `NaN` by the time the function sees it.
+
+### Resolved Issues
+
+- **A call of a user function whose definition a compile target cannot emit is
+  compiled inlined.** On the `glsl` and `interval-js` targets `f((x,y))` with
+  `f(P) := a·P.x² + b·P.y²` declined — a shader function needs a static type for
+  every parameter and a point-typed one has none
+  (`parameter "P" has no static GLSL type`); the interval target has no
+  `PointX`/`PointY` lowering over an opaque parameter — while the same body
+  written out compiled. The call now compiles with the body substituted at the
+  call site (the coordinate accessors of the literal point folded), so
+  `f((x,y))`, `d((x,y))` with `d(P) := √(P.x²+P.y²)`, a two-point
+  `Q((x,y),(1,2))` and a chained `e(P) := d(P) + 1` all compile on both targets;
+  the `javascript` target keeps compiling such calls by reference. The body is
+  substituted, never evaluated — an impure body, a generic or recursive callee,
+  a symbolic point or a list argument keep the definition's own decline. (Tycho
+  item 216.)
+
+- **Applications of a pure user function to number-literal arguments are
+  memoized within an evaluation.** A recursive definition that applies itself
+  twice per level, `R(i,x,y) = R(i-1,x,y) + 0.5·S(x,y,R(i-1,x,y))`, cost the
+  interpreter 2^i body evaluations at depth `i` — minutes at depth 20 where the
+  compiled artifact, whose CSE pass binds the repeated self-call, took
+  microseconds. The same application — same literal, same number-literal
+  arguments, same exact/numeric route — is now answered from a memo, so depth 20
+  evaluates in milliseconds. An entry is valid only while the engine's state
+  version — the axis every assignment, declaration, assumption, configuration
+  change, non-clean scope pop and checkpoint restore advances — and a
+  mutable-object store epoch are both unchanged, so a pure body that reads an
+  assigned free symbol or an object field is never answered from a stale result;
+  an impure body or a symbolic argument is never memoized. (Tycho item 217.)
+
+- **The `javascript` compile target lowers a point multiplied by a list.**
+  `[1,2,3]·(cos a, sin a)` and `(3((-N)..N)+cos t)·(cos a, sin a)` declined with
+  "no list-arithmetic support" while `x+[1,2,3]` and `2(cos a, sin a)` compiled.
+  The interpreter broadcasts over the LIST and scales the point whole at each
+  element — a list of points — which a flat element-wise broadcast over the two
+  arrays would have zipped instead; the product now emits a nested broadcast
+  (list outside, point components inside) and agrees with `evaluate()` on every
+  shape probed, a list-typed or tuple-typed symbol included. Shapes the
+  interpreter does not broadcast keep failing closed (`tuple·tuple`, a matrix,
+  two lists of provably different lengths). `Add` and `Divide` of a point
+  against a list, which the interpreter answers with a per-element
+  `incompatible-type` error or leaves inert, used to compile to a plausible zip
+  (`(1,2)+[3,4]` → `[4, 6]`); they now fail closed. (Tycho item 214.)
+
+- **`[1,0] = P` with `P` declared `tuple<number, number>` compiles.** It
+  declined as "a tuple participant" while `[1,0]=[x,y]` and `(1,0)=P` compiled.
+  A list and a point are never equal in the interpreter (a point binds
+  atomically), so the pair is a constant whatever the coordinates — the literal
+  `[1,0]=(1,0)` already folded to `False` before compilation. The
+  list-vs-point-symbol pair now compiles to that constant (`true` for
+  `NotEqual`) instead of declining. (Tycho item 215.)
+
+- **A zip of two unknown-length point views keeps its element tuple-ness in the
+  TYPE.** With `n` unassigned, `A = (Range(0,n)/n)·(1,0)` is a lazy view of
+  points, but `A - B` evaluated to `Map((_1, _2) ↦ _1 + _2, A, B)` typed
+  `indexed_collection<number>` — the mapping's parameters are bare, so its body
+  was typed with both `unknown` — and `PointY` over the view folded to a scalar
+  absence marker on the strength of the type alone, while the pulled values were
+  correct tuples. `Map` now derives a bare-parameter mapping's element type from
+  its sources' element types (no annotation is written onto the literal, so no
+  runtime check is added and the lambda's shape is unchanged), and the same view
+  now reads `indexed_collection<tuple<finite_number, finite_number>>`. Two
+  component tier lies on the way were fixed with it: a scalar-scaled point now
+  widens its components by the declared scalar's tier (`x·(1,0)` with
+  `x: number` is `tuple<number, number>`, and `(1/n)·(…, 1)` no longer claims an
+  integer second coordinate), and a collection-times-point product scales the
+  components by the collection's element type. `PointY` over a point view whose
+  length is not yet decidable answers the lazy projection instead of an absence
+  marker. (Tycho item 212.)
+
+- **`PointX`/`PointY`/`PointZ` over a list of SYMBOLIC points stay symbolic.**
+  With `P` declared `tuple<number, number>` and unassigned, `PointY([P])`
+  evaluated to `[NaN]` and `PointY([(1,2), P])` to `[2, NaN]` while `PointY(P)`
+  stayed symbolic: the broadcast arm read a symbolic element's missing
+  components as an absent coordinate. A symbolic element now keeps the accessor
+  applied to it — `[PointY(P)]`, `[2, PointY(P)]`, `[PointY(P), PointY(2P)]` —
+  and substitutes to the numbers once the point is assigned; a coordinate a
+  point provably lacks still takes the absence marker. (Tycho item 213.)
+
+- **`.N()` of a point view is a view of points, not a tuple of coordinate
+  views.** `N((Range(0,n)/n)·(1,0))` came back as `(Map(…), Map(…))` — and, with
+  `n` assigned, as `([0, 1/3, …], [0, 0, …])` — because the numeric routes of
+  `Multiply` and `Add` ran their tuple branch on the raw operand `Range(0,n)/n`,
+  which is collection-typed but not yet a collection, before the `.N()` step
+  could reveal the view. Such a co-factor now defers to the post-evaluation
+  re-dispatch, where the collection wins exactly as on the exact route. The
+  literal-list shape `N([0, 1/3]·(1,0))` used to crash (`mulN` had no
+  single-operand short-circuit, so `mulTensors`' tuple "scalar" recursed into a
+  zero-operand product); it is `[(0, 0), (0.333…, 0)]`.
+
+- **A primed name with a subscript that does not fold into the symbol is a
+  primed variable, like the bare name.** `\alpha_1'` parses as the primed
+  variable `Prime(alpha_1)`, but `\alpha_{i+1}'`, `A_{i,j}'` and `x_{n+1}''`
+  parsed as `Derivative(Subscript(…))` — the prime parselet read every compound
+  base as an expression to differentiate — and canonicalization then lifted the
+  subscript into a lambda over its own base (`(alpha) ↦ alpha_{i+1}`). Such a
+  base now asks the same variable-or-function question as the bare symbol,
+  decided by its base: `Prime(Subscript(alpha, i+1))` for an unknown base,
+  `Derivative(Subscript(f, n+1))` for `f` declared a function. The prime-first
+  spelling `\alpha'_{i+1}` agrees, the applied `\alpha_{i+1}'(t)` is unchanged,
+  and a parenthesized expression `(x^2)'` is still differentiated.
+
+- **A symbolic derivative order is accepted and stays symbolic.** `f^{(n)}` is
+  documented as `Derivative(f, n)`, but with `n` unassigned it canonicalized to
+  an `incompatible-type` error (the order was checked against `number` without
+  the inference a free symbol gets elsewhere), and had it got through,
+  evaluation read the non-numeric order as 1 and returned the FIRST derivative.
+  The order is now inferred `number` and the expression stays inert until it is
+  assigned (`n := 2` then gives `f''`). Also fixed on the way:
+  `Derivative(g, 0)` with `g` a function symbol evaluated to `(x) ↦ g`, the
+  constant function returning the symbol, instead of `g` (likewise the all-zero
+  multi-index `Derivative(g, 0, 0)`), and a multi-index derivative of a symbol
+  bound to a lambda (`Derivative(g, 1, 0)` with `g(x, y) := x^2 y`) stayed inert
+  because that arm only recognized an inline function literal.
+
+- **A compiled `Sum`/`Product` keeps its NaN exit when a caller-supplied
+  function is applied beneath another operator or inside a user-defined
+  callee.** A function declared by signature only and implemented through the
+  `functions` compile option projects unknown effects onto every application of
+  it, so the skippability gate — which lets a `Sum` stop evaluating terms once
+  its accumulator is NaN when nothing in the body has observable effects — kept
+  all 30 exits for `\sum sq(n x)` but none for `\sum (sq(n x) + 1)`,
+  `\sum \sin(sq(n x))`, `\sum 2 sq(n x)`, or `\sum wrap(n x)` with
+  `wrap(t) := sq(t) + 1`: the `functions` entry's purity oracle was consulted
+  only when the vouched head was the whole body. The gate now re-reads the
+  effect projection per node with each oracle's answer standing in for the head
+  it vouches for, so a pure entry keeps the exit wherever the head sits, and an
+  impure entry, an impure built-in beside it, or a second head with no oracle
+  still refuse.
+
+- **A product of two infinities could come out with the wrong sign at machine
+  precision.** With `ce.precision = 'machine'`,
+  `x · (-2) · 3.1 · (-∞) · (-∞) · (y + 1)` evaluated to `+oo · x · (y + 1)`
+  instead of `-oo · x · (y + 1)`. The machine-precision numeric value answered
+  "no sign" for ANY infinity, and the product accumulator read that as positive,
+  so once the running coefficient was `-∞` the next infinity flipped it. The
+  big-number path already returned ±1 for ±∞; the two now agree. The pairwise
+  fold that products without a sum go through masked the bug, which is why it
+  surfaced only alongside a factored sum.
+
+- **`Multiply` gave `~oo` a sign.** `2·~oo` evaluated to `+oo` and `-2·~oo` to
+  `-oo`, which contradicted `Negate(~oo)` — that correctly stays `~oo`, so
+  `-2·~oo` and `-(2·~oo)` disagreed. An undirected infinity takes no sign from
+  its factors: all three are now `~oo`. One neighbouring case went with it:
+  `i·~oo` answered `NaN`, because the general complex product computed
+  `∞·0 − ∞·1`. The indeterminate form `0·~oo` is still `NaN`, and the signed
+  infinities are untouched (`-2·∞ = -oo`).
+
+- **A real infinity turned in a non-real direction is `~oo`, not `NaN`.** `∞·i`
+  evaluated to `NaN`, as did `∞·(2+3i)` and every other product of a real ±∞
+  with a factor that has a non-zero imaginary part: the general complex product
+  computes `∞·0` for the real part and lands on the indeterminate form. Such a
+  product is infinite with no real direction left, which is precisely what the
+  single point at infinity represents, so it is now `~oo`. The rule reads from
+  either side: a non-real COEFFICIENT does the same to an evaluated real
+  infinity, so `i·ln(0)` is `~oo` rather than `-oo`. `0·∞` remains the genuine
+  indeterminate form at `NaN`, and a real factor still keeps the signed rule
+  (`-2·∞ = -oo`, `2·ln(0) = -oo`).
+
+- **A sum holding `~oo` alongside a real infinity kept the wrong one.**
+  `∞ + ~oo` evaluated to `+oo` and `-∞ + ~oo` to `-oo`, discarding the `~oo`
+  term; both are `~oo`, since the undirected point at infinity absorbs the sum.
+  `Add` selected `~oo` by asking whether a term typed `complex`, which stopped
+  selecting anything once `~oo` moved to `number`, leaving the signed-infinity
+  counters — which track only real ±∞ — to decide. It now tests the value. Two
+  real infinities are unaffected (`∞ + -∞` is still `NaN`).
+
+- **`Gamma` at a non-positive integer returned a large finite number when
+  compiled.** `Gamma(-2)` compiled without constant folding ran to
+  `6413262697001887`: the reflection formula `π / (sin(πz)·Γ(1−z))` cannot see
+  the pole, because `sin(-2π)` computes as ≈2.4e-16 rather than 0. The kernel
+  now answers `NaN` at every pole. The interpreter was unaffected — it returns
+  `~oo` before reaching the kernel — and so are non-integer negative arguments
+  (`Gamma(-0.5)` = -3.5449…).
+
+- **Malformed dictionary input is reported instead of thrown — or silently
+  accepted.** Building a dictionary from a malformed expression raised a raw
+  JavaScript exception, which `ce.box()` promises never to do for untrusted
+  input, and two shapes were worse than that: a tuple with more than two
+  elements (`["Dictionary", ["Tuple", key, value, extra]]`) and a non-string key
+  both produced an EMPTY dictionary that reported itself as valid. All of these
+  now box to an `incompatible-type` error naming the offending entry, the way
+  the sibling `DictionaryFrom`/`RecordFrom` handlers already did. A malformed
+  dictionary NESTED inside another is reported too, rather than becoming a
+  silently empty entry.
+
+- **The two dictionary construction routes agreed on empty keys.** The
+  `["Dictionary", …]` form accepted an empty-string key while the plain-data
+  `{dict: …}` form rejected it, so a dictionary built the first way serialized
+  to `{dict: {"": …}}` and then failed to box back — a valid expression that did
+  not survive its own round trip. Both routes now reject it.
+
+- **Dictionary keys and record-type fields named after `Object.prototype`
+  members work.** A `__proto__` entry could not be stored at all (the dictionary
+  rendered as `{->}` and listed no keys, while `At` still returned the value by
+  reading the prototype), and reading a MISSING `toString` or `valueOf` key
+  returned the inherited JavaScript function as if it were a math value, where
+  any other missing key yields `NaN`. The same flaw dropped a `__proto__` field
+  when a `record{…}` type was parsed back from its own spelling, so such a
+  dictionary did not round-trip through its type.
+
+- **An argument that violates a type variable's declared bound is now
+  reported.** Calling a generic function with an operand its bound refuses —
+  `f("abc")` where `f: (T) -> list<T> where T: number` — was accepted and left
+  to run time. The check that decides whether an operand REFUTES a parameter
+  reads the declared signature, and for a generic arm it read the parameter with
+  the variable still free, which no type predicate can answer; the arm is now
+  read with each variable standing for its declared bound, so `T: number`
+  refuses a `string` outright. An UNBOUNDED variable is unaffected: it ranges
+  over every value type, so nothing refutes it and such a call still defers.
+
+- **A symbol whose name matches an `Object.prototype` member no longer reads
+  that member.** A MathJSON symbol name is an arbitrary string, but several
+  lookups keyed plain JavaScript objects by it, so `toString`, `constructor`,
+  `valueOf` or `__proto__` found an inherited value instead of missing. Three
+  consequences, all fixed:
+
+  - `ce.parse('\\mathrm{toString} + 1')` **threw** a `TypeError`. The LaTeX
+    parser's scope chain answered "declared" for a name it had never seen and
+    handed back the inherited function as the symbol's type.
+  - A compiled expression read a MISSING symbol of such a name as the inherited
+    member: `toString + 1` returned the string
+    `"function toString() { [native code] }1"`, where every other missing symbol
+    yields `NaN`. A caller-supplied `vars` map was also consulted with `in`
+    rather than an own-property test, on all four targets.
+  - `\\mathrm{__proto__}` resolved as a known **unit**, because the unit tables
+    answered `Object.prototype` for that key and the lookup tests its result for
+    truthiness. `\\sum_{\\mathrm{__proto__}=1}^{3} \\mathrm{__proto__}` silently
+    lost its index and evaluated to `3·__proto__` instead of `6`.
+
+  Ordinary symbol names are unaffected, and the emitted code is unchanged for
+  them — the own-property guard is emitted only for a colliding name.
+
+### Breaking Changes
+
+- **The deprecated `realOnly` compile option has been REMOVED.** It was an
+  OUTPUT projection applied to a compiled unit's result after the kernel had run
+  — a `{re, im}` collapsed to `re` when the imaginary part was at roundoff scale
+  and to `NaN` otherwise, a top-level boolean became `NaN`, and an array result
+  was projected component-wise. It never selected a lowering, so nothing about
+  which code is emitted changes; only what the runner hands back does.
+
+  The result convention already carries what most callers wanted: a compiled
+  value whose imaginary part is exactly zero comes back as a plain `number`, and
+  a returned `ComplexResult` always has `im !== 0`. Test `typeof v === 'number'`
+  per sample. Where the projection's specific choices mattered, reproduce them
+  at your own value boundary — a `{re, im}` slot, a boolean result, and `~oo`
+  (`{re: Infinity, im: Infinity}`, what a compiled `(-1)!` now returns) all
+  reach the caller unflattened instead of as `NaN`. To forbid promotion and hold
+  the real lane — which `realOnly` never did — pass `mode: 'strict'`.
+
+  `realOnly` is gone from the typed option surface, so a TypeScript caller
+  passing it gets a compile error. An untyped JavaScript caller still gets a
+  one-time console warning naming the removal on both compile routes rather than
+  silently losing the projection.
 
 ### Improvements
 
-- **Declaration statements no longer pay for re-registering themselves.**
-  One Epsil `type` / `protocol` / conformance statement registers its
-  declarations up to three times per program run (the static pre-pass and
-  the evaluation loop each canonicalize it, then it evaluates). The second
-  same-statement registration used to take the full replacement path —
-  re-parsing the body, re-settling every conformance edge in the engine,
-  re-running the effect-widening checks — to rebuild exactly the state it
-  had just built. It is now recognized as a no-op from the statement's
-  declaration-origin stamp. Measured: a fresh `type` statement in an
-  engine holding 8 protocols dropped from ~1.7 ms to ~0.2 ms per program.
-  Notebook re-runs in a later program still replace, a duplicate
-  declaration in one program is still an error, and the raw MathJSON /
-  host API routes keep their idempotent replace semantics unchanged.
+- **A `functions` entry can now be declared pure, and a compiled `Sum` over it
+  stops at the first NaN again.** A compiled `Sum`/`Product` exits as soon as
+  its accumulator becomes NaN, since NaN absorbs both `+` and `*` and no
+  remaining term can change the answer. That exit was suppressed for any body
+  splicing caller-supplied source — a `functions`/`operators` entry, a
+  string-valued `vars` symbol, an operator with a caller `compile` handler —
+  because such code may count its own calls, log, or mutate shared state. The
+  suppression was all-or-nothing: ONE caller-supplied factor anywhere in the
+  body dropped the exit for every term, and for the scalar loop arm too.
 
-- **Internal methods are now visibly internal.** Methods tagged `@internal`
-  now start with `_`, including the compilation-target registry, expression
-  inference/binding/cache-reset hooks, parser diagnostic helpers, operator
-  definition updates, and precision-oriented `BigDecimal` helpers. These were
-  already outside the supported public API; the names now make that status
-  apparent at call sites.
+  Note what the skipped terms could still change. Once the accumulator is NaN
+  the sum's VALUE is settled whatever the remaining terms do, so the only thing
+  running them preserved was the supplied function's SIDE EFFECTS. A caller who
+  knows there are none can now say so:
 
-### Bug Fixes
-
-- **Type-variable bindings over bare collection operands stay in the
-  values-only family.** The signature solver's element reading of a bare
-  collection constructor had drifted from the bare-types ruling and answered
-  `any`: `Unique` over an operand declared bare `collection` (likewise
-  `list`, `set`, `indexed_collection`) instantiated its
-  `(collection<T>) -> list<T>` signature with `T := any` and produced
-  `list<any>` — an absence-admitting type outside the values-only collection
-  family the operand came from. Bare constructors are `<unknown>` synonyms,
-  so `T` now binds to `unknown` and the result is a plain values-only
-  `list`. The broadcast lift's element peel of a bare `list`/
-  `indexed_collection` is aligned the same way.
-
-- **Setting `expr.value` to a boxed expression no longer corrupts the
-  value.** The setter's input dispatch sniffed for a `{re, im}`
-  plain-object before recognizing an already-boxed expression — and every
-  `BoxedExpression` has `re`/`im` getters, so a boxed non-numeric value (a
-  lambda, a list, `√2`) was silently converted to a complex number whose
-  parts are NaN. A MathJSON function expression in array form
-  (`["Function", …]`) was likewise swallowed by the `number[] → List`
-  convenience. Both now box correctly, so `expr.value = ce.parse('x \\mapsto x^2+1')` installs a callable function — and that install now
-  routes through the same definition-update path as `ce.assign` (a real
-  operator definition with provenance, journaling, and a `redefine` state
-  event) instead of a raw object literal.
-
-- **The `print` hint no longer fires for `print` itself.** Since `print` is
-  a real function, the `print-not-available` hint now serves only as a
-  did-you-mean for the unresolved aliases (`puts`, `echo`, `println`,
-  `printf`), and its message points at `print`. A user binding that shadows
-  `print` falls through to the ordinary did-you-mean path instead of the
-  self-contradictory "There is no print; did you mean print?".
-
-- **`couldMatch()` now sees through `broadcastable<T>`.** The predicate
-  distributes `broadcastable<T>` as the union `T | indexed_collection<T>` —
-  the same expansion the subtype and disjointness checks already used — so
-  `broadcastable<number>` correctly reports it could match
-  `collection<any>` (and any type either arm could match). Previously it
-  fell to the containment fallback and answered `false`, which among other
-  things made the new `expected-function` guard reject a
-  broadcastable-typed head.
-
-- **Color heads guard promoted (maybe-complex) operands instead of emitting
-  channel garbage.** `Hsv(90\cdot\sqrt{x+1}, 1, 1)` under the default
-  `auto` mode handed `_SYS.hsv` the promoted `{re, im}` object and returned
-  NaN at every input — including inputs where the radical is entirely real
-  (`x = 3`, `√4 = 2`) — with no decline a consumer could detect. All eight
-  color heads (`Rgb`, `Hsv`, `Hsl`, `Oklab`, `Oklch`, `Colormap`,
-  `ColorMix`'s ratio, and `ColorFromColorspace`'s literal tuple components)
-  now take the same D2/D6 runtime guard as `Max`/`Floor`/`Mean`: a promoted
-  value that is real at run time unwraps and yields the true color; a
-  genuinely complex one yields an equally-sized NaN-filled color array —
-  never a bare scalar NaN, so the result shape a caller destructures is
-  invariant. In `strict` mode a definitely-complex operand fails closed at
-  compile time, as elsewhere. Found in the same pass: compiled
-  `Colormap(name, t)` with a non-finite `t` (e.g. plain `√(-1)` in strict
-  mode) crashed at run time with "undefined is not iterable" — it now
-  returns a NaN color. Reported by a consumer as their item 204
-  (dynamic-colour feature, two red browser specs); the `ColorMix` /
-  `ColorFromColorspace` / shape-invariance gaps were caught by dual review
-  before staging.
-
-- **Broadcast over a list operand no longer breaks the "wide is real"
-  promotion analysis.** With `L := [0,1,2,3]`, compiling
-  `\sqrt{x^2+L^2}-1` under the default `auto` mode produced
-  `["[object Object]-1", …]` (JS string concatenation), `\cdot 2` produced
-  NaN, and `\max(0, …)` returned NaN — all behind `success: true`. A
-  broadcast closure re-invokes the head's scalar codegen on synthetic
-  element temps that carry no sign or type evidence, so the promotion
-  verdict re-derived inside the closure promoted `√(x²+L²)` to the complex
-  kernel even though the radicand is provably non-negative — while the
-  downstream analysis, reading the real radicand, correctly said real and
-  emitted plain arithmetic over the `{re, im}` elements. The verdict is now
-  decided once on the node-level operands and carried into the closure, so
-  producer and consumer agree again: the norm shape keeps the real kernel
-  (and no longer misreports `promoted: true`), and a broadcast `Power` with
-  a literal fractional exponent now promotes correctly (the literal was
-  previously elementized into a temp the `isNumber` test could never see).
-  Reported by a consumer from a 687-document strict/auto parity sweep (186
-  corrupted sample points across 16 documents).
-
-- **A complex-declared symbol with a real assigned value no longer compiles
-  to a NaN kernel.** With `z: complex` and `z := 5`, compiling an expression
-  using `z` constant-folds the value into the kernel — but the folded
-  emission was a bare real literal (`5`) while every consumer of a
-  complex-analyzed symbol reads the `{re, im}` encoding, so `.re`/`.im`
-  reads off it made the whole kernel return NaN unconditionally. The folded
-  emission is now wrapped in the target's idempotent complex lift
-  (`_SYS.cplx`) whenever the symbol's analysis is complex and the value's
-  own emission is a real scalar — a symbolically real value (`z := √2`)
-  included. Affected `auto` promotion and `complex` mode; `strict` already
-  failed closed. Reported by a consumer as `auto` returning NaN on
-  `\max(0, \sqrt{x^2+y_r^2}-1)` where the value is real (√89 − 1).
-
-- **`compile` is now on the global registration slot.** The self-registration
-  slot (`globalThis[Symbol.for('io.cortexjs.compute-engine')]`) carried the
-  constructor, `LatexSyntax` and the type guards but not the standalone
-  `compile()` wrapper, so a bundle-external consumer discovering the engine
-  through the slot could not reach the supported compilation entry point
-  (escalation retry, deprecation warnings, alias normalization) without
-  falling back to `@internal` API.
-
-- **`CompilationResult.mode` now reports the RESOLVED discipline.** It is
-  documented as "the arithmetic discipline the returned code was compiled
-  under", but under the `auto` default it reported `'strict'` for a
-  compilation whose emitted code ran in the complex kernel — contradicting
-  `promoted: true` on the same result, which is defined as "any promotable
-  head was lowered through a complex kernel". `auto` promotes on its FIRST
-  attempt, with no escalation, so the mode latch still read `'strict'`:
-
-  ```js
-  compile(ce.parse('\\sqrt{x}'), { to: 'javascript' }); // auto default
-  // was  mode: 'strict'   promoted: true   run({x:-1}) -> {re:0, im:1}
-  // now  mode: 'complex'  promoted: true   run({x:-1}) -> {re:0, im:1}
+  ```typescript
+  compile(expr, { functions: { s: { source: mySpline, pure: true } } });
   ```
 
-  A default compile that promotes nothing still reports `'strict'`, and
-  `'auto'` is still never a reported value — it is a policy over the two
-  disciplines, so **no public type changed**. Note `mode` describes the
-  EMISSION, not the result shape: a promoted compile under the deprecated
-  `realOnly: true` reports `'complex'` beside a real `NaN`, because `realOnly`
-  is a projection applied after the kernel runs. `typeof v === 'number'`
-  remains the only sound per-sample test of a returned value.
+  The `functions` option accepts a `{ source, pure? }` descriptor beside the
+  bare source-or-function spellings it always took. A declared `pure` is an
+  assertion and is believed rather than re-derived, so asserting it for a helper
+  that draws or counts will drop calls to it; `pure: false` pins the
+  conservative behavior.
 
-- **The `realOnly` and `complexPromotion` deprecation warnings now reach the
-  target-level compile entry.** They were emitted only by the standalone
-  `compile()` export, so a caller using
-  `ce._getCompilationTarget(name).compile(...)` received no deprecation signal
-  at all — while the options continued to work on that route. That is the
-  route an integration takes once it needs a specific target, so the consumers
-  missing the warning were systematically those with the most call sites to
-  migrate. All four built-in targets (`javascript`, `python`, `gpu`,
-  `interval-javascript`) now warn; the warnings remain once-per-process per
-  option, so a call passing through both routes still emits exactly one.
+  **An entry that declares nothing is analysed instead**, so the common
+  arithmetic helper needs no annotation: a source that is an arrow or function
+  expression whose body uses only its parameters, numeric literals and an
+  allowlist of `Math` members is taken as pure. It calls nothing else — not a
+  parameter (`(f) => f(x)` is rejected, since `f` is whatever the caller passed
+  at run time), and not a `Math` member outside the allowlist (`Math` is an
+  ordinary mutable object, so `Math.audit` may be anything). Also rejected:
+  `Math.random`, whose two calls disagree; a closure over an outer binding
+  (`(t) => t * scale` mentions a name that is not a parameter); and a bare name
+  with no body to read, which can only be declared. The grammar is small and
+  explicitly enumerated rather than a JavaScript semantics check, which is what
+  keeps the rejections safe; a missed helper costs the early exit and nothing
+  else.
 
-- **A `Sequence` operand is now spliced into a `List`, `Set` or `Tuple`
-  literal.** `["List", 1, ["Sequence", 2, 3], 4]` is the 4-element
-  `[1, 2, 3, 4]`, as documented, where it used to be a 3-element list whose
-  middle element was a `tuple<finite_integer, finite_integer>` (element type
-  `list<finite_integer | tuple<…>>`). `Set` and `Tuple` behaved the same way;
-  a spliced `Tuple` changes arity and type accordingly, and a spliced repeat
-  in a `Set` is deduplicated. The associative heads (`Add`, `Multiply`, …)
-  already spliced, so this makes the collection constructors agree with them.
-  The empty sequence (`Nothing`) was already erased, which is what made the
-  gap easy to miss.
-- **A set produced lazily by `Join` or `Append` no longer reports duplicate
-  elements.** `Join(Set(5,2,10,18), Set(1,2,3))` had `count` 7 and enumerated
-  `2` twice; it is now the 6-element set the documentation describes.
-  `Append(Set(1, 2), 2)` had `count` 3 and is now 2. `Join` adopts the set
-  kind from ANY set operand — `Join(Set(1,2), List(2,3))` is a set — while
-  `Append` adopts the kind of its SOURCE, so `Append(List(1,2), Set(3,4))`
-  stays a list with the set as one appended element. In both, `count`, `each`
-  and `at` now agree with each other and with the value the same node produces
-  when materialized. A set-kind result whose operands cannot be enumerated, or
-  whose deduplication would exceed `ce.iterationLimit`, reports its `count` as
-  unknown rather than guessing.
-- **`Map` over a set no longer reports results its callback collapsed.**
-  `Map(x -> x^2, Set(-1, 1, 2))` claimed three elements and enumerated
-  `1, 1, 4`; it is now the 2-element `Set(1, 4)` that materializing the same
-  node already produced. The image of a set under a function is a set.
-  `Map` over a list, and `Filter`/`Take`/`Drop`/`Reverse` over a set (which
-  only ever drop elements, never duplicate them), are unaffected.
-- **`Join`/`Append` of a dictionary or record now merges keys, last value
-  winning.** `Join(Dictionary(a:1, b:2), Dictionary(b:3, c:4))` reported 4
-  entries and enumerated `b` twice; it is now the 3-key dictionary
-  `{a:1, b:3, c:4}`. The rule matches the literal constructor — a repeated key
-  keeps its first position and takes the last value, exactly as
-  `Dictionary(a:1, b:2, a:3)` is `{a:3, b:2}`. Such a result also materializes
-  as a `Dictionary` again; it previously came back as a `Set` of entry tuples,
-  changing the head as well as the entry count.
-- **A truncated collection preview no longer drops an element silently.** A
-  non-indexed collection (any set) of exactly six elements previewed as five
-  with no `...` continuation marker, claiming to be complete; it now shows
-  `Set(1, 2, 3, 4, 5, ...)`.
+  Purity governs only whether an emission may be SKIPPED. A caller-supplied
+  implementation stays opaque to every pass that would rewrite what is inside it
+  — common-subexpression elimination included — because the emitter receives its
+  operands as text and may drop, repeat or defer them. Values are unchanged in
+  every arm.
+
+- **A callback with too MANY parameters is now rejected at a user-declared arrow
+  slot**, the way one with too few already was. With
+  `myOp: ((number) -> number) -> number`, the call `myOp((a, b) |-> a + b)`
+  reported nothing and failed at application; it now carries the same
+  `callback-arity` diagnostic the opposite mismatch gets — "myOp calls its
+  callback with 1 argument (per the declared parameter list); `(a, b) => a + b`
+  declares 2 parameters". This covers a callback written inline and one supplied
+  through a symbol alike, whether the symbol was declared with a signature or
+  inferred from an assigned lambda.
+
+  The check reads the slot arm's admissible range — required, then optional,
+  then a variadic tail's mandatory occurrences — so a slot spelled
+  `((number, number?) -> number)` still accepts both a unary and a binary
+  callback, while a `((number+) -> number)` slot now rejects a nullary one it
+  can never satisfy. At an OVERLOAD set the verdict participates in choosing the
+  arm, so a callback that fits one arm resolves to that arm instead of being
+  reported against a more specific sibling it cannot satisfy. The library's own
+  collection operators are unaffected: their canonical handlers mint the richer
+  per-operator wording before validation runs.
+
+- **Signature subtyping now checks arity in both directions.** A signature
+  requiring MORE arguments than a fixed-arity signature supplies is no longer
+  reported as its subtype: `(number, number) -> number` is not a
+  `(number) -> number`. Only the too-few direction was refused before, which is
+  what let a wrong-arity callback reach an arrow slot unnoticed. A signature
+  whose tail is optional or variadic keeps its existing leniency.
+
+- **`Sort` and `Ordering` declare the comparator result they actually accept.**
+  The comparator arm read `((any, any) any -> number)`, but the evaluator has
+  always also accepted an Elixir-style BOOLEAN comparator (`True` means the
+  first argument sorts first), so the arm is now
+  `((any, any) any -> number | boolean)`. The previous spelling was masked by
+  the arity hole above — a boolean comparator was admitted through the unary
+  sort-KEY arm instead, which also meant `Sort(xs, Less)` type-checked for the
+  wrong reason. Behavior is unchanged; the declared type now matches it.
+
+## 0.117.0 _2026-08-20_
+
+### Breaking Changes
+
+- **`evaluate()` now leaves a product of sums FACTORED.** `(a+b)(c+d)` evaluates
+  to itself rather than to `ac+bc+ad+bd`, and `2(x+1)` stays `2(x+1)`.
+  `evaluate()`'s contract is the most EXACT form, and a factored product is
+  exactly as exact as the polynomial it expands to while being smaller — often
+  dramatically so, since expanding multiplies the term count at every factor.
+  **`Expand` reproduces the previous output verbatim**, so code that needs the
+  expanded form should ask for it. This is what made a `Product` of linear
+  factors superlinear: `∏_{k=1}^{8}(kn-1)` returned a nine-term polynomial with
+  large coefficients instead of its eight compact factors, and a plotting
+  consumer paid that cost on every sample because a plot axis variable can never
+  be bound.
+
+  `simplify()` and `.N()` still expand, as does every internal normalization
+  path — the change is confined to the `Multiply` and `Product` evaluate
+  handlers (`mulFactored()` and `productAccumulate()` respectively; the
+  `∏(kn-1)` example above is the `Product` half). Several results are now
+  reported factored where they were not: `∫x²/(2(1+x²))dx` is `½(x - arctan x)`,
+  `d/dx LambertW(x)` is `W(x)/(x(W(x)+1))`, and a quadratic with a symbolic
+  coefficient solves to `½(a ± √(a²-4))`. The values are unchanged.
+
+### Improvements
+
+- **Raw-form subscript folding no longer depends on the base's spelling.** An
+  undeclared subscripted name parsed with `form: 'raw'` folded to a joined
+  symbol for a Latin base (`a_{0}` → `"a_0"`) but stayed structural for a
+  command-spelled Greek base (`\eta_{w}` → `["Subscript","eta","w"]`) and for a
+  prefixed base (`\operatorname{speed}_{0}`), and the prime-first spelling
+  (`\alpha'_1`) diverged from the subscript-first one (`\alpha_1'`) the same
+  way. All spellings now fold to the joined symbol (`"eta_w"`, `"alpha_1"`,
+  `"speed_0"`), matching what canonical form always produced, and the two prime
+  orders agree on every spelling. Unchanged: an indexed-collection base keeps
+  the element-access reading unless the joined name is declared, a
+  `subscriptEvaluate` base (such as `\gamma` for the `EulerGamma` family) keeps
+  its subscripts, and dictionary-claimed constants such as unbraced `\mu_0` are
+  untouched. **If your code reads `form: 'raw'` output and pattern-matches
+  `["Subscript", base, sub]` nodes for undeclared names, re-measure it** — those
+  nodes are now plain symbols; code that folded them itself now receives the
+  already-folded name.
+
+### Resolved Issues
+
+- **Dividing a list of points by a scalar keeps the points.** A collection whose
+  elements are numeric tuples — `list<tuple<number, number>>`, the shape a set
+  of points carries — typed its quotient `list<number>`, dropping the element
+  tuple-ness, while the equivalent product `p·(1/q)` kept it. The values were
+  always correct; only the type was wrong, and it was wrong in a way that
+  changed downstream readings: `PointX`/`PointY` over a `list<number>` take the
+  element-INDEX reading rather than the elementwise one, so a normalized point
+  list read as its own first coordinate. Every denominator spelling is repaired
+  (a scalar, a `broadcastable<number>`, a sibling collection of scalars that
+  divides elementwise), and a divisor that can present a tuple — a point, a
+  point list, or a `broadcastable<tuple<…>>` — still has no defined quotient.
+  The same repair applies to the product of a point list with a sibling list of
+  scalars, which used to widen to `list<number | tuple<…>>`.
+
+- **Scaling a list of points widens the point's components.** A scalar factor
+  folded into a collection's cells but stopped at a tuple cell, so
+  `list<tuple<integer, integer>>` scaled by a real still claimed integer
+  components even though `[(3,4)]·0.5` is `[(1.5, 2)]`. Each component is now
+  widened with the scalar factors, as a non-tuple cell already was.
+
+- **The derivative of a vector-valued function no longer claims a scalar
+  result.** A head declared as a bare `function` and only then assigned a
+  tuple-valued lambda typed `f'(t)` as `number` even though evaluating it
+  returned a 3-tuple — so the declared type contradicted the value, and
+  type-strict consumers such as `Cross` and `Dot` rejected the call with
+  `incompatible-type`. `Derivative` now reads the codomain of an assigned
+  function literal when the declaration itself is uninformative, and `D` of a
+  tuple- or list-valued body reports the shape it actually evaluates to
+  (`D((cos t, sin 2t, t), t)` is a tuple, not a `number`). A head that is
+  declared `function` and never assigned still reports the long-standing scalar
+  compromise.
+
+- **A literal `0` operand is no longer dropped when serializing to LaTeX.**
+  Several serializers tested an operand for truthiness where they meant to test
+  for absence, and the MathJSON of the literal `0` is the number `0` — so a zero
+  operand read as a missing one and was silently deleted. A domain restriction
+  on a zero lost BOTH operands (`When(0, x=x)` serialized to the empty string),
+  `Return(0)` printed as a bare `return`, a big operator lost its body AND its
+  indexing sets (`Sum(0, i=1..10)` became `\sum`), an integral lost its
+  integrand (`Integrate(0, x)` became `\int`), and `Delimiter(0)` became an
+  empty `()`. Each now serializes its zero, so an expression carrying one
+  round-trips through LaTeX again — which matters wherever serialized LaTeX is a
+  persistence boundary, since parsing was never at fault and the loss was
+  silent. `Log(x, 0)` also now renders its zero base as a base (`\log_{0}(x)`)
+  rather than falling back to the argument-list form.
+
+  The round trip is an equality of CANONICAL expressions, not of bytes or of raw
+  parse trees. Re-serializing is free to choose a different spelling of the same
+  value (`\left[.1,.3\ ...\ 1\right]` comes back as `(0.1..0.3..1)`,
+  `\operatorname{abs}` as `\vert…\vert`, `\sqrt{m}` as `m^{1/2}`), so a
+  byte-stability check reports damage on a bundle where nothing is wrong.
+  Compare with `.isSame()` on the canonical parse. Also beware an assertion that
+  merely looks for a `0` in the output: `Sum(0, i=1..10)` now serializes
+  `\sum_{i=1}^{10}0`, but the upper limit contains a `0` of its own, so
+  "contains a zero" is satisfied by output that dropped the body — the exact
+  defect being tested for. Assert on the reparsed expression, not on the string.
+
+- **A negative subject of a `When` restriction keeps its precedence.**
+  `When(-1, cond)` serialized as `-1\left\{cond\right\}`, which reads back as
+  `Negate(When(1, cond))` — the negation applied to the restriction instead of
+  to its subject. The subject is now parenthesized whenever its own precedence
+  is below that of the restriction. The repaired form is
+  `(-1)\left\{cond\right\}`, which parses back to `When(-1, cond)` at canonical
+  form; a RAW parse of it keeps the parentheses and the unfolded negation
+  (`["When", ["Delimiter", ["Negate", 1]], cond]`), as it does for a
+  parenthesized negative literal anywhere else. The invariant restored here is
+  that the negation sits inside the restriction rather than outside it — check
+  it against the canonical parse, not the raw one.
+
+- **A symbol named after a JavaScript object member no longer misbehaves.**
+  Names such as `toString`, `constructor` and `valueOf` collide with members
+  every JavaScript object inherits, and the engine looked symbol names up in
+  tables that carried those members. The consequences were visible three ways:
+  `ce.box("toString")` returned the JavaScript function of that name instead of
+  an expression, `ce.function("toString", [1]).toString()` rendered a JavaScript
+  error message as the expression's text, and `toString` used as a variable was
+  refused by `compile()` as though it were a built-in operator. All three now
+  treat such a name as the ordinary symbol it is.
+
+- **Rewriting a nested `Sum`/`Product` no longer breaks its index binding.**
+  `.subs()`, `.replace()` and `.map()` each rebuilt a scoped node onto a FRESH
+  scope, parented at the rewriting site rather than at the rebuilt outer node.
+  The chain from the inner body then never reached the outer binder's index, so
+  an outer index whose name collides with a library constant resolved to the
+  CONSTANT: `Σ_{i=1}^{2} Σ_{j=1}^{2} x·At(K, i+j)` substituted at `x := 1`
+  answered 60 where the same expression built directly answers 120, and
+  `Σ_{i=1}^{2} Σ_{j=1}^{2} x·i` under `x → 2` answered `8i` — the imaginary unit
+  — instead of 12. Nothing looked wrong: the rewritten expression reported
+  `isCanonical` and printed identically to the direct one. A scoped node is now
+  rebuilt onto its own scope, so the chain is preserved at any nesting depth.
+  Only the OUTER index's name mattered, so sums indexed `p`/`q` were correct all
+  along and sums indexed `i`/`j` — what most people write first — were not.
+
+- **A partial `CanonicalForm[]` request no longer rewrites a binder's own
+  index.** Boxing with `{ form: ['Order'] }` (or any other partial form) runs
+  before a binder's scope exists, and its symbol pass resolved EVERY symbol
+  against the ambient scope — including the bound variable at its binding site.
+  `Sum(2i, Limits(i, 1, 3))` came back as
+  `Sum(2·Complex(0,1), Limits(Complex(0,1), 1, 3))` and then failed to evaluate
+  with `incompatible-type`; the `Number` form rewrote it a second time, through
+  its imaginary-unit normalization. A name the node's operator declares as a
+  binding site is now left alone, at the site and throughout the binder's body.
+  A FREE imaginary unit still folds as before.
+
+- **An unrolled `Sum`/`Product` now stops at the first NaN, and a constant
+  collection inside one is built once instead of once per term.** When both
+  bounds of a `Sum` or `Product` are constant and the range is small, the
+  JavaScript target unrolls it into explicit terms rather than emitting a loop.
+  That unrolled form evaluated every term even after the running total had gone
+  NaN — where the loop form exits on the first one — and it re-emitted every
+  subexpression per term, including subexpressions whose value cannot depend on
+  the index. A 31-term sum sampling a constant 101-element list built that list
+  31 times, in the source and again on every call: 11 KB of emitted JavaScript
+  with 31 `Array.from` constructions, all evaluated even when the first term
+  already answered NaN. Such a sum now emits 4 KB with a single construction
+  bound ahead of the accumulation, and returns as soon as the total is NaN. This
+  restores the cost a plot or sampling loop over such an expression had before
+  the typing improvement that began steering these bodies into the unrolled form
+  (they previously took the element-wise fold loop, which already had both
+  properties) — a plot that went blank because every sample evaluated all 31
+  terms paints again. Values are unchanged: NaN absorbs both `+` and `*`, so
+  stopping early returns the same answer. From four terms on, the emitted source
+  for such a sum is a statement sequence in an IIFE rather than a flat
+  `a + b + c` chain; two- and three-term sums keep the flat chain. The SCALAR
+  loop form — a range past the unroll limit, or a bound that is not a
+  compile-time constant — gained the same exit, which it had only on the
+  element-wise fold path: a symbolic-bound or 100,000-term sum no longer runs
+  every remaining iteration after the total has gone NaN. Its shape is otherwise
+  unchanged (one emission of the body, no per-term statements). Complex-valued
+  sums and products keep every term in both forms, deliberately: a complex
+  accumulator with a finite imaginary part does not absorb, so an early exit
+  there could change the answer. In both forms the exit is omitted when a term
+  splices caller-supplied source — a `functions`/`operators` entry, a
+  string-valued `vars` symbol, an operator with a caller `compile` handler —
+  since such code may count its own calls or mutate shared state, so it must run
+  as many times as it did before. Note this when checking the change yourself: a
+  `vars` entry whose value is a STRING is spliced as source, which is exactly
+  the carve-out above, so a sum compiled with `vars: { x: 'number' }` emits no
+  early exit at all and looks like the old behavior. Measure with a numeric
+  `vars` value, or with no `vars` map — the free symbol is read from the
+  arguments object either way.
+
+- **A protocol function member read as a field now says so.** `b.span` for a
+  `function span(self: Self) -> number` requirement reported
+  `unknown-field "span" (w, h)` — true of the object's LAYOUT and useless to the
+  author, since the name they wrote does exist, on a protocol the value conforms
+  to. It now reports `protocol-function-not-a-field`, naming the protocol and
+  the call spelling: a `function` member is called (`span(b)`), only a
+  `readonly`/`readwrite` property is read with a dot (`b.area`). This is the
+  mirror of the `protocol-property-not-callable` warning below. Object, record
+  and named-tuple receivers all report it, and so does an ASSIGNMENT to such a
+  name (`b.span = 5`), whose message says the member cannot be written rather
+  than recommending a call. When several conformances answer the same name, the
+  message names them all and asks for a qualified call, since a bare one would
+  be `protocol-call-ambiguous`. A name no protocol claims still reports the
+  layout, and so does a name whose conformance is not settled — a PENDING edge
+  carries no implementation, so there is no call to recommend yet.
+
+- **Epsil: a protocol property called as a function is now reported.** A
+  protocol's two member kinds are spelled differently — a `function` member is
+  invoked in call position (`span(b)`), a `readonly`/`readwrite` property is
+  read with a dot (`b.area`) — and using the call form for a property resolved
+  to no operator, so it stayed a silently inert application: a program ending in
+  `print(c, area(c))` printed `area(Circle(…))` with nothing to say why. It now
+  raises a `protocol-property-not-callable` warning naming the property, the
+  protocol that declares it, and the dot spelling. The check runs over the raw
+  statement, so it fires even when the inert call is consumed by another
+  operator and never reaches the statement's value — the shape this was reported
+  on. Function members in call position are correct and untouched, and a name
+  that has a real operator definition (a user function that happens to share a
+  property's name) is never reported.
+
+- **Epsil: the `protocol-implementation-pending` warning no longer covers the
+  whole program.** It was emitted with a hardcoded whole-source range, because
+  the check walks the protocol registry — which outlives the batch — rather than
+  the source, so an editor squiggled the entire file. Each pending edge is now
+  anchored to the `type X is P` statement that declared it when that statement
+  is in this batch; one statement naming several protocols anchors every one of
+  its edges. An edge declared in an EARLIER batch (the declare-in-one-cell,
+  implement-in-the-next pattern the warning exists to support) still falls back
+  to the whole program, since this source contains no statement to point at.
+
+- **A declared type now admits a value whose type is `unknown`.** Assigning an
+  expression the engine cannot type statically — a call to a function with no
+  signature, say — to a symbol with a declared type was refused: `let xs: list`
+  followed by `xs = f(0)` raised `incompatible-type list unknown`, and so did
+  the `let xs: list = f(0)` spelling, for every declared type (`number`,
+  `string`, `list<number>`, …). A type of `unknown` states nothing about the
+  value ("some value, not stated which"), so there is nothing for the
+  declaration to refute; it is admitted and the verdict is left to run time,
+  which is what the argument-position boundary already did — the identical value
+  passed to a `list` parameter was accepted. Values the engine CAN type are
+  still held to the contract (`xs = 42` against `list` is still an error), and a
+  bare-constructor declaration still refines its element slot from real
+  evidence: an admitted `unknown` value leaves `xs` reporting `list`, and a
+  later `xs = [1, 2, 3]` refines it to `list<finite_integer>`. `any` is
+  unaffected — it is a stated contract, not a placeholder, and is still checked,
+  and so is a declared function SIGNATURE (`(number) pure -> number`), which
+  keeps refusing an `unknown` value rather than installing a definition that
+  would be callable under a contract nothing proved. Note the admission is
+  unchecked: nothing re-examines the value later, exactly as at a typed
+  parameter.
+
+- **A compilation reached through a target now escalates to complex mode like
+  the standalone `compile()` does.** Under the default `auto` mode a lane
+  mismatch — a complex-shaped value, typically a promoted unknown-sign radical,
+  reaching a binding the compilation shaped real — is answered by recompiling
+  under `mode: 'complex'`. That retry existed only in the standalone `compile()`
+  export, so a caller using the target route
+  (`ce._getCompilationTarget('javascript').compile(expr, options)`, the route an
+  integration takes once it needs a specific target) got a thrown
+  `LaneMismatchError` instead — or, with `fallback: true`, a `success: false`
+  result with the `lane-mismatch` diagnostic and an interpreter-backed `run` —
+  where the standalone route returned working compiled code. The escalation now
+  lives in each target's own `compile()`, so both routes behave identically:
+  such a call returns `success: true` with `mode: 'complex'`, `promoted: true`
+  and the failed strict attempt's diagnostic in `escalation`. Callers of the
+  target route under the default mode are affected; `fallback: true` callers
+  will see `success: true` where they previously saw `success: false` with
+  `lane-mismatch`. `mode: 'strict'` is unchanged on both routes, and the shader
+  and interval targets, which never promote to complex, are unaffected. One
+  consequence for a THIRD-PARTY registered target: escalation is now each
+  target's own responsibility, so a custom target that declares `auto` support
+  no longer inherits the retry from the standalone wrapper — apply the exported
+  `compileWithAutoEscalation` helper inside its `compile()` to keep the
+  behavior.
+
+- **The Python target's interpreter fallback no longer drops the `realOnly`
+  projection.** With `fallback: true` on the Python target route, a declined
+  compilation handed back an interpreter-backed `run` that ignored
+  `realOnly: true` (the standalone route forwarded it; the target route did not)
+  — a complex result then reached a caller that had asked for the real-only
+  projection. Same route-asymmetry family as the escalation fix above, found
+  while moving it.
+
+## 0.116.1 _2026-08-19_
+
+### Improvements
+
+- **`Cross` accepts numeric tuples, like `Dot` always did.**
+  `Cross((1,2,3), (4,5,6))` computed nothing — the signature demanded `vector`,
+  so a point spelled as a tuple was rejected with `incompatible-type` while the
+  same point passed `Dot` — and the two classic vector products disagreed about
+  what a vector is. A provable numeric 3-tuple (a point in ℝ³, including a
+  `PointList` row) is now lowered to its component vector exactly as `Dot`
+  lowers it; the result is a `List`, consistent with collection operators not
+  preserving the `tuple` kind. A tuple that is not provably numeric stays a
+  symbolic `Cross`, and a wrong-length tuple gets the `incompatible-dimensions`
+  report, not a type error. Affects code that builds `Cross` over `Tuple`/point
+  operands — previously an error, now a value.
+
+### Resolved Issues
+
+- **`compile()` no longer reports the boolean literals as required inputs.**
+  `CompilationResult.freeSymbols` lists the identifiers a caller must supply,
+  and `True`/`False` were included even though every target either bakes them
+  into the emitted code or drops them entirely. Since consumers derive a
+  compiled function's variable list from `freeSymbols`, and `True` is the
+  idiomatic fallback condition of a `Which`, an ordinary piecewise such as
+  `Which(x > 0, 1, True, 2)` acquired a phantom variable named `True`.
+- **A boolean literal compiled to invalid code on the shader and interval
+  targets.** The `glsl` and `wgsl` targets emitted the undeclared identifier
+  `True` — a shader that fails to compile, reported behind a successful result —
+  and the interval target emitted a lookup for a caller-supplied variable named
+  `True` that threw at run time. Each target now emits its own spelling of the
+  literal.
+
+- **Trigonometric operators now report a non-numeric operand instead of staying
+  inert.** The trigonometric and hyperbolic functions, `Degrees` and `DMS`
+  validated only the NUMBER of arguments, not their types, so an operand that
+  turned out not to be a number was absorbed rather than reported:
+  `Sin(At(["a", 2], 1))` stayed as `sin("a")` and `Degrees(At(["a", 2], 1))`
+  answered a bare `NaN`. All of them now answer `incompatible-type`, matching
+  the arithmetic operators. This completes the numeric-operand checking
+  introduced in 0.116.0, which had covered arithmetic but not these operators.
+- **`DMS` no longer mis-folds a component that is not a plain real number.** Its
+  degrees, minutes and seconds components were read in a way that silently
+  discarded anything but a real number literal, so `DMS(1, At([30, 2], 1))`
+  answered `NaN` even though the minutes component resolves to 30, and
+  `DMS(1, i)` answered exactly what `DMS(1, 0)` does. Such a call now evaluates
+  its components first and, when one of them cannot be folded, is left
+  unevaluated instead of producing a wrong angle.
+- **The root `compile()` export regained its precise result types.** Its
+  declared return type collapsed the target generic, so `run` was typed optional
+  even for executable targets such as `javascript`, and `realOnly: true` no
+  longer narrowed `run`'s values to plain `number` — a type-precision regression
+  against the internal target route
+  (`ce._getCompilationTarget(...).compile(...)`) that 0.116.0 told consumers to
+  migrate away from. The export's overloads now mirror the underlying compile
+  function's, so the target name flows through: `compile(expr).run` is
+  non-optional, `compile(expr, { realOnly: true }).run(...)` is a `number`, and
+  calling `run` unguarded on a source-only target (`python`) is a type error.
+  Runtime behavior was never affected. Reported by a consumer at 0.116.0
+  adoption.
+
+## 0.116.0 _2026-08-19_
+
+### Breaking Changes
+
+- **`Type` now returns a type value instead of text.** Use `StringFrom(Type(x))`
+  if you need the type name as a string, or use type-aware checks such as
+  `x is integer` and `Subtype(Type(x), TypeFrom("number"))`. Code such as
+  `Type(3) == "integer"` now evaluates to `False`.
+- **Callback type declarations now use regular arrow types.** The old
+  `callback<...>` spelling no longer parses. Declare the callback slot directly,
+  for example `(T) any -> boolean` for a predicate. Calls that could only fail,
+  such as filtering a `list<string>` with a number-only predicate, are now
+  rejected before evaluation.
+- **The minimum supported Node.js version is now 22.3.0.** Older Node 21
+  releases are no longer supported.
+- **`About` now returns a dictionary.** Read fields such as `About(Pi)["type"]`
+  or `About(f)["signature"]` instead of parsing a display string.
+- **Bare collection types now mean values-only collections.** `list`, `set` and
+  similar bare types are synonyms for their `<unknown>` form, not `<any>`. Use
+  `collection<any>` when absence markers such as `Missing` should be admitted.
+- **Dictionaries now print in dictionary literal form.** `toString()` and the
+  Epsil REPL print dictionaries as `{"key" -> value}`, with `{->}` for an empty
+  dictionary. MathJSON serialization is unchanged.
+
+### Types And Pattern Matching
+
+- Added first-class type values with `TypeFrom(...)`, `Subtype(...)` and the
+  primitive `type`. Example: `Subtype("integer", "number")` evaluates to `True`.
+- `is` tests and `match` type patterns now accept full type expressions,
+  including unions, negations and parameterized collections. Example:
+  `x is list<integer>` and `x is number | string`.
+- Protocol tests can be written with `is`. Example:
+  `x is Hashable & Comparable`.
+- Collection declarations with a bare element type can refine from assignments.
+  Example: after `let xs: list; xs = [1, 2, 3]`, `xs` is typed as a list of
+  integers.
+- Uses of assigned symbols are checked against their assigned type instead of
+  narrowing the symbol silently. This reports incompatible uses earlier, before
+  evaluation.
+
+### Epsil And VS Code Extension
+
+- Added console I/O with `print(...)` and `input(prompt?)`. `print` writes to
+  the host console and returns `Nothing`; `input` reads one line of text where
+  the host supports it.
+- The CLI and REPL no longer echo a final `Nothing` result, so a program ending
+  with `print("done")` only displays `done`.
+- Very deeply nested Epsil expressions now produce an `expression-nesting-limit`
+  diagnostic instead of overflowing the JavaScript stack.
+- Lexing and parsing now respect the evaluation time budget, so an oversized
+  program can time out before execution begins.
+- The VS Code extension gained Go to Definition, Find All References, Rename
+  Symbol, richer hovers and diagnostic links to the error reference.
+
+### Strings And Regular Expressions
+
+- Added regular expressions with the `regexp` type and
+  `RegExp(pattern, flags?)`. New operations include `IsMatch`, `StringMatch`,
+  `StringMatchAll`, and regular-expression forms of `StringSplit` and
+  `StringReplace`.
+
+  ```epsil
+  IsMatch("abc123", RegExp("[0-9]+"))
+  StringReplace("a1b22c", RegExp("[0-9]+"), "#")
+  ```
+
+- Regular expressions use the host JavaScript regexp dialect. The `g` and `y`
+  flags are rejected because their mutable position would make evaluation order
+  visible.
+- `StringMatch` returns match text, ranges, numbered groups and named groups.
+  Ranges are character-based, matching the rest of the string library.
+
+### Symbolic
+
+- `And` and `Or` once again compare and match symbolically without depending on
+  operand order. Evaluation still runs left to right and still short-circuits.
+- Applying a value that is known not to be a function now reports
+  `expected-function` instead of staying inert. Example: `Pi(2)` is now an
+  error.
+
+### Engine State
+
+- Added engine checkpoint APIs: `ce.checkpoint()`, `ce.restore(cp)` and
+  `ce.discard(cp)`. Notebook-like clients can checkpoint before a cell, restore
+  to that point after an edit, then replay later cells.
+- Checkpoints preserve expression validity and cache identity where possible.
+  Restoring replays state changes, but effects still run again: `Random()` draws
+  again and `Print(...)` prints again.
+
+### Compilation And Numeric
+
+- Numeric operators now accept operands that may be numeric and report a typed
+  error only when evaluation proves the value is non-numeric. Example: `a + 1`
+  is allowed for `a: value`, but `a = "hello"` later produces an
+  `incompatible-type` error.
+- Fixed several compiled complex-number cases that could return `NaN` or corrupt
+  values while reporting success, including color functions, list broadcasts,
+  complex-declared symbols with real values, and promoted radicals inside
+  broadcasts.
+- `CompilationResult.mode` now reports the actual arithmetic mode used by the
+  emitted code. A default compile that promotes to complex reports
+  `mode: "complex"`.
+- Deprecation warnings for `realOnly` and `complexPromotion` now appear through
+  target-level compile entry points as well as the standalone `compile()`
+  export.
+- Consumers that discover the engine through the global registration object can
+  now access the supported `compile()` helper there too.
+
+### Collections
+
+- `Sequence` now splices into `List`, `Set` and `Tuple` literals. Example:
+  `List(1, Sequence(2, 3), 4)` becomes `[1, 2, 3, 4]`.
+- Lazy set operations now deduplicate consistently. `Join(Set(5, 2), Set(2, 3))`
+  now has three elements, not four with a duplicate `2`.
+- `Map` over a set now returns the distinct image of the set. Example:
+  `Map(x => x^2, Set(-1, 1, 2))` is `Set(1, 4)`.
+- Joining or appending dictionaries and records now merges keys with the last
+  value winning. Example: `Join({"a" -> 1}, {"a" -> 2})` yields `{"a" -> 2}`.
+- Truncated set previews now show an ellipsis when more elements remain.
+
+### Type Fixes
+
+- Fixed bare collection and type-variable inference so bare collection operands
+  stay in the values-only family.
+- Fixed intersections, `never`, negated types, collection meets and
+  function-signature intersections so type reductions are more consistent.
+- Fixed several type edge cases, including matching bare names against
+  intersections, preserving vector and matrix spellings, and reporting arity
+  errors for malformed `Type(...)` calls.
 
 ### Documentation
 
-- The `Extract` and `Exclude` sections have been removed from the collections
-  reference. Neither operator has ever existed in the engine, and the
-  documented `Extract` read a 2-element `Tuple` index as an inclusive span
-  where the shipped `At` reads it as a gather of two indices. Use `At` (single
-  index, or a collection of indices), `Slice` (a contiguous span), `Reverse`,
-  and `DeleteAt`. `Slice`, `DeleteAt`, `Insert` and `ReplaceAt` are now listed
-  in the operator index, where none of them appeared before.
+- Removed documentation for the non-existent `Extract` and `Exclude` operators.
+  Use `At`, `Slice`, `Reverse` or `DeleteAt` instead.
+
+### Benchmarks
+
+#### Numeric performance (200-digit precision)
+
+Median time per call, in **microseconds — lower is better**. `—` means the tool
+returned no usable result at that precision.
+
+| Expression         | CE 0.116.0 | CE 0.100.0 | SymPy | math.js | Mathematica |
+| ------------------ | ---------: | ---------: | ----: | ------: | ----------: |
+| $\pi^2$            |        8.4 |        7.5 |   177 |   1,316 |         3.9 |
+| $\sin 1$           |         21 |         21 |   220 |     440 |         5.1 |
+| $\cos 1$           |         21 |         21 |   220 |     618 |         7.1 |
+| $\ln 2$            |         15 |         14 |   350 |   4,344 |         3.7 |
+| $e^{\pi}$          |         14 |         13 |   213 |   5,308 |         4.6 |
+| $\zeta(3)$         |      1,533 |      1,551 |   267 |       — |          49 |
+| $\Gamma(\tfrac13)$ |        829 |        821 |   342 |       — |         213 |
+| $\psi(\tfrac13)$   |        715 |        716 | 2,786 |       — |         171 |
+
+#### Symbolic capability & performance
+
+Each cell is **how many times faster than Mathematica** that engine is on the
+case (`Mathematica ÷ engine`, so **higher is better**; Mathematica itself is
+`1×`). `—` means the engine can't do the case. Compare the **CE 0.116.0** and
+**CE 0.100.0** columns to see what is _new since the last published benchmark_
+(a `—` under `0.100.0` next to a number under the current build). The **CE +
+R/F** column is the current build with the opt-in Rubi integrator + Fungrim
+identities loaded (`loadIntegrationRules` / `loadIdentities`), on the same
+minified bundle.
+
+| Operation                              | CE 0.116.0 | CE + R/F | CE 0.100.0 | SymPy  | math.js | Mathematica |
+| -------------------------------------- | :--------: | :------: | :--------: | :----: | :-----: | :---------: |
+| **Antiderivatives**                    |            |          |            |        |         |             |
+| $\int\frac{1}{\sqrt x}\,dx$            |    3.7×    |   2.0×   |    2.8×    |  0.5×  |    —    |     1×      |
+| $\int\frac{x}{\sqrt{1-x^2}}\,dx$       |    7.7×    |   1.4×   |    5.8×    | 0.08×  |    —    |     1×      |
+| $\int\frac{1}{x^3+1}\,dx$              |    4.2×    |   0.8×   |    3.7×    |  0.3×  |    —    |     1×      |
+| $\int\frac{\sqrt x}{1+x}\,dx$          |     —      |   1.7×   |     —      |  0.1×  |    —    |     1×      |
+| $\int\frac{x}{(1+x)^{1/3}}\,dx$        |     —      |   1.0×   |     —      | 0.01×  |    —    |     1×      |
+| $\int\frac{x^2}{(1+x)^{1/3}}\,dx$      |     —      |   1.0×   |     —      | 0.007× |    —    |     1×      |
+| **Derivatives**                        |            |          |            |        |         |             |
+| $\tfrac{d}{dx}\sqrt{1-x^2}$            |   0.03×    |  0.03×   |   0.03×    | 0.001× | 0.003×  |     1×      |
+| **Simplification**                     |            |          |            |        |         |             |
+| $\sqrt{3+2\sqrt2}$                     |    41×     |   30×    |    29×     |   —    |    —    |     1×      |
+| $\sqrt6\,x+\sqrt2\,x$                  |    63×     |   55×    |    49×     |  3.2×  |   16×   |     1×      |
+| **Evaluation**                         |            |          |            |        |         |             |
+| $\lim_{x\to0}\tfrac{\sin x}{x}$        |    33×     |   12×    |    33×     |  3.0×  |    —    |     1×      |
+| $\lim_{x\to\infty}(1+\tfrac1x)^x$      |    3.8×    |   3.5×   |    4.4×    |  2.1×  |    —    |     1×      |
+| $\int_1^2\tfrac1x\,dx$                 |   3672×    |  4204×   |   4152×    |  80×   |    —    |     1×      |
+| $\int_{-\infty}^{\infty} e^{-x^2}\,dx$ |    262×    |   100×   |    237×    |  2.6×  |    —    |     1×      |
+| **Solving**                            |            |          |            |        |         |             |
+| $x^4+x^2-1=0$                          |    0.2×    |   0.2×   |    0.3×    | 0.06×  |    —    |     1×      |
+| $x^3-x-1=0$                            |    1.5×    |   1.6×   |    1.4×    | 0.04×  |    —    |     1×      |
+
+Across the cases both solve, Compute Engine is a **median 3.8× faster than
+Mathematica** (up to 3672×) — in the browser, not a proprietary kernel.
+
+<sub>Measured 2026-08-19 · Compute Engine `0.116.0` (current build @ `c5f1f3be`)
+· published `0.100.0` · SymPy `1.14.0` · math.js `15.2.0` · Mathematica
+`14.3.0 for Mac OS X ARM` · Node `v22.13.1`. Correctness is verified numerically
+against an independent `mpmath` reference, never another tool. Reproduce with
+`npm run build production && ./venv/bin/python3 benchmarks/gen_cases.py && node benchmarks/report.mjs && node benchmarks/report_changelog.mjs`.</sub>
 
 ## 0.115.0 _2026-08-17_
 
 ### Breaking Changes
 
-- **The default compile mode is now `auto`: strict shapes PLUS promotion of
-  unknown-sign radicals, escalating once to complex mode on a lane mismatch.**
-  `compile('\\sqrt{x}')` now lowers through the complex kernel (`_SYS.csqrt`)
-  and returns `{re: 0, im: 1}` at `x = −1` where it returned `NaN` — the
-  interpreter's value; at `x = 4` it is still the number `2`. Also promoted:
-  `Ln`/`Log` of an unknown-sign operand and `x^{0.3}`-style powers (a
-  non-integer NUMBER exponent of an unknown-sign base). Radicals whose operand
-  is non-negative under the compiler's own "wide is real" premise —
-  `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`, `ln(x²)` — keep the real kernel
-  byte-for-byte. A complex-shaped value reaching a wide binding (`b(z)` for
-  `b(x) := 2x`, `b(√a)`) no longer compiles a per-call-site lane specialization:
-  the compilation is redone once in complex mode and the result reports it
-  (`mode: 'complex'`, `escalation.boundary`, a user-legible
-  `escalation.binding`). `result.promoted` reports whether a promotion happened
-  (a compile-time fact decided from the source, so the same source always
-  reports the same flag). Real-only heads over a maybe-complex operand (`z < 2`
-  for a complex-typed `z`, `Floor`, `Max`, `Erf`, …) take the runtime rule under
-  `auto` too (`false`/`NaN` when the value is complex) instead of failing
-  closed; a statically non-real operand (`i < 2`) is still a compile-time
-  decline. Pass `mode: 'strict'` for the previous default (real kernel, `NaN`,
-  fail-closed); the shader targets are unchanged (`strict` only). Cost: ~2.3× on
-  chains that actually promote, nothing on the rest. Step 4 of the compile-mode
-  migration.
-- **`complexPromotion` and `realOnly` are deprecated.** `complexPromotion: true`
-  maps to `mode: 'complex'` (a console warning, once per process; it is ignored
-  with a warning beside an explicit `mode`); `realOnly: true` keeps its old
-  result projection for one release with a warning — the result convention below
-  (a real value is a plain `number`, a `ComplexResult` always has `im !== 0`)
-  replaces it.
-- **Compiled JavaScript result convention: a value whose imaginary part is
-  exactly zero now comes back as a plain `number`, never as `{re, im: 0}`.**
-  Both directions are guaranteed at the `run()` boundary — a returned `{re, im}`
-  always has `im !== 0`, and a real value is never an object — so a consumer's
-  per-sample test is the single `typeof v === 'number'`. Applies element by
-  element to collection results, and to the interpreter-backed fallback runner.
-  The transcendental complex kernels (`_SYS.casin`, `_SYS.cexp`, `_SYS.cpow`, …)
-  now chop their own roundoff dust at the machine scale (as the interpreter's
-  `apply` does), which is what lets the boundary test be exact instead of a
-  chop: `arcsin(0.5)` compiled through the complex kernel is the number
-  `0.5235…`, and `1 + 1e-12i` stays `{re: 1, im: 1e-12}` (nothing is chopped in
-  ring arithmetic). `realOnly: true` still projects as before. Step 1 of the
-  compile-mode migration (`docs/plans/2026-08-16-compile-complex-mode.md`).
+- **The default JavaScript and Python compile mode is now `auto`.** Expressions
+  such as `Sqrt(x)`, `Ln(x)` and non-integer powers may promote to complex
+  arithmetic when the sign is unknown. For example, compiled `Sqrt(x)` now
+  returns `{re: 0, im: 1}` at `x = -1` and `2` at `x = 4`. Use `mode: "strict"`
+  for the previous real-only compile behavior.
+- **`complexPromotion` and `realOnly` are deprecated.** Use `mode: "complex"` or
+  `mode: "strict"` instead. `realOnly` still works for this release but now
+  warns.
+- **Compiled JavaScript returns plain numbers for exactly real results.** A
+  complex result object `{re, im}` is now returned only when `im !== 0`. Use
+  `typeof value === "number"` to test whether a sample is real.
+- **`StringJoin` now joins one collection, with an optional separator.** The old
+  variadic concatenation form changed meaning for two strings.
+  `StringJoin("ab", "cd")` is now `"acdb"` because `"cd"` is the separator
+  between the characters of `"ab"`. Use `Join("ab", "cd")` or interpolation for
+  string concatenation.
+- **Several string collection operators now preserve string results.**
+  `RandomShuffle("abc")` and `DeleteAt("abcdef", 2)` return strings, not lists
+  of characters. Chunking and combinatorics over strings now return lists of
+  strings, for example `SlidingWindow("abcd", 2)` returns `["ab", "bc", "cd"]`.
 
-- **`StringJoin` is no longer variadic, and a two-string call now means
-  something else — silently.** The signature narrows to
-  `(collection<string | character>, separator: string?) -> string`: one
-  collection to join, plus an optional separator between elements. There is no
-  compatibility spelling.
+### Compilation
 
-  This is the entry to read carefully, because the old spelling still evaluates.
-  `StringJoin("ab", "cd")` used to be `"abcd"`; a string is now a collection of
-  its characters, so the same call is read as "join the characters of `"ab"`
-  with the separator `"cd"`" and evaluates to `"acdb"`. No error, a different
-  answer. Audit every multi-argument `StringJoin` call.
+- Added explicit compile modes: `"strict"`, `"complex"` and `"auto"`.
+  Unsupported modes now return a clear diagnostic instead of silently changing
+  behavior.
+- `CompilationResult` now includes `mode`, `promoted`, `escalation` and
+  structured `diagnostic` data so callers do not need to parse error messages.
+- Strict mode now rejects complex values where the generated code expects real
+  numbers, with a `lane-mismatch` diagnostic.
+- Complex mode now treats broad or unannotated numeric inputs as complex-capable
+  and promotes unknown-sign radicals consistently.
+- JavaScript runners now validate incoming values against the shapes used during
+  compilation. For example, a complex object passed to a real-analyzed binding
+  throws a clear `TypeError`.
+- Fixed compiled complex behavior for multi-clause functions, protocol methods,
+  fallback evaluation, real-only special functions and promoted radicals.
+- _(Recorded after release.)_ A compiled `Reduce` or `Scan` whose accumulator
+  becomes complex mid-fold through an unknown-sign radical — for example
+  `Reduce([4, -4], (a, x) -> a + sqrt(x), 0)` — returned `success: true` with
+  `value: null` in 0.114.0. The complex-mode migration in this release fixed it
+  (the radical now promotes and the fold computes `{re: 2, im: 2}`, matching the
+  interpreter). Documented here retroactively after a consumer traced the fix to
+  this release; the change landed in commit `7cfa95b4`.
+
+### Epsil
+
+- Added definition attributes for user-defined functions: `bind` parameters,
+  algebraic properties such as `commutative` and `associative`, and doc
+  comments.
 
   ```epsil
-  StringJoin(["a", "b", "c"], ", ")   // ➔ "a, b, c"
-  StringJoin("abc", "-")              // ➔ "a-b-c"   (Python's sep.join(s))
-  StringJoin("ab", "cd")              // ➔ "acdb"    (was "abcd")
+  /// Square a value.
+  function square(x) -> number { x^2 }
+  About(square)["description"]
   ```
 
-  Migration: for concatenating a fixed number of strings use `Join(a, b)` (the
-  new string arm below) or Epsil interpolation `"\(a)\(b)"`. Keep `StringJoin`
-  only where the subject really is a collection to be joined.
+- Fixed pipe placement when a stage has a missing trailing argument. Examples
+  such as `xs |> Fold(f, 10)` now put `xs` in the collection slot instead of
+  displacing arguments incorrectly.
+- Multi-clause functions now map over collections the same way function literals
+  do. Example: `fib(5..10)` evaluates element-wise.
+- `Which` and `If` now hold or broadcast correctly when a comparison's broadcast
+  shape cannot be decided statically.
+- `Sum` and `Product` now substitute loop indexes correctly inside held `If` and
+  `Which` terms.
+- A symbol's inferred type is updated when a later value proves the earlier
+  guess was too narrow.
 
-  Two smaller consequences of the narrowing: a `character` is not a collection,
-  so `StringJoin(CharacterFrom("a"))` is now an `incompatible-type` error (wrap
-  it — `String(c)`, or put it in a list), and an element that is neither a
-  string nor a character is reported as an `incompatible-type` error at the
-  operand wherever the operand's own type shows it, rather than only leaving the
-  call unevaluated.
+### Strings
 
-- **`RandomShuffle`, `RandomSample` and `DeleteAt` return a `string` for a
-  string source**, both as the static type and as the runtime value. All three
-  produce a permutation or a subset of the source's own characters, so by the
-  string-preservation rule they belong with `Reverse` and `Take`; until now they
-  returned `list<character>`. `Type(RandomShuffle("abc"))` is `"string"`, and
-  `DeleteAt("abcdef", 2)` is `"acdef"`, not `["a", "c", "d", "e", "f"]`. Code
-  that consumed the list result must either accept the string or re-project it
-  with `Characters(...)`. This closes the last of the Phase-1 string-arm
-  deferrals.
-
-- **The chunking and combinatorics operators return INNER STRINGS for a string
-  source**, both as the static type and as the runtime value: `Chunk`,
-  `Partition` (chunk, sliding-window and predicate forms), `ChunkBy`,
-  `SlidingWindow`, `Permutations` and `Combinations` now report `list<string>`
-  instead of `list<list<character>>`. Each inner element is a contiguous run —
-  or a reordering, or a subset — of the source's own characters, which is the
-  same condition under which `Reverse`, `Take` and `RandomShuffle` already
-  preserve the string kind.
-
-  ```epsil
-  Chunk("abcdef", 2)          // ➔ ["abc", "def"]     (was [["a","b","c"], …])
-  Partition("abcd", 2)        // ➔ ["ab", "cd"]
-  SlidingWindow("abcd", 2)    // ➔ ["ab", "bc", "cd"]
-  Permutations("ab")          // ➔ ["ab", "ba"]
-  Combinations("abc", 2)      // ➔ ["ab", "ac", "bc"]
-  ```
-
-  A group that comes out empty is an empty STRING, so `Chunk` — which always
-  reshapes to exactly `k` groups — answers `Chunk("abc", 5)` with
-  `["a", "b", "c", "", ""]`. `Partition`'s DISPLAYED signature is unchanged
-  (`list<list<T>>`): its string result comes from a `type` handler rather than a
-  leading string arm, because its second parameter is a contextual `callback`
-  slot and a second arm carrying that slot would make the Design-D parameter
-  stamp ambiguous, costing `Partition(xs, n => n < 3)` the `integer` annotation
-  on `n`.
-
-  Code that consumed the inner lists must either accept the strings or
-  re-project them with `Characters(...)`. `Tally` is deliberately UNCHANGED and
-  still yields `character` values: its first component holds the source's
-  distinct _elements_, each paired with a count, not runs of them, so
-  `Tally("banana")` stays `(["b","a","n"], [1,3,2])`.
-
-### New Features
-
-- **`mode: 'strict'` is now in force at every binding boundary.** Under the
-  strict discipline a complex-shaped value reaching a binding the compilation
-  shaped real — a wide (unannotated) user-function parameter, whether called
-  directly (`b(z)`, `b(L)` for a `list<complex>`) or passed by name
-  (`Map(b, L)`), a wide multi-clause clause parameter, a wide protocol member
-  parameter, a `Block` local first bound real and later assigned a complex value
-  (top-level or inside a conditional) — is a `LaneMismatch` decline:
-  `success: false`, `diagnostic.code === 'lane-mismatch'`,
-  `kind: 'correctness'`, with a user-legible `binding` ("the parameter `x` of
-  `b`") and the offending `value`, instead of a silently wrong `NaN` /
-  `"[object Object]"` result. `auto` (the default) and `complex` keep today's
-  emission in this release; step 4 of the migration makes `auto` escalate.
-- **`mode: 'complex'` now computes.** Under the complex discipline a numeric
-  binding whose static type is wide (`unknown`, `number`, an unannotated
-  parameter, a block local not declared real) is complex-shaped and lifted at
-  its use through the idempotent `_SYS.cplx` (a number becomes `{re, im: 0}`, an
-  object or a non-number passes through); a user function is emitted once,
-  whatever its call sites pass; unknown-sign `Sqrt`/`Ln`/`Log` promote (`√a` at
-  `a = −2` is `{re: 0, im: 1.414…}`, at `a = 4` the number `2`); and the
-  real-only heads take the D2/D6 RUNTIME rule — an ordering comparison, an
-  integer-only head (`Floor`, `Mod`, `Max`, …) or a real-only helper (`Erf`, …)
-  over a maybe-complex operand binds it once, runs the real lowering when its
-  imaginary part is exactly zero, and answers `false` / `NaN` otherwise (`z < 2`
-  for a complex-typed `z` compiles: `true` at `1`, `false` at `i`); a statically
-  non-real operand (`i < 2`, `Floor(2i)`) is a compile-time `capability` decline
-  (`diagnostic.code === 'non-real-operand'`). Typed-real values keep the real
-  kernel. Step 3 of the compile-mode migration.
-- **D3 entry check on the compiled JavaScript runner.** `run(vars)` and a
-  compiled lambda's arguments are checked against the shape the compilation
-  analyzed each binding as: a `{re, im}` bound to a free symbol or unannotated
-  lambda parameter analyzed real throws a `TypeError` naming it (it used to
-  compute garbage), and a plain number bound to a `complex`-typed symbol or
-  parameter is lifted to `{re, im: 0}` (`z^2 + z` with `run({z: 2})` used to
-  return `NaN`). One `typeof` per binding per call. Engine-initiated (implicit)
-  compilations opt out with the new `entryChecks: false` option; their callers
-  own the argument contract.
-- **Definition attributes: `bind` parameters, algebraic properties, and doc
-  comments.** Three additions ride on the `DefineFunction` attributes operand
-  introduced with `hold` in 0.114.0:
-  - **`bind`** marks a bound-variable parameter of a `hold` function — the
-    user-defined counterpart of `Sum`'s index:
-    `hold mySum(body, bind i, n) = Sum(body, (i, 1, n))`, then
-    `mySum(k^2, k, 3)` is `14`. The caller passes a symbol at a `bind` position
-    (else `bind-symbol-expected`); the parameter is substituted by that symbol
-    in the body, binder positions included, and the definition is installed as a
-    binder (`scoped: operandSites(…)`), so the call declares the symbol in its
-    own scope and a global `k` does not leak in. `bind` requires `hold`
-    (`bind-requires-hold`) and is contextual (`f(bind) = …` is an ordinary
-    parameter). MathJSON: `{hold: True, bind: ["i"]}`.
-  - **`commutative`, `associative`, `idempotent`, `involution`** in the
-    specifier slot of a definition
-    (`function op(a, b) commutative associative -> number {…}`,
-    `conj(z) involution -> number = -z`) set the operator flags of the same
-    names, so calls are sorted, flattened and folded (`conj(conj(w))` → `w`) at
-    canonicalization. An associative function is binary and a flattened n-ary
-    call is folded from the left. Arity is checked; not combinable with `hold`;
-    every clause of a multi-clause definition must state the same words.
-    MathJSON: `{commutative: True, …}`.
-  - **A doc comment** (`///` lines or a `/** … */` block) written immediately
-    before a function definition becomes its `description`: `About(f)` prints
-    it, the VS Code hover shows it below the quoted header, and it survives a
-    serialization round trip (re-emitted as `///` lines). MathJSON:
-    `{description: "…"}`. `About(f)` also now describes a user-defined or
-    library FUNCTION (signature, flags, description) instead of falling through
-    to "symbol / value".
-
-- **`compile()` accepts a `mode` option — `'strict'`, `'complex'` or `'auto'`**
-  — the arithmetic discipline a compilation runs under (what a wide-typed
-  numeric binding is shaped as, and what happens when a complex-shaped value
-  reaches one). The effective mode is `options.mode` ?? the target's `mode` ??
-  the target's default (`'auto'` on `javascript` and `python`, `'strict'` on
-  `interval-js`, `glsl` and `wgsl`); requesting a mode a target does not offer
-  is a `capability` decline, never a silent coercion. A custom `CompileTarget`
-  declares what it offers with `supportedModes` and the `complexLift` /
-  `complexIsReal` (and, for a reusable direct target, `reset`) hooks. In this
-  release every setting still compiles with the strict-shaped emission; the
-  strict lane-mismatch declines, the complex discipline and `auto`'s escalation
-  land in the following steps.
-- **`CompilationResult` gains `mode`, `promoted`, `escalation` and
-  `diagnostic`.** `diagnostic` is the structured form of `error` on every
-  decline —
-  `{ code, kind: 'capability' | 'correctness', message, boundary?, binding?, value? }`
-  — so a consumer's census never re-cuts a taxonomy from message text; `mode`
-  and `promoted` report the discipline the code was compiled under and whether a
-  radical was promoted (`'strict'` / `false` in this release).
-  `LaneMismatchError` / `CompileDeclineError` and the `CompileMode` /
-  `CompileDiagnostic` types are exported.
-
-- **`Join` concatenates strings.** When every argument is a string, `Join`
-  answers a `string` — this is the variadic string concatenation, and the
-  counterpart of `StringJoin`'s one-collection form:
-
-  ```epsil
-  Join("ab", "cd")            // ➔ "abcd"          (typed string)
-  Join("ab", "cd", "ef")      // ➔ "abcdef"
-  Join("ab", Characters("cd"))// ➔ ["a","b","c","d"]  (list<character>)
-  ```
-
-  The arm is chosen by the arguments, not by the declared types: as soon as one
-  argument is not a string the generic collection arm applies and a string
-  operand contributes its characters. Concatenation joins and re-segments, so
-  `Join("e", "́")` is the single character `"é"`.
-
-- **Substring search: `RangeOf`, `ContainsSequence`, `StartsWith` and
-  `EndsWith`.** These are contiguous-**subsequence** operators, generic over
-  indexed collections, and character-wise on strings. They are the answer to the
-  "substring search is a separate operation" note from the previous release:
-  `Contains`/`IndexOf` search for one **element**, this family searches for a
-  **sequence** of them.
-
-  ```epsil
-  RangeOf([9, 7, 5, 3], [7, 5])       // ➔ [2,3]    — the range 2..3
-  RangeOf("hello world", "o w")       // ➔ [5,6,7]  — the range 5..7
-  RangeOf("abc", "z")                 // ➔ Nothing
-  ContainsSequence("abc", "ab")       // ➔ True   (Contains("abc","ab") is False)
-  StartsWith("hello", "he")           // ➔ True
-  EndsWith("hello", "lo")             // ➔ True
-  ```
-
-  `RangeOf` answers a **span** — a 1-based inclusive `range` — rather than a
-  start index, so it feeds `Slice` and replacement directly, and its optional
-  third argument is the index to start searching at, with the span always
-  reported in the original subject's indexes: find-next is
-  `RangeOf(xs, needle, Last(r) + 1)`, and find-all is that loop run until it
-  answers `Nothing`. A `from` past the end is `Nothing`, never an error, so the
-  loop terminates cleanly; a `from` below 1 or non-integer is an error value, as
-  is an **empty** needle (an empty span is not representable — `Range(1, 0)` is
-  the descending range `[1, 0]`). The three booleans answer `True` for an empty
-  needle instead. An infinite or unknown-length subject or needle leaves the
-  expression symbolic, and `EndsWith` additionally needs a known length.
-
-  Matching whole elements is what makes the string cases grapheme-safe without a
-  separate rule — a needle can never match across a cluster boundary:
-
-  ```epsil
-  RangeOf("x́y", "x")   // ➔ Nothing  (the characters are [x́, y])
-  RangeOf("👨‍👩‍👧", "👩")        // ➔ Nothing  (the subject is ONE character)
-  RangeOf("ée", "e")   // ➔ [2]      — the range 2..2, the FINAL e
-  ```
-
-- **`Slice` accepts a `nothing` span and passes it through**, so a `RangeOf`
-  result can be sliced without a test in between:
-  `Slice(xs, RangeOf(xs, needle))` is the matched run, or `Nothing` when the
-  needle is absent. Sliced with a found span the result has the needle's element
-  sequence — the defining law of `RangeOf`, stated element-wise because `Slice`
-  is kind-preserving (a `list<character>` needle over a string subject gives a
-  `string` back, equal element by element but never `==`, since the two types
-  are disjoint siblings).
-
-- **String operations: `StringReplace`, `Trim`/`TrimStart`/`TrimEnd`,
-  `StringRepeat`, `PadStart`/`PadEnd`.**
-
-  ```epsil
-  StringReplace("a-b-c", "-", "+")     // ➔ "a+b+c"
-  StringReplace("a-b-c", "-", "+", 1)  // ➔ "a+b-c"   (count limits from the left)
-  Trim("  hi  ")                       // ➔ "hi"
-  Trim("abcba", "ab")                  // ➔ "c"       (chars is a SET, not an affix)
-  StringRepeat("ab", 3)                // ➔ "ababab"
-  PadStart("7", 3, "0")                // ➔ "007"
-  PadEnd("ab", 7, "123")               // ➔ "ab12312"
-  ```
-
-  `StringReplace` finds occurrences with the same character-wise matching
-  `RangeOf` uses, non-overlapping, left to right, walking the **original**
-  subject and skipping past each match — so a replacement's own content is never
-  re-matched (`StringReplace("aa", "a", "aa")` is `"aaaa"`, not an infinite
-  expansion). An empty `target` is an error value: the host `replaceAll("", x)`
-  insert-at-every-boundary behavior is deliberately not inherited. An empty
-  `replacement` means deletion. `count` must be a positive integer.
-
-  `Trim`'s optional argument is a **set** of characters to strip (a string
-  argument means "the set of this string's characters"), defaulting to the
-  Unicode `White_Space` set `StringSplit` already uses. `PadStart`/`PadEnd`
-  count characters, not display columns; a multi-character pad repeats and the
-  final copy is truncated on a character boundary; an empty pad is an error
-  value, and `n` must be a non-negative integer.
-
-- **Case operations: `ToUpperCase`, `ToLowerCase`, `CaseFold`.** Unicode default
-  (locale-independent) mappings, applied to the whole string rather than
-  character by character, because case mapping is contextual:
-
-  ```epsil
-  ToUpperCase("straße")        // ➔ "STRASSE"  — Length 7, from a 6-character input
-  ToLowerCase("ΟΔΟΣ")          // ➔ "οδος"     — final sigma, chosen by position
-  CaseFold("Straße")           // ➔ "strasse"
-  CaseFold("ΟΔΟΣ") == CaseFold("οδοσ")   // ➔ True
-  ```
-
-  `CaseFold` is the primitive for case-insensitive comparison — compare folded
-  forms, not `ToLowerCase` results, which disagree on the Greek final sigma.
-  There is no locale argument in v1, so the Turkish dotless-i mapping is not
-  available. The fold is a documented v1 approximation: the host offers no
-  case-folding primitive, so it is uppercase-then-lowercase with the Greek final
-  sigma restored to medial, which agrees with Unicode full case folding on
-  Latin, Greek and Cyrillic text and deviates for a few characters
-  `CaseFolding.txt` maps specially (Cherokee, some Turkic and Lithuanian
-  sequences).
-
-- **`StringCompare(a, b)`** answers `-1`, `0` or `1` for the **code-point**
-  order of two strings, compared position by position over their NFC scalar
-  sequences. This is not the order `<` gives: the relational operators on two
-  multi-character strings compare UTF-16 **code units**, which sorts the astral
-  characters (U+10000 and up, encoded from U+D800) below the range
-  U+E000–U+FFFF. The two orders agree on everything below U+D800 — all of Latin,
-  Greek, Cyrillic, CJK. `<` is unchanged; use `StringCompare` when the ordering
-  must be by code point. The order is deliberately never locale-aware; a
-  collation, if it ships, arrives as an explicit argument.
-
-- **`NumberFrom(s, base?)`** parses a numeral, filling the gap `DigitsFrom`
-  (integer-only) left. The accepted grammar is fixed so hosts cannot drift:
-  optional surrounding Unicode whitespace, an optional sign, then either a
-  decimal numeral (ASCII digits, optional `.` fraction, optional `e`/`E`
-  exponent) or one of the exact spellings `oo`, `+oo`, `-oo`, `NaN`.
-
-  ```epsil
-  NumberFrom("42")        // ➔ 42        (exact integer)
-  NumberFrom("3.14")      // ➔ 3.14      (exact decimal; .N() to numericize)
-  NumberFrom("-1.5e2")    // ➔ -150
-  NumberFrom(".5")        // ➔ 0.5
-  NumberFrom("5.")        // ➔ Error(invalid-number)
-  NumberFrom("12abc")     // ➔ Error(invalid-number)   — never 12
-  NumberFrom("")          // ➔ Error(invalid-number)
-  NumberFrom("ff", 16)    // ➔ 255       (base 2–36, integer numerals only)
-  ```
-
-  Failure is always an error value, never `NaN` — `NaN` is a legitimate parse
-  _result_ for the literal `"NaN"`, so it cannot double as the failure signal.
-  Non-ASCII decimal digits are rejected, so homoglyph digits cannot slip
-  through. Exactness follows the evaluate/`N` contract: an integer numeral is an
-  exact integer, a fractional or exponent numeral an exact decimal.
-
-  See the [Strings reference](/compute-engine/reference/strings/) and the
-  sequence-search family in the
-  [Collections reference](/compute-engine/reference/collections/).
-
-### Bug Fixes
-
-- **A pipe stage missing its trailing argument now receives the piped value
-  there.** `xs |> Fold(f, 10)` put the list in the FIRST slot whose type it fit
-  — `initial: value` (a list is a value) — pushing `10` into the collection slot
-  and leaving an inert `Fold(f, xs, 10)`; likewise `xs |> Fold(Join, header)` (a
-  string is a collection, so `header` "fit" the slot it was pushed into). The
-  placement now also requires the written arguments to fit the slots they are
-  displaced into, and among the fitting slots takes the TRAILING one — the one
-  that displaces the fewest written arguments. `xs |> Take(10)`, `xs |> Map(f)`
-  and `xs |> Filter(p)` place as before.
-
-- **A multi-clause function with a declared `complex` parameter, and a protocol
-  member with a declared `complex` parameter, are now handed the argument in the
-  shape their body expects.**
-  `S(0) -> complex {0}; S(z: complex) -> complex {z + 1}` compiled as `S(w)`
-  returned `{re: null}` at `w = 2` (now `3`); `scale(2, w)` for
-  `scale(self, k: complex)` returned `{re: null}` at `w = 3` (now `4`). The
-  multi-clause and protocol dispatchers also decide dispatch on the normalized
-  value — an exactly-real `{re, im: 0}` dispatches as the real number it is — so
-  a value clause or a `real`-typed clause selects as the interpreter selects.
-- **The interpreter-backed compile fallback honors the runner contract in both
-  directions.** A `{re, im}` value passed in `vars` is declared as a complex
-  number (it was declared `number`, so `run()` threw an `incompatible-type`
-  error on the assignment), and a boolean-valued or complex-valued result comes
-  back as a boolean / `{re, im}` instead of the unconditional `.re` (`NaN` for a
-  boolean, the real part of a genuinely complex value). Shared by every target's
-  `fallback: true` decline.
-- **A multi-clause function applied to a collection now maps over it, like a
-  function literal does.**
-  `fib(0) = 0; fib(1) = 1; fib(n) = fib(n - 1) + fib(n - 2)` then
-  `5..10 |> fib |> Sum` bound the whole range to `n` — no base clause ever
-  matched, and the call died with "Maximum call stack size exceeded". It now
-  evaluates to `136` (`fib(5..10)` is `[5, 8, 13, 21, 34, 55]`). Same rules as
-  for `x ↦ …`: every clause's parameters must be scalar (a clause taking a
-  `list<…>` binds the collection whole), and hold/binder definitions are exempt.
-  Two typing defects surfaced alongside and are fixed: `g(x)` with an untyped
-  `x` no longer narrows `x` to a literal clause's type
-  (`g(0) = 0; g(n) = n^2; g(x)` evaluated to `0`; it now stays `g(x)`); and a
-  user function's call is no longer re-typed by the "integer arguments ⇒ integer
-  result" heuristic that operators without a type handler get (`k(n) = n / 3`
-  typed `k(4)` as `finite_integer` for the value `4/3`; the body's own inferred
-  `finite_number` now stands). An intersection signature is also read arm by arm
-  for scalar-ness, so a `(matrix) & (collection)` overload set no longer admits
-  a list at the `matrix` slot unchecked.
-
-- **A real-only special function over a promoted radical no longer compiles to
-  `{re: NaN}`, and `Limit` at ∞ resolves sums with a scaled `Erf` term.**
-  Under the default `auto` mode `2·Erf(√y)` compiled its `Erf` through the
-  real-only helper (the D6 rule: a real value, or `NaN` for a non-real
-  argument) while the enclosing `Multiply` was told the value was complex — the
-  analysis fell through to the operand recursion because `Erf` types `number`
-  — and read `.re` off a plain number: `{re: NaN, im: NaN}` at every point.
-  Same for `Erfc`, `Gamma`, `Zeta`, `Digamma`, `Factorial`, `LambertW`,
-  `Arsinh`, `ErfInv`. The compiler now knows a head lowered through a real-only
-  string helper is real-shaped. `Limit` probes its growth oracles through the
-  compiler, so `lim_{y→∞} 3√2·√π·Erf(√2/2·√y) − 6e^{−y/2}√y − 2e^{−y/2}y^{3/2}`
-  (the χ²-tail antiderivative) resolves to `3√2·√π` instead of staying inert,
-  and `∫ₓ^∞ y^{3/2}e^{−y/2}dy` closes to its exact form.
-
-- **`Which`/`If` no longer throw on a comparison whose broadcast outcome is
-  statically undecided.** Since 0.114.0 a comparison such as `h(x) = 10` with
-  `h` undeclared types `broadcastable<boolean>`; `Which(h(x) = 10, 1, True, 0).evaluate()` then raised "Condition must evaluate to True or False" where
-  it used to be held, and `x{h(x) ≤ [1,2,3]}` stayed un-broadcast. Both are
-  held/broadcast again. An undecided `If`/`Which` is also returned with its
-  condition EVALUATED (arms untouched): `Which(C = U[1], …)` now reads
-  `Which(C = 10, …)`.
-
-- **A `Sum`/`Product` whose term is an undecided `If`/`Which` no longer leaks
-  the loop index or sums a wrong value.** `Σ_{k=1}^{3} If(x < k, k, 0)`
-  evaluated to `3·If(x < k, k, 0)` (and the `Which` spelling to `Which(x < k, 9, True, 0)`) — the held condition never saw the index's value, so three
-  identical terms were accumulated. It is now `If(x < 1, 1, 0) + If(x < 2, 2, 0) + If(x < 3, 3, 0)`; a nested binder that reuses the index name inside a
-  held arm keeps its own binding.
-
-- **A symbol's inferred type is revised when its own value outgrows it.** An
-  assignment commits the *likely* type of the assigned expression (`C_0 := Σ_k Which(C = U_k, k, True, 0)` with `C` still unknown types `number`, the
-  scalar reading); that type is now re-checked against the value's live type
-  and, once `C := [10, 30]` makes the value `[1, 3]`, moves to
-  `vector<integer^2>` instead of remaining a `number` the value no longer
-  satisfies. A declared type is a contract and never moves; a guess the value
-  still fits is kept.
+- `Join` now concatenates strings. Example: `Join("ab", "cd", "ef")` returns
+  `"abcdef"`.
+- Added contiguous sequence search: `RangeOf`, `ContainsSequence`, `StartsWith`
+  and `EndsWith`. Example: `ContainsSequence("abc", "ab")` is `True`, while
+  `Contains("abc", "ab")` is `False`.
+- `Slice` accepts `Nothing`, so `Slice(xs, RangeOf(xs, needle))` returns the
+  match or `Nothing` without an extra branch.
+- Added `StringReplace`, `Trim`, `TrimStart`, `TrimEnd`, `StringRepeat`,
+  `PadStart` and `PadEnd`.
+- Added case operations: `ToUpperCase`, `ToLowerCase` and `CaseFold`. Use
+  `CaseFold` for case-insensitive comparison.
+- Added `StringCompare(a, b)` for deterministic code-point ordering.
+- Added `NumberFrom(s, base?)` for parsing numbers from strings. Failures return
+  an error value, not `NaN`.
 
 ## 0.114.0 _2026-08-16_
 
 ### Breaking Changes
 
-- **A string is now an indexed collection of characters:
-  `string <: indexed_collection<character>`.** Strings can be counted, indexed
-  (1-based), iterated and searched with the ordinary collection operators —
-  `Length("shop")` is `4`, `"abc"[2]` is `"b"`, `isDigit(c) = c in "0123456789"`
-  works — and the elements are grapheme clusters, so a ZWJ emoji family or a
-  regional-indicator flag counts as one character.
+- **Strings are now indexed collections of characters.** `Length("shop")` is
+  `4`, `"abc"[2]` is `"b"`, and generic collection code can now accept strings.
+  If a function should accept collections but not strings, use a type such as
+  `collection & !string`.
+- **`string` is no longer a `scalar`.** Declare `string`, or `string | number`,
+  when strings are intended.
+- **Added a distinct `character` type.** Characters are single user-perceived
+  characters and are not one-character strings, although they compare equal by
+  value where appropriate. `Characters("ab")` now returns `list<character>`.
+- **String-preserving collection operators now return strings for string
+  input.** Examples: `Reverse("abc")` returns `"cba"` and `Take("abc", 2)`
+  returns `"ab"`. Transforming operators such as `Map` still return lists.
+- **Materializers and set operators read strings as characters.**
+  `ListFrom("abc")` is `["a", "b", "c"]`, and `[..."ab"]` is `["a", "b"]`.
+- **`Max`, `Min`, `GCD` and `LCM` no longer expand strings.** Strings are
+  treated as non-numeric values for these operators.
+- **Invalid UTF-16 surrogate halves are normalized when strings enter the
+  engine.** They are replaced with `U+FFFD` so all string operations work on
+  well-formed Unicode.
+- **Compiled string collection operations are grapheme-correct in JavaScript and
+  fail closed on targets that cannot support them.** Python and shader targets
+  no longer emit approximate string collection code.
 
-  The lattice change is global, and this is the part to re-audit: **every**
-  user-authored function, protocol conformance or pattern typed over
-  `collection<T>` / `indexed_collection<T>` / `collection` now silently accepts
-  strings. Where a definition was written assuming "collection" meant
-  "list-like", it will now also be selected for a string argument.
+### Strings
 
-  To exclude strings, intersect the bound with a negation. This is the spelling
-  that works today:
+- Added `CharacterFrom(s)` and host API support for character values.
+  `String(c)` converts a character back to a string.
+- Strings work with collection operations over grapheme clusters. Example:
+  `Tally("mississippi")` counts characters, and `"7" in "0123456789"` is `True`.
+- `String(collection)` now joins a finite collection into one string. Example:
+  `String([1, 2])` returns `"12"`; use `Map(String, [1, 2])` to convert each
+  element separately.
 
-  ```epsil
-  f(xs: T) -> integer where T: collection & !string = Length(xs)
+### Epsil And Types
 
-  f([1, 2])   // ➔ 2
-  f("ab")     // ➔ incompatible-type: expected `collection & !string`,
-              //    got `string`
-  ```
+- Added `hold` functions, whose arguments are bound as written and evaluated
+  only when used in the function body. Example: `hold f(e) = Head(e)` lets
+  `f(a + 1)` inspect the expression structure instead of the evaluated value.
+- Re-declaring an object type now re-checks protocol conformances that depend on
+  its stored fields. This makes notebook-style re-runs update field-backed
+  protocol behavior correctly.
+- Protocol member effect annotations in implementation blocks are now honored
+  and checked.
+- Writes through mutable objects consistently carry the `state` effect.
+- `Head` and `Tail` now resolve a symbol's assigned expression during evaluation
+  while staying structural for unbound symbols.
 
-  ```js
-  ce.declare('f', '(T) -> integer where T: collection & !string');
-  ce.function('f', [ce.box(['List', 1, 2])]).isValid;  // ➔ true
-  ce.function('f', [ce.string('ab')]).isValid;         // ➔ false
-  //   incompatible-type: expected `collection & !string`, got `string`
-  ```
+### Numeric And Symbolic Fixes
 
-  `character` is a **primitive type**, not a collection kind. A consumer that
-  classifies values should ask the type — `type.matches('character')`,
-  `type.matches('indexed_collection<character>')` — rather than comparing type
-  strings: a string still reports its type as `string`, never as
-  `indexed_collection<character>`, exactly as a `range` reports `range`.
-
-- **`string` is no longer a `scalar`.** `scalar` is now "a `boolean`, a
-  `character`, or a `number`". A declaration `x: scalar` no longer admits a
-  string, and `ce.type('string').matches('scalar')` is `false`. Keeping `string`
-  in both branches would have made `scalar` and `collection` overlap, so every
-  predicate that treats them as the two halves of `value` would carry a hidden
-  exception. Declare `string` (or `string | number`) where a string was
-  intended.
-
-- **A new `character` type: exactly one user-perceived character.** It is a
-  scalar and a **disjoint sibling** of `string` — a character is not a
-  one-character string and a string is not a character, in either direction. A
-  character has no elements, which is what makes recursive walks over a string's
-  characters terminate structurally.
-
-  Consequences for existing MathJSON and code:
-
-  - `Characters` / `GraphemeClusters` migrate from `(string) -> list<string>` to
-    `(string) -> list<character>`. The elements print the same and compare equal
-    to the corresponding one-character strings (a value law: two values with the
-    same NFC scalar sequence are equal, so `c == "a"` and `"a" in "abc"` still
-    work), but their **MathJSON changes**: a character serializes as the call
-    form `["CharacterFrom", "'a'"]`, so `["Characters", {str: "ab"}]` is now
-    `["List", ["CharacterFrom", "'a'"], ["CharacterFrom", "'b'"]]`. Any consumer
-    that reads that JSON expecting bare string literals must be updated.
-    `StringSplit(s, "")` is unchanged and still yields one-character
-    **strings**.
-  - `StringJoin` accepts characters as well as strings, so
-    `StringJoin(Characters(s))` still round-trips.
-  - A one-character string **literal** narrows to a character in a position that
-    expects one; a multi-character literal there is an `incompatible-type`
-    error. Only literals narrow — a `string`-typed expression must be converted
-    explicitly with `CharacterFrom(s)`.
-
-- **`Sort`, `Reverse`, `Take`, … return a `string` for a string input**, both as
-  the static type and as the runtime value. The element-preserving operators —
-  `Reverse`, `Rest`, `Most`, `Take`, `Drop`, `Slice`, `Unique`, `Sort`,
-  `RotateLeft`, `RotateRight`, `Filter`, and likewise `TakeWhile`, `DropWhile`
-  and `Dedup` — are closed over the kind, so `Sort("cba")` is `"abc"`, not
-  `["a", "b", "c"]`. The element-**transforming** higher-order operators (`Map`,
-  `FlatMap`, `Scan`, `Zip`) stay list-out permanently, even for a
-  character-to-character callback; rejoin explicitly with `String(...)`.
-
-  One caveat is inherent to grapheme segmentation rather than a defect: a
-  string-preserving operator segments, operates, then joins and re-segments, and
-  joining can merge adjacent characters. So the result may have a different
-  character count than the input — reversing can move a combining mark next to a
-  different base character. `String(Characters(s)) == s` always holds;
-  `Characters(String(cs))` may have _fewer_ elements than `cs`.
-
-- **Materializers and set operators read a string as its characters.**
-  `ListFrom("abc")` is `["a", "b", "c"]` (it used to be `["abc"]`), and the same
-  flip applies to `SetFrom`, `TupleFrom` and the spread element: `[..."ab"]` is
-  `["a", "b"]`, where a string operand used to be an `incompatible-type` error.
-  `Union` and `Intersection` likewise read a string operand as its characters,
-  so `Union(Set(1), "ab")` is `Set(1, "a", "b")`. `SetMinus` deliberately does
-  **not** follow: its trailing operands name _values_ to exclude, so
-  `SetMinus(S, "ab")` still removes the string `"ab"` from `S` rather than the
-  characters `a` and `b`.
-
-- **`Max`, `Min`, `GCD` and `LCM` no longer expand a string operand.** They
-  treat a string atomically; a string is not a number, so these stay symbolic
-  instead of silently folding over characters. `Sum` and `Product` continue to
-  report a typed error on a string element.
-
-- **Lone surrogates are replaced with `U+FFFD` at construction.** A native
-  JavaScript string can hold an unpaired UTF-16 surrogate, on which
-  segmentation, UTF-8 encoding, equality and serialization are undefined. Every
-  string entering the engine is now scanned once and each unpaired surrogate
-  becomes the REPLACEMENT CHARACTER, so every string value is well-formed
-  Unicode and every downstream operation is total.
-  `ce.string('a\ud800b').string` is `"a�b"`, with `Length` 3.
-
-- **Compilation: string collection operations are grapheme-correct in JavaScript
-  and fail closed elsewhere.** `Length(s)`, `s[i]`, iteration- derived operators
-  (`Map`, `Filter`, `Reduce`, `Contains`, …) and the string-preserving operators
-  compile to segmented JavaScript — `Length` of a string never lowers to the
-  host `.length`, which counts UTF-16 code units. Python has no grapheme
-  segmentation in its standard library, so those operations now report a
-  target-capability diagnostic (`success: false`) rather than compiling to a
-  code-point approximation; GLSL and WGSL reject string-typed operands as
-  before.
-
-### New Features
-
-- **The `character` type, and strings as collections.** A `character` is exactly
-  one user-perceived character (one Unicode grapheme cluster), a scalar
-  alongside `boolean` and `number`. Build one with `CharacterFrom(s)` (an empty
-  or multi-character string is a diagnostic, never a truncation), with
-  `ce.character('x')` from the host API, or by writing a one-character string
-  literal where a character is expected. `String(c)` converts back, and
-  `CharacterFrom(String(c)) == c` always holds.
-
-  With `string <: indexed_collection<character>`, the collection library applies
-  to strings directly:
-
-  ```epsil
-  Length("shop")                     // ➔ 4
-  "abc"[2]                           // ➔ "b"
-  isDigit(c) = c in "0123456789"     // character membership
-  isDigit("7")                       // ➔ True
-  Tally("mississippi")               // character frequencies
-  ```
-
-  `c in s` is **character** membership, not substring search — `"ab" in "abc"`
-  is `False`, consistent with every other collection. A generic
-  contiguous-subsequence family (`ContainsSequence`, `RangeOf`, `StartsWith`,
-  `EndsWith`) is the separate operation for substring search, and is not
-  available yet.
-
-  Two properties keep the change from leaking where it would be wrong. Strings
-  are **broadcast-atomic**: a broadcasting operator applied to a string receives
-  the whole string, so `String("ab", 1)` is `"ab1"` and a lambda with a scalar
-  parameter is applied to the string rather than mapped over its characters.
-  Strings are also **`Flatten`-atomic**: `Flatten(["ab", "cd"])` is
-  `["ab", "cd"]`.
-
-  `String` called with exactly one finite collection **joins** that collection's
-  elements instead of broadcasting over them, which is what makes
-  `String(Characters(s)) == s` hold. This applies to EVERY collection kind, not
-  just text: `String([1, 2])` is now `"12"` (it used to broadcast to
-  `["1", "2"]`); to map over the elements write `Map(String, [1, 2])`.
-  Multi-argument calls still broadcast (`String("x", [1, 2])` is
-  `["x1", "x2"]`).
-
-  Character equality and ordering are defined on the NFC scalar sequence and are
-  deliberately never locale-aware: canonical forms, dedup keys and match plans
-  must be identical on every host. Collation, if it ever ships, will be an
-  explicit argument.
-
-  See the [Strings reference](/compute-engine/reference/strings/) and the
-  type-lattice section of the [Types guide](/compute-engine/guides/types/).
-
-- **`hold` functions — user-defined functions whose arguments are not
-  evaluated.** A definition prefixed with `hold` (`hold f(e) = Head(e)`,
-  `hold function f(e) { … }`) binds each argument to its parameter as written:
-  canonicalized and bound in the caller's scope, but unevaluated. Reading the
-  parameter in the body evaluates the argument there (call-by-name —
-  `hold twice(e) = e + e` evaluates `e` twice; read it once into a `let` to
-  evaluate once), while a structural operator sees the expression itself: with
-  `let a = 3`, `f(a + 1)` is `Add` where an ordinary function receives `4` and
-  answers `Integer`. This is the user-function counterpart of an operator
-  definition's `lazy` flag, and it is spelled at the definition, not per
-  parameter: every parameter is held. In MathJSON the prefix is
-  `DefineFunction`'s new optional third operand, an attributes dictionary —
-  `["DefineFunction", "f", ‹literal›, {hold: True}]` — which installs a `lazy`
-  operator definition. A hold function is single-clause: a literal parameter
-  (`hold f(0) = …`, diagnosed `hold-literal-parameter`) and a second clause
-  (`hold-single-clause`) are refused; a same-domain redefinition replaces as
-  usual. `hold` is a contextual keyword, like `type`, and stays an ordinary
-  identifier elsewhere. `About(f)` labels a hold function. A host
-  `ce.declare('f', { lazy: true, evaluate: ‹Function literal› })` now also binds
-  its arguments as written instead of the literal quietly evaluating them one
-  level down. See the "Hold functions" section of the Epsil control-flow guide.
-
-### Issues Resolved
-
-- **Re-declaring a conforming object type in a later cell now re-runs its
-  conformances.** A protocol property can be satisfied by a stored field of the
-  same name on a conforming object type, and that verdict was taken against the
-  layout the type had when the conformance was registered. Re-running
-  `type P = object{…}` with different fields — which the notebook pattern allows
-  — left every such verdict standing: an accessor synthesized for a field the
-  new declaration dropped kept answering, a field it added got none, and a
-  RETYPED field delivered a value of the new type through a property still
-  statically typed as the old one (`readonly a: integer` reading `"s"`). A
-  redefinition now re-settles every conformance edge exactly as replacing a
-  protocol already did, and leaves an unsatisfiable edge pending with a warning
-  that says what moved. Objects constructed earlier are unaffected — they keep
-  the layout they were built with, so their own fields still read and write —
-  but asking one for a protocol property its pinned layout cannot satisfy is now
-  refused with `protocol-implementation-missing` instead of quietly evaluating
-  to the unevaluated call. The unqualified `p.name` reports the same thing in
-  the one case where the conformance is in force and only this instance cannot
-  meet it — a property the type gained after the object was built. It is
-  otherwise unchanged: `unknown-field`, naming the object's stored fields, is
-  still the answer whenever no live conformance answers for the name at all,
-  which covers a conformance the redefinition left pending as well as one whose
-  implementation has simply not been written yet. A stored field the object does
-  carry reads and writes directly, without consulting any conformance.
-
-  Two consequences are worth knowing by their message. A `type` statement can
-  now leave a conformance pending rather than satisfying it, when satisfying it
-  again would make a dispatched call more effectful than an annotation elsewhere
-  already promised — the type is still declared, and the end-of-batch warning
-  carries the reason:
-
-  ```epsil
-  // with `function caller(t: T) pure -> integer { f(t) }` already accepted
-  type T = object{n: integer}
-  // ➔ warning: protocol-implementation-pending T S
-  //    "conformance-widens-declared-contract: satisfying this conformance
-  //     again would make dispatched calls more effectful than declared
-  //     contracts allow: `caller` declares `pure` but would infer `random`…"
-  ```
-
-  And a protocol property read is refused when a transparent ALIAS the field is
-  typed through has been re-declared, because an object pins its layout one
-  level deep and the alias moves under it:
-
-  ```epsil
-  type alias A = string
-  protocol P { readonly a: A }
-  type T = object{a: A} is P
-  let p = T(a: "s")
-  type alias A = integer
-  p.(P.a)
-  // ➔ Error(protocol-implementation-missing, "…its stored `a` holds `string`,
-  //    which the property's `A` does not admit…")
-  ```
-
-- **`Reduce` under `.N()` no longer errors when the reducer's accumulator turns
-  complex mid-fold.** `["Reduce", [1, 2, 3], ["Function", z² + c, z, k], 0]`
-  with a complex `c` (declared, assigned, substituted or a literal) evaluated
-  correctly with `.evaluate()` (`−0.25 + 0.5i`) but `.N()` returned
-  `Error("unexpected-mathjson", "{\"re\":null,\"im\":0.5}")`. The compiled fast
-  path `Reduce` takes under numeric approximation checked that the seed and the
-  elements were real, but not that the reducer's RESULT stayed real: the
-  compiled reducer returned a `{re, im}` object into a number accumulator, the
-  next step computed on the object, and boxing the result failed. The fast path
-  now hands the fold to the interpreted reducer at the first non-number result,
-  redoing that step from the still-valid numeric accumulator; a real reducer
-  keeps the fast path unchanged. Reported by Tycho against 0.112.0/0.113.0.
-
-- **`.abs()` on a negation now returns the absolute value, not the negation.**
-  `BoxedFunction.abs()` short-circuited on both an `Abs` head and a `Negate`
-  head by returning the receiver unchanged. That is right for `Abs` —
-  `‖x‖ = |x|` is idempotent — and wrong for `Negate`, since `|−x| = |x|`:
-  `ce.parse('-x').abs()` answered `-x`, which evaluates to −3 at `x = 3`. The
-  reachable consequence was a stored NEGATIVE uncertainty: `PlusMinus` and
-  `Measurement` call `.abs()` on the error term when canonicalizing, so
-  `PlusMinus(5, -e)` kept `-e` and serialized `5 ± -e`. A numeric negative was
-  always normalized (`PlusMinus(5, -3)` → `3`) because the literal path never
-  reaches the short-circuit, which is why this survived.
-
-- **The derivative of a vector norm no longer uses the scalar `|x|` rule.**
-  `Abs` over a tuple is the Euclidean norm, but the derivative table carried
-  only the scalar rule `d|x|/dx = sign(x)` and applied it to any `Abs` head.
-  Through the chain rule that produced `Sign((cos t, 1)) · (−sin t, 0)` — a
-  tuple multiplied by a tuple — surfacing either as a nonsense value or as an
-  `incompatible-type` tuple/number error depending on what enclosed it. The
-  norm's derivative is now the projection of the component velocities onto the
-  unit vector, `d|v|/dt = (Σᵢ vᵢ·vᵢ′)/|v|`, checked against a central difference
-  at several points per shape. An operand with no statically-known components (a
-  symbol typed `list<number>`) declines and leaves `D` inert rather than
-  guessing; a scalar `|x|` is unchanged.
-
-  The reported witness was a head DECLARED before it was bound
-  (`ce.declare('F', 'function')`, then an assignment), where the two routes
-  disagreed: declaring first installs a value definition rather than an operator
-  definition, and only the latter folded the constant norm away before
-  differentiating — so the scalar rule fired on one route and was masked on the
-  other. Both routes now agree.
-
-- **A declared subscripted symbol spelled with a Greek (dictionary) base is no
-  longer captured as an index once the base becomes a collection.** With
-  `\eta_w = 1.33` and `\eta` bound to a list, `\eta_w` parsed as `At(eta, w)` —
-  the existing symbol `eta_w` was shadowed by element access and its own
-  serialization `\eta_{w}` did not re-parse to itself. The declared-joined-name
-  rule that already governed ASCII bases (`x_w` with `x_w` declared) now applies
-  to dictionary-spelled bases too: a joined name that resolves in scope wins
-  over index capture, so `\eta_w` is `eta_w` while an undeclared `\eta_1` on a
-  list `eta` still indexes. Applies to the `\eta` command and to the Unicode `η`
-  spelling alike.
-
-- **`Reduce`/`Scan` now compile correctly when the accumulator is or becomes
-  complex.** Two lanes flow through a fold's combiner — the element's and the
-  accumulator's — and only the first was modelled, so every accumulator was
-  compiled as a plain number: `Reduce([1+2i, i], (a,x) ↦ a + 2x, 0)` answered
-  `{ re: '[object Object]0', im: 2 }` behind `success: true` (interpreter
-  `2 + 6i`); a COMPLEX seed (`1+i`) and a seedless `Scan` over complex elements
-  were wrong the same way; a bare user-function combiner
-  (`h(a,x) := a + 2x; Reduce(L, h, 0)`) answered `NaN`; and the builtin
-  combiners concatenated (`Scan(L, Add, 0)` → `"0[object Object]"`). The
-  combiner is now compiled with its parameters bound to the lanes the fold
-  actually runs — the element's from the source, the accumulator's from the seed
-  widened by the body's own result — a real seed into a complex accumulator is
-  lifted to `{ re, im: 0 }`, a bare user-function combiner is compiled through a
-  typed eta-expansion, `Add`/`Multiply` combine through the complex kernels over
-  a complex lane (`Min`/`Max` fail closed there — no ordering), the fold's
-  static type follows the combiner — a bare user function's declared result, or
-  for a builtin combiner the source's element type widened by the seed (both
-  were `unknown`, which made `Reduce(L, h, 0) + 1` and `Reduce(L, Add, 0) + 1`
-  fail closed as "possibly a collection"), and the fold's parent agrees on the
-  value shape (`Reduce(L, h, 0) + 1` → `3 + 6i`). Folds whose accumulator stays
-  real, folds over a real source, and builtin folds over real data are emitted
-  exactly as before. Reported by Tycho against 0.112.0/0.113.0.
-
-- **An effect annotation on a member of a protocol implementation block no
-  longer makes that member uncallable, and is now checked against the body.**
-  Writing
-  `type Box = object{n: integer} is Sized { function size(self: Self) pure -> integer { self.n } }`
-  registered without complaint and then failed at every call with
-  `Error("Function body must be a scoped Block expression")`; removing `pure`
-  made the same program work. An effect specifier lowers to a full signature
-  stamped on the literal's body, and that signature mentions `Self` — a
-  substitution token no type resolver knows — so it did not parse and the body
-  was replaced by an error. The substitution is now applied to the stored
-  implementation once, when the conformance is registered, so the annotated
-  member is callable from Epsil source and from raw MathJSON alike. (A host
-  implementation is a JavaScript callback with no signature to carry an
-  annotation, and is unaffected.)
-
-  With the annotation now reaching a contract check, a member's declared effects
-  are held to the same rule as a top-level definition's — declared must cover
-  inferred — and violating it is refused with the same `incompatible-type`
-  error, reading "expected pure effects, got random effects". The check covers
-  `get`/`set` accessors too, so a `pure` setter that stores into its receiver is
-  now refused; as with every other implementation problem, the conformance as a
-  whole is rejected and nothing is registered. A side-effect of the same
-  substitution: an authored accessor's own effects are now visible at all — a
-  setter whose body writes `self.n = v` infers `state`, where it previously
-  inferred nothing because its receiver was typed `unknown`. A CONDITIONAL
-  conformance (`type list<T> is P where T: number { … }`) cannot record a
-  specifier against its head pattern, so one written there is now refused when
-  the conformance is declared, with `protocol-conditional-member-effects`,
-  instead of registering and failing at the call.
-
-- **A compiled user function with a declared `complex` parameter no longer
-  returns a corrupt value.** The emitted body read the parameter in the real
-  lane while the call site handed it a `{ re, im }` object, so the body's
-  arithmetic ran on the object itself — `Q(z) = z + i` declared
-  `(complex) -> complex` answered `{ re: '[object Object]0', im: 1 }` behind
-  `success: true`, where the interpreter answers `1`. A silently wrong number
-  rather than a decline.
-
-  Three of the four argument shapes were affected (a statically complex
-  argument, a statically real one, and an untyped symbol handed a complex value
-  at `run()` time); only an untyped symbol handed a plain number happened to
-  work. All four are now correct. A parameter declared complex is compiled in
-  the complex lane for every call site, and each call delivers an object: a
-  complex literal passes through, a provably real argument is wrapped statically
-  at no runtime cost, and anything else — where the same artifact may
-  legitimately receive either a number or a complex object — goes through a new
-  idempotent runtime coercion.
-
-  The same applies where the function is referenced as a VALUE rather than
-  called — as `Map`'s callback, for instance. Those consumers hand the callee a
-  raw element, so such a reference now resolves to a small coercing shim; a
-  function with no complex parameter is unaffected and its emitted code is
-  unchanged.
-
-  JavaScript only; the `{ re, im }` convention does not exist on the other
-  targets, which are unaffected.
-
-- **A write through a mutable object now carries the `state` effect on every
-  route.** Three writes previously read as purer than they are. A bare store
-  statement `p.age = 43` reported the `scope` effect — the label of a binding
-  write, read straight off `Assign`'s declared signature — where it stores into
-  a heap cell every other reference to `p` sees; a set through a `readwrite`
-  protocol property reported no effect at all; and a function storing through a
-  COMPUTED property (`function f(x: Q) { x.age = 3 }`, where `age` is a property
-  of the object type `Q` rather than a field of its layout) inferred nothing, so
-  annotating it `pure` was accepted while calling it mutated the caller's
-  object. All three now report `state`, and a `pure` annotation on any of them
-  is refused with `incompatible-type: expected pure effects, got state effects`.
-  Nested and indexed receivers count (`o.child.age = 9`, `xs[i].age = 9`);
-  assignment to a plain symbol is unchanged (`scope`). A qualified property READ
-  contributes no `state`, but both halves now also report what an AUTHORED
-  accessor body does, so a computed getter whose body draws makes the read
-  `random`. The label is decided per call site, because `Assign` spells both a
-  binding write and a store and `ProtocolProperty` spells both a read (three
-  operands) and a set (four), and one declared arrow cannot say both.
-
-  A set is read as a store from the SHAPE of the call, without asking which
-  conformer's setter was selected — deliberately generous in one direction, and
-  the alternative is unsound: an inference walk runs before conformances
-  register, so a registry-derived answer would report a genuine store pure and
-  let a `pure` annotation stand. The one case it over-labels — the value-type
-  rebinding sugar `d.name = v` on a tuple, which reports `["scope", "state"]`
-  where it mutates nothing — is unreachable now that the B1 mutability gate
-  refuses a value type conforming to a settable property.
-
-- **`Head` and `Tail` are no longer value-blind on a symbol operand.** Both are
-  lazy (structural) operators, and their canonical fold treated a symbol operand
-  as the structure itself: `["Head", "x"]` canonicalized to the literal
-  `"Symbol"` regardless of what `x` was bound to, and `["Tail", "x"]` evaluated
-  to `Nothing`. This also froze a user function `f(e) = Head(e)` to the constant
-  `Symbol` at definition time (`f(3 + y)` returned `Symbol`). A symbol operand
-  now stays symbolic at canonicalization and is resolved through its binding at
-  evaluation — a lookup of the expression the symbol is bound to, not an
-  evaluation of it: with `x := a + 1`, `Head(x)` is `Add` and `Tail(x)` is
-  `Sequence(a, 1)` whether or not `a` has a value; an unbound symbol, a numeric
-  constant (`Pi`) and an operator name (`Sin`) still have head `Symbol` and no
-  tail. Compound operands fold structurally as before (`Head(a + 1)` is `Add`
-  even when `a` has a value).
+- `Reduce` and `Scan` now handle complex accumulators correctly in both
+  interpreted and compiled numeric paths.
+- `Abs` over a negation now returns the absolute value rather than the negated
+  expression.
+- The derivative of a vector norm now uses the vector norm rule instead of the
+  scalar absolute-value rule.
+- A declared subscripted symbol with a Greek base, such as `\eta_w`, now remains
+  the declared joined symbol instead of being captured as an index when `\eta`
+  becomes a collection.
+- A compiled user function with a `complex` parameter now receives and returns
+  correctly shaped values.
 
 ## 0.113.0 _2026-08-16_
 
 ### Breaking Changes
 
-- **A protocol that can modify object state can now only be conformed to by
-  object types (the mutability gate).** A protocol with at least one `readwrite`
-  property, or a function member whose _declared_ effects include `state`, is
-  object-only; conforming any other kind of type to it is the new
-  `protocol-requires-object` error:
+- **Protocols that can mutate state now require object types.** A protocol with
+  a `readwrite` property or a member declared with `state` effects can only be
+  implemented by an `object{...}` type. Use an object type when writable
+  protocol properties are needed.
+- **Assigning to a protocol property now stores into the object.**
+  `p.name = "Ada"` mutates the object referred to by `p` and returns the
+  assigned value. It no longer calls a setter that rebuilds and rebinds `p`.
+- **Collection operators now report result types by collection kind.** Operators
+  such as `Reverse`, `RotateLeft`, `RotateRight`, `Rest`, `Most` and `Filter` no
+  longer promise to preserve every indexed collection kind. For example,
+  reversing a tuple now reports a list type.
 
-  ```epsil
-  protocol Identifiable { readwrite id: string }
-  type Badge = record{id: string} is Identifiable
-  // -> protocol-requires-object: the `Identifiable` protocol has settable
-  //    properties. `Badge` is a record, and records are immutable; declare
-  //    `Badge` as an object type to conform.
-  ```
+### Objects And Protocols
 
-  The reason is that a writable property is only meaningful on something that
-  can be written to. Protocol properties were designed before the language had
-  mutable values, so `p.name = v` on a record or tuple was given the only
-  meaning then available — call the setter, which builds a _new_ value, and
-  rebind `p` to it. With `object{…}` types in the language that workaround is
-  superfluous, and keeping it meant one syntax with two meanings selected by the
-  receiver's type.
+- Stored object fields can now satisfy protocol property requirements with the
+  same name. Example: `type Person = object{name: string} is Nameable` can
+  satisfy a readonly `name` property without writing a getter.
+- Field-backed writable properties store into the object in place.
+- A stored field and an explicit accessor for the same protocol property are now
+  reported as a conflict.
 
-  **Migration is one line: declare the type as `object{…}` instead.**
-  `type Person = tuple<n: string, age: integer>` becomes
-  `type Person = object{n: string, age: integer}`; its constructor then takes
-  named arguments (`Person(n: "Bob", age: 42)`), and a `set` handler stores into
-  the receiver and returns it (`{ self.n = v   self }`) rather than rebuilding.
-  A protocol with only `readonly` properties and no declared `state` is
-  unaffected, and so is a protocol whose function members carry a _bare_ arrow
-  or an explicit `pure` — a bare requirement's effects are derived from its
-  conformers, so it never gates. Settable properties on builtin types
-  (`type string is Tagged` with a `readwrite tag`) are gone permanently: a
-  builtin can never be an object type. This applies on every route — the Epsil
-  `type … is …` statement, the `DeclareConformance` MathJSON form, and
-  `ce.declareProtocolImplementation()` (which throws). Replacing an existing
-  protocol so that it starts to gate is not rejected and does not remove
-  anything — conformance is monotone — but leaves the now-inadmissible
-  conformances pending, which the end-of-batch `protocol-implementation-pending`
-  warning reports.
+### Collections
 
-- **Assigning to a protocol property is now a store, and no longer rebinds the
-  variable.** `p.name = v` used to be sugar for `p = «set name»(p, v)`: the
-  `set` handler returned an updated value and the assignment rebound the
-  left-hand variable to it. It now invokes the handler against the object `p`
-  refers to and discards whatever the handler returns; the assignment evaluates
-  to the **value assigned**, not to the receiver.
+- `Slice` now accepts an index span. Example: `Slice(xs, 2..4)` is equivalent to
+  `Slice(xs, 2, 4)`.
+- Bare collection element types now consistently read as `unknown` rather than
+  `any`.
+- Assigning a value to a symbol declared `unknown` now refines the symbol from
+  the assigned value. Declare `any` when the type should remain fully
+  permissive.
+- Speculative parsing no longer narrows symbols declared `unknown` in the
+  surrounding engine.
 
-  ```epsil
-  type Person = object{n: string, age: integer} is Nameable { … }
-  let p = Person(n: "Bob", age: 42)
-  let alias = p
+### Numeric, Compilation And Parsing
 
-  p.name = "Ada"   // ➔ "Ada"   (was: Person(n: "Ada", age: 42))
-  alias.name       // ➔ "Ada"   — the very same object was modified
-  ```
-
-  Three consequences. The target no longer has to be a variable, so
-  `xs[1].name = v` stores into the list's element (previously
-  `property-assignment-target-invalid`, a diagnostic that is now retired
-  entirely). A receiver that is not an object — a record, a tuple, a builtin —
-  is `immutable-value-assignment`, reported identically whether the target's
-  type is known when the program is canonicalized or only when it runs. That is
-  reachable in ordinary code: after the mutability gate above a value type can
-  no longer carry a _settable_ property, but it can still carry a `readonly`
-  one, and writing to it (`q.tag = "z"`, or the qualified
-  `q.(Tagged.tag) = "z"`) reports the target's type rather than the property's
-  read-only-ness — nothing about an immutable value can be written, whichever
-  property is named. And a `set` handler's declared result is no longer checked
-  against the receiver: nothing consumes it, so returning something else is no
-  longer `protocol-signature-mismatch`. Returning the receiver remains the
-  useful convention. The qualified spelling is now a write as well as a read:
-  `p.(Nameable.name) = v` means the same store, restricted to the protocol
-  named. Compiled targets refuse a property store (fail closed) rather than
-  emitting a rebinding, since objects have no compiled representation yet.
-
-- **Collection operators no longer promise to return their operand's own kind;
-  the static result type is now honest per kind.** `Reverse`, `RotateLeft` and
-  `RotateRight` were declared `(T) -> T where T: indexed_collection`, and
-  `Rest`/`Most` as `(indexed_collection) -> indexed_collection`. The first
-  promised kind-preservation for EVERY indexed kind, which the runtime cannot
-  deliver: a `tuple` type carries its arity and per-position element types
-  (`["Reverse", ["Tuple", 1, "'a'"]]` claimed `tuple<finite_integer, string>`
-  for the value `("a", 1)` — the element types in the wrong order), and a
-  `range` admits only ascending spans (a reversed or rotated span is not one).
-  The second lost the element type altogether.
-
-  The rule now is per kind: a `list` operand keeps its full type, shape included
-  (`vector<3>` reversed or rotated is still a `vector<3>`); every other indexed
-  kind — tuple, range, an opaque `indexed_collection<T>` — results in `list<T>`,
-  and the length-changing `Rest`/`Most` result in `list<T>` for every kind (a
-  `list` type carries no length). `Filter`'s result follows the same rule: it
-  echoed the source's type, so a filtered 3-vector claimed `vector<3>`, a
-  filtered tuple claimed the tuple's arity, and a filtered span claimed `range`;
-  an indexed source now yields `list<T>` (a set source keeps its type).
-  Concretely, `["Reverse", ["Tuple", 1, "'a'"]]` types as
-  `list<finite_integer | string>`, `["Reverse", ["Range", 1, 10]]` and
-  `["Rest", ["Range", 1, 10]]` as `list<integer>`, and
-  `["Rest", ["List", 1, 2, 3]]` as `list<finite_integer>` (was bare
-  `indexed_collection`). Values are unchanged — these operators are lazy views
-  either way — and `Take`, `Drop`, `Slice`, `Sort` and `Unique` already returned
-  `list<T>`. Code that matched on the old declared signature strings
-  (`(T) -> T where T: indexed_collection`) must be updated; `Reverse`,
-  `RotateLeft` and `RotateRight` are now overload sets,
-  `((T) -> T where T: list) & ((indexed_collection<T>) -> list<T> where T)`.
-  (Phase 0b of `docs/STRING_ROADMAP.md`.)
-
-### New Features
-
-- **A stored field of an object type now satisfies a protocol property
-  requirement of the same name, with no `get`/`set` written.** A `readwrite`
-  requirement is satisfied when the field's type is exactly the property's type
-  (the getter direction would admit a narrower field and the setter direction a
-  wider one, so only the property's own type satisfies both); a `readonly`
-  requirement is satisfied when the field's type is the property's type or a
-  subtype. The engine synthesizes the accessors, so the interpreted tiers —
-  dispatch selection, property reads and property writes — find a handler where
-  they already look, and a write through the synthesized setter stores into the
-  object in place, returning the very same object rather than a rebuilt copy.
-  Compiling such an access is not yet supported: a synthesized accessor is a
-  host callback, which the compile planner refuses, so a compiled qualified read
-  or write on a field-backed type declines and the expression stays interpreted
-  — the same answer object field access itself gives until it is lowered.
-  Declaring both a stored field and an explicit accessor for one property name
-  is now the error `object-property-conflict`: a property is field-backed or
-  computed, never both. Field backing applies to object types only — records,
-  primitives, the bare `object` type and conditional (`where`-clause)
-  conformances get none.
-
-  With this, the `Person`/`Identifiable` example of
-  `docs/TYPE_SYSTEM_ROADMAP.md` Appendix B ("Objects and protocols") runs as
-  written: `firstName`, `lastName`, `age` and `role` are covered by the stored
-  fields, the implementation block supplies only the computed `get fullName` and
-  `function birthday`, and
-  `"Happy birthday, \(birthday(p).fullName)! You are \(p.age)."` evaluates to
-  `"Happy birthday, Alan Turing! You are 43."`.
-
-- **`Slice` accepts an index span.** `["Slice", xs, r]`, where `r` is a `range`
-  (an ascending, step-1 span of 1-based indexes such as `["Range", 2, 4]`),
-  returns the elements at those indexes: `["Slice", xs, r]` is
-  `["Slice", xs, ["First", r], ["Last", r]]`, with the positional form's
-  clamping (an end past the end of `xs` is clamped, a start past the end yields
-  `[]`). The parameter is typed `range` deliberately: a descending or stepped
-  `Range` (`["Range", 4, 2]`, `["Range", 1, 9, 2]`) is not a `range` and is
-  rejected as a type error, because unpacking it into `(start, end)` bounds
-  would contradict its own meaning (`["Slice", xs, 4, 2]` is empty; the
-  collection `4..2` is the pair `[4, 2]`). To gather elements at arbitrary
-  indexes use `["At", xs, indexes]`. `Slice` is now an overload set —
-  `((indexed_collection<T>, range) -> list<T>) & ((indexed_collection<T>, start: number, end: number) -> list<T>)`
-  — and the span form compiles to JavaScript as a native `slice`. This is the
-  `Slice(xs, range)` form the upcoming `RangeOf` sequence search consumes
-  (`Slice(xs, RangeOf(xs, needle))` is `needle`; `docs/STRING_ROADMAP.md`, Phase
-  0c).
-
-### Issues Resolved
-
-- **The element type of an unparameterized collection type is now `unknown`, not
-  `any`.** `collection`, `indexed_collection`, `list`, `set`, `tuple`,
-  `dictionary` and `record` written without a type argument reported `any` for
-  their elements, while the operators that actually extract one (`At`, `First`,
-  `Last`) reported `unknown` — so the same question had two answers and a
-  caller's behavior turned on which it asked. `unknown` is the correct reading:
-  `any` is a CONTRACT the author states ("anything may go here"), while writing
-  a bare `collection` states nothing about the members at all.
-
-  In practice four result types get more honest — `Join`, `Filter`, and scalar
-  arithmetic broadcast over a bare-typed collection now report `list<unknown>`
-  where they claimed `list<any>`. `range` is unchanged (`integer`): its members
-  genuinely are known, which is a fact rather than an absent statement. A
-  parameterized type still reports exactly what it was given.
-
-- **Assigning to a symbol declared `unknown` now types it from the value.**
-  `ce.declare('v', 'unknown')` followed by `ce.assign('v', 5)` left `v` typed
-  `unknown`, while the same assignment with no prior declaration settled on
-  `integer` — so a declaration that says nothing was SUPPRESSING inference
-  rather than deferring it. `unknown` is a placeholder that refines per use, not
-  a contract (`any` is the contract spelling), so the declaration withholds type
-  evidence and the assignment is the first evidence there is. The assignment now
-  settles the type exactly as the no-declaration route does — including the
-  literal promotion, so the result is `integer` rather than the value's raw
-  `finite_integer` — and marks it inferred, so later evidence can still refine
-  it and a second assignment is not held to the first one's type. This also
-  recovers precision that was being lost: with the assignment inert, the type
-  came from a later USE instead, and a use knows less than the value does
-  (`v + 1` yielded `number` where the value proves `integer`). A declared
-  CONCRETE type is unaffected, and `any` stays `any`: neither is a placeholder,
-  and a value that does not fit a concrete declared type is still rejected.
-
-  Two consequences worth knowing, both of which make an error arrive earlier
-  rather than change what is an error. A 2-tuple assigned to an `unknown` symbol
-  is now statically known, so `PointZ(u)` reports its dimension error at boxing
-  instead of at evaluation. And a collection assigned to an `unknown` symbol now
-  has a known element type, so a `Map` over it stamps the mapping parameter
-  (`Typed(w, 'finite_integer')`) instead of leaving it bare. Code that used a
-  declared `unknown` plus an assignment specifically to obtain a loosely-typed
-  symbol should declare `any` instead.
-
-- **A speculative parse no longer narrows a symbol declared `unknown`.**
-  `ce.parse(latex, { speculative: true })` promises to leave no trace in the
-  engine's type state, and it confines a narrowing use by shadowing the ambient
-  symbol inside the transient scope. The shadow was applied only to symbols
-  whose type was INFERRED, on the reasoning that a declared type cannot be moved
-  by a use — true of a declared concrete type, but not of `unknown`, which is a
-  placeholder that refines per use rather than a contract. So
-  `ce.declare('u', 'unknown')` followed by a speculative parse of `u + 1`
-  persistently narrowed `u` to `number`. The parse result still reports the
-  derived type (`number` here); only the ambient definition is left alone. This
-  also removes an inconsistency visible from outside: a symbol whose type had
-  been narrowed by an earlier use and then put back with the `type` setter WAS
-  confined, because the restore leaves the inferred flag set, while the same
-  symbol freshly declared `unknown` was not — two symbols identical in every
-  respect except history behaved differently.
-
-- **Dividing by a scaled vector norm no longer collapses to a literal `0`.**
-  `1/(3·|(1, 2)|)` — `["Divide", 1, ["Multiply", 3, ["Abs", ["Tuple", 1, 2]]]]`,
-  and the LaTeX `\frac{1}{3\vert(1,2)\vert}` that boxes through it —
-  canonicalized to the number `0`, not to an error or a `NaN`, where the answer
-  is `√5/15`. Over a tuple, `Abs` is the Euclidean norm: the result is a number
-  whose OPERAND is not one. `isFinite` answers `false` for anything that is not
-  a number at all, meaning "not a finite number" rather than "infinite", and
-  `Abs` propagated that `false` from its operand as a proof that the norm itself
-  was infinite. The product type handler reads a provably non-finite factor, so
-  `3·|(1, 2)|` typed `non_finite_number`, and `Divide` then applied the sound
-  `1/±∞ = 0` fold to it. The fold and the `1/±∞` typing are unchanged; what is
-  fixed is the false claim feeding them, so a genuinely infinite operand
-  (`1/(3·Abs(∞))`, `1/(3·Ln(0))`) still folds to `0`. `Sqrt` propagated
-  finiteness the same way and is guarded too — it folded nothing, because the
-  product type also requires every factor to be provably real, so this closes
-  the unsound claim before something else reads it. A bare symbol anywhere in
-  the product masked the collapse, which is why it survived: `1/(3·|(x, 2)|)`
-  and `1/(c·|(1, 2)|)` were always correct.
-
-- **A complex value passed as an ARGUMENT to a user-defined function with a
-  wide-typed parameter now compiles correctly.** With `b(x) := 2x` and a
-  declared-complex `w`, `compile(b(w))` emitted the one real-lane definition
-  `const _fn_b = (x) => 2 * x` and called it on the `{re, im}` object, so the
-  result was `NaN` at every point behind `success: true`; the same happened for
-  `b(t + w)`, `h(w, 2)`, and — under the `complexPromotion` opt-in — for the
-  filed witness `|b(a(t))/2 − 1|` with `a(t) := √(t−1)` (compiled `NaN`,
-  interpreter `1.30384…`). The call site's own verdict ("the argument is
-  complex") was known and then discarded at the user-call boundary: the body was
-  analyzed with its parameters masked real, and the emitter compiled every user
-  function exactly once.
-
-  A user function is now emitted once PER LANE PATTERN. A call site that binds a
-  complex scalar to a parameter not declared complex names a specialization
-  (`_fn_b$z1`, "parameter 1 complex") whose body compiles with that parameter
-  bound complex; the analysis binds the same lanes, so the parent and the
-  emitted body agree on the value shape; and a recursive self-call inside the
-  complex lane resolves to that same specialization. Every real-lane call keeps
-  its bare `_fn_b` name and byte-identical body, a parameter DECLARED complex
-  keeps the existing call-site coercion, and arguments that are not provably
-  scalar keep the previous runtime broadcast. Shader targets are unchanged
-  (their statically typed signatures fail closed on such a call). The same lane
-  also reaches the two collection shapes of the defect: a collection of complex
-  scalars broadcast into scalar parameters (`b(L)` with `L: list<complex>`,
-  previously `[NaN, NaN]`) takes the elements' lane, and a bare user-function
-  symbol used as an element callback over such a source (`Map(b, L)`, previously
-  `[NaN, NaN]` while the inline `Map(x ↦ 2x, L)` was correct) is compiled
-  through its eta-expansion so the call inside grants the lane.
-
-  Found alongside it: an emitted user-function body compiled under the CALLER's
-  `Block` local-shape frames, so a body reading a global `k` while the calling
-  block declared its own complex local `k` lowered the plain global as
-  `{re, im}` (`{re: null}` where the interpreter answers `7`). The body now
-  compiles under an isolated frame — the module-level discipline the GPU
-  definition lowering already applied.
-
-- **`\operatorname{unique}`, `\operatorname{sort}`, `\operatorname{reverse}` and
-  `\operatorname{total}` now parse to their operators.** The lowercase spellings
-  had no LaTeX dictionary entry while eight siblings in the same family
-  (`length`, `count`, `min`, `max`, `mean`, `median`, `join`, `shuffle`) did, so
-  they parsed as an application of an undeclared head — which then
-  auto-declares. There was no diagnostic at any point, and the result carried a
-  plausible `list<unknown>` type, so importing content that used these spellings
-  silently produced a symbolic non-answer. The capitalized forms always worked;
-  this was the lowercase spelling only.
-
-  `total(C)` is the sum of a collection and lowers to `Sum` — there is no
-  `Total` operator in the engine. A table test now pins every lowercase spelling
-  to the head it must resolve to, covering the previously-working eight as well,
-  so the set cannot drift again.
-
-- **A no-match diagnostic on an overload set no longer shows a generic parameter
-  as `…<unknown>`.** When no arm of an overload set accepted a call, the
-  reported "expected" type was the near-miss arm's instantiation, in which a
-  type variable that got no call-site binding reads `unknown` — so
-  `["Slice", "x", 2, 3]` blamed `x` for not being an
-  `indexed_collection<unknown>`, an impossible-looking requirement. The message
-  now shows the declared skeleton (`indexed_collection`), the same wording a
-  plain (non-overloaded) signature already used. Display only; typing is
-  unchanged.
+- Fixed division by a scaled vector norm, which could incorrectly collapse to
+  `0`.
+- Fixed compiled calls where a complex value is passed to a user function with a
+  wide parameter.
+- Lowercase LaTeX operator names such as `\operatorname{unique}`,
+  `\operatorname{sort}`, `\operatorname{reverse}` and `\operatorname{total}` now
+  parse to their intended operators.
+- Overload diagnostics now display the declared type shape instead of confusing
+  `...<unknown>` instantiations.
 
 ## 0.112.0 _2026-08-15_
 
 ### Breaking Changes
 
-- **The Epsil function arrow is now `=>`; `|->` is an error with a fix-it.** An
-  anonymous function is written `x => x + 1`, `(a, b) => a + b`,
-  `(x: integer) => x`, `() => 1` — the same arrow a `match` case already uses
-  (`pattern => body`), so one glyph means "yields" everywhere. The old `|->` sat
-  one character away from the pipe `|>` it most often appears next to
-  (`xs |> Map(_ |-> f(_), _)`), and read as the blackboard `↦` rather than as
-  the lambda arrow every mainstream language spells `=>`. Function TYPES keep
-  `->` (`(number) -> number`) and dictionary entries keep `->` (`{k -> v}`):
-  `->` is the type-level and key-value arrow, `=>` is the value-level one.
+- **Epsil lambdas now use `=>`.** The old `|->` spelling reports a diagnostic
+  with a fix-it. Function types still use `->`, and dictionary entries still use
+  `->`.
 
   ```epsil
   let square = x => x^2
-  [1, 2, 3] |> Map(_ => _^2, _)                // ➔ [1, 4, 9]
-  match n { 0 => "zero"; k if k > 0 => "pos"; otherwise => "neg" }
+  [1, 2, 3] |> Map(_ => _^2, _)
   ```
 
-  Because `=>` is shared with the `match` arm, a guard ends at the first `=>` at
-  the arm's own nesting depth: `n if valid => n` is guard `valid`, body `n`. A
-  lambda-valued guard needs parentheses (`n if (f => f)(n) => …`) — which
-  forbids nothing useful, since a bare function value is always truthy. Arm
-  bodies are unaffected: `0 => x => x + 1` is an arm whose value is a lambda.
+- **`record` and `object` field types now use braces.** Write
+  `record{x: integer, y: integer}` and `object{name: string}` instead of the old
+  angle-bracket form.
+- **`And`, `Or` and related boolean operators now short-circuit and preserve
+  operand order.** This can change serialized order for expressions that were
+  previously sorted during canonicalization.
 
-  Writing `|->` now reports `mapsto-arrow-legacy` with a fix-it that rewrites it
-  to `=>`, and the program is still parsed as the function it meant so no
-  cascade follows. Unicode input accepts both `⇒` (U+21D2) and `↦` (U+21A6) for
-  the arrow; the fancy-symbol serializer emits `⇒`, for lambdas and `match` arms
-  alike (`↦` is no longer emitted). The ASCII-math serializer and every
-  diagnostic and hint that spelled the arrow now say `=>`. Along the way,
-  `↦`/`⇒` were found never to have worked in a typed parameter list
-  (`(x: integer) ↦ x` reported a spurious `unexpected-symbol ":"`) or as a
-  `match` case arrow — both fixed.
+### Epsil
 
-- **`record` and `object` types are written with braces.**
-  `record{x: integer, y: integer}` replaces `record<x: integer, y: integer>`,
-  and `type Person = object{name: string, age: integer}` replaces the
-  `object<…>` form. Braces now mean an unordered, keyed field set — matching the
-  `{…}` value literals for sets and dictionaries — while angle brackets keep
-  meaning type arguments or an ordered element list, so `list<integer>`,
-  `dictionary<string>`, `set<T>`, `callback<…>`, `Pair<T, U>` and
-  `tuple<x: integer, y: integer>` (element names are labels on positions, not
-  keys) are unchanged. `record{}` and bare `record` / `object` are also
-  unchanged. The old spelling is a parse error naming the brace form
-  (``A record type is written with braces: `record{key: type, …}` ``); type strings serialize with braces, so `typeToString` output and
-  anything that snapshots it changes accordingly.
+- Lambda parameters and `for` loop bindings can destructure tuple elements.
+  Example: `pairs |> Map(((x, y)) => x + y, _)`.
+- Callback arity mismatches are now reported statically. Example:
+  `Map((x, y) => x + y, [1, 2, 3])` reports that `Map` calls its callback with
+  one argument.
+- A pipe stage that cannot accept exactly one piped value now reports
+  `pipe-stage-arity` instead of returning a partially applied function.
+- Duplicate lambda parameter names are now parse diagnostics.
+- `for` and `while` loops now serialize back to Epsil loop syntax instead of
+  generic `Loop(...)` calls when possible.
 
-  ```epsil
-  let p: record{x: integer, y: integer} = {x -> 1, y -> 2}
-  type Person = object{name: string, age: integer}
-  function origin() -> record { {x -> 0, y -> 0} }   // bare `record` + a body
-  ```
+### Types And Collections
 
-  In Epsil, a `{` after a bare `record`/`object` opens a field list only when it
-  is followed by `}` or by `name :`; otherwise it is the block body of a
-  function whose return type is the bare `record`/`object`, as in the last line
-  above. Where a block is required — the return type of a `function` declaration
-  — the two readings are told apart by looking for the body after the candidate
-  field list, so `-> record { }` and `-> record { x: integer }` are a bare
-  `record` plus a body, and `-> record{a: integer} { … }` is a field list plus a
-  body.
+- Added the `range` type for ascending, contiguous 1-based index spans. It is
+  still an indexed collection of integers, but can also be required by
+  span-consuming operators.
+- A lazy collection callback now runs once per element per consumption, avoiding
+  duplicate side effects from probing.
+- `Max`, `Min` and statistics over `Linspace` now handle descending,
+  single-sample and symbolic cases correctly.
+- Pipes that implicitly map over a collection now report the mapped collection
+  type.
+- Comparisons that may broadcast now report a `broadcastable<...>` type,
+  allowing `Which` and `Sum` to type their results more accurately.
+- Scaling or shifting collections now widens element types correctly. Example:
+  `(1..4)/2` reports rational elements, not integers.
+- Loop and comprehension binders can widen inferred element types when the
+  iterated collection under-declares its elements.
 
-  Fixed while here: record and object keys and tuple element labels that are not
-  plain identifiers (``record{`直径`: string}``, ``tuple<`my x`: integer>``)
-  serialized unquoted, producing a type string `parseType` could not read back;
-  they are now backtick-quoted on the way out.
+### Compilation And Numeric
 
-### New Features
-
-- **A lambda parameter can be a tuple pattern: `((p, q)) => p && q`.** Tuple
-  destructuring existed in `let (a, b) = v`, `(a, b) := v` and `match`, but not
-  where a per-element pair shows up most — a callback parameter and a `for`
-  header. A parameter written with a second pair of parentheses is ONE parameter
-  that takes a tuple and binds a name to each component (Kotlin's
-  `{ (a, b) -> … }`), reusing the pattern grammar `let` already has: bare names,
-  `_` to skip a position, nested `(…)` patterns. `(p, q) => …` is unchanged (two
-  parameters). `for (p, q) in pairs { … }` accepts the same pattern. In MathJSON
-  the pattern sits in a parameter position:
-  `["Function", body, ["Tuple", "p", "q"]]`.
-
-  ```epsil
-  [(True, True), (True, False), (False, True), (False, False)]
-    |> Map(((p, q)) => p && q, _)         // ➔ [True, False, False, False]
-  for (name, age) in people { … }
-  ```
-
-  A shape mismatch at the call is the same `incompatible-type` error the
-  destructuring `let` produces; a literal or a per-element type annotation
-  inside the pattern is a parse diagnostic (`pattern-binding-expected`,
-  `pattern-element-annotation`). Destructuring lambdas are interpreted — the
-  compile targets decline them explicitly rather than bind the wrong names.
-  Fixed while here: the JavaScript target's `Integrate` lowering tested a
-  parameter-name array with `!== undefined` (vacuously true), so a parameter
-  with no readable name compiled the integrand against the enclosing scope.
-
-- **A callback whose parameter count cannot fit its operator is now a
-  `callback-arity` error, statically.** Partial application is a feature of
-  ordinary positional calls (`f(1)` on a binary `f` is a function awaiting the
-  second argument), but inside a collection operator the OPERATOR decides how
-  many arguments the callback receives, so a mismatch is never what was meant —
-  and the operators disagreed about it, several silently:
-  `Map((p, q) => p + q, [1,2,3])` answered three closures typed `vector<3>`,
-  `Sort(xs, (a, b, c) => a < b)` returned `xs` UNSORTED, `Fold` buried an
-  `Error` in a nested closure, `Filter`/`Any`/`All`/`Reduce` stayed inert, and
-  `Map(p => p, xs, ys)` threw `Too many arguments` only once an element was
-  forced. Every callback-taking collection operator now checks in its canonical
-  handler (so it fires on the box, parse, `ce.function` and Epsil routes)
-  whether a function literal — or a symbol with a known, non-generic signature —
-  can accept the argument count it supplies: `Map` one per source, the
-  per-element family one, `Reduce`/`Fold`/`Scan` two, `Fill` two, and the mode
-  selectors `Sort`/`Ordering` (key or comparator) and `Iterate` (`f(previous)`
-  or `f(index, previous)`) either of their two. A nullary literal (`() => True`)
-  is a constant and fits any slot; a callback of unknown arity (`function`,
-  `callback<…>`, generic) is not checked. The message names both sides and the
-  fix:
-
-  ```
-  Map calls its callback with 1 argument (each element of the collection);
-  `(p, q) => p + q` declares 2 parameters. To take a pair apart, use a tuple
-  pattern parameter: ((p, q)) => …
-  ```
-
-  The tuple-pattern hint is offered only when the source's elements are provably
-  tuples of exactly the declared width. Suggested on the shape of the mismatch
-  alone it named rewrites that cannot work — `Map((p, q) => p + q, [1, 2, 3])`
-  proposed `((p, q)) => …` for a list of NUMBERS. The arity error itself is a
-  fact about the callback and is unchanged; only the suggested fix is now gated.
-
-- **A pipe stage that cannot take one value is a `pipe-stage-arity` error.**
-  `x |> f` hands `f` exactly one value, so a multi-parameter stage can never be
-  applied. It used to fall through to the currying path and answer a residual
-  closure with no diagnostic — `[100, 200] |> (x, y, z) => x + y + z` evaluated
-  to `(_1, _2) => …` — which in a pipeline is never what was meant. This applies
-  to a named stage too: `xs |> add` on a two-parameter `add` is the error, not a
-  partial application.
-
-  It is deliberately NOT the `callback-arity` error above. A pipe stage is not
-  an operator-owned callback slot — `x |> f` is an application whose argument is
-  written to the left — and the remedy differs: a pipe points at the CALL form,
-  with `_` marking the piped value's slot, rather than at a tuple pattern.
-
-  ```
-  A pipe passes its stage exactly 1 value; `(x, y, z) => x + y + z` declares 3
-  parameters. A stage that takes several arguments is written as a call, with
-  `_` in the piped value's slot: `xs |> Fold(f, 0, _)`
-  ```
-
-  When the piped value is a collection of tuples, the tuple pattern still works:
-  `pairs |> ((p, q)) => p + q`. `epsil doc pipe-stage-arity` explains the whole
-  rule.
-
-  Fixed while here: `Fill((i: integer) => 2i, (2, 2))` compiled to JavaScript
-  (silently accepting a unary generator) while the interpreter threw on the same
-  expression; both routes now agree.
-
-- **New `range` type: an index span.** A `Range` that denotes a contiguous,
-  ascending run of 1-based collection indexes — integer bounds, at least 1,
-  ascending, one apart, finite — now has the narrower type `range` instead of
-  `indexed_collection<integer>`. `["Range", 2, 5]` is a `range`; a stepped
-  `["Range", 1, 10, 2]` (a gather, not a span), a descending `["Range", 5, 2]`,
-  and a symbolic `["Range", a, b]` keep the wider type, as do fractional and
-  infinite ranges.
-
-  `range` is a subtype of `indexed_collection<integer>` and a SIBLING of `list`
-  — neither is a subtype of the other — so everything that accepted a `Range`
-  before still accepts one, and the elements are still typed `integer`. What the
-  type adds is the ability for a span-consuming operator to require a usable
-  span at the TYPE level rather than checking at runtime. It is an index span,
-  not a mathematical interval (that is `Interval`) and not the statistical range
-  of a data set (that is `Min`/`Max`). There is deliberately no empty span:
-  `["Range", 1, 0]` already means the descending pair `[1, 0]`.
-
-  One representational note for code that switches on the shape of a type:
-  `range` is a PRIMITIVE type name, so in the type AST it is the bare string
-  `"range"`, not an object with a `kind` (the way `list` and
-  `indexed_collection` are). A classifier written as a switch over `kind` will
-  fall through on it even though it is a collection type; match the primitive
-  name, or test with `type.matches('indexed_collection<integer>')`.
-
-### Issues Resolved
-
-- **A `Sum` or `Product` with a symbolic bound now compiles to a shader that
-  GLSL/WGSL drivers accept.** The loop counter is declared as an integer, but a
-  bound such as `K - 1` (or a constant-folded `Length(L)`) is a float
-  expression, and shader languages have no implicit int→float promotion — so
-  `for (int j = 0; j <= K + -1.0; j++)` was reported as a successful compilation
-  and then rejected by the driver as `'<=' : wrong operand types`. Both bounds,
-  for both operators and both targets, are now converted in the loop header
-  (`int(floor(K + -1.0))` / `i32(floor(…))`), flooring a non-integer bound the
-  way the JavaScript target does. Constant bounds are unchanged. In the same
-  fix, a `compileFunction()` parameter (or shader uniform) declared `int`,
-  `i32`, `uint` or `u32` is now converted to a float wherever the body uses it
-  in arithmetic (`float(K) + 1.0`), where before it was spliced in bare and
-  produced the same driver-side type error; an integer-declared loop bound is
-  used directly (`j <= K`), and an `int` argument passed to a float-typed user
-  function is converted instead of failing compilation. The conversion is a
-  32-bit float and loses precision above 2²⁴.
-
-- **A statistics function applied to a single value now works when compiled.**
-  `Mean(x)`, `Median(x)`, `Variance(x)` and the rest are legal whatever `x` is,
-  and interpretation answers them by treating one datum as a one-element list —
-  `Mean(4)` is `4`, `Variance(4)` is `NaN` (the sample form divides by `n − 1`),
-  `PopulationVariance(4)` is `0`. The compiled versions instead threw
-  `values is not iterable` at run time, after reporting a successful
-  compilation. They now agree with interpretation in every case, including when
-  the same compiled function is called with a number one time and an array the
-  next. A statistics head over COMPLEX data (`Mean([i, 2i])`) now fails closed
-  and falls back to interpretation, rather than compiling to `NaN`.
-
-- **Differentiating a point-valued function bound by `assign` is componentwise
-  again.** A lambda whose body head is `PointList` differentiated correctly when
-  the function was defined by parsing
-  (`g(t) \coloneq \operatorname{PointList}(\sin t, \cos t, t)`) but not when the
-  same lambda was installed through `ce.assign()` — there the chain rule treated
-  `PointList` as an opaque 3-ary function and produced
-  `Apply(Derivative("PointList", 0, 1, 0), …)` rather than differentiating each
-  component. A `Tuple` body was componentwise under both binding forms, which is
-  what made the asymmetry easy to miss. `p'(0.25)` for an assign-bound
-  `(t) \mapsto \operatorname{PointList}(\sin t, \cos t, t)` now gives
-  `(0.9689…, -0.2474…, 1)` on every route — the prime form, `D(p(t), t)`,
-  `Derivative(p, 1)` and the `\mapsto` spelling — matching the parse-bound
-  result. The head stays `PointList`, and list-valued components zip as before.
-
-  This matters disproportionately because installing a definition through
-  `assign` is the registration route a host uses when it holds the lambda
-  programmatically rather than as source text, so every point-valued curve
-  registered that way had an inert derivative.
-
-- **A prime written before a subscript now attaches to the subscripted name.**
-  `F'_{0}(t)` and `F^{\prime}_{0}(t)` (both spellings the Desmos editor emits)
-  parsed as `Multiply(t, Subscript(Prime(F), 0))`: the prime bound to the bare
-  `F`, the subscript then applied to the derivative, and the trailing `(t)`
-  degraded to an invisible product instead of an application. All three
-  spellings — `F'_{0}(t)`, `F^{\prime}_{0}(t)` and `F_{0}'(t)` — now parse
-  identically, as `Apply(Derivative(F_0, 1), t)`, the derivative of the function
-  named `F_0`. Higher orders (`F''_{0}(t)`) and the bare form (`F'_{0}`) follow
-  the same rule, and a subscript that is an expression (`F'_{n+1}`) keeps the
-  `Subscript` reading it already had in the `F_{n+1}'` spelling.
-
-- **Element-wise arithmetic over a collection of complex values now compiles.**
-  The JavaScript target broadcasts scalar arithmetic across a list operand
-  through its `_SYS.bcast` runtime helper, and that path used to decline the
-  moment any element was complex-valued, reporting `success: false` with "cannot
-  compile scalar arithmetic over a list-valued operand" and falling back to
-  interpretation. `2·[1+i, 3+i]` now compiles and produces the interpreter's
-  `[2+2i, 6+2i]`. This also removes a cost of enabling the opt-in
-  `complexPromotion` compile option: with `w(t) := [√(t−1), √(t−2)]`, turning
-  the option on made `2·w(t)`, `w(t)+1` and `w(t)/2` stop compiling, because
-  promotion makes every element of that body complex. All three compile with the
-  option on and match interpretation at both ends of the domain. A collection
-  whose elements DISAGREE about being complex (`[1+i, 2]`, which is emitted as
-  the heterogeneous `[{re, im}, 2]`) still fails closed: one scalar closure is
-  mapped over every position, so no single real-or-complex convention fits it.
-
-- **A complex argument to a rounding, min/max or integer-division head no longer
-  compiles to NaN.** `Floor`, `Ceiling`, `Round`, `Truncate`, `Fract`, `Max`,
-  `Min`, `Clamp`, `Mod`, `Remainder`, `GCD` and `LCM` lower to real-only target
-  code — there is no rounding of a complex number, and the complex numbers carry
-  no total order — but unlike the special functions (`Erf`, `Gamma`, `Zeta`),
-  which already failed closed, these were spelled as function codegen and
-  slipped past that check. `Floor(x + (1+i))` compiled to `Math.floor({re, im})`
-  and returned NaN while reporting `success: true`; `Mod(x + (1+i), 2)` returned
-  NaN where the interpreter answers `1`. They now fail closed and the
-  interpreter answers. Real operands are unaffected — `Floor(x)` still compiles
-  to `Math.floor(_.x)`.
-
-- **`&&` and `||` (`And`/`Or`) now short-circuit.** The operands are evaluated
-  left to right, in the order written, and evaluation stops at the first `false`
-  (for `&&`) or the first `true` (for `||`); the remaining operands do not run.
-  Before, `And`/`Or` were declared eager and commutative: every operand was
-  evaluated (`false && f()` still called `f()`, and a guard such as
-  `k <= n && xs[k] > 0` still read `xs[k]` out of range), and canonicalization
-  sorted the operands, so `g() && f()` could even run `f()` first — while the
-  JavaScript compilation target already emitted a short-circuiting `&&`, so
-  compiled and interpreted code disagreed on side effects and errors.
-
-  **A consequence worth calling out separately, because it is the one part of
-  this change that fails silently: the operands of `And`, `Or`, `Nand` and `Nor`
-  are no longer reordered at canonicalization.** `["And", "q", "p"]` stays as
-  written, where before it came back sorted as `["And", "p", "q"]`. Sorting is
-  what the `commutative` flag did, and it is incompatible with short-circuiting:
-  once evaluation order is part of the meaning, reordering the operands changes
-  which ones run. Everything else in this entry announces itself by running less
-  code or raising where it used to succeed; this one does not signal at all —
-  code that assumed a canonical conjunction was sorted (comparing two
-  conjunctions structurally, keying a cache or a snapshot on the serialized
-  form, or pinning the order in a test) now just sees a different order, with no
-  error. `Xor` still sorts its operands, and `Add`, `Multiply` and the other
-  commutative operators are untouched.
-
-  Nested `And`/`Or` are still flattened, and the symbolic simplifications
-  (`A ∧ ¬A → False`, duplicate removal, absorption, CNF/DNF) are unchanged.
-  `Nand`, `Nor` and `Implies` short-circuit the same way (`Nand` stops at the
-  first `false`, `Nor` at the first `true`, `Implies` skips its consequent when
-  the antecedent is `false`), and so do chained comparisons: `a < b < c`,
-  `a = b = c` and their `<=`/`!=` forms stop at the first adjacent pair that is
-  false, so `c` is not evaluated once `a < b` fails. `Xor` and `Equivalent`
-  cannot short-circuit (every operand affects the result) and are unchanged.
-  When an operand is a collection the operation is element-wise, every operand
-  is evaluated once, and the result is a list.
-
-- **A lazy collection's callback now runs exactly once per element per
-  consumption.** `Sum`, `Product`, `Reduce`, `Max`, `Min`, `GCD`/`LCM`, `Length`
-  and the statistics family (`Mean`, `Median`, `Variance`, …) used to run one or
-  more probe enumerations before the real one — pulling a first element to learn
-  whether the collection declines to enumerate, asking whether it is empty
-  before counting it, or scanning for an absent datum and for symbolic data in
-  separate passes — so `Sum(Map(f, xs))` ran `f` N+1 times over N elements,
-  `Max(Map(f, xs))` 2N+1 times and `Mean(Map(f, xs))` 2N times. With callbacks
-  that write to a variable or a mutable object, the extra runs were observable
-  (Appendix B of `docs/TYPE_SYSTEM_ROADMAP.md`, ruling B8). Each consumer now
-  reads every verdict off the single walk it already performs; the computed
-  values are unchanged.
-
-- **`Max`/`Min` of a descending or single-sample `Linspace` were wrong, and
-  `Max`/`Min`/`Mean` of a symbolic one returned `NaN`.**
-  `Max(Linspace(5, 1, 3))` — the elements `[5, 3, 1]` — returned `1` and `Min`
-  returned `5`, because the extremum was read off a fixed endpoint that is only
-  right for an ascending run; and `Max(Linspace(1, 5, 1))`, whose single sample
-  is `1`, returned `5`. The extremum is now taken over the samples that exist (a
-  symbolic count stays symbolic). And a finite collection that _declines_ to
-  enumerate (`Linspace(a, 1, 3)` with `a` unknown) was read as _empty_ by the
-  absent-datum gate, so `Max`, `Min`, `Mean` and the other aggregates answered
-  `NaN`; they now stay symbolic (`max(Linspace(a, 1, 3))`), as `Sum` already
-  did. `Max([])` and `Max(Missing)` are still `NaN`.
-
-- **`for` and `while` loops round-trip through the Epsil serializer.** A `Loop`
-  used to serialize only in the call spelling `Loop(do {…}, x in xs)` —
-  re-parseable, but not what the author wrote. It now prints as
-  `for x in xs { … }`, `for (p, q) in pairs { … }` or `while c { … }`, and a
-  `break`/`continue` inside a loop body prints as the keyword. Outside a loop
-  body — at the top level, or inside a function literal within a loop, where the
-  parser would report `control-outside-loop` — the call form
-  `Break()`/`Continue()` is kept, tracked by a serializer-side loop depth that
-  resets at every function-literal boundary, exactly as the parser's does.
-  `Loop` shapes the surface grammar cannot spell keep the call form.
-
-- **A duplicate name in a lambda parameter list is a parse diagnostic.**
-  `(x, x) => x`, `(x: integer, x) => x` and a tuple-pattern leaf repeating a
-  name (`((p, p)) => p`, `(x, (p, x)) => …`) now report `unexpected-symbol` at
-  parse time, the same diagnostic `let (p, p) = v` gives, instead of surfacing
-  later as an "already declared" error out of canonicalization (and nothing at
-  all from `epsil check`). `_` discards a position and may repeat.
-
-- **A signature mixing optional parameters with a variadic tail is rejected on
-  the type-object route too.** The type-string grammar has always refused
-  `(number, number?, number+) -> number` ("Variadic arguments cannot be used
-  with optional arguments"), but a `Type` object built by hand and passed to
-  `ce.declare()` slipped through — a type that existed but had no spelling
-  `parseType` could read back. `BoxedType` now enforces the same rule for every
-  object-route entry, nested signatures included, with the same message
-  (`code: 'variadic-with-optional'`).
-
-- **A pipe whose stage maps now has the type of the mapped collection.** A unary
-  function literal on the right of `|>` maps over a collection topic instead of
-  being applied to it as a whole, so `xs |> x => x^2` means `Map(x => x^2, xs)`.
-  Its static type described the wrong thing: it reported the stage's RESULT type
-  — an element — so the whole pipe fell back to `unknown` and every consumer
-  downstream, arithmetic broadcast in particular, read it as a scalar. It now
-  reports the collection type that the equivalent `Map` reports, with the same
-  shape and element type.
-
-  ```epsil
-  [1, 2, 3] |> n => n^2
-  // type was `unknown`, now `vector<3>`
-
-  [(True, True), (True, False), (False, True)] |> p => p[1] && p[2]
-  // type was `unknown`, now `list<broadcastable<boolean>^3>`
-  ```
-
-  The escapes from the implicit `Map` are unchanged and still type as an
-  application: a bare function symbol (`xs |> Sum`), a string topic, a
-  non-collection topic, and a parameter annotation claiming the whole collection
-  (`xs |> (l: list<number>) => Length(l)`).
-
-- **A comparison that may or may not broadcast now says so in its type, and
-  `Which`/`Sum` carry that through.** `Equal` and `NotEqual` compare a
-  collection against a scalar element-wise (`[2, 3, 2] = 2` is
-  `[True, False, True]`) but compare two collections as a whole (a single
-  boolean). When one side is definitely a collection and the other is an
-  expression whose type is not yet known — `U_1` where `U` is declared bare
-  `indexed_collection`, so its elements could themselves be collections — which
-  of the two applies is only settled at evaluation. The declared type used to
-  claim the scalar `boolean` while the value broadcast to a list, and every
-  consumer inherited the disagreement. With `C` and `U` both declared
-  `indexed_collection` and assigned `C := [2, 3, 2]`, `U := [2, 3]`:
-
-  | expression                       | type was         | type now                        |
-  | -------------------------------- | ---------------- | ------------------------------- |
-  | `C = U_1`                        | `boolean`        | `broadcastable<boolean>`        |
-  | `{C = U_1: 1, 0}`                | `finite_integer` | `broadcastable<finite_integer>` |
-  | `\sum_{i=1}^{2} {C = U_i: i, 0}` | `number`         | `broadcastable<integer>`        |
-
-  All three evaluate to lists (`["True","False","True"]`, `[1,0,1]`, `[1,2,1]`),
-  which the new types admit — `broadcastable<T>` is the union
-  `T | indexed_collection<T>`. Declaring a concrete element type
-  (`U: list<number>`) still gives the sharper definite `list<…>` types, and the
-  two statically decidable outcomes are unchanged: two collections compare to a
-  scalar `boolean` (`C = U`), and a collection against a definitely-scalar
-  operand types `list<boolean>`. The ordering comparisons (`Less`, `Greater`,
-  `LessEqual`, `GreaterEqual`) broadcast in every collection case, so they have
-  no undecidable outcome and keep their definite `list<boolean>`.
-
-- **Scaling or shifting a collection by a non-integer scalar no longer claims
-  integer elements.** When a scalar broadcast over a collection — a `Range`, a
-  declared `list<integer>` symbol, a list literal — the declared element type
-  echoed the collection's own elements and ignored the scalar entirely, so
-  `\frac{1}{2}(1..4)` reported `list<integer>` while evaluating to
-  `[1/2, 1, 3/2, 2]`. The scalar's numeric tier is now combined into the element
-  type: `\frac{1}{2}(1..4)`, `(1..4)/2` and `(1..4)+\frac{1}{2}` report
-  `list<rational>`, `0.5(1..4)` and `0.5·L` (with `L: list<integer>`) report
-  `list<real>`, and `2(1..4)` still reports `list<integer>`. The most visible
-  consequence: a comprehension declares its binder from that element type, so
-  `x \operatorname{for} x = \frac{1}{2}(1..4)` used to fail with
-  `Symbol "x": the value "1/2" of type "finite_rational" is not compatible with the type "integer"`;
-  it now yields `[1/2, 1, 3/2, 2]`. `i·[i, 2i]` likewise reported
-  `vector<imaginary^2>` for a value of `[-1, -2]` and now reports
-  `vector<finite_complex^2>` — neither sums nor products are closed over the
-  imaginary numbers.
-
-- **A loop or comprehension binder no longer fails when the iterated collection
-  under-declares its elements.** A binder's index type is a GUESS read off the
-  collection's declared element type, but it was recorded as if the user had
-  declared it, so an element outside that type aborted the whole iteration with
-  an `incompatible-type` error instead of iterating. Such a binder now widens
-  its guess to cover the value, matching how every other inferred type behaves
-  on assignment. A binding site that genuinely declares a type is unaffected and
-  still holds its values to it.
-
-- **Broadcasting a scalar over a nested list no longer retypes the inner
-  symbols.** With `L := [1, 2]`, merely boxing `2 · [L, L]` (or `1 + [L, L]`)
-  narrowed `L`'s recorded type from `vector<finite_integer^2>` to `real` — the
-  value stayed `[1, 2]`, so a later broadcast over `L` in the same engine
-  claimed an unsound type. The numeric-argument check walked the elements of a
-  list operand and inferred the scalar context onto each of them, including an
-  element that is itself a collection-valued symbol. Elements that are or may be
-  collections are now skipped, exactly as a top-level collection operand already
-  was; plain scalar elements are still inferred.
+- Shader compilation now emits valid integer conversions for symbolic `Sum` and
+  `Product` bounds.
+- Statistics functions such as `Mean(x)` now compile correctly for a single
+  value.
+- Differentiating point-valued functions installed through `assign` is
+  componentwise again.
+- Primes before subscripts now attach to the subscripted function name. Example:
+  `F'_{0}(t)` parses as the derivative of `F_0` applied to `t`.
+- Element-wise arithmetic over collections of complex values now compiles where
+  a single real-or-complex convention fits.
+- Real-only numeric operations such as `Floor`, `Max` and `Mod` now decline
+  complex operands instead of compiling to `NaN`.
 
 ## 0.111.0 _2026-08-15_
 
-### New Features
-
-- **Mutable objects can now be modified: `p.age = 43` stores into a field.**
-  `type Person = object<name: string, age: integer>` declared a type and
-  `Person(name: "Alan", age: 42)` constructed a value in 0.110.0, but there was
-  no way to change one — the assignment failed with a confusing
-  `expected \`symbol\`, got \`integer\``, because it fell through to the
-  rebinding-sugar path, which describes a different concept. A field assignment
-  is now a store:
-
-  ```epsil
-  type Person = object<name: string, age: integer>
-  let p = Person(name: "Alan", age: 42)
-  p.age = p.age + 1
-  p.age                     // ➔ 43
-  ```
-
-  The target no longer has to be a variable — any expression that evaluates to
-  an object can be stored into, so `xs[i].name = v` and `p.friend.name = v`
-  work. The right-hand side is evaluated once, at the store, at the exact tier
-  (`Sqrt(2)` is stored symbolically, never as a float), and the object is
-  mutated in place: every name referring to it sees the change, including a
-  `const` binding, since the store writes the object and never the binding.
-
-  A store is an effect: a function whose body stores into a field infers the
-  `state` label, so annotating such a function `pure` is refused rather than
-  silently accepted. Stores do not disturb the engine's invalidation generations
-  — only results that actually read the changed object's fields are recomputed —
-  so a store-heavy loop does not cold unrelated caches.
-
-- **Assigning to a field of an immutable value now says so.** A field assignment
-  on a record, dictionary, tuple, or scalar reports
-  `immutable-value-assignment`, naming both ways forward (build an updated copy,
-  or declare the type as `object<…>`), where it previously reported
-  `incompatible-type: expected \`symbol\`` — a message about the old lowering
-  rather than about anything the author wrote.
-
 ### Breaking Changes
 
-- **`RecordFrom` has been removed.** It declared `(collection) -> record` but
-  returned an inert, untyped `Record(…)` application, because `Record` has no
-  operator definition anywhere in the engine — so its declared result type lied.
-  Use `DictionaryFrom`, which already returns exactly what `RecordFrom`
-  promised: given pairs whose keys are all bare identifiers, its result types as
-  `record<…>`. A record and a dictionary differ only in the type world, and
-  record-ness is derived from the value, so the two operators were never
-  distinct.
+- **`RecordFrom` has been removed.** Use `DictionaryFrom`. Given identifier
+  keys, `DictionaryFrom([("a", 1), ("b", 2)])` already produces a value typed as
+  a record.
 
-  ```epsil
-  DictionaryFrom([("a", 1), ("b", 2)])
-  // ➔ {"a" -> 1, "b" -> 2}, typed record<a: finite_integer, b: finite_integer>
-  ```
+### Objects
 
-### Issues Resolved
+- Mutable object fields can now be assigned. Example: `p.age = p.age + 1` stores
+  into the object in place, and all aliases see the update.
+- Assigning to fields of immutable values now reports
+  `immutable-value-assignment` with guidance to use an object type or build an
+  updated copy.
 
-- **An Epsil program now stops when its time budget expires.** A host that runs
-  `executeEpsil()` inside `ce.withTimeLimit(…)` gave the whole program one
-  deadline, but the interpreter turned each statement's timeout into an error
-  value and went on to the next statement — and only statements doing enough
-  work to reach one of the engine's internal checks ever noticed. A 5
-  000-statement program ran to completion under a 1 ms budget, reporting
-  `completed`, with a `timeout` diagnostic on roughly one statement in 250. That
-  is a correctness bug, not a latency one: the program that ran was a
-  _different_ program — twenty statements skipped from the middle, and every
-  later statement executed against the state those should have produced. In an
-  imperative language whose errors are values, a skipped assignment does not
-  announce itself; what follows just reads a stale or missing binding and yields
-  a plausible number. The deadline is now checked before every statement (in the
-  static type pass as well as the evaluation loop, which used to swallow it
-  there too), and the first expiry ends the run: `result.value` is the
-  statement's `Error("Timeout exceeded", "timeout")`, `valueRange` points at it,
-  and no later statement runs. Count-based caps (`iterationLimit`,
-  `recursionLimit`) are per-construct and unchanged: the breaching statement is
-  an error value and the program continues. See the Interruptibility section of
-  the Epsil evaluation guide, which now also spells out that a loop cut short by
-  `iterationLimit` leaves its partial assignments in place.
+### Epsil And Performance
 
-- **Parsing a long Epsil program was quadratic in its length.** Every bare-`=`
-  statement re-scanned the program's tokens from the first one to find where its
-  left-hand side begins; a 16 000-line program of simple assignments took 1.8 s
-  to parse, ~30× longer per line than a 500-line one. That lookup is a binary
-  search now, and the lexer's per-character class tests (`isBreak`, `isSyntax`,
-  …) use `Set`s instead of scanning arrays of thousands of code points. Parse is
-  linear again: ~4 µs per statement at every size measured (500 → 16 000 lines),
-  29× faster on the 16 000-line program.
+- Epsil programs now stop when the active time budget expires, instead of
+  continuing after a statement times out.
+- Parsing long Epsil programs is now linear in program length.
+- Canonicalization now checks `withTimeLimit` deadlines while it runs.
 
-- **Operators no longer commit an answer for a collection-typed variable that
-  has no value yet.** A symbol declared `list<number>` (or `vector<2>`, or a
-  call whose head returns one) is collection-_shaped_, but cannot be enumerated
-  until it is assigned. Six operator families read "cannot enumerate" as "is a
-  scalar" and took their scalar path, producing an answer that the same
-  expression contradicted once the value arrived:
+### Collections And Numeric
 
-  With `ce.declare('L', 'list<number>')` and no value assigned yet:
-
-  ```epsil
-  Sum(L)                  // was L,       now symbolic (6 once L = [1,2,3])
-  Union(L, {1})           // was {L, 1},  now symbolic ({5,1} once L = [5])
-  1 ∈ {1,2} \ L           // was True,    now undecided (False once L = [1])
-  Mean(L)                 // was NaN,     now symbolic (2 once L = [1,2,3])
-  Missing + L             // was NaN,     now symbolic ([NaN,NaN] once assigned)
-  ```
-
-  and with `ce.declare('B', 'list<boolean>')`, `Which(B, 1, True, 2)` threw out
-  of `evaluate()` and is now held.
-
-  The `SetMinus` row is the one to note: it _inverted_ a membership answer, and
-  a wrong `True` there feeds assumption discharge. `Which` hard-threw out of
-  `evaluate()` where the compiled path already held the same condition, so the
-  interpreter and the compiler disagreed about what a collection-typed condition
-  is; they now agree.
-
-  Once the symbol is assigned, every one of these gives exactly what it gave
-  before — the fix withdraws wrong answers, it does not make the operators
-  inert. The same correction also reaches a valueless _scalar_ symbol in the
-  statistics aggregates: `Mean(y)` stays symbolic instead of folding to `NaN`.
-  An absent datum is unaffected: `Mean([1, Missing, 3])` is still `NaN`.
-
-- **Canonicalization now honors a `withTimeLimit` deadline while it runs, not
-  only between runs.** The walk is a plain recursion, so nothing checked the
-  budget inside it and a single long canonicalization ran to completion no
-  matter how small the limit — the overrun scaled with the size of the input
-  rather than being bounded by the deadline. A 12 000-term sum parsed under
-  `withTimeLimit({ ms: 1 })` ran 2 799 ms; it now cancels in 6 ms, and a 50 ms
-  budget lands at 54 ms. Work outside a `withTimeLimit` span is unaffected and
-  pays no measurable cost.
-
-  One half of `parse()` is still unbounded: the LaTeX parser is a decoupled,
-  injected dependency with no access to the engine's deadline, so giving it one
-  is an interface change and has not been made yet. A span around `ce.parse()`
-  can still overrun by the parser's share of the work, which is roughly half.
-
-- **Compiling an indexed read out of a collection with complex elements no
-  longer produces a wrong value.** A list is compiled element by element and
-  each element picks its own real-or-complex lowering, so the emitted array is
-  mixed: `[i·t, 1]` becomes `[{re, im}, 1]`. An indexed read was nonetheless
-  classified from the whole collection, which describes no individual element —
-  so it was wrong in both directions, and silently, behind `success: true`. At
-  `t = 0.3`, with no compile options set:
-
-  ```epsil
-  [i t, 1][2] + 1                      // was {re: NaN}, now 2
-  h(t) := [i t, 1]  ;  h(t)[1] + 1     // was the string "[object Object]1",
-                                       // now 1 + 0.3i
-  2 * h(t)                             // was [NaN, 2]; now declines to the
-                                       // interpreter, which gives [0.6i, 2]
-  ```
-
-  The read is now classified from the element it actually selects. A literal
-  index names one element; a run-time index is answered when every element
-  agrees. A run-time index into a collection whose elements DISAGREE has no
-  static answer — the read is a complex object for some indices and a plain
-  number for others — so it now declines to compile and the interpreter
-  evaluates it, rather than emitting one of the two lowerings and being wrong
-  for the other.
-
-  This also completes the opt-in `complexPromotion` introduced in 0.110.0 for
-  collection-valued functions, which was its motivating case: promotion always
-  happened inside the body, and only the reading of the result was missing.
-  `w(t) := [√(t−1), √(t−2)]` with `|w(t)[1]/2 − 1|` now matches the interpreter
-  with the option on, for a list body and for a point-list body alike. The
-  promotion rule itself is unchanged, and compilation without the option is
-  unaffected apart from the corrected values above.
-
-- **Comparing a collection-typed operand with a list no longer overflows the
-  stack.** `M = [1,2]` with `M` declared `vector<2>` and unassigned — or
-  `L(1) = [1,2]` under `L: (number) -> vector<2>`, in either operand order, and
-  `NotEqual` likewise — crashed `evaluate()` with a `RangeError` on a bare
-  engine. The list-vs-scalar broadcast rule for `Equal`/`NotEqual` is applied
-  twice, once before evaluation (`skipBroadcastForVectorOps`) and once inside
-  the evaluate handler. 0.110.0 taught the first to count an operand that is
-  collection-TYPED but not a collection NODE, because placeholder-signature
-  refinement had started giving such operands their concrete collection types;
-  the handler's twin predicate was not taught the same test. The two rules then
-  disagreed — the first skipped, the handler broadcast and rebuilt the identical
-  node, and evaluating it re-entered the first — which is the same loop the
-  handler's docstring already recorded for top-typed operands such as `A(t)`.
-  Both predicates now apply the test, and the comment at each site names the
-  other. Such comparisons stay inert (nothing has resolved, so the whole-
-  collection rule leaves them undecided); list-vs-scalar broadcast, named-list
-  broadcast, whole-list equality, and comparisons on a DEFINED vector-valued
-  function are all unchanged.
-
-- **`Subset` over set literals no longer answers backwards.**
-  `Subset(Set(1), Set(1, 2))` and `SubsetEqual(Set(1), Set(1, 2))` evaluated to
-  `False`, while `Subset(Set(1, 2), Set(1))` evaluated to `True`, on a bare
-  engine with two literal, finite, fully known sets. The `subsetOf` collection
-  handler had two contradictory readings of its operand order in the codebase at
-  once: `receiver ⊆ other` — the public `Expression.subsetOf(other, strict)`
-  contract, which `Set` implemented — and `other ⊆ receiver`, which the named
-  number sets implemented and which the dispatcher assumed. Against a `Set`
-  literal the dispatcher therefore computed the question backwards. The whole
-  family (`Subset`, `SubsetEqual`, `Superset`, `SupersetEqual` and the three
-  `Not…` forms) inherited it.
-
-  Every handler now answers `receiver ⊆ other`, and the dispatcher asks the
-  candidate SUBSET. Fixed in the same pass:
-
-  - `SupersetEqual` and `NotSupersetEqual` asked for a STRICT superset, so
-    `SupersetEqual(Set(1), Set(1))` was `False`.
-  - An operand the engine cannot resolve — a symbol declared `set<number>` and
-    not yet assigned — left the relation `False`, an answer a later assignment
-    contradicts. Such a comparison now stays unevaluated. An operand whose TYPE
-    rules out a collection (`Subset(3, Set(1))`) is still `False`.
-  - `Range(2, 4, 2)` (= {2, 4}) counted as a subset of `Range(1, 5, 2)` (= {1,
-    3, 5}): sharing a step was accepted without checking that the two grids are
-    in phase.
-  - `Range`'s reported element sign was taken from the range's DIRECTION, so
-    every ascending range read as `positive` — `Range(-5, 10)` included, which
-    is how it passed for a subset of `PositiveIntegers`.
-  - Strictness compared element COUNTS, which is not a stand-in for set equality
-    when a collection's elements repeat: `Subset(List(1, 1), List(1))` was
-    `True` (same elements) and `Subset(List(1, 1), List(1, 2))` was `False`
-    (genuinely a strict subset). It now looks for an element of the superset
-    that the subset lacks.
-  - A `Range` was compared by its declared upper BOUND rather than its last
-    element, so `Range(1, 5, 3)` and `Range(1, 4, 3)` — both {1, 4} — were not
-    subsets of one another; and two single-element ranges with different steps
-    (`Range(1, 1, 1)`, `Range(1, 1, 5)`) failed a step test that has nothing to
-    constrain. The grid arithmetic is also confined to integer bounds now: a
-    decimal step takes the elementwise walk rather than trusting `%`.
-  - `Interval` had no `subsetOf` handler at all, so
-    `Subset(Interval(1, 2), Interval(0, 5))` was `False`. It has one now,
-    honoring open and closed endpoints and infinite bounds.
-
-  Sign constraints now compose along their lattice rather than by exact match,
-  so `Subset(PositiveIntegers, NonNegativeNumbers)` is `True` where it was
-  `False`, and a finite collection is decided against an infinite number set
-  from its element type alone — `SubsetEqual(Range(1, 1000000), Integers)` is
-  `True` without walking a million elements.
-
-- **An `Interval`'s emptiness now follows its endpoints.** `Interval(1, 1)`
-  reported `isEmptyCollection` as `true` while its own `contains(1)` returned
-  `true` — the closed degenerate interval is the set {1}, not the empty set. In
-  the other direction, a reversed interval with both endpoints open
-  (`Interval(Open(2), Open(1))`) reported itself NON-empty, because emptiness
-  was decided from the endpoint markers before the bounds were compared.
-  Emptiness is now: bounds that cross are empty; bounds that coincide are empty
-  unless BOTH endpoints are closed.
-
-  `Random` over a degenerate interval still errors, but for the right reason. It
-  had been reading `isEmptyCollection` to reject `Random(Interval(1, 1))`, which
-  only worked while that handler was wrong. A continuous draw needs positive
-  WIDTH — a different question from set-emptiness — so it now tests the width
-  directly, which is what the compiled path (`domainInterval` in the JavaScript
-  target) already did. Interpreter and compiler now apply the same guard.
-
-- **A declared collection type now answers `count` even with no value.**
-  `ce.declare('M', 'vector<2>')` promises 2 elements, so `M.count` is `2` where
-  it was `undefined`, and `Count(M)` evaluates to `2` instead of staying
-  symbolic. A `matrix<3x4>` counts its 3 rows (`count` is the number of
-  top-level elements, matching `each()` and `at()`), a `tuple` counts its
-  members, a named type answers as its expansion does, and a union answers when
-  every arm agrees (`vector<2> | tuple<number, number>` is 2). An UNSIZED
-  collection type (`list<T>`, `set<T>`) carries no length and stays `undefined`,
-  as does a non-collection — a `number` is not a collection of unknown size.
-
-  **`isEmptyCollection` and `isFiniteCollection` deliberately do NOT answer from
-  the type**, and neither do the capability facets `isCollection` and
-  `isEnumerableCollection`. A declared size is not permission to walk: roughly
-  twenty library sites treat `isFiniteCollection === true` as their precondition
-  for iterating and then index by `count` — `Sort` builds `0..count-1` and
-  dereferences `at(i)!` — so answering `true` for a symbol whose `each()` yields
-  nothing turns them into definite wrong answers (`Unique` returning `[]`,
-  `Quartiles` returning `(NaN, NaN, NaN)`) or a crash. `count` is safe because
-  it is not itself a walk gate. Making those two answer from the type requires
-  first teaching every such caller to consult `isEnumerableCollection`, which is
-  a separate change.
-
-  An APPLICATION does not take the shortcut either: its collection type can be
-  an artifact of the vacuous lift rather than a promise (`Total([1,2])` with
-  `Total` undeclared types `list<unknown^2>` yet walks nothing), and a bound
-  head with a genuinely sized return is not distinguishable from it at that
-  point, so `count` would outrun the walk — the invariant pinned by
-  `test/compute-engine/tycho-item-167-broadcast-count.test.ts`.
+- Operators now stay symbolic for collection-typed symbols that have no value
+  yet, instead of guessing scalar or empty behavior. Example: `Mean(L)` stays
+  symbolic for unassigned `L: list<number>`.
+- Indexed reads from collections with complex elements now compile correctly or
+  decline when no single result shape fits every possible index.
+- Collection comparisons no longer overflow the stack for
+  declared-but-unassigned collection operands.
+- Subset and superset operators now use the documented operand order and handle
+  ranges, intervals and strictness more accurately.
+- Closed degenerate intervals, such as `Interval(1, 1)`, are now treated as
+  non-empty.
+- Declared fixed-size collection types now expose their `count` without
+  requiring a value. Example: a `vector<2>` symbol has count `2`.
 
 ## 0.110.0 _2026-08-15_
 
 ### Breaking Changes
 
-- **A function that writes to a variable outside itself must now declare the
-  `scope` effect.** A named definition with no effect annotation now guarantees
-  it does not mutate anything outside its own call: installing a body that
-  provably assigns to an outer variable (or calls a function declared `scope`)
-  is refused with an `incompatible-type` error naming the fix. This covers every
-  definition route: one-step definitions, multi-clause accumulation, and the
-  declare-then-assign idiom (`ce.declare('f', '(number) -> number')` then
-  `ce.assign('f', body)` — a bare declared arrow still leaves every OTHER effect
-  freely inferred, but an escaping writer now requires the annotation there
-  too). Opt in with the `scope` specifier — Epsil
-  `function bump(n) scope { total = total + n }`, or a
-  `"(number) scope -> number"` signature, or the `effects: ['scope']` definition
-  flag.
+- **Functions that write to outer variables must declare the `scope` effect.**
+  Unannotated functions now guarantee they do not mutate outer bindings. Use
+  `function bump(n) scope { total = total + n }` when mutation is intended.
 
-  What does NOT need an annotation: top-level assignments and accumulating loops
-  (`for k in Range(1, 100) { total = total + k }` at the top level is
-  unchanged); writes to a function's own locals and — new in this release — its
-  own **parameters** (`f(x) := (x := x + 1; x)` is call-local, now inferred
-  pure, and works exactly as before); factories returning stateful closures
-  (`makeCounter`), whose `scope` lives on the returned closure's own arrow; and
-  forward references or mutual recursion, which stay optimistic. In exchange,
-  every unannotated function is guaranteed unable to mutate global state
-  mid-evaluation.
+### Compilation
 
-### Issues Resolved
+- Added `complexPromotion` as an opt-in compile option for complex results from
+  `Sqrt`, `Ln` and `Log` when their operand sign is unknown.
+- Compile-time constant folding now includes small constant indexed collections.
+  Example: `At(Map(_ => _^2, 1..6), k)` can bake the mapped list into emitted
+  code.
+- Computed `Range` bounds now use their runtime length when compiled, instead of
+  being mistaken for numeric literals.
+- Compile-time folding is now deterministic and based on expression cost, not
+  wall-clock timing.
+- Local function definitions now compile and stay local to their block instead
+  of leaking into the global scope.
 
-- **Adding three or more collections no longer nests the result when one of them
-  is a lazy view** (Tycho item 189). `[1,2,3] + [4,5,6] + Range(1,3)` returned
-  `[[6,7,8],[8,9,10],[10,11,12]]` instead of `[6,9,12]`: the element-wise tensor
-  kernel treated an operand that is a collection but not a materialized list — a
-  `Range`, a `Reverse`/`Take` view, or the lazy result of a broadcast over more
-  than 100 elements — as a SCALAR, and added it whole to every cell. Only the
-  diagonal held the intended value and the result was O(n²). Two or fewer
-  operands, and any number of plain lists, were unaffected, which is why the
-  shape surfaced in the field (a 900-element colour grid whose intermediate
-  stayed lazy) rather than in small examples. The kernel now declines such an
-  operand and the sum falls through to the element-wise broadcast that zips it,
-  matching what `Multiply` already did.
+### Epsil And Types
 
-- **Canonicalizing a broadcast `At` over a comprehension-derived index range no
-  longer takes minutes in a document scope** (Tycho item 186 — the surviving
-  half of item 182's storm class). Parsing `L[1+3(0..(\mathrm{Length}(D)-1))]`
-  with `D` a lazy comprehension whose body reaches a user function carrying an
-  undeclared free symbol burned 120–240 s in one `ce.parse`: re-auto-declaring
-  that free symbol during canonicalization replaced its binding wrapper's inner
-  definition in place, which made every collection-facet memo snapshot that had
-  walked the lambda body born-stale, so each `count`/`isEmpty` probe re-scanned
-  the comprehension and rebuilt broadcast lambdas (~460K constructions) until
-  the deadline. Dependency validation now treats a valueless→ valueless rebind
-  of a pinned binding as benign — the name still resolves through the scope
-  chain, which is separately re-checked — while a rebind where either side holds
-  a value invalidates as before. The witness parse now canonicalizes in ~15 ms
-  at full production size.
+- Writes to a function's own parameters are treated as call-local and can remain
+  pure.
+- Property writes are judged by the base variable, so writes to local objects do
+  not incorrectly require `scope`.
+- Declared placeholder signatures using `unknown` now refine from the function
+  body. Use `any` for a true accept-anything contract.
+- Declared function clauses can omit parameter annotations when a declared
+  signature already supplies them.
+- Assigning to a declared subscripted name now prefers the joined symbol, and
+  ambiguous undeclared function-family assignments now report an explicit error.
 
-- **Arithmetic on a vector-valued call no longer fails when the call's own
-  arguments are not yet defined** (Tycho item 188). With `h` returning a vector
-  and `X`, `Y` declared but not yet assigned, `\frac{H(X(t), Y(t))}{g(t)}` was
-  rejected at parse time with
-  `incompatible-type ('number', 'broadcastable<vector<finite_number^2>>')`, even
-  though the same division evaluates elementwise and the same row parsed fine
-  once `X`, `Y` and `g` had been assigned — so a definition's validity depended
-  on where it sat in a document. Undefined arguments make a call's result type
-  `broadcastable<T>` ("a `T`, or a collection of `T` that broadcasts"), and the
-  numeric-operand check admitted `broadcastable<number>` but not a wrapper
-  around a vector, tuple or list. It now admits the wrapper wherever it admits
-  the bare type, for every numeric operator (`Add`, `Multiply`, `Subtract`,
-  `Divide`, `Negate`); a wrapper around a genuinely non-numeric type is still
-  rejected. The same change makes `broadcastable<T>` agree with `list<T>` for
-  every `T` — previously a mixed union such as
-  `broadcastable<finite_integer | string>` was refused where
-  `list<finite_integer | string>` was accepted.
+### Numeric And Collections
 
-- **Dividing a point or vector no longer claims the components keep the
-  numerator's numeric tier.** `Divide` with a tuple-typed numerator (e.g. a
-  `PointList` quotient) echoed the numerator's type, so
-  `tuple<finite_integer, finite_integer>` divided by an integer-valued call
-  still claimed _integer_ components even though `[6, 2]/4` is `[3/2, 1/2]`. The
-  quotient now keeps the tuple/vector structure while widening each component
-  with the same rules as scalar division (integer/integer → `finite_rational`,
-  real/real → `finite_real`, a possibly-`NaN` denominator → `number`). The same
-  widening lets `Divide` preserve the shape of a broadcast-lifted numerator
-  (`broadcastable<vector<n>>`, from the item-188 case above) instead of
-  collapsing it: the quotient types `broadcastable<vector<…>>` with
-  honestly-widened components, matching what `Add`, `Multiply`, `Subtract` and
-  `Negate` already did for the shape.
+- Adding three or more collections now handles lazy views correctly instead of
+  nesting results.
+- Arithmetic on vector-valued calls with not-yet-defined arguments now remains
+  valid when the eventual operation is element-wise.
+- Dividing a point or vector now widens component numeric types honestly.
+  Example: `[6, 2] / 4` has rational components.
+- `Equal` and `NotEqual` between a collection-typed application and a list now
+  produce one whole-collection boolean.
+- Nested-list broadcasts no longer retype inner collection-valued symbols.
+- Large counted `Take` and `Drop` operations in compiled code now honor the
+  requested count instead of throwing at the iteration limit.
+- `Filter` and `Unique` now apply the iteration cap to unproductive pulls, so
+  productive infinite filters can be consumed safely with `Take`.
 
-- **Assigning to a subscripted name now honors a declared joined name, and the
-  ambiguous lambda case is an explicit error instead of a silent no-op.** Two
-  related fixes to `⟨name⟩_⟨subscript⟩ \coloneq …`:
-  - **Declared-name precedence now governs the assignment LHS.** With
-    `ce.declare('l_P', …)` in effect, `l_{P} \coloneq P^2+1` assigns to the
-    symbol `l_P` — previously it silently defined a _family_ on the base letter
-    `l` and left the declared `l_P` unbound (documents routinely use `f` and
-    `f_x` as unrelated names, so the family reading could clobber a sibling
-    definition). This also makes declare-then-assign work with a
-    function-literal right-hand side: `l_{P} \coloneq P \mapsto …` now binds the
-    declared `l_P`.
-  - **With no declaration**, a function-literal right-hand side is genuinely
-    ambiguous (a function _named_ `l_P`, or a _family_ `l` indexed by `P`?) and
-    previously fell into the sequence-definition machinery, which bound nothing
-    usable and reported nothing. It now returns an `ambiguous-assignment` error
-    naming both working spellings: write `l_P(P) \coloneq ⟨body⟩` to define a
-    function named `l_P`, or assign an expression in `P` (not a function
-    literal) to define a family.
+### Performance
 
-  Integer recurrences (`a_1 \coloneq 1`, `a_n \coloneq a_{n-1}+2`, including
-  re-running a base-case row), the undeclared expression-bodied family form
-  `l_P \coloneq P^2+1`, head-application definitions, and assigning function
-  _values_ via `ce.assign()` are all unchanged.
-
-- **Declaring a function with a placeholder signature no longer breaks the
-  definition that follows.** `ce.declare('f', '(unknown) -> unknown')` followed
-  by `f(P) \coloneq \sqrt{P[1]^2+P[2]^2}` was refused with `incompatible-type` —
-  a placeholder declaration was strictly more restrictive than no declaration —
-  and calls stayed inert. A declared `unknown` parameter or result slot is now a
-  placeholder the definition refines, per-position: the definition installs
-  under the refined concrete signature (so a `[3,4]` argument binds whole
-  instead of broadcasting elementwise), and a concrete slot in the same arrow —
-  `(tuple<number, number>) -> unknown` — is preserved verbatim. `any` is
-  different, by design: `(any) -> any` (the identity function's signature) is a
-  contract to accept every value, and a body that cannot honor it is still
-  refused — now surfaced as an error value on the LaTeX route as well. See "The
-  `unknown` type" in the types guide for the placeholder-vs-contract distinction
-  and the `nothing`/`missing` caveat.
-
-- **`Equal`/`NotEqual` between a collection-typed application and a list is a
-  single boolean again.** With `L: (number) -> vector<2>`, the comparison
-  `L(1) = [1,2]` broadcast elementwise to `["True","True"]` instead of the
-  documented whole-collection verdict `"True"`: the pre-evaluation broadcast
-  gate counted collection literals and possibly-collection (opaque) types but
-  missed operands _definitely typed_ as collections. List-vs-scalar comparisons
-  still broadcast elementwise.
-
-- **A compiled `Range` with a computed bound no longer loses every element but
-  the first.** On the `javascript` target, a range whose bound was an expression
-  rather than a literal — `1..(Length(L)/3)` — compiled to the single-element
-  list `[1]` when it appeared inside arithmetic, so a comprehension over it
-  produced one element instead of all of them. The result was wrong rather than
-  refused: the compiled function reported success and returned a short list,
-  disagreeing with interpretation, which was always correct.
-
-  The constant-folding guard tested the compiled bound with `parseFloat`, which
-  reads a leading numeric prefix and ignores the rest. `Length(L)/3` compiles to
-  `0.3333333333333333 * (_.L).length`, so the guard read the bound as 0.333,
-  computed a descending range of length one, and emitted it as a literal. Only a
-  bound that is entirely numeric is folded now; every computed bound defers its
-  length to run time. A literal bound (ascending or descending) folds exactly as
-  before.
-
-- **Compiling the same expression twice now always produces the same code.**
-  Compile-time constant folding decided whether to fold a subtree using a
-  wall-clock budget, so the decision depended on machine load — and the two
-  outcomes do not agree to the last digit, because a folded value is computed by
-  the interpreter in extended precision while the structural lowering computes
-  in machine floats. Two engines compiling one source could therefore return
-  numbers differing around the 13th significant digit. A seven-term `Sum` over
-  two user functions measured 37–89 ms against the 100 ms budget, which is how
-  it surfaced: a test comparing definitions in different orders passed alone and
-  failed only in loaded parallel runs, with a different subset failing each
-  time.
-
-  Eligibility is now decided by a deterministic estimate of the expression's own
-  cost, so it depends on the input and nothing else. Constructs that multiply
-  work are priced by their counts — a `Sum`/`Product` by its trip count, a
-  `Map`/`Filter` by its source's size — and anything whose count cannot be
-  determined statically is not folded. Two side effects worth knowing: declining
-  is now much cheaper (a constant summing 100 000 mapped elements is turned away
-  in about 3 ms, where before it was evaluated for ~100 ms until the clock ran
-  out), and a bound supplied by a _consumer_ rather than a source still folds,
-  so `Sum(Take(Map(f, 1..∞), 10))` is still baked to a literal. The previous
-  caveat that the compiled form of a near-budget constant must not be pinned in
-  a test no longer applies.
-
-- **A function defined inside another function no longer leaks into the global
-  scope.** `function make() { helper(x) = x + 1; helper }` used to install
-  `helper` as a global — callable at top level after `make()` returned, and
-  silently **overwriting** any existing global function of the same name. Nested
-  definitions are now block-local: they shadow an outer function instead of
-  replacing it, and the name is gone once the enclosing call returns. A returned
-  helper still works as a first-class value, and top-level definitions (the
-  notebook gesture) are unchanged.
-
-### New Features
-
-- **`complexPromotion` compile option — opt in to complex results from
-  `Sqrt`/`Ln`/`Log`** (Tycho item 190). These heads compile to the real kernel
-  (`Math.sqrt`) when their operand is a real number whose sign is not known at
-  compile time, so a negative operand yields `NaN` where `evaluate()` promotes
-  to a complex value: with `z(t) := \sqrt{t-1}`, compiled `|z(t)/2 - 1|`
-  returned `NaN` at `t = 0.3` while the interpreter returned `1.08397416943394`.
-  That default is unchanged — it keeps radical chains on the fast path and is
-  what lets an ordering comparison over a radical compile at all — but a caller
-  whose expressions are genuinely complex-valued (a plotting front-end with a
-  per-document "complex mode" maps that switch onto this option) can now pass
-  `{ complexPromotion: true }` and get the interpreter's value. Real inputs are
-  lifted automatically, so the argument convention is unchanged. Two
-  consequences when enabled: affected chains are about 2.3× slower (an
-  expression with no unknown-sign `Sqrt`/`Ln`/`Log` is emitted exactly as
-  before), and an ordering comparison over such a head fails closed rather than
-  compiling — `Less(Sqrt(x), 2)` has no truth value once `Sqrt(x)` may be
-  complex. Honored by the `javascript` and `python` targets; `glsl`/`wgsl` keep
-  the real kernel. Independent of, and composable with, `realOnly`, which only
-  projects the result at the boundary and can never produce complexness on its
-  own. See the "Complex Promotion" section of the compilation guide.
-
-### Improvements
-
-- **Long flat operator chains parse in linear time.** Parsing `a+b+c+…` (or
-  `a\cdot b\cdot …`) re-walked and re-copied the whole accumulated chain at
-  every operator, so the LaTeX parse of a long sum was quadratic in the number
-  of terms: a 12 000-term sum took ~1.7 s to parse (`form: 'raw'`), 20× a 3
-  000-term one. The per-operator work is now constant — the same sum parses in
-  ~90 ms, and doubling the term count doubles the time — for sums, products,
-  subscripted symbols, and parenthesized terms alike. Parse output is unchanged.
-- **Deeper expression trees can be boxed before the stack runs out.** Boxing
-  recurses once per level of a MathJSON tree, and more than half of the stack
-  frames it spent per level were wrappers that do nothing once an enclosing
-  construction is active. Those are now bypassed on the nested path: the
-  canonical path went from 20 to 9 frames per level, so a `Sin(Sin(…))` nest
-  that overflowed at ~225 levels now boxes to ~385, and `1-2-3-…-N` (which
-  parses to a left-nested `Subtract` chain) from ~360 to ~620 terms. The limit
-  is raised, not removed.
-- **Writes to a function's own parameters are recognized as call-local.** The
-  effects inference previously stamped `scope` on any body assigning to one of
-  its parameters; such bodies (e.g. clamping or normalizing an argument in
-  place) now infer pure, making them cacheable and compile-eligible.
-- **Property writes are judged on their base variable.** A property rebinding
-  (`q.name = v`) on a local `let` binding or parameter now counts as a local
-  write — such bodies infer pure instead of `scope`, and install without an
-  annotation. The same write on an outer variable is still escaping, and a
-  subscript definition (`L_0 := 1`, which defines a sequence) is always an
-  escaping write.
-- **`Map` auto-compile instrumentation is reachable from an install.** The
-  counters that say whether a lazy `Map` drain compiled, re-validated its
-  dependencies, recompiled or fell back to the interpreter were only a
-  module-level export, which a published install cannot import and which does
-  not survive minification. They are now also available as
-  `ce._mapAutoCompileStats` (`attempts`, `compiledHits`, `revalidations`,
-  `recompiles`, `elementFallbacks`, `nanDoubleChecks`). The counters are
-  process-global and cumulative, so measure one drain by reading them before and
-  after it and taking the difference. Like every other `_`-prefixed member, it
-  is reachable at runtime with no stability promise.
+- Long flat sums, products and related chains now parse in linear time.
+- Deep expression trees can be boxed more reliably before hitting the host stack
+  limit.
+- Large documents involving comprehensions and broadcasted indexed reads now
+  parse much faster.
 
 ## 0.109.0 _2026-08-14_
 
 ### Breaking Changes
 
-- **Defining the same function clause twice in one program is now an error.** A
-  clause whose parameter list coincides with one an earlier statement of the
-  SAME program already defined silently replaced it, changing what the program
-  computed with nothing to show for it. It is now `function-redefinition`,
-  reported with the first definition's location. `epsil check` reports it too,
-  without running the program.
-
-  Only REPLACEMENT is refused. Clauses at DIFFERENT parameter lists still
-  accumulate, which is what multi-clause functions are for — `fib(0) = 1`,
-  `fib(1) = 1`, `fib(n) = fib(n-1) + fib(n-2)` is unaffected, as is dispatch on
-  distinct literal patterns or on arity. Two clauses count as the same one when
-  their parameter DOMAINS coincide, the same test dispatch uses to pick a
-  clause, so renaming a parameter does not make a new clause.
-
-  Redefinition ACROSS programs is unchanged: re-running an edited definition in
-  a later program (the notebook gesture) still replaces last-wins, and replaces
-  only the matching clause, leaving a function's other clauses in place.
-  Definitions made through the host API rather than an Epsil program are never
-  affected.
-
-### Issues Resolved
-
-- **Spreading a declared-but-unassigned dictionary or record symbol no longer
-  errors.** With `let d: dictionary<integer>` and no value yet, the Epsil merge
-  `{->, ...d, "k" -> 3}` errored with
-  `Expected a collection of pairs, got dictionary<integer>` instead of staying
-  symbolic until `d` receives a value (as the same spread over a `list`-typed
-  symbol already did). Cause: the could-be-a-collection type test used by the
-  eager materializers (`ListFrom`, `SetFrom`, `TupleFrom`) did not know the
-  `dictionary` and `record` types, so the unresolved symbol was wrapped as if it
-  were a scalar datum. That test now covers the keyed collections (`dictionary`,
-  `record`) — this widening is the behavioral change. The threadable/broadcast
-  admission check was split off under its own name with its membership EXACTLY
-  as before, so nothing about which operands broadcast changed: `Sin(dict)` and
-  `dict + 1` still report `incompatible-type` loudly, and set operands are still
-  admitted whole and stay symbolic. Also fixed alongside:
-  `DictionaryFrom`/`RecordFrom` on a malformed element (a non-pair, or a
-  non-string key) now return an error expression instead of throwing an uncaught
-  JS exception out of `evaluate()`, and a dictionary-typed operand is no longer
-  subject to scalar numeric type-inference in non-strict mode.
-
-- **Degree mode no longer produces wrong compiled results for angular functions
-  with a constant argument** (regression in 0.108.0). With `angularUnit` set to
-  `"deg"`, compiled `sin(90)` returned 0.0274 instead of 1 and compiled
-  `arctan(1)` returned 2578.31 instead of 45, disagreeing with interpretation,
-  which was always correct. The failure was silent — no decline, no error, just
-  wrong numbers — and applied to every angular function whose argument was a
-  constant. An argument containing a variable was never affected.
-
-  Cause: whole-subtree constant folding, added in 0.108.0, evaluated a subtree
-  in which the angular conversion had already been applied, using an engine
-  still set to degrees — so the conversion happened twice. Folding now evaluates
-  with the angular unit neutralized, and declines outright for a subtree
-  containing a `D`, `Derivative` or `ND` head, since differentiation is
-  deliberately left in the engine's own angular convention and such a subtree
-  carries two conventions at once. Radian mode was never affected.
-
-- **A program that defines a function and then calls it now compiles to
-  JavaScript.** Both definition forms were affected:
-
-  ```
-  const g = (k) |-> Sum(Take(Map(_ |-> _^2, 1..oo), k))
-  g(3)
-  ```
-
-  used to fail the whole compilation with ``Unknown operator `g` ``, and
-  `function g(k) { … }` with `DefineFunction: … no lowering`. The declaration
-  itself always lowered correctly (`let g = ((k) => …)`); only the CALL had no
-  resolution, because head lookup consulted the engine's definitions and a
-  block-local declaration never enters them. Calls now resolve against the
-  block's own function-valued locals — with recursion, mutual reference between
-  locals, use as a callback value (`Map(sq, 1..oo)`), definitions made inside a
-  loop body, and the same collection broadcast an engine-level function gets
-  (`h([1,2,3])` → `[2,3,4]`). A `function` definition is HOISTED, so a call may
-  precede it (`let a = g(3)` before `function g(k) { … }` answers 4, as it does
-  when interpreted); a `const`/`let` lambda is not, matching the interpreter,
-  and a call before one fails closed.
-
-  Everything that cannot be compiled to something the interpreter agrees with
-  fails closed instead: an arity mismatch, a multi-clause `function` set, a
-  generic signature, and a declared `broadcastable<T>` parameter applied to a
-  possibly-collection argument (`(x: broadcastable<value>) |-> (x, x)` over a
-  list, which the interpreter maps one rank down). The last two are the same
-  gates the engine-defined route enforces, now shared by both rather than
-  duplicated. Python and the GPU targets — which declare a local separately from
-  its assignment and can hold no function-valued local — are unchanged.
-
-  The two spellings also now compile to the SAME code. A call with constant
-  arguments folds for both (`g(3)` → `14`); previously only the `function` form
-  did, because `DefineFunction` declares its name in the engine as it
-  canonicalizes while a `const` binding declares nothing, so only the former
-  reached the folder with a known head.
-
-- **A `_` lambda parameter no longer shadows the compiled vars object.** The
-  JavaScript targets bind the caller's `vars` argument to `_` and compile a free
-  symbol `k` to `_.k`. `_` is also how an implicit lambda parameter is spelled,
-  so `_ ↦ _ + k` emitted `((_) => _ + _.k)` — inside the arrow `_` is the
-  parameter, a number, so `_.k` read `undefined` off it. Every such call was
-  silently wrong behind `success: true`: `Map(_ ↦ _ + k, [1,2,3])` with `k = 10`
-  answered `[NaN, NaN, NaN]` instead of `[11,12,13]`, and
-  `Filter([1,2,3,4], _ ↦ _ < k)` answered `[]`. A colliding parameter is now
-  renamed at emission, on both routes that emit a function — the inline lambda
-  and the named definition (`f(x) := …`, and each clause of a multi-clause set).
-  The rename applies only where the body actually reads the vars object, so a
-  literal with no free symbol — `_ ↦ _²`, the common case — emits exactly as
-  before.
-
-  A parameter named after a runtime HELPER namespace (`_SYS` on JavaScript,
-  `_IA` on the interval target) is renamed too. Those are baked into emitted
-  code as literal tokens, so such a parameter shadowed them for its whole body —
-  `TypeError: _SYS.rangeIter is not a function` at run time, for a program the
-  interpreter evaluates fine. No source spells a parameter that way, so unlike
-  `_` these are renamed unconditionally.
-
-- **`Drop`'s element count no longer disagrees with its own walk for a negative
-  count.** `Drop(1..10, -5)` reported 15 elements — more than the source has —
-  for a walk that yields 10: the count clamped its result rather than the drop
-  count, so `count - (-5)` grew instead of dropping nothing. `Length` was the
-  visible symptom, but the count facet is also what indexing bounds, emptiness
-  and the materialization gates read.
-
-- **The iteration cap on `Filter` and `Unique` now counts UNPRODUCTIVE pulls,
-  not total pulls.** The cap exists to turn a walk that can never finish into
-  `iteration-limit-exceeded` instead of a hang — a predicate that never matches,
-  a source that repeats one value forever. Only an unbroken run of non-emissions
-  is that walk: a filter that keeps emitting is bounded by whatever consumes it.
-  Counting its productive pulls too meant `Take(Filter(1..∞, _ ↦ _ > 0), 1025)`
-  stopped at the default limit of 1024 — silently truncated when interpreted, an
-  error when compiled — for a walk that rejects nothing. Both now answer 1025
-  elements. A predicate that never matches still hits the cap, unchanged.
-
-  The `count` FACET keeps its own bound, now stated separately: past
-  `ce.iterationLimit` matching elements a filtered count is reported as unknown
-  rather than walked to the end, so answering a facet stays cheap work for a
-  question nobody asked to be exact. The two concerns had shared one mechanism.
-
-- **A compiled `Take`/`Drop` count larger than `ce.iterationLimit` no longer
-  throws.** `Sum(Take(Map(_ ↦ _², 1..∞), 100000))` compiled to a lazy stream
-  that raised `Iteration limit of 1024 exceeded` at run time, where interpreting
-  it answers 333338333350000; `Take(Drop(1..∞, 2000), 3)` failed the same way.
-  The iteration cap exists to turn a walk that can never finish into that error
-  instead of a hang — a `Filter` whose predicate never matches, a `TakeWhile`
-  whose predicate never turns false — and those two keep it. A counted
-  `Take`/`Drop` pulls a resolved, finite number of elements and provably
-  terminates, so it is now honoured in full, as the interpreter honours it. An
-  unbounded stage upstream of one still raises the error, from its own cap.
-
-- **A declared function's clauses may now leave their parameters unannotated.**
-  Under `let fact: (integer) -> integer`, the clause `fact(n) = n * fact(n - 1)`
-  was refused outright: the bare `n` inferred `unknown`, so `n - 1` widened to
-  `number` and the recursive call failed against the very declaration written to
-  make it check. Annotating every parameter a second time (`fact(n: integer)`)
-  was the only way through, even though the same shape had always been accepted
-  when the function was assigned rather than defined by clauses. The declaration
-  is authoritative for parameters now, as it already was for the result, so a
-  bare parameter takes the declared type at its position. A parameter the author
-  DID annotate is untouched and still checked as an arm of the declaration, so a
-  clause outside the declared domain remains an error.
-
-### New Features
-
-- **Compile-time constant folding now covers constant COLLECTIONS**, extending
-  the subtree folding released in 0.108.0. A constant collection is baked into a
-  literal list, which matters most when the collection is constant but its
-  consumer is not:
-
-  ```
-  At(Map(_ ↦ _^2, 1..6), k)   →   _SYS.at([1, 4, 9, 16, 25, 36], _.k)
-  ```
-
-  The index `k` is a run-time input, so the expression as a whole cannot fold —
-  but its base is now built once at compile time instead of being rebuilt and
-  re-mapped on every call. The literal goes through each target's own list
-  lowering, so the JavaScript and Python targets emit `[1, 4, 9, …]` and the
-  shader targets a `vec3(…)` / `float[5](…)`. A collection folds only when it is
-  finite, **indexed** (a `Set` has no defined element order, so a literal list
-  would invent one), holds at most **50** numeric elements — the threshold the
-  `Range` handler already uses to choose between an inline literal and a
-  generator — and meets every gate the number and boolean folds meet. Anything
-  larger, or holding strings, tuples or nested collections, compiles
-  structurally as before, and `constantFold: false` disables it along with the
-  rest of the folding.
-
-## 0.108.0 _2026-08-14_
+- **Defining the same function clause twice in one Epsil program is now an
+  error.** Clauses with different parameter domains still accumulate for
+  multi-clause functions, and re-running a later program still replaces
+  definitions notebook-style.
 
 ### Epsil
 
-- **A name may only be declared once per program.** A second `type` or
-  `protocol` declaration of the same name inside ONE program is now the error
-  `type-redefinition` / `protocol-redefinition`, reported with the first
-  declaration's location as a note; previously it was accepted silently and the
-  second declaration won. A sum declaration owns every name it introduces (its
-  own and its variants'), so a second sum reusing one variant name is the same
-  error, reported once, and registers none of its names. **Redefinition ACROSS
-  programs is unchanged**: re-running an edited `type` or `protocol` statement
-  in a later program (the notebook gesture) still replaces the previous
-  declaration, as does a nested `executeEpsil` run, which is its own program. A
-  bare conformance (`type point is Hashable`) declares no type and is never
-  affected.
+- Spreading declared-but-unassigned dictionaries and records now stays symbolic
+  instead of erroring. Example: `{->, ...d, "k" -> 3}` can be built before `d`
+  has a value.
+- Dictionary conversion errors now return error expressions instead of throwing
+  uncaught JavaScript exceptions.
 
-- **Spread expressions in list and set literals, and dictionary merges.**
-  `[...xs, c, ...ys]` splices collections into a list literal, `{1, ...s}` into
-  a set literal (deduplicating), and `{...defaults, "verbose" -> true}` merges
-  dictionaries — completing the `...` trio (call arguments spread, match
-  patterns collect, literals splice). The splice is a canonicalization rewrite
-  on the shared `["Spread", …]` marker, so it works identically for MathJSON
-  (`["List", ["Spread", "xs"], 3]`): literal collections splice eagerly, a lone
-  spread `[...xs]` canonicalizes to `Join(xs)` (the list materialization of
-  `xs`), symbolic or lazy segments lower to the equivalent
-  `Join`/`SetFrom`/`DictionaryFrom` expression, and an infinite segment stays
-  lazy (`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). **Tuples do not spread** —
-  a tuple is a unit, and `ListFrom` is the explicit converter — so spreading one
-  is a loud `spread-tuple` error; scalars and strings are `incompatible-type`
-  errors. (In a call, the rule is mirror-image: argument lists are tuple-shaped,
-  so there exactly tuples spread.) Dictionary merges are **last-wins** on key
-  collisions — a literal entry after a spread overrides it — while duplicate
-  _literal_ keys keep the literal convention (first wins, with a diagnostic). A
-  brace of only spreads is a set-spread; lead with the bare `->` marker for a
-  pure dictionary merge: `{->, ...d1, ...d2}`.
+### Compilation
+
+- Degree-mode compiled angular functions with constant arguments now agree with
+  interpretation. Example: compiled `sin(90)` in degree mode now returns `1`.
+- Epsil programs that define a local function and call it can now compile to
+  JavaScript, including recursive calls and use as callbacks where supported.
+- Lambda parameters named `_` no longer shadow the generated JavaScript vars
+  object, fixing compiled callbacks that refer to free variables.
+- `Drop` with a negative count now reports the same element count it actually
+  yields.
+- Compiled counted `Take` and `Drop` over infinite streams now work when the
+  requested count is larger than `ce.iterationLimit`.
+
+## 0.108.0 _2026-08-14_
 
 ### Breaking Changes
 
-- **`Map` now takes its mapping function FIRST: `Map(f, xs)`,
-  `Map(f, xs, ys)`.** The signature is `(function, collection+)` — the operator
-  is variadic over its source collections, and a variadic parameter cannot
-  precede a required one, so the historical collection-first order
-  (`Map(xs, f)`) was not expressible as a positional signature: the declared
-  signature and the handlers had drifted apart, and this repairs them onto the
-  one honest spelling (which also matches Mathematica's `Map[f, xs]` and Lisp's
-  `mapcar`). A call in the legacy order now reports an `incompatible-type` error
-  on the function slot (naming the misplaced collection) rather than evaluating.
-  The pipeline placeholder spelling changes accordingly: `xs |> Map(_, f)`
-  becomes `xs |> Map(f, _)` — or, more simply, `xs |> Map(f)`: the implicit pipe
-  argument now fills the first slot the piped value's type fits, no longer
-  always the first slot. `FlatMap`, `Filter`, `Reduce`, and the other
-  callback-taking collection operators are unchanged — none of them is variadic
-  over collections, so their collection-first spellings remain expressible and
-  true.
+- **`Map` now takes the function first: `Map(f, xs)`.** The legacy `Map(xs, f)`
+  order now reports an `incompatible-type` error. Pipeline calls should use
+  `xs |> Map(f, _)` or simply `xs |> Map(f)`.
 
-  Migration is not limited to call sites that _construct_ a `Map`: code that
-  _consumes_ `Map` expressions positionally must be swept too. Anything reading
-  `ops[0]` expecting the source collection (or `ops[1]` expecting the callback)
-  — serializers, tree walks, length/shape predicates keyed on "the first
-  operand" — now reads the wrong operand without any error. Stored old-order
-  expressions stay visible rather than failing silently: the `incompatible-type`
-  error is produced at parse/box (canonicalization) time, so a legacy-order
-  `Map` in captured content is already marked invalid before any evaluation.
+### Epsil
 
-### New Features
+- A type, protocol or sum name may only be declared once in a single Epsil
+  program. Re-running a later program can still replace the declaration.
+- Added spread syntax in list and set literals and dictionary merges. Examples:
+  `[...xs, 3]`, `{1, ...s}` and `{->, ...defaults, "verbose" -> true}`.
 
-- **Compiled code now constant-folds whole subtrees.** A pure subexpression with
-  no free variables is evaluated at compile time and emitted as a literal, on
-  every compilation target: `Sum(Take(Map(_ ↦ _^2, 1..20), 10))` compiles to
-  `385` instead of a map/slice/reduce chain, and the constant part of a live
-  expression folds too (`x + Sum(Map(_ ↦ _^2, 1..5))` → `_.x + 55`). Numbers and
-  booleans fold; list- and string-valued subtrees keep their structural
-  lowering. Folding never touches anything live or effectful: impure operators
-  (`Random(…)`), unknowns, `vars`-mapped inputs, names bound by an enclosing
-  lambda or loop, and operators whose emission the caller overrode with the
-  `functions`/`operators` options all decline it; a `Sum`/`Product` over a
-  non-finite bound never folds (a divergent series would otherwise bake the
-  interpreter's iteration-limit-truncated partial sum as a "constant"); and the
-  evaluation runs under a short time budget and collection-size cap — a constant
-  too expensive to evaluate at compile time compiles structurally as before.
-  Because the folded value is the interpreter's, compiled results now track
-  `evaluate()` where the two previously disagreed in the last ulp (`sin(π/6)`
-  compiles to `0.5`, not `Math.sin(Math.PI/6)` = `0.49999999999999994`). Opt out
-  with `compile(expr, { constantFold: false })` — useful for inspecting the
-  structural lowering of a constant expression. The interval-arithmetic target
-  never folds: a point value would discard the outward-rounded enclosure that
-  target exists to compute. Relatedly, a compile-time-constant `Take`/`Drop`
-  count (and Python `Tabulate`/`Fill` dimension) is now normalized at compile
-  time — `Take(xs, 10)` emits `.slice(0, 10)`, not `.slice(0, Math.max(0, 10))`.
+### Compilation And Numeric
 
-- **A derivative with no tractable symbolic closed form now falls back to
-  numeric differentiation — on both the compiled and interpreted routes.**
-  Differentiating a deeply-nested body (e.g. `√(x + √(x + … + 1))` nested 37
-  deep) grows exponentially; past the engine's differentiation growth budget the
-  javascript compile used to fail closed and the interpreted route hung in the
-  expansion (Tycho item 177). Past that same budget both routes now use one
-  shared 8th-order centered-difference stencil (composed for higher orders, with
-  the sampling window held constant so it does not step outside the function's
-  domain): the compiled target emits it as the `_SYS.nd` runtime helper, and
-  `N()` of an `Apply` of the unresolved `Derivative` computes it with the
-  identical function, so the two routes agree bit-for-bit. Within the budget
-  nothing changes — the exact symbolic closed form is used, as before. Plain
-  `evaluate()` keeps the exactness contract and stays symbolic. Accuracy is
-  stencil-grade (~1e-10 relative at order 1, ~1e-3 envelope at order 3), fit for
-  plotting, not for exact arithmetic. Also new: `ND(f, x)` at a **runtime**
-  point now compiles (it previously required a compile-time numeric point), and
-  `D(body, x)` past the budget lowers the same way. The failed symbolic attempt
-  still runs once per compile before the fallback engages (bounded by the growth
-  budget, roughly a second per derivative node on the deep shapes).
+- Compiled code now folds pure constant subexpressions to literals. Example:
+  `x + Sum(Map(_ => _^2, 1..5))` can compile as `x + 55`. Use
+  `constantFold: false` to inspect structural output.
+- Difficult symbolic derivatives now fall back to numeric differentiation for
+  `N()` and compiled evaluation when a closed form is too large. Exact
+  `evaluate()` still stays symbolic.
+- `At(xs, indexes)` now preserves known selection counts, improving `Zip` and
+  `Map` over gathered elements.
+- `expr.unknowns` no longer reports typed lambda parameters as free variables.
+- Numeric approximation of divergent infinite sums and products no longer
+  returns silently truncated partial results.
+- `170!` no longer overflows to `Infinity` in machine-precision paths.
+- Python-compiled counts for `Take`, `Drop`, `Tabulate` and `Fill` now round
+  like the interpreter.
+- Numeric quadrature now honors active time limits.
 
-### Issues Resolved
+### Strings
 
-- **An `At` gather no longer erases the length of the collection carrying it.**
-  `At(xs, I)` with an integer-collection index selects many elements, and the
-  selection is position-preserving, so its length is exactly the index's — but
-  it reported no `count` until evaluated. Because `Zip` takes the minimum over
-  its members' counts, one gather member erased the count of the whole `Zip`,
-  and a `Map` over that `Zip` lost it in turn: `Map(f, Zip(At(xs, I), ys))`
-  answered `count` `undefined` even though every part of it counted fine once
-  evaluated. The same gap left the `Zip`'s emptiness unknown, which kept the
-  `Map` SYMBOLIC instead of producing its elements. Both facets are now answered
-  from the operands without evaluating. A boolean MASK index still reports no
-  count before evaluation — a mask filters, so its length is the number of
-  `True` entries.
+- `IntegerString` now preserves the minus sign. Example: `IntegerString(-42)`
+  returns `"-42"`.
+- `StringSplit(s, "")` now splits into grapheme clusters instead of UTF-16 code
+  units, avoiding corrupt non-BMP characters.
 
-- **`expr.unknowns` no longer reports a typed lambda parameter as a free
-  variable.** A `Function` literal's annotated parameter — the
-  `["Typed", "x", type]` spelling canonicalization produces for callback
-  parameters — leaked into `unknowns` (and its alias `freeVariables`), so any
-  expression containing a `Map`-style callback reported a phantom unknown:
-  `Map(_ ↦ _^2, [1,2,3])` reported `_` free. Bare (unannotated) parameters were
-  already excluded; a same-named variable that is genuinely free OUTSIDE the
-  lambda is still reported.
+### Performance
 
-- **`.N()` of a divergent infinite `Sum`/`Product` no longer returns a silently
-  truncated partial.** `Sum(i, i=1..∞).N()` answered `50015001` (the 10001-term
-  iteration-limit prefix), the harmonic series answered `9.7877…`, and
-  `Product(n, n=1..∞)` a huge partial product — finite numbers for series that
-  have no finite value, with nothing marking them as truncations. An
-  infinite-domain sum or product whose convergence the Richardson acceleration
-  cannot establish now stays unevaluated. Convergent series are unaffected
-  (`Σ 1/n² = 1.6449…`, `Σ (−1)^{n+1}/n = ln 2`, `Π (1+1/n²) = sinh(π)/π`), and
-  the bare-index default-domain spelling (`Sum(f, x)` ≡ `x` from 1 to ∞) now
-  computes the true limit of a convergent series instead of a truncation.
-  Doubly-infinite and reflected ranges go through the same certification
-  (`Σ 2^{−|n|}` over ℤ = 3, the oscillating `Σ sinc³(n)` over ℤ = 3π/4, `Σ 2^n`
-  for n = −∞…−1 = 1), with one deliberate tightening: a doubly-infinite sum must
-  converge ABSOLUTELY — `Σ n` over ℤ stays unevaluated rather than answering its
-  Cauchy principal value `0`, since symmetric pairing structurally cancels a
-  divergent series. A convergent series the acceleration cannot certify (e.g.
-  `Σ 1/n^{1.5}`, a non-integer-power tail) also stays unevaluated rather than
-  returning an approximation of unstated error.
-
-- **`170!` no longer saturates to `Infinity` in machine-precision paths.** The
-  shared machine `factorial()` capped at `n ≥ 170`, but `170! ≈ 7.26e306` is the
-  largest double-representable factorial (`Number.MAX_VALUE ≈ 1.8e308`; only
-  `171!` overflows) — an off-by-one dating to 2021 that compiled `170!` (and any
-  machine-float factorial path) to `Infinity` for a representable value.
-
-- **Python-compiled `Take`/`Drop` counts and `Tabulate`/`Fill` dimensions now
-  round like the interpreter.** A fractional runtime count was truncated by
-  `Take`/`Drop` (`int(x)` — `Take(xs, 2.5)` kept 2 elements where the
-  interpreter keeps 3) and rounded half-to-even by `Tabulate`/`Fill` (Python's
-  `round()`, which disagrees with the interpreter's round-half-up at
-  half-integers). Both now emit the interpreter's `toInteger` contract,
-  `floor(x + 0.5)`; the JavaScript target already rounded correctly.
-
-- **Collection facet probes no longer storm (or crash) on symbolic-bound
-  ranges.** Reading `count`/`isFiniteCollection`/`isEmptyCollection` on a
-  collection with a state-dependent bound — `0..(Length(D)-1)` with `D` a lazy
-  comprehension — numerically re-evaluated the bound on EVERY read, with no
-  cache anywhere in the chain. Canonicalizing one Desmos-derived expression
-  against a document-sized state ran 210K such probes (~9.4 s inside a 5 s
-  evaluation span; without a deadline the cascade's allocation churn exhausted a
-  4 GB heap), because each probe's own evaluation constructed broadcast lambdas
-  whose scope traffic invalidated every generation-keyed cache in the engine —
-  the probes could never memoize themselves. The three facet getters are now
-  backed by a dependency-precise memo (the element memo's invalidation
-  machinery: world-epoch plus per-dependency write-version and name-resolution
-  checks), and the dependency snapshot understands two shapes it wrongly
-  rejected before: forward-referenced function names (`R` calling `R_xz` defined
-  a few cells later) and free symbols auto-declared inside a function body's own
-  scope. The reported document now opens with that span at 31 ms (was 10.4 s)
-  and the crash arm parses in 5 ms. Also fixed along the way: a stale-cache hole
-  where redefining a function name to a scalar (`assign('f', 5)` over a function
-  `f`) advanced no version axis, so element/facet memos kept serving the old
-  function's results — walked function heads are now tracked as dependencies;
-  and `ce.iterationLimit` changes now count as configuration changes so
-  limit-dependent answers refresh. (Tycho item 182 — a document-open refusal in
-  production.)
-
-- **Numeric quadrature now honors the evaluation deadline.** The adaptive
-  Gauss–Kronrod kernel never checked the span deadline, so an integral the panel
-  refinement could not finish ran unbounded: a nested oscillatory integral
-  (`∫₀¹(∫ sin(1/(xy+10⁻⁴))dx)dy`) under a 1 s `withTimeLimit` ran for minutes
-  until killed externally, even with the armed span on the stack (Tycho item 183
-  — a document-open hang in production). The kernel now checks the deadline once
-  per panel and salvages the partial result (the accumulated estimate with
-  `converged: false`, the same in-band behavior the Monte-Carlo fallback already
-  had), and it both inherits and re-publishes the ambient deadline — so an
-  integrand that is itself an integral, including one reached through compiled
-  code (`_SYS.integrate`, which has no engine access), is bounded by the outer
-  span too. The repro now terminates at exactly the 1 s deadline with a clean
-  timeout. Results without a deadline are unchanged.
-
-- **`IntegerString` preserves the sign.** `IntegerString(-42)` returned `"42"`
-  (the handler took the absolute value), so `DigitsFrom(IntegerString(n))` did
-  not round-trip negative integers. It now returns `"-42"` (and `"-2a"` in base
-  16).
-
-- **`StringSplit` with an empty separator no longer corrupts non-BMP text.**
-  `StringSplit(s, "")` delegated to JavaScript's `split("")`, which cuts between
-  UTF-16 code units — splitting `"a🏳️‍🌈b"` produced lone surrogate halves
-  (rendering as `�`). An empty separator now splits into user-perceived
-  characters (grapheme clusters), the same segmentation `Characters` uses.
+- Large documents with symbolic range bounds now avoid major slowdowns and
+  memory pressure.
 
 ## 0.107.0 _2026-08-13_
 
 ### Epsil
 
-- **Pipeline stages are more concise: implicit first argument, inline lambdas,
-  and implicit `Map`.** Three pipe-stage sugars make
-  `1..oo |> Take(10) |> _^2 |> Sum` (and the spelled-out
-  `… |> Take(_, 10) |> Map(_, _^2) |> Sum`) evaluate to 385:
+- Pipelines gained concise stage forms. A missing argument is filled by the
+  piped value, inline lambdas can appear directly after `|>`, and a
+  one-parameter lambda stage over a collection maps each element.
 
-  - a call stage missing required arguments receives the piped value as its
-    implicit **first argument** (`xs |> Take(10)` ≡ `xs |> Take(_, 10)`); a
-    complete call keeps its old meaning, and an explicit `_` still marks the
-    slot the piped value fills;
-  - a `|->` lambda may be written **inline after `|>`** without parentheses — in
-    stage position the arrow binds tighter than the pipe, and the body ends at
-    the next `|>` (so `xs |> x |-> x^2 |> Sum` is `xs |> (x |-> x^2) |> Sum`;
-    previously a `symbol-expected` parse error);
-  - a **one-parameter lambda stage over a collection maps** each element
-    (implicit `Map`), and an operator-written placeholder expression (`_^2`,
-    `_ + 1`) is such a lambda. Named-function stages (`xs |> Sum`), string
-    topics, and lambdas whose authored parameter annotation accepts the whole
-    collection still apply to the whole value; in a call stage `_` remains the
-    piped value (`xs |> Take(_, 3)`).
+  ```epsil
+  1..oo |> Take(10) |> _^2 |> Sum
+  ```
 
-  The first and third rules live in the engine's `Pipe` operator, so they hold
-  on the MathJSON route too; the lambda-reading of `_^2` is an Epsil-surface
-  (parser) rule.
+- `otherwise` is now accepted as the wildcard case in `match`.
+- Named calls to a function assigned earlier in the same program no longer
+  produce false static diagnostics.
+- Diagnostics inside reordered named calls now underline the argument that
+  actually failed.
+- Inline function literals now accept named arguments. Example:
+  `((x, y) => x - y)(y: 2, x: 10)` returns `8`.
 
-- **`otherwise` is accepted as the wildcard case of a `match`.** The keyword is
-  a synonym for a bare `_` pattern — `otherwise => "other"`, with or without a
-  guard (`otherwise if c => …`) — and lowers to the same `_` node, so
-  serialization and the irrefutable-non-final-case diagnostic are unchanged. It
-  is contextual, not reserved: recognized only when the bare word is the entire
-  pattern of a case, it remains an ordinary identifier everywhere else
-  (including inside structured patterns, where a bare name binds).
+### Compilation
 
-- **A named call to a `:=`-assigned callee no longer draws false static
-  diagnostics.** `f := (x: number, y: string) |-> x + 3` followed by
-  `f(y: "ok", x: 1)` runs correctly (the assignment pins a signature carrying
-  the parameter names), but the static pre-pass — which canonicalizes every
-  statement before any evaluates — saw the callee as an auto-declared symbol
-  with no parameter names and emitted one `argument-names-unavailable`
-  diagnostic per argument for a program that is not wrong. The pass now
-  registers the signature such a statement pins — `f := ⟨annotated literal⟩`,
-  and `let/const f : ⟨arrow type⟩` with or without an initializer — for the
-  later statements of the same program, under the pass's inference rollback
-  frame (checking still mutates nothing). Registration is first-wins per name,
-  mirroring the runtime, where a reassignment never re-pins the binding's
-  declared type. The diagnostic still fires where it is a true prediction: a
-  named call written before the assignment, and an **unannotated** literal
-  (whose inferred signature drops its parameter names), both of which fail at
-  runtime too.
+- `Take`-bounded infinite pipelines now compile to JavaScript safely. Unbounded
+  infinite pipelines fail at compile time instead of throwing a runtime range
+  error.
+- Fractional `Take` and `Drop` counts in compiled JavaScript now round like the
+  interpreter.
 
-- **A diagnostic inside a reordered named call now underlines the argument at
-  fault, not a bystander.** With `function f(x: number, y: string) {…}`, the
-  call `f(y: "ok", x: "bad")` produces `expected number, got string` — and the
-  underline previously landed on `y: "ok"`: the engine reports the faulted
-  argument by its position in DECLARATION order (named calls are permuted into
-  that order before validation), while the source anchor was read from the
-  argument list as WRITTEN, at the same index. The locator now reconciles the
-  two through the callee's declared parameter names, so the underline lands on
-  `x: "bad"` — in both the static and runtime tiers, for mixed
-  positional-and-named calls, and for a final-statement error's `valueRange`.
-  When the names cannot be resolved, the anchor widens to the whole call rather
-  than guessing. Positional calls are unaffected.
+### Performance And Static Checking
 
-- **An inline function literal now takes named arguments.**
-  `((x: number) |-> x + 1)(x: 5)` evaluates to 6 instead of declining with
-  `argument-names-unavailable`, and the arguments may be written in any order
-  (`((x: number, y: number) |-> x - y)(y: 2, x: 10)` is 8). The parameter names
-  are read from the literal expression itself, so this works for **unannotated**
-  literals too (`((x, y) |-> x - y)(y: 2, x: 10)`), even though their inferred
-  signature carries no names — a literal bound to a name first
-  (`f := (x, y) |-> …; f(x: 1, y: 2)`) still requires annotations, as before.
-  All the named-call rules apply unchanged: unknown names get
-  `argument-name-unknown` with the literal's declared names, a positional
-  argument may not follow a named one, duplicates are rejected, and a named call
-  never curries. The same shapes work on the MathJSON route
-  (`["Apply", ⟨literal⟩, ["NamedArgument", …]]` and a function-literal head
-  applied directly).
+- Canonicalizing or typing expressions that reference comprehension-bound names
+  is much faster.
+- Static Epsil checking no longer mutates engine state. Inferred types, forward
+  references and declarations from a check are discarded afterward.
 
-### Issues Resolved
+### Effects
 
-- **Canonicalizing or typing an expression that references a comprehension-bound
-  name is no longer catastrophically slow.** With
-  `B := [case-body for n = C + 1]` (a lazy `Comprehension`) assigned, a single
-  canonical box of a row filtering `B` — e.g. the implicit-surface equation
-  `(x - ⌊(Filter(B, Z↦Z=Z) - 1)/15⌋ + 7)² + … = 0.25` — took ~7–17 s, the first
-  `.type` read ~60–170 s, and a `couldMatch` on that type ~90 s, nearly
-  independent of the collection's size (Tycho item 181). The cause was cache
-  self-invalidation, not the comprehension itself: lazy-collection probes
-  (`Comprehension` count/finiteness scans, `Filter` emptiness walks) bracket
-  each read with an eval-context push/pop, and every pop advanced the version
-  counter that `.type`/`.sgn` caches key on — so each probe threw away the
-  caches the enclosing type derivation was filling, and the recomputation re-ran
-  the probes (measured: 872K pops and 1.85M type recomputes — 100% yielding
-  identical results — in one box). A pop now proves cleanliness with a version
-  stamp taken at push: if nothing advanced any invalidation axis while the
-  context was on the stack and its assumptions are untouched, the pop no longer
-  invalidates. The repro's full pipeline drops from ~3 minutes to ~50 ms.
-
-- **A `Take`-bounded infinite collection now compiles to JavaScript.**
-  `Sum(Take(Map(1..oo, _ |-> _^2), 10))` previously compiled to
-  `Array.from({length: Infinity}, …)` — code that compiled cleanly and threw
-  `RangeError: Invalid array length` the first time it ran. A statically
-  infinite pipeline — `Range` with an infinite bound, under
-  `Map`/`Filter`/`Drop`/`Rest` — now compiles to a lazy iterator stream,
-  materialized where `Take` or `TakeWhile` bounds it (the take count may be a
-  runtime variable). An infinite pipeline that is never bounded fails closed at
-  **compile** time with a clear error instead of the runtime `RangeError`; the
-  Python target likewise rejects a non-finite `Range` bound at compile time (it
-  previously emitted code that raised `OverflowError` at run time). Also fixed
-  while there: a fractional `Take`/`Drop` count now rounds like the interpreter
-  (`Take([1,2,3,4], 2.5)` takes three elements; the compiled `slice` used to
-  truncate to two).
-
-  The lazy stream helpers enforce the interpreter's runtime guards too: a scan
-  that can never terminate — `Filter` with a never-true predicate, `TakeWhile`
-  with a never-false one — throws the interpreter's `Iteration limit … exceeded`
-  error at `engine.iterationLimit` pulls instead of locking the thread, and an
-  invalid runtime count (`NaN`, `±∞`, or beyond the safe-integer range) is
-  treated as the interpreter treats it — an unresolved parameter yielding an
-  empty walk — rather than being coerced to a default or iterated verbatim. A
-  count that is _statically_ non-finite (`Take(1..oo, oo)`) fails closed at
-  compile time, and the range start may be a runtime variable
-  (`Take(Map(Range(n, oo), f), 10)` compiles).
-
-- **Statically checking an Epsil program no longer mutates the engine.** The
-  static checking pass (`epsil check`, and the pre-pass `executeEpsil` runs)
-  could permanently alter session state for a program that never ran: type
-  inference performed while checking wrote through to pre-existing definitions
-  (checking `u + 1` narrowed a previous cell's `u` to `number` for good), and
-  the forward-reference registry's snapshot rollback had a one-shot defect —
-  checking the same forward-referencing program twice on one engine left the
-  registry corrupted. The pass now runs under an inference **rollback frame**, a
-  new engine-internal primitive that journals every inference-driven mutation
-  (type-slot writes, operator-signature writes, binding-half swaps,
-  declarations, forward-reference registry deltas, fresh-inference membership,
-  provenance history, narrowing-sink entries) and undoes them all — in strict
-  LIFO order, preserving definition identity — when the check completes.
-
-### New Features
-
-- **New effect label `state`** (a minor-version event: the effect-label
-  enumeration is closed and versioned, and an older engine parsing a type string
-  that uses `state` errors rather than silently weakening the contract). The
-  label denotes creation or mutation of **object** state — a heap store through
-  a reference, or an object construction — as distinct from `scope`, which is
-  mutation of a _binding_. It parses and serializes in the effect-specifier slot
-  (`(t) state -> u`), inference and contracts treat it as an ordinary label, and
-  it participates in protocol-requirement effect ceilings. It is currently
-  **inert**: no evaluator emits it until mutable objects
-  (`docs/TYPE_SYSTEM_ROADMAP.md` Appendix B) land.
+- Added the `state` effect label for object creation and mutation. It is
+  available in type strings and effect contracts, preparing for mutable object
+  support.
 
 ## 0.106.1 _2026-08-13_
 
@@ -3562,7 +3461,7 @@ import ChangeLog from '@site/src/components/ChangeLog';
 - **Operators can declare an `elementCount` handler** (companion to
   `canEnumerate`) to report their length without evaluating.
 
-### Bug Fixes
+### Resolved Issues
 
 #### Epsil
 
@@ -9259,6 +9158,12 @@ against an independent `mpmath` reference, never another tool. Reproduce with
 
 ### Resolved Issues
 
+- **Exact integer tensors stay exact.** A shadowed branch in the tensor dtype
+  classifier routed every integer literal into a float64 buffer, which silently
+  disabled the exact-arithmetic path for integer matrices. With the repair,
+  `Inverse([[1,2],[3,4]])` evaluates to exact rationals (`[[-2,1],[3/2,-1/2]]`)
+  and `.N()` still produces the float form; an integer outside the float-safe
+  range stays expression-backed instead of rounding.
 - **`assume()` after `assign()` now records the assumption.** The predicate was
   evaluated through the symbol's assigned value before the assumption system saw
   it, so with `w := 5`, `assume(w > 0)` folded to `True`, returned
