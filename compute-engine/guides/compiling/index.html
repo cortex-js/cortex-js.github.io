@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -284,7 +284,15 @@ JavaScript.</p>
 <p>When no condition matches, compiled <code>Which</code> returns <code>NaN</code>. The interpreter
 answers <code>Missing</code> for the same input — the absence marker has no value in the
 target&#x27;s floating-point model, so it projects to <code>NaN</code>. See
-<a href="#non-finite-results" class="">Non-Finite Results</a>.</p>
+<a href="#non-finite-results" class="">Non-Finite Results</a>. A selection whose arms are all
+provably not numbers — strings, lists — answers the target&#x27;s missing-object
+literal instead, <code>undefined</code> in JavaScript and <code>None</code> in Python, so that
+<code>IsMissing</code> and <code>Coalesce</code> work on a compiled string selection; an arm whose
+type is unknown counts as a number. An <code>If</code> with no else-branch is
+the one-clause <code>Which</code>: <code>If(c, t)</code> compiles on every target and returns
+<code>NaN</code> when <code>c</code> is false. An <code>If</code> whose branch is a statement — an
+assignment, a loop — is a guard statement, not a value, and keeps its own
+rules (see the statement sections below).</p>
 <code-playground><div slot="javascript">// import { compile } from &#x27;@cortex-js/compute-engine&#x27;;
 <!-- -->
 <!-- -->// No clause covers x = 0, and there is no fallback clause
@@ -472,12 +480,12 @@ negative-zero approach that IEEE arithmetic does distinguish:</p>
 <!-- -->console.log(f.run({ x: 0 }));    // ➔ Infinity
 <!-- -->console.log(f.run({ x: -0 }));   // ➔ -Infinity
 </div></code-playground>
-<p>Absence markers project the same way. <code>Missing</code> — what an unmatched <code>Which</code>
-returns — is not a number, so the chained ternary ends in a literal <code>NaN</code> (see
+<p>Absence markers project the same way. <code>Missing</code> — what an unmatched <code>Which</code>,
+an else-less <code>If</code> and a false restriction <code>e\{c\}</code> return — is not a
+number, so the chained ternary ends in a literal <code>NaN</code> (see
 <a href="#if-and-which-conditionals" class=""><code>If</code> and <code>Which</code></a>). The same value reaches <code>run()</code>
-when the expression was never compiled at all: an else-less <code>If</code> declines and
-falls back to interpretation, and its <code>Missing</code> crosses the boundary as <code>NaN</code>
-too.</p>
+when the expression was never compiled at all and fell back to
+interpretation: its <code>Missing</code> crosses the boundary as <code>NaN</code> too.</p>
 <p><strong>Type guards follow the finite-by-default lattice.</strong> Every bare numeric type
 name denotes a <strong>finite</strong> value, so the guard a compiled parameter test emits
 rejects <code>Infinity</code> and <code>NaN</code> exactly as the interpreter&#x27;s signature check does:

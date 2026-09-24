@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -45,7 +45,7 @@
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/0ad263" target="_blank" rel="noopener noreferrer" class=""><code>0ad263</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{BarnesG}(z^\star)=\mathrm{BarnesG}(z)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{BarnesG}(\overline{z})=\overline{\mathrm{BarnesG}(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>BarnesG</strong> — Barnes G-function.
 Used by the Compute Engine for expansion.
@@ -95,20 +95,20 @@ Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://arxiv.org/abs/math/0308086" target="_blank" rel="noopener noreferrer" class="">arxiv.org</a>
 <a href="https://fungrim.org/entry/6395ee" target="_blank" rel="noopener noreferrer" class=""><code>6395ee</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z^\star)=\begin{cases}\mathrm{LogBarnesG}(z)&amp;z\in\lparen-\infty, 0\rbrack\\\mathrm{LogBarnesG}(z)^\star&amp;\top\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(\overline{z})=\begin{cases}\mathrm{LogBarnesG}(z)&amp;z\in\lparen-\infty, 0\rbrack\\\overline{\mathrm{LogBarnesG}(z)}&amp;\top\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/6c6d3e" target="_blank" rel="noopener noreferrer" class=""><code>6c6d3e</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z\times(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\lparen-\infty, 0\rbrack\land N_{var}\in\N^*</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function; <strong>LogBarnesGRemainder</strong> — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://dx.doi.org/10.1098/rspa.2014.0534" target="_blank" rel="noopener noreferrer" class="">dx.doi.org</a>
 <a href="https://fungrim.org/entry/6f8e14" target="_blank" rel="noopener noreferrer" class=""><code>6f8e14</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z\times(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&amp;0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z\times(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&amp;-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\Z</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -125,14 +125,14 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/8b7991" target="_blank" rel="noopener noreferrer" class=""><code>8b7991</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=(\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\lparen-\infty, -1\rbrack</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
 <strong>Reference:</strong> <a href="https://arxiv.org/abs/math/0308086" target="_blank" rel="noopener noreferrer" class="">arxiv.org</a>
 <a href="https://fungrim.org/entry/8c96a5" target="_blank" rel="noopener noreferrer" class=""><code>8c96a5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x</code></p>
+<p><code class="language-math math-inline">\mathrm{LogBarnesG}(z+1)=\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land z\notin\lparen-\infty, -1\rbrack</code>.
 <strong>Symbols:</strong> <strong>LogBarnesG</strong> — Logarithmic Barnes G-function.
 Used by the Compute Engine for simplification.
@@ -385,7 +385,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/5ce30b" target="_blank" rel="noopener noreferrer" class=""><code>5ce30b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{PolyGamma}(m, z^\star)=\mathrm{PolyGamma}(m, z)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{PolyGamma}(m, \overline{z})=\overline{\mathrm{PolyGamma}(m, z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">m\in\N\land z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/5db5f2" target="_blank" rel="noopener noreferrer" class=""><code>5db5f2</code> · Fungrim entry ↗</a></p>
@@ -474,7 +474,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a6bdf5" target="_blank" rel="noopener noreferrer" class=""><code>a6bdf5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{Digamma}(z^\star)=\mathrm{Digamma}(z)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{Digamma}(\overline{z})=\overline{\mathrm{Digamma}(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/aa47cd" target="_blank" rel="noopener noreferrer" class=""><code>aa47cd</code> · Fungrim entry ↗</a></p>
@@ -611,7 +611,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1d5e92" target="_blank" rel="noopener noreferrer" class=""><code>1d5e92</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\binom{z}{2}=\frac{z(z-1)}{2}</code></p>
+<p><code class="language-math math-inline">\binom{z}{2}=\frac{z\times(z-1)}{2}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1df686" target="_blank" rel="noopener noreferrer" class=""><code>1df686</code> · Fungrim entry ↗</a></p>
@@ -660,7 +660,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/471485" target="_blank" rel="noopener noreferrer" class=""><code>471485</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">n!=n(n-1)!</code></p>
+<p><code class="language-math math-inline">n!=n\times(n-1)!</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4f20ff" target="_blank" rel="noopener noreferrer" class=""><code>4f20ff</code> · Fungrim entry ↗</a></p>
@@ -855,7 +855,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/d16cb4" target="_blank" rel="noopener noreferrer" class=""><code>d16cb4</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Gamma(z^\star)=\Gamma(z)^\star</code></p>
+<p><code class="language-math math-inline">\Gamma(\overline{z})=\overline{\Gamma(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\Z_{\le0}</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/d7d2a0" target="_blank" rel="noopener noreferrer" class=""><code>d7d2a0</code> · Fungrim entry ↗</a></p>

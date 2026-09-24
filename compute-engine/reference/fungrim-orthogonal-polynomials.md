@@ -16,7 +16,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Chebyshev polynomials
 
-$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}$$
+$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n\times(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}$$
 
 **Holds when** $n\in\Z\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -513,7 +513,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
+$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n\times(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -642,7 +642,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z^\star)=\mathrm{LegendrePolynomial}(n, z)^\star$$
+$$\mathrm{LegendrePolynomial}(n, \overline{z})=\overline{\mathrm{LegendrePolynomial}(n, z)}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for expansion.

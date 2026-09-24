@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -37,7 +37,7 @@
 <li class=""><a href="#legendre-polynomials" class="">Legendre polynomials</a> (22)</li>
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="chebyshev-polynomials">Chebyshev polynomials<a href="#chebyshev-polynomials" class="hash-link" aria-label="Direct link to Chebyshev polynomials" title="Direct link to Chebyshev polynomials" translate="no">​</a></h2>
-<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}</code></p>
+<p><code class="language-math math-inline">x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n\times(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land x\in\C\setminus\lbrace-1, 1\rbrace</code>.
 <strong>Symbols:</strong> <strong>ChebyshevT</strong> — Chebyshev polynomial of the first kind; <strong>ChebyshevU</strong> — Chebyshev polynomial of the second kind.
 Used by the Compute Engine for simplification.
@@ -367,7 +367,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/217521" target="_blank" rel="noopener noreferrer" class=""><code>217521</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)=0</code></p>
+<p><code class="language-math math-inline">(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n\times(n+1)\mathrm{LegendrePolynomial}(n, z)=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/27688e" target="_blank" rel="noopener noreferrer" class=""><code>27688e</code> · Fungrim entry ↗</a></p>
@@ -448,7 +448,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/a7ac51" target="_blank" rel="noopener noreferrer" class=""><code>a7ac51</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, z^\star)=\mathrm{LegendrePolynomial}(n, z)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{LegendrePolynomial}(n, \overline{z})=\overline{\mathrm{LegendrePolynomial}(n, z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\N\land z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/b2d723" target="_blank" rel="noopener noreferrer" class=""><code>b2d723</code> · Fungrim entry ↗</a></p>

@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -69,7 +69,7 @@ Used by the Compute Engine for simplification and equation solving.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4491b8" target="_blank" rel="noopener noreferrer" class=""><code>4491b8</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\exp(z^\star)=\exponentialE^{z}^\star</code></p>
+<p><code class="language-math math-inline">\exp(\overline{z})=\overline{\exponentialE^{z}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/52d827" target="_blank" rel="noopener noreferrer" class=""><code>52d827</code> · Fungrim entry ↗</a></p>
@@ -185,8 +185,8 @@ Used by the Compute Engine for simplification and equation solving.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/22fb4a" target="_blank" rel="noopener noreferrer" class=""><code>22fb4a</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arctan(x+y)=\arctan(x)+\arctan((y)(1+x(x+y))^{-1})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1</code>  <em>or</em>  <code class="language-math math-inline">x\in\R\land y\in\R\land x(x+y)\gt-1</code>.
+<p><code class="language-math math-inline">\arctan(x+y)=\arctan(x)+\arctan((y)(1+x\times(x+y))^{-1})</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1</code>  <em>or</em>  <code class="language-math math-inline">x\in\R\land y\in\R\land x\times(x+y)\gt-1</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/268c9e" target="_blank" rel="noopener noreferrer" class=""><code>268c9e</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -209,7 +209,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/3ea11b" target="_blank" rel="noopener noreferrer" class=""><code>3ea11b</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))</code></p>
+<p><code class="language-math math-inline">\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x\times(x+y))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R\land y\in\R</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/47331d" target="_blank" rel="noopener noreferrer" class=""><code>47331d</code> · Fungrim entry ↗</a></p>
@@ -224,7 +224,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/503d4d" target="_blank" rel="noopener noreferrer" class=""><code>503d4d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\arctan(z^\star)=\arctan(z)^\star</code></p>
+<p><code class="language-math math-inline">\arctan(\overline{z})=\overline{\arctan(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/632063" target="_blank" rel="noopener noreferrer" class=""><code>632063</code> · Fungrim entry ↗</a></p>
@@ -433,7 +433,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/099b19" target="_blank" rel="noopener noreferrer" class=""><code>099b19</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\ln(z^\star)=\ln(z)^\star</code></p>
+<p><code class="language-math math-inline">\ln(\overline{z})=\overline{\ln(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lparen-\infty, 0\rbrack</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/13895b" target="_blank" rel="noopener noreferrer" class=""><code>13895b</code> · Fungrim entry ↗</a></p>
@@ -558,7 +558,7 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/340936" target="_blank" rel="noopener noreferrer" class=""><code>340936</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{sinc}(z^\star)=\mathrm{sinc}(z)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{sinc}(\overline{z})=\overline{\mathrm{sinc}(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/3a428f" target="_blank" rel="noopener noreferrer" class=""><code>3a428f</code> · Fungrim entry ↗</a></p>
@@ -644,7 +644,7 @@ Used by the Compute Engine for simplification.
 <p>Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fdc94c" target="_blank" rel="noopener noreferrer" class=""><code>fdc94c</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\frac{z(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0</code></p>
+<p><code class="language-math math-inline">\frac{z\times(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\land n\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/ff5e82" target="_blank" rel="noopener noreferrer" class=""><code>ff5e82</code> · Fungrim entry ↗</a></p>
@@ -801,7 +801,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/755655" target="_blank" rel="noopener noreferrer" class=""><code>755655</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\sin(z^\star)=\sin(z)^\star</code></p>
+<p><code class="language-math math-inline">\sin(\overline{z})=\overline{\sin(z)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/82c83f" target="_blank" rel="noopener noreferrer" class=""><code>82c83f</code> · Fungrim entry ↗</a></p>
@@ -1031,7 +1031,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/ac54c7" target="_blank" rel="noopener noreferrer" class=""><code>ac54c7</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\sqrt{z^\star}=\sqrt{z}^\star</code></p>
+<p><code class="language-math math-inline">\sqrt{\overline{z}}=\overline{\sqrt{z}}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">z\in\C\setminus\lparen-\infty, 0\rparen</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/c58f46" target="_blank" rel="noopener noreferrer" class=""><code>c58f46</code> · Fungrim entry ↗</a></p>

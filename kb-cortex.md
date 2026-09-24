@@ -38,14 +38,14 @@ Epsil is **symbolic by default**: expressions stay exact unless you ask for a
 numeric approximation with `N()`.
 
 ```epsil-live
-Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
+simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 ```
 
 Values have a type, and strings support `\(…)` interpolation:
 
 ```epsil-live
 let x = 2^11 - 1
-"\(x) has type \(Type(x))"
+"\(x) has type \(type(x))"
 ```
 
 Errors are ordinary values, so a program never throws to its host — a problem
@@ -95,6 +95,11 @@ Understand **how Epsil evaluates** — exact values, mutable bindings, lazy
 collections, ordinary error values, and session scope.
 </ReadMore>
 
+<ReadMore path="/style/">
+Write **idiomatic Epsil** — the style guide: declarations, recursion,
+pipelines, building lists, errors as values, effects, and pattern matching.
+</ReadMore>
+
 ## Tools and Integrations
 
 <ReadMore path="/for-agents/">
@@ -123,6 +128,11 @@ calls and indexing.
 
 <ReadMore path="/operators/">
 **Operators** — arithmetic, logic, relational, and the pipeline operator.
+</ReadMore>
+
+<ReadMore path="/library/">
+**Standard library** — every function and constant by category, with
+signatures, summaries, and executable examples.
 </ReadMore>
 
 <ReadMore path="/control-flow/">
@@ -249,7 +259,7 @@ Save this program as `squares.epsil`:
 
 ```epsil
 square(x) = x^2
-Map(square, 1..5)
+map(square, 1..5)
 ```
 
 Run it:
@@ -271,13 +281,13 @@ The conventional file extension is `.epsil`.
 Expressions remain exact and symbolic by default:
 
 ```epsil-live
-Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
+simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
 ```
 
 Use `N()` when you want a numeric approximation:
 
 ```epsil-live
-N(Sqrt(2))
+N(sqrt(2))
 ```
 
 ## Embed Epsil in JavaScript
@@ -364,7 +374,7 @@ later manipulation:
 
 ```epsil
 let share = 1 / 3
-Simplify(share + share + share)
+simplify(share + share + share)
 // ➔ 1
 ```
 
@@ -374,12 +384,14 @@ point where a decimal is actually useful — for presentation, plotting, or a
 numerical algorithm:
 
 ```epsil
-N(Sqrt(2))
+N(sqrt(2))
 // ➔ 1.4142135623730950488
 ```
 
-Capitalized names such as `Simplify`, `Sqrt`, and `N` are Compute Engine
-operators. Lowercase names are normally the names you introduce.
+Names such as `simplify`, `sqrt`, and `N` are Compute Engine operators; a
+library name also answers to its capitalized MathJSON spelling (`Simplify`,
+`sqrt`). The names you introduce are lowercase too, and a name you declare
+shadows a library name in its scope. See [Naming](/naming/).
 
 ## Names describe values
 
@@ -400,7 +412,7 @@ whether to bind it to a new name or replace an old binding.
 
 ```epsil
 let readings = [3, 1, 2]
-let sorted = Sort(readings)
+let sorted = sort(readings)
 (readings, sorted)
 // ➔ ([3, 1, 2], [1, 2, 3])
 ```
@@ -415,7 +427,7 @@ For a one-line mathematical definition, put parameters in parentheses and the
 formula after `=`:
 
 ```epsil
-circleArea(r) = Pi * r^2
+circleArea(r) = pi * r^2
 circleArea(3)
 // ➔ 9pi
 ```
@@ -426,7 +438,7 @@ expression is the result, so there is no `return` ceremony:
 ```epsil
 function hypotenuse(a, b) {
   let squared = a^2 + b^2
-  Sqrt(squared)
+  sqrt(squared)
 }
 hypotenuse(3, 4)
 // ➔ 5
@@ -436,7 +448,7 @@ Anonymous functions use `=>`. They are especially useful for a small
 transformation passed to a collection operator:
 
 ```epsil
-Map(n => n^2, 1..5)
+map(n => n^2, 1..5)
 // ➔ [1, 4, 9, 16, 25]
 ```
 
@@ -477,15 +489,15 @@ endpoints. Use a pipeline when data goes through several transformations:
 
 ```epsil
 1..10
-  |> Filter(n => n % 2 == 0)
+  |> filter(n => n % 2 == 0)
   |> n => n^2                         // Map(n => n^2, _)
-  |> Sum
+  |> sum
 // ➔ 220
 ```
 
 Pipelines read from input to result, rather than inside out. The `_` marks the
-argument position filled by the piped value, which matters when `Map` or
-`Filter` has another argument as well.
+argument position filled by the piped value, which matters when `map` or
+`filter` has another argument as well.
 
 For work whose purpose is changing a binding — an accumulator, for example —
 use a loop:
@@ -497,7 +509,7 @@ total
 // ➔ 5050
 ```
 
-Use `Map`, `Filter`, and `Reduce` for value-producing iteration; use `for` and
+Use `map`, `filter`, and `reduce` for value-producing iteration; use `for` and
 `while` when performing a sequence of updates is the clearest model.
 
 ## Types document important boundaries
@@ -553,18 +565,19 @@ executes each code fence directly through `executeEpsil`, while
 `test/epsil/programs.test.ts` provides deeper assertions for representative
 results and runtime behavior.
 
-A few idioms these programs rely on:
+A few idioms these programs rely on (the [Style Guide](/style/)
+collects them all, with the reasons):
 
 - Loops (`for`, `while`) are evaluated **for effect** — accumulate into a
-  variable (a number, or a list built up with `Join`/`Append`), or use
-  `Map`/`Filter`/`Reduce` for value-producing iteration.
+  variable (a number, or a list built up with `join`/`append`), or use
+  `map`/`filter`/`reduce` for value-producing iteration.
 - `1..n` is the **inclusive** range from 1 to n, and `x |> f` pipes a value
   into a function — when the function takes several arguments, `_` marks the
-  piped value's slot (`xs |> Map(f, _)`).
+  piped value's slot (`xs |> map(f, _)`).
 - `a if c else b` is the conditional expression — the same `If` as
   `if c { a } else { b }`, without the braces.
 - Collection **literals** evaluate their elements; lazy **operators**
-  (`Range`, `Map`, `Filter`) are generators that enumerate on demand (see
+  (`Range`, `map`, `filter`) are generators that enumerate on demand (see
   [Evaluation](/evaluation/)).
 - `a % b` is the remainder (`Mod`), and a postfix `!` is the factorial. The
   `!` must directly follow its operand (`n!`; `x != y` is still ≠).
@@ -588,7 +601,7 @@ total
 ```
 
 **FizzBuzz, as a value.** `if`/`else` is an expression, so the whole program
-is a single `Map` — no printing, no mutation:
+is a single `map` — no printing, no mutation:
 
 ```epsil
 1..15 |> k =>
@@ -627,12 +640,15 @@ a
 // ➔ 21
 ```
 
-**Collecting values in a loop.** A list accumulates through `Join`; each
-appended literal snapshots the loop variable's current value:
+**Collecting values in a loop.** A list grows by spreading the old one into
+a new literal; each literal snapshots the loop variable's current value. (A
+`join(xs, [k])` on every turn would nest a lazy recipe once per turn and
+slow to a crawl by a thousand elements — see the
+[Style Guide](/style/#building-a-list-one-element-at-a-time).)
 
 ```epsil
 let xs = []
-for k in 1..3 { xs = Join(xs, [k]) }
+for k in 1..3 { xs = [...xs, k] }
 xs
 // ➔ [1, 2, 3]
 ```
@@ -696,7 +712,7 @@ let y = 5
 // ➔ (True, False)
 ```
 
-**A truth table**, as a `Map` over the four boolean pairs:
+**A truth table**, as a `map` over the four boolean pairs:
 
 ```epsil
 [(True, True), (True, False), (False, True), (False, False)] 
@@ -711,7 +727,7 @@ ONE parameter taking a pair, rather than two parameters:
 
 ```epsil
 [(True, True), (True, False), (False, True), (False, False)]
-  |> Map(((p, q)) => p && q, _)
+  |> map(((p, q)) => p && q, _)
 // ➔ [True, False, False, False]
 ```
 
@@ -728,7 +744,7 @@ Fermat's little theorem 7¹² ≡ 1 (mod 13), and 222 = 18·12 + 6, so:
 **gcd/lcm, factorization and divisors** of a number:
 
 ```epsil
-(GCD(48, 36), LCM(48, 36), FactorInteger(360), Divisors(28))
+(gcd(48, 36), lcm(48, 36), factorInteger(360), divisors(28))
 // ➔ (12, 144, [(2, 3), (3, 2), (5, 1)], [1, 2, 4, 7, 14, 28])
 ```
 
@@ -736,7 +752,7 @@ Fermat's little theorem 7¹² ≡ 1 (mod 13), and 222 = 18·12 + 6, so:
 declaration unpacks it into names in one statement:
 
 ```epsil
-divmod(a: integer, b: integer) = (Floor(a / b), a % b)
+divmod(a: integer, b: integer) = (floor(a / b), a % b)
 let (q, r) = divmod(2026, 7)
 (q, r)
 // ➔ (289, 3)
@@ -747,7 +763,7 @@ pair carried in a two-element list literal, stays exact all the way to F(200)
 — far past the 2⁵³ limit of floating point:
 
 ```epsil
-Fold((p, _) => [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
+fold((p, _) => [p[2], p[1] + p[2]], [0, 1], 1..200)[1]
 // ➔ 280571172992510140037611932413038677189525
 ```
 
@@ -773,15 +789,22 @@ fact(10)
 fib(0) = 0
 fib(1) = 1
 fib(n: integer) = fib(n - 1) + fib(n - 2)
-Map(fib, 1..10)
+map(fib, 1..10)
 // ➔ [1, 1, 2, 3, 5, 8, 13, 21, 34, 55]
 ```
 
 A single-clause spelling with a conditional is equivalent
 (`fact(n) = 1 if n <= 1 else n * fact(n - 1)`), as is the two-step form —
-declare with `let`, then assign a `=>` lambda. Note that *mutually*
-recursive functions still require declaring all the names with `let` before
-defining any of them.
+declare with `let`, then assign a `=>` lambda. *Mutually* recursive functions
+need no declaration ceremony either: a call to a name that a later statement
+defines is resolved when that definition runs, in every form above.
+
+```epsil
+even(n) = true if n == 0 else odd(n - 1)
+odd(n) = false if n == 0 else even(n - 1)
+[even(4), odd(7)]
+// ➔ [True, True]
+```
 
 ## Higher-Order Functions
 
@@ -883,28 +906,28 @@ N(area * h)
 // ➔ 0.33335
 ```
 
-**Monte Carlo estimate of π.** `Random()` returns a uniform value in [0, 1):
+**Monte Carlo estimate of π.** `random()` returns a uniform value in [0, 1):
 
 ```epsil
 let inside = 0
 let total = 500
 for k in 1..total {
-  let px = Random()
-  let py = Random()
+  let px = random()
+  let py = random()
   if px^2 + py^2 < 1 { inside = inside + 1 }
 }
 N(4 * inside / total)
 // ➔ ≈ 3.14 (varies by run)
 ```
 
-**Reproducible simulations.** `WithRandomSeed(seed, body)` evaluates `body`
+**Reproducible simulations.** `withRandomSeed(seed, body)` evaluates `body`
 with a seeded random frame. The block replays exactly, while repeated draws
 *inside* it still differ (the n-th draw of a frame is `hash(seed, n)`). Frames
 nest, and the innermost one wins. Outside any frame, draws are live:
 
 ```epsil
-let a = WithRandomSeed(7, [Random(1..100), Random(1..100)])
-let b = WithRandomSeed(7, [Random(1..100), Random(1..100)])
+let a = withRandomSeed(7, [random(1..100), random(1..100)])
+let b = withRandomSeed(7, [random(1..100), random(1..100)])
 a == b
 // ➔ True
 ```
@@ -917,14 +940,14 @@ The calculus operators work symbolically, keeping parameters exact.
 a displacement `d` is `∫₀ᵈ kx dx`:
 
 ```epsil
-Integrate(k*x, (x, 0, d))
+integrate(k*x, (x, 0, d))
 // ➔ 1/2 * k * d^2
 ```
 
 A definite integral with numeric bounds evaluates exactly:
 
 ```epsil
-Integrate(Sin(x), (x, 0, Pi))
+integrate(sin(x), (x, 0, pi))
 // ➔ 2
 ```
 
@@ -932,15 +955,15 @@ Integrate(Sin(x), (x, 0, Pi))
 `sin x ≈ x` is governed by a limit at 0:
 
 ```epsil
-Limit((Sin(x) - x)/x^3, x, 0)
+limit((sin(x) - x)/x^3, x, 0)
 // ➔ -1/6
 ```
 
-**Series.** The Maclaurin expansion of sine, with a `BigO` tail marking the
+**Series.** The Maclaurin expansion of sine, with a `bigO` tail marking the
 first dropped term:
 
 ```epsil
-Series(Sin(x), x, 0)
+series(sin(x), x, 0)
 // ➔ x - 1/6 * x^3 + 1/120 * x^5 + BigO(x^7)
 ```
 
@@ -956,25 +979,25 @@ N(UnitConvert($30\,\mathrm{km/h}$, $\mathrm{m/s}$))
 // ➔ 8.333333333333334 m/s
 ```
 
-**Uncertainty propagation.** `Measurement(value, error)` carries an absolute
+**Uncertainty propagation.** `measurement(value, error)` carries an absolute
 uncertainty that `*` propagates in quadrature. For a plot measured
 L = 10 ± 0.1 m by W = 20 ± 0.2 m, the area error is
 √(20²·0.1² + 10²·0.2²) = √8 ≈ 2.83:
 
 ```epsil
-let L = Measurement(10, 0.1)
-let W = Measurement(20, 0.2)
+let L = measurement(10, 0.1)
+let W = measurement(20, 0.2)
 N(L * W)
 // ➔ 200.0 ± 2.8
 ```
 
 ## Complex Numbers
 
-The imaginary unit is `i`; complex arithmetic, `Conjugate` and `Abs` (the
+The imaginary unit is `i`; complex arithmetic, `conjugate` and `abs` (the
 modulus) all work:
 
 ```epsil
-((2 + 3i) * (1 - i), Conjugate(2 + 3i), Abs(3 + 4i))
+((2 + 3i) * (1 - i), conjugate(2 + 3i), abs(3 + 4i))
 // ➔ ((5 + i), (2 - 3i), 5)
 ```
 
@@ -990,7 +1013,7 @@ $e^{i\pi/3}$
 imaginary part: (1+i)(2+i)(3+i) = 10i:
 
 ```epsil
-Product(Map(k => k + i, Range(1, 3)))
+product(map(k => k + i, Range(1, 3)))
 // ➔ 10i
 ```
 
@@ -1014,8 +1037,8 @@ h
 π²/6 — the difference is the tail of the series, ≈ 1/100:
 
 ```epsil
-let s = Sum(1/k^2, (k, 1, 100))
-N(Pi^2 / 6 - s)
+let s = sum(1/k^2, (k, 1, 100))
+N(pi^2 / 6 - s)
 // ➔ 0.00995016666333…
 ```
 
@@ -1031,7 +1054,7 @@ D(f(t), t)
 the polynomial:
 
 ```epsil
-let roots = Solve(x^2 - 5x + 6 == 0, x)
+let roots = solve(x^2 - 5x + 6 == 0, x)
 roots |> r => r^2 - 5r + 6
 // ➔ [0, 0]
 ```
@@ -1062,7 +1085,7 @@ N(Abs(x - phi))
 let n = 100
 let p = 5
 let z = 0
-while p <= n { z = z + Floor(n / p); p = p * 5 }
+while p <= n { z = z + floor(n / p); p = p * 5 }
 z
 // ➔ 24
 ```
@@ -1081,7 +1104,7 @@ count
 pentagon on the unit circle; their vector sum is exactly zero:
 
 ```epsil
-Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
+sum(exp(2*pi*i*k/5), (k, 0, 4))
 // ➔ 0
 ```
 
@@ -1091,7 +1114,7 @@ Sum(Exp(2*Pi*i*k/5), (k, 0, 4))
 an exact rational — the 10th harmonic number:
 
 ```epsil
-Fold((a, k) => a + 1/k, 0, 1..10)
+fold((a, k) => a + 1/k, 0, 1..10)
 // ➔ 7381/2520
 ```
 
@@ -1110,7 +1133,7 @@ symbolic values, never floats:
 // ➔ (sqrt(3)/2, 1/4 * pi, 1/6 * pi, 1)
 ```
 
-**Solving equations exactly.** `Solve` returns the exact solution set — for a
+**Solving equations exactly.** `solve` returns the exact solution set — for a
 cubic, an absolute-value equation and an exponential equation:
 
 ```epsil
@@ -1125,19 +1148,19 @@ into a string:
 
 ```epsil
 let x = 2^11 - 1
-"\(x) has type \(Type(x))"
+"\(x) has type \(type(x))"
 // ➔ "2047 has type integer"
 ```
 
 **A formatted table.** `\t` and `\n` escapes in a string literal are real
 control characters. Build a table of `n`, `n²`, `n³` — one interpolated row
-per value, folded onto the header with `Join` in a pipeline (`Join` is the
-two-string concatenation; `StringJoin` joins one collection and would read the
+per value, folded onto the header with `join` in a pipeline (`join` is the
+two-string concatenation; `stringJoin` joins one collection and would read the
 accumulator as its characters):
 
 ```epsil
 let header = "n\tn^2\tn^3\n"
-1..5 |> n => "\(n)\t\(n^2)\t\(n^3)\n" |> Fold(Join, header)
+1..5 |> n => "\(n)\t\(n^2)\t\(n^3)\n" |> fold(join, header)
 ```
 
 produces (tabs aligned, newline-separated rows):
@@ -1151,31 +1174,31 @@ n	n^2	n^3
 5	25	125
 ```
 
-**Character frequencies.** `Characters` splits a string into user-perceived
-characters (grapheme clusters); `Tally` counts them:
+**Character frequencies.** `characters` splits a string into user-perceived
+characters (grapheme clusters); `tally` counts them:
 
 ```epsil
-let freq = "mississippi" |> Characters |> Tally
-let d = DictionaryFrom(Zip(freq[1], freq[2]))
+let freq = "mississippi" |> characters |> tally
+let d = dictionaryFrom(zip(freq[1], freq[2]))
 (d["m"], d["i"], d["s"], d["p"])
 // ➔ (1, 4, 4, 2)
 ```
 
-**Word counts.** `StringSplit` with no separator splits on runs of
+**Word counts.** `stringSplit` with no separator splits on runs of
 whitespace (with a separator string, it splits on each occurrence):
 
 ```epsil
-let words = StringSplit("the quick brown fox the lazy dog the")
-(Length(words), Tally(words)[2])
+let words = stringSplit("the quick brown fox the lazy dog the")
+(length(words), tally(words)[2])
 // ➔ (8, [3, 1, 1, 1, 1, 1])
 ```
 
-**A Caesar cipher.** A three-stage pipeline: `UnicodeScalars` turns a string
-into its code points, `Map` shifts each, and `StringFrom(…, "unicode-scalars")`
+**A Caesar cipher.** A three-stage pipeline: `unicodeScalars` turns a string
+into its code points, `map` shifts each, and `StringFrom(…, "unicode-scalars")`
 rebuilds the string. Shifting back decodes, so the cipher round-trips:
 
 ```epsil
-shift(s, k) = s |> UnicodeScalars |> c => c + k |> StringFrom(_, "unicode-scalars")
+shift(s, k) = s |> unicodeScalars |> c => c + k |> stringFrom(_, "unicode-scalars")
 (shift("hello", 3), shift(shift("hello", 3), -3))
 // ➔ ("khoor", "hello")
 ```
@@ -1185,9 +1208,9 @@ characters agree; a word is a palindrome when its characters equal their
 reverse:
 
 ```epsil
-let anagram = Sort(Characters("listen")) == Sort(Characters("silent"))
+let anagram = sort(characters("listen")) == sort(characters("silent"))
 let s = "racecar"
-let palindrome = Characters(s) == Reverse(Characters(s))
+let palindrome = characters(s) == reverse(characters(s))
 (anagram, palindrome)
 // ➔ (True, True)
 ```
@@ -1199,8 +1222,8 @@ let palindrome = Characters(s) == Reverse(Characters(s))
 
 ```epsil
 let m = [[2, 1], [1, 3]]
-let d = Determinant(m)
-let t = Transpose(m)
+let d = determinant(m)
+let t = transpose(m)
 (d, t[1, 2], t[2, 1])
 // ➔ (5, 1, 1)
 ```
@@ -1209,7 +1232,7 @@ let t = Transpose(m)
 
 ```epsil
 let xs = [4, 8, 15, 16, 23, 42]
-(Mean(xs), Median(xs), Max(xs), Variance(xs))
+(mean(xs), median(xs), max(xs), variance(xs))
 // ➔ (18, 31/2, 42, 182)
 ```
 
@@ -1217,7 +1240,7 @@ let xs = [4, 8, 15, 16, 23, 42]
 `_` is the piped value:
 
 ```epsil
-1..10 |> Filter(n => n % 2 == 0) |> Reduce((acc, n) => acc + n)
+1..10 |> filter(n => n % 2 == 0) |> reduce((acc, n) => acc + n)
 // ➔ 30
 ```
 
@@ -1232,7 +1255,7 @@ let m = [[1, 2], [3, 4]]
 **Pipelines.** `x |> f` applies `f` to `x`:
 
 ```epsil
-[4, 8, 15, 16, 23, 42] |> Mean
+[4, 8, 15, 16, 23, 42] |> mean
 // ➔ 18
 ```
 
@@ -1240,14 +1263,14 @@ When a stage takes several arguments, `_` marks the slot the piped value
 fills. The primes below 100, counted:
 
 ```epsil
-1..100 |> Filter(_, IsPrime) |> Length
+1..100 |> filter(_, isPrime) |> length
 // ➔ 25
 ```
 
 If the slot can be inferred based on the type of the previous argument, it can be left out:
 
 ```epsil
-1..100 |> Filter(IsPrime) |> Length
+1..100 |> filter(isPrime) |> length
 // ➔ 25
 ```
 
@@ -1257,7 +1280,7 @@ And a lambda is automatically converted to a map:
 1..100 |> x => x^2
 
 // Shorthand for:
-1..100 |> Map(x => x^2, _)
+1..100 |> map(x => x^2, _)
 ```
 
 
@@ -1276,17 +1299,17 @@ dot(...p, ...q)
 explicit initial value:
 
 ```epsil
-Fold((acc, n) => acc + n^2, 0, 1..5)
+fold((acc, n) => acc + n^2, 0, 1..5)
 // ➔ 55
 ```
 
-**Solve a linear system.** `LinearSolve(A, b)` solves `A·x = b`, exactly for
+**Solve a linear system.** `linearSolve(A, b)` solves `A·x = b`, exactly for
 exact input. Here `2x + y = 5`, `x + 3y = 10`:
 
 ```epsil
 let A = [[2, 1], [1, 3]]
 let b = [5, 10]
-LinearSolve(A, b)
+linearSolve(A, b)
 // ➔ [1, 3]
 ```
 
@@ -1295,17 +1318,17 @@ each solution as a tuple of values in the order of the variable list —
 nonlinear systems may return several tuples:
 
 ```epsil
-Solve([x^2 + y^2 == 25, x + y == 7], [x, y])
+solve([x^2 + y^2 == 25, x + y == 7], [x, y])
 // ➔ [(3, 4), (4, 3)]
 ```
 
 **Errors are values.** A type-incompatible element does not abort the
 computation — it surfaces as `NaN` while the valid inputs still compute. Here
-`Sqrt` is mapped over a list containing a string:
+`sqrt` is mapped over a list containing a string:
 
 ```epsil
 let inputs = [16, -4, "banana", 81]
-inputs |> x => Sqrt(x)
+inputs |> x => sqrt(x)
 // ➔ [4, 2i, NaN, 9]
 ```
 
@@ -1317,15 +1340,15 @@ has complex ones:
 ```epsil
 let A = [[2, 1], [1, 2]]
 let B = [[0, -1], [1, 0]]
-(Eigenvalues(A), Eigenvalues(B))
+(eigenvalues(A), eigenvalues(B))
 // ➔ ([3, 1], [i, -i])
 ```
 
-**Vector products.** `Cross` is the 3-D cross product; `Dot` the inner
+**Vector products.** `cross` is the 3-D cross product; `dot` the inner
 product:
 
 ```epsil
-(Cross([1, 0, 0], [0, 1, 0]), Dot([1, 2, 3], [4, 5, 6]))
+(cross([1, 0, 0], [0, 1, 0]), dot([1, 2, 3], [4, 5, 6]))
 // ➔ ([0, 0, 1], 32)
 ```
 
@@ -1339,7 +1362,7 @@ symbol-value table and the subtractive rule:
 ```epsil
 let value = {"I" -> 1, "V" -> 5, "X" -> 10, "L" -> 50, "C" -> 100, "D" -> 500, "M" -> 1000}
 let s = ["M","C","M","X","C","I","V"]
-let n = Length(s)
+let n = length(s)
 let total = 0
 for i in 1..n {
   let cur = value[s[i]]
@@ -1349,23 +1372,23 @@ total
 // ➔ 1994
 ```
 
-**A frequency table.** `Tally` returns `(values, counts)`; `Zip` pairs them and
-`DictionaryFrom` builds the dictionary. This is the idiomatic build-then-read
+**A frequency table.** `tally` returns `(values, counts)`; `zip` pairs them and
+`dictionaryFrom` builds the dictionary. This is the idiomatic build-then-read
 pattern (there is no in-place `d[k] = v` update):
 
 ```epsil
 let words = ["red","blue","red","green","blue","red","blue"]
-let t = Tally(words)
-let freq = DictionaryFrom(Zip(t[1], t[2]))
+let t = tally(words)
+let freq = dictionaryFrom(zip(t[1], t[2]))
 (freq["red"], freq["blue"], freq["green"])
 // ➔ (3, 3, 1)
 ```
 
-**Enumerating a dictionary** with `Keys` and `Values`:
+**Enumerating a dictionary** with `keys` and `values`:
 
 ```epsil
 let scores = {"alice" -> 90, "bob" -> 85, "carol" -> 95}
-(Keys(scores), Max(Values(scores)))
+(keys(scores), max(values(scores)))
 // ➔ (["alice", "bob", "carol"], 95)
 ```
 
@@ -1375,33 +1398,33 @@ usable directly in an expression — here summing the values over the keys:
 ```epsil
 let d = {"a" -> 1, "b" -> 2, "c" -> 3}
 let s = 0
-for k in Keys(d) { s = s + d[k] }
+for k in keys(d) { s = s + d[k] }
 s
 // ➔ 6
 ```
 
 ## Sets
 
-`Intersection`, `Union` and set equality work on sets. Passing lists to
-`Intersection` deduplicates and returns a `Set`. The common divisors of 48 and
+`intersection`, `union` and set equality work on sets. Passing lists to
+`intersection` deduplicates and returns a `Set`. The common divisors of 48 and
 36 are the intersection of their divisor lists (equivalently, the divisors of
 gcd(48, 36) = 12):
 
 ```epsil
 let d48 = [1, 2, 3, 4, 6, 8, 12, 16, 24, 48]
 let d36 = [1, 2, 3, 4, 6, 9, 12, 18, 36]
-Intersection(d48, d36)
+intersection(d48, d36)
 // ➔ Set(1, 2, 3, 4, 6, 12)
 ```
 
 Set equality compares by membership, not by how the set was produced: a
-computed set (an `Intersection` result, a filtered set…) equals a set literal
+computed set (an `intersection` result, a filtered set…) equals a set literal
 with the same elements.
 
 ```epsil
 let d48 = [1, 2, 3, 4, 6, 8, 12, 16, 24, 48]
 let d36 = [1, 2, 3, 4, 6, 9, 12, 18, 36]
-Intersection(d48, d36) == {1, 2, 3, 4, 6, 12}
+intersection(d48, d36) == {1, 2, 3, 4, 6, 12}
 // ➔ True
 ```
 
@@ -1409,7 +1432,7 @@ Intersection(d48, d36) == {1, 2, 3, 4, 6, 12}
 
 A recursive-descent JSON parser, in about a hundred lines. JSON maps onto
 Epsil data directly — objects become dictionaries, arrays become lists,
-`null` becomes `Missing` — and numbers come out **exact**: `2.5e-1` parses to
+`null` becomes `missing` — and numbers come out **exact**: `2.5e-1` parses to
 the rational `1/4`, not a float.
 
 The program pulls together most of the language:
@@ -1428,14 +1451,14 @@ The program pulls together most of the language:
 ```epsil
 type alias json = number | string | boolean | missing | list<json> | dictionary
 
-let digits = Characters("0123456789")
+let digits = characters("0123456789")
 isDigit(c: character | missing) = c in digits
 isWs(c: character | missing) = c == " " || c == "\n" || c == "\t" || c == "\r"
 
 // Index of the first non-whitespace character at or after i
 function skipWs(cs: list<character>, i: integer) -> integer {
   let j = i
-  while j <= Length(cs) && isWs(cs[j]) { j = j + 1 }
+  while j <= length(cs) && isWs(cs[j]) { j = j + 1 }
   j
 }
 
@@ -1443,8 +1466,8 @@ function skipWs(cs: list<character>, i: integer) -> integer {
 function parseDigits(cs: list<character>, i: integer) -> tuple<integer, integer> {
   let j = i
   let n = 0
-  while j <= Length(cs) && isDigit(cs[j]) {
-    n = 10 * n + IndexOf(digits, cs[j]) - 1
+  while j <= length(cs) && isDigit(cs[j]) {
+    n = 10 * n + indexOf(digits, cs[j]) - 1
     j = j + 1
   }
   (n, j)
@@ -1493,14 +1516,14 @@ function scanString(cs: list<character>, i: integer) -> tuple<string, integer> {
         "r" => "\r"
         e => e // covers \" \\ \/
       }
-      out = Join(out, [c])
+      out = join(out, [c])
       j = j + 2
     } else {
-      out = Join(out, [cs[j]])
+      out = join(out, [cs[j]])
       j = j + 1
     }
   }
-  (StringJoin(ListFrom(out)), j + 1)
+  (stringJoin(listFrom(out)), j + 1)
 }
 
 // String: cs[i] is the opening quote
@@ -1516,14 +1539,14 @@ function parseArray(cs: list<character>, i: integer) -> tuple<json, integer> {
     while more {
       let v = 0
       (v, j) := parseValue(cs, j)
-      out = Join(out, [v])
+      out = join(out, [v])
       j = skipWs(cs, j)
       if cs[j] == "," { j = skipWs(cs, j + 1) }
       else { more = false } // at "]"
     }
     j = j + 1
   }
-  (ListFrom(out), j)
+  (listFrom(out), j)
 }
 
 // Object: cs[i] is "{" — key-value pairs become a dictionary
@@ -1540,15 +1563,15 @@ function parseObject(cs: list<character>, i: integer) -> tuple<json, integer> {
       j = skipWs(cs, skipWs(cs, j) + 1) // skip ":"
       let v = 0
       (v, j) := parseValue(cs, j)
-      keys = Join(keys, [k])
-      vals = Join(vals, [v])
+      keys = join(keys, [k])
+      vals = join(vals, [v])
       j = skipWs(cs, j)
       if cs[j] == "," { j = skipWs(cs, j + 1) }
       else { more = false } // at "}"
     }
     j = j + 1
   }
-  (DictionaryFrom(Zip(ListFrom(keys), ListFrom(vals))), j)
+  (dictionaryFrom(zip(listFrom(keys), listFrom(vals))), j)
 }
 
 // Any JSON value, dispatched on its first character
@@ -1560,13 +1583,13 @@ function parseValue(cs: list<character>, i: integer) -> tuple<json, integer> {
     "{" => parseObject(cs, j)
     "t" => (True, j + 4) // true
     "f" => (False, j + 5) // false
-    "n" => (Missing, j + 4) // null
+    "n" => (missing, j + 4) // null
     _ => parseNumber(cs, j)
   }
 }
 
 function jsonParse(s: string) -> json {
-  let (v, _) = parseValue(Characters(s), 1)
+  let (v, _) = parseValue(characters(s), 1)
   v
 }
 
@@ -1582,13 +1605,13 @@ let src = """
 }
 """
 let doc = jsonParse(src)
-(doc.name, doc.tags[2], doc.born + 1, doc.ratio, doc.active, IsMissing(doc.note))
+(doc.name, doc.tags[2], doc.born + 1, doc.ratio, doc.active, isMissing(doc.note))
 // ➔ ("Ada Lovelace", "computing", 1816, 1/4, "True", "True")
 ```
 
 Some details worth noticing: the exponent `2.5e-1` came back as the exact
 rational `1/4`, and adding 1 to `doc.born` is ordinary arithmetic on the
-parsed value. An absent key would read back as `Missing` — the same value a
+parsed value. An absent key would read back as `missing` — the same value a
 JSON `null` parses to — and `IsMissing` recognizes both. The parser is about
 as fast as you would expect an interpreted recursive-descent parser to be;
 it is a language showcase, not a replacement for a native JSON reader.
@@ -1647,18 +1670,105 @@ Source: https://epsil.dev/naming/
 
 # Naming Conventions
 
-Epsil follows the naming convention used throughout its standard library:
-**capitalized** identifiers denote library operators, **lowercase**
-identifiers denote user-defined variables and functions.
+Epsil spells the standard library in **lowercase**: `sin`, `map`,
+`isPrime`, `pi`. Every function and constant of the library also answers to
+its MathJSON name, with an initial capital: `Sin`, `Map`, `IsPrime`, `Pi`.
+The two spellings name the same thing.
 
 ```epsil
-Sin(x)
-Simplify(2 + 3x^3)
-Map(x => x^2, [1, 2, 3])
+sin(pi / 2)
+// ➔ 1
+Sin(Pi / 2)
+// ➔ 1
+map(sin, [0, pi / 2])
+// ➔ [0, 1]
 ```
 
-`Sin`, `Simplify`, and `Map` are library operators; `x` is an ordinary user
-symbol.
+The lowercase spelling is the style of the language. The capitalized
+spelling is what MathJSON uses and what the engine reports: a value prints
+back with the MathJSON names, and a diagnostic names the operator as `Sin`.
+
+## How the spelling is formed
+
+The lowercase spelling of a library name lowercases its first letter:
+`Floor` is `floor`, `IsPrime` is `isPrime`, `StringJoin` is `stringJoin`,
+`GoldenRatio` is `goldenRatio`. When the name starts with several capital
+letters, the whole run is lowercased and the last letter of the run stays a
+capital when it starts the next word: `GCD` is `gcd`, `LCM` is `lcm`,
+`LUDecomposition` is `luDecomposition`, `NDSolve` is `ndSolve`.
+
+The [Standard Library](/library/) page lists both spellings of every
+definition.
+
+## Names with no lowercase spelling
+
+A library name has no lowercase spelling when Epsil already has a way to
+write it:
+
+- **Operators the language writes as symbols**: `Add` is `+`, `Power` is
+  `^`, `Pipe` is `|>`, `Equal` is `==`, `And` is `&&`, `Element` is `in`,
+  `Range` is `..`, and so on for the whole [operator table](/operators/).
+- **Constructs with their own syntax**: `If` and `Which` are `if`/`else`,
+  `Match` is `match`, `Loop` is `for` and `while`, `Function` is `=>` and
+  `function`, `Declare` is `let` and `const`, `Block` is `{ … }`, `Typed` is
+  `x: T`, `Spread` is `...xs`, `At` is `xs[i]`.
+- **Literals**: `List` is `[…]`, `Tuple` is `(a, b)`, `Set` is `{…}`,
+  `Dictionary` is `{k: v}`, `String` is `"…"`, `True` and `False` are
+  `true` and `false`, `NaN` and `Infinity` are literal words.
+- **Single-letter names**: `D` and `N` stay capitalized, because `d` and `n`
+  are ordinary variable names.
+- **Relation glyphs** with no reading as a function (`Approx`, `Tilde`,
+  `Precedes`, `PlusMinus`, …): write them through a LaTeX island.
+- **Engine-internal heads** that a program never writes (`ErrorCode`,
+  `RuntimeError`, `Signature`, …).
+
+Writing one of these in lowercase is an unknown call, reported with a
+did-you-mean suggestion when a close name exists.
+
+## User names and shadowing
+
+User-defined variables, functions, and types are lowercase too: `total`,
+`area`, `type point = …`. Nothing in the parser or the engine enforces a
+case; the library spellings and the user names share one namespace and
+resolve by **scope**, not by case.
+
+A user binding shadows a library name for the rest of its scope, whichever
+spelling the library name has: a `let`, a `const`, a parameter, a loop
+variable, a `match` pattern, or a `function` definition.
+
+```epsil
+let sum = 0
+sum + 1
+// ➔ 1
+```
+
+```epsil
+function mean(x) { 42 }
+mean(7)
+// ➔ 42
+```
+
+```epsil
+[1, 2, 3] |> map(count => count * 2)
+// ➔ [2, 4, 6]
+```
+
+A bare library name that nothing shadows IS the library definition, in
+every position: `mean` alone is the `Mean` function, so `mean + 1` is a type
+error rather than a sum with an unknown number. Declare the variable first.
+
+```epsil
+let mean = 5
+mean + 1
+// ➔ 6
+```
+
+The constants `e` and `i` are lowercase library values already: `e^2` is
+the exponential, `i^2` is `-1`, and `1 + 2i` is a complex number. They
+shadow like any other name — `let e = 3; e^2` is `9`.
+
+To name a raw symbol that happens to spell a library name, use the verbatim
+form: `` `sin` `` is the symbol `sin`, not the sine function.
 
 ## Glyph Aliases
 
@@ -1680,29 +1790,42 @@ and serialization emits the canonical name:
 | `ℚ`   | `RationalNumbers` |
 | `ℕ`   | `NonNegativeIntegers` |
 | `ℂ`   | `ComplexNumbers`  |
+| `∫`   | `Integrate`       |
+| `∑`   | `Sum`             |
+| `∏`   | `Product`         |
 
 ```epsil
 3.1 ∈ ℝ
 // ➔ True
+∫(1/x, x)
+// ➔ Integrate(1/x, x)
 ```
 
 Note the doublestruck `ⅈ`/`ⅇ` (U+2148/U+2147), not the ordinary letters:
-`i` and `e` remain plain user symbols. To name a raw symbol that happens to
-be a glyph, use the verbatim form (`` `π` ``).
+`i` and `e` are the lowercase library constants described above. To name a
+raw symbol that happens to be a glyph, use the verbatim form (`` `π` ``).
 
-This is a **convention with no enforced semantics** — nothing in the parser
-or the engine requires a capitalized name to be an operator or a lowercase
-name to be a variable. A user can declare a lowercase function or a
-capitalized variable; it will work exactly the same way. The convention
-exists so that, by scanning a program, it's usually obvious at a glance
-which names come from the library and which are the author's own.
+In a **type annotation** the number-set glyphs name the type, not the set
+constant: `c: ℝ` is `c: real`, `n: ℕ` is `n: integer<0..>`. See
+[Types](/types/#glyph-type-names).
 
-Because the convention isn't enforced, a name collision — a user symbol
-that happens to share a capitalized library name, or vice versa — isn't a
-parse error. It resolves the same way any other symbol lookup does: by
-**scope**, not by case. A local declaration shadows an outer one (including
-a library operator) for the rest of that scope, exactly as it would for any
-other symbol.
+## Subscripts
+
+A run of subscript letters and digits directly after a name is part of the
+name, spelled with an underscore — the same name the LaTeX `x_n` produces:
+
+| Written | Symbol  |
+| :------ | :------ |
+| `xₙ`    | `x_n`   |
+| `a₁`    | `a_1`   |
+| `a₁₂`   | `a_12`  |
+| `xᵢⱼ`   | `x_ij`  |
+
+So `xₙ` can be declared, assigned, matched and passed exactly like `x_n`,
+and `let xₙ = 3` followed by `x_n` reads the same binding. A subscript that
+holds a sign or a parenthesis is not a name: `xₖ₊₁` is the expression
+`Subscript(x, k + 1)`. Superscripts never join a name — `x²` is `x^2`; see
+[Superscripts and subscripts](/operators/#scripts).
 
 ---
 
@@ -1717,7 +1840,7 @@ the documentation test suite and its `// ➔` output verified, so nothing here
 can drift from the implementation.
 
 **What carries over.** The shape of a program: sequential statements,
-lexically scoped functions, closures, first-class lambdas, `Map`/`Filter`, a
+lexically scoped functions, closures, first-class lambdas, `map`/`filter`, a
 `for x in collection` loop, the conditional expression `a if c else b`,
 arbitrary-precision integers, `%` with Python's sign convention, negative
 indices, chained comparisons, and `**` for exponentiation.
@@ -1726,7 +1849,7 @@ indices, chained comparisons, and `**` for exponentiation.
 
 1. **Indexing is 1-based.** `xs[1]` is the first element.
 2. **Arithmetic is exact and symbolic by default.** `1/3` is the rational one
-   third, `Ln(2)` stays `ln(2)`. Floats happen only when you ask, with `N(…)`.
+   third, `ln(2)` stays `ln(2)`. Floats happen only when you ask, with `N(…)`.
 3. **`//` is a comment, not floor division**, and `=` assigns only as a whole statement — inside an expression it is `Equal`, never
    equality. Both fail *quietly* — see [Traps](#traps).
 
@@ -1745,12 +1868,16 @@ There is no `print`. A program's value is the value of its **last statement**.
 | `lambda: 42` | `() => 42` |
 | `def f(x: float) -> float:` | `f(x: real) -> real = x^2` |
 | `return` | *(no `return`)* — the last expression is the value |
-| `math.floor(x)`, `np.mean(xs)` | `Floor(x)`, `Mean(xs)` — no modules, no imports |
+| `math.floor(x)`, `np.mean(xs)` | `floor(x)`, `mean(xs)` — no modules, no imports |
+| `obj.method(a)` | `c.area(a)` only when `area` is a [protocol](/protocols/#dot-call) function; otherwise `f(c, a)` or `c \|> f` — `xs.Sort()` is an error |
 
-Naming convention: `Capitalized` names are library operators, `lowercase`
-names are yours. Calling an unknown function is not an error — the call stays
-symbolic, with a did-you-mean warning when a close library name exists
-(`len` suggests `Length`).
+Naming convention: library operators are lowercase, as in Python (`sin`,
+`map`, `max`, `len` is `length`), and also answer to their MathJSON names
+(`sin`, `map`, `max`, `length`). Your names are lowercase too and shadow a
+library name by scope, as a Python assignment to `sum` does. Calling an
+unknown function is not an error — the call stays symbolic, with a
+did-you-mean warning when a close library name exists (`len` suggests
+`length`).
 
 ```epsil
 fact(n) = 1 if n <= 1 else n * fact(n - 1)
@@ -1772,18 +1899,18 @@ let double = x => 2x
 | `xs[-1]` | `xs[-1]` |
 | `xs[1:3]` | `xs[2..3]` — 1-based, **inclusive** on both ends |
 | `range(1, 6)` | `1..5` or `Range(1, 5)` — **inclusive** of the end |
-| `len(xs)` | `Length(xs)` |
-| `sorted(xs)` / `sorted(xs, reverse=True)` | `Sort(xs)` / `Sort(xs, (a, b) => a > b)` |
-| `sum`, `min`, `max`, `any`, `all` | `Sum`, `Min`, `Max`, `Any`, `All` |
-| `reversed(xs)` | `Reverse(xs)` |
-| `zip(a, b)` | `Zip(a, b)` |
-| `enumerate(xs)` | `Zip(1..Length(xs), xs)` |
-| `xs.index(v)` | `IndexOf(xs, v)` |
-| `xs + ys`, `xs.append(v)` | `Join(xs, ys)`, `Append(xs, v)` — both return a **new** collection |
-| `xs[2] = 9` | *(no element assignment)* — rebuild with `Map`/`Join` |
-| `d.keys()`, `d.values()` | `Keys(d)`, `Values(d)` |
-| `dict(zip(ks, vs))` | `DictionaryFrom(Zip(ks, vs))` |
-| `collections.Counter(xs)` | `Tally(xs)` → a `(values, counts)` pair |
+| `len(xs)` | `length(xs)` |
+| `sorted(xs)` / `sorted(xs, reverse=True)` | `sort(xs)` / `sort(xs, (a, b) => a > b)` |
+| `sum`, `min`, `max`, `any`, `all` | `sum`, `min`, `max`, `any`, `all` |
+| `reversed(xs)` | `reverse(xs)` |
+| `zip(a, b)` | `zip(a, b)` |
+| `enumerate(xs)` | `zip(1..length(xs), xs)` |
+| `xs.index(v)` | `indexOf(xs, v)` |
+| `xs + ys`, `xs.append(v)` | `join(xs, ys)`, `append(xs, v)` — both return a **new** collection |
+| `xs[2] = 9` | *(no element assignment)* — rebuild with `map`/`join` |
+| `d.keys()`, `d.values()` | `keys(d)`, `values(d)` |
+| `dict(zip(ks, vs))` | `dictionaryFrom(zip(ks, vs))` |
+| `collections.Counter(xs)` | `tally(xs)` → a `(values, counts)` pair |
 
 Collections are **immutable values**. There is no in-place mutation: build a
 new collection and rebind the name. The values-are-immutable, bindings-are-not
@@ -1793,40 +1920,40 @@ explains why a closure sees a later reassignment and why a function cannot
 modify its caller's variable.
 
 ```epsil
-let counts = DictionaryFrom(Zip(["apples", "figs"], [3, 1]))
-(counts["apples"], Keys(counts), counts["pears"])
+let counts = dictionaryFrom(zip(["apples", "figs"], [3, 1]))
+(counts["apples"], keys(counts), counts["pears"])
 // ➔ (3, ["apples","figs"], NaN)
 ```
 
 A missing numeric dictionary field yields `NaN` rather than raising
-`KeyError`; a missing nonnumeric field remains `Missing`. `IsMissing`
+`KeyError`; a missing nonnumeric field remains `missing`. `isMissing`
 recognizes either representation, and `Coalesce(value, fallback)` supplies a
 default. See [Traps](#traps).
 
 ### Comprehensions
 
 Epsil has no comprehension syntax. Use the pipeline operator `|>` with
-`Filter`/`Map`; `_` is the placeholder for the piped value.
+`filter`/`map`; `_` is the placeholder for the piped value.
 
 ```python
 sum(n**2 for n in range(1, 11) if n % 2 == 1)
 ```
 
 ```epsil
-1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
+1..10 |> filter(_, n => n % 2 == 1) |> map(n => n^2, _) |> sum
 // ➔ 165
 ```
 
-`Range`, `Map`, `Filter`, `Take`, `Drop` and `Join` are **generators**, like
+`Range`, `map`, `filter`, `take`, `drop` and `join` are **generators**, like
 Python's — they enumerate only when materialized (indexed, aggregated, or
 iterated). A deferred mapping function reads variables at *materialization*
 time, so the same "late binding in a closure" surprise applies:
 
 ```epsil
 let n = 1
-let m = Map(k => k * n, 1..3)
+let m = map(k => k * n, 1..3)
 n = 10
-Sum(m)
+sum(m)
 // ➔ 60
 ```
 
@@ -1845,8 +1972,8 @@ Sum(m)
 | `try/except` | *(none)* — errors are ordinary values |
 | `# comment` | `// comment` or `/* … */` |
 
-Loops run **for effect**: their value is `Nothing`. Accumulate into a variable
-declared outside the loop, or use `Map`/`Filter`/`Reduce`/`Fold` when you want
+Loops run **for effect**: their value is `nothing`. Accumulate into a variable
+declared outside the loop, or use `map`/`filter`/`reduce`/`fold` when you want
 a value.
 
 ```epsil
@@ -1876,12 +2003,12 @@ classify(n) = match n {
   k if k > 0 => "positive"
   _ => "negative"
 }
-Map(classify, [-2, 0, 5])
+map(classify, [-2, 0, 5])
 // ➔ ["negative", "zero", "positive"]
 ```
 
 Because a bare name binds, `match x { Pi => … }` does *not* test for π — it
-binds a fresh variable named `Pi`. Write `match x { == Pi => … }`. This is the
+binds a fresh variable named `pi`. Write `match x { == Pi => … }`. This is the
 same rule as Python's (where a bare `case FOO:` is a capture pattern), but it
 bites more often because Epsil's constants are ordinary names.
 
@@ -1890,19 +2017,19 @@ bites more often because Epsil's constants are ordinary names.
 | Python | Epsil |
 |:--|:--|
 | `7 / 2` → `3.5` | `7 / 2` → the exact rational `7/2`; `N(7 / 2)` → `3.5` |
-| `7 // 2` → `3` | `Floor(7 / 2)` — **`//` starts a comment in Epsil** |
+| `7 // 2` → `3` | `floor(7 / 2)` — **`//` starts a comment in Epsil** |
 | `7 % 2`, `-7 % 3` → `2` | `7 % 2`, `-7 % 3` → `2` — same sign convention |
 | `x ** 2`, `pow(x, 2)` | `x^2` or `x**2` |
-| `math.sqrt(x)` | `Sqrt(x)` — exact: `Sqrt(9)` is `3`, `Sqrt(2)` stays `√2` |
-| `math.pi`, `math.e` | `Pi`, `e` |
-| `math.log(x)`, `math.log10(x)` | `Ln(x)`, `Log(x)`; `Log(x, b)` for base *b* |
-| `abs`, `round`, `math.floor`, `math.ceil` | `Abs`, `Round`, `Floor`, `Ceil` (not `Ceiling`) |
+| `math.sqrt(x)` | `sqrt(x)` — exact: `sqrt(9)` is `3`, `sqrt(2)` stays `√2` |
+| `math.pi`, `math.e` | `pi`, `e` |
+| `math.log(x)`, `math.log10(x)` | `ln(x)`, `log(x)`; `log(x, b)` for base *b* |
+| `abs`, `round`, `math.floor`, `math.ceil` | `abs`, `round`, `floor`, `ceil` (not `Ceiling`) |
 | `float(expr)` | `N(expr)`, or `N(expr, digits)` for a precision |
 | `10 ** 100` (bigint) | `10^100` — same unbounded integers |
 | `complex(2, 3)` | `2 + 3i` |
-| `statistics.mean/median` | `Mean`, `Median`, `Variance`, `StandardDeviation` |
-| `math.gcd`, `math.factorial` | `GCD`, `LCM`, `n!` |
-| *(SymPy territory)* | `Simplify`, `Solve`, `D`, `Integrate`, `Limit`, `Series` are built in |
+| `statistics.mean/median` | `mean`, `median`, `variance`, `standardDeviation` |
+| `math.gcd`, `math.factorial` | `gcd`, `lcm`, `n!` |
+| *(SymPy territory)* | `simplify`, `solve`, `D`, `integrate`, `limit`, `series` are built in |
 
 Exactness is the default, and comparison is tolerant, so the classic
 floating-point gotcha does not appear:
@@ -1914,11 +2041,11 @@ let approx = N(1/3 + 1/6)
 // ➔ (1/2, 0.5, True)
 ```
 
-`Round` rounds halves **away from zero**; Python rounds halves to even. This
+`round` rounds halves **away from zero**; Python rounds halves to even. This
 is the one numeric answer that differs on values you are likely to type:
 
 ```epsil
-(Round(0.5), Round(2.5), Round(-0.5))
+(round(0.5), round(2.5), round(-0.5))
 // ➔ (1, 3, -1)
 ```
 
@@ -1927,7 +2054,7 @@ is the one numeric answer that differs on values you are likely to type:
 Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 
 ```epsil
-([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sum(Map(k => k^2, 1..4)))
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], sum(map(k => k^2, 1..4)))
 // ➔ ([2,3,4], [4,10,18], 30)
 ```
 
@@ -1936,47 +2063,47 @@ Arithmetic broadcasts over a list elementwise, without anything like NumPy:
 | Python | Epsil |
 |:--|:--|
 | `f"x is {x}"` | `"x is \(x)"` — works in any string literal |
-| `"a" + "b"` | `Join("a", "b")` — `+` on strings is a **type error** |
-| `len(s)` | `Length(s)` — a string is a collection of its characters (grapheme clusters, not code points) |
+| `"a" + "b"` | `join("a", "b")` — `+` on strings is a **type error** |
+| `len(s)` | `length(s)` — a string is a collection of its characters (grapheme clusters, not code points) |
 | `s[0]` | `s[1]` — 1-based; each element is a `character` |
 | `c in s` | `c in s` — character membership; substring search is a separate operation |
-| `"ab" in s` | `ContainsSequence(s, "ab")` — `in` never means substring |
-| `s.split()` / `s.split(",")` | `StringSplit(s)` / `StringSplit(s, ",")` |
-| `"".join(parts)` / `sep.join(parts)` | `StringJoin(parts)` / `StringJoin(parts, sep)` |
+| `"ab" in s` | `containsSequence(s, "ab")` — `in` never means substring |
+| `s.split()` / `s.split(",")` | `stringSplit(s)` / `stringSplit(s, ",")` |
+| `"".join(parts)` / `sep.join(parts)` | `stringJoin(parts)` / `stringJoin(parts, sep)` |
 | `str(x)` | `String(x)` |
 | `"""…"""` | `"""…"""` — multi-line strings, same delimiter |
 | `r"raw\string"` | `#"raw\string"#` — extended string literal |
 
 ```epsil
 let name = "world"
-let parts = StringSplit("a b c")
-("hello \(name)", Join("a", "b"), Length(name), parts[2])
+let parts = stringSplit("a b c")
+("hello \(name)", join("a", "b"), length(name), parts[2])
 // ➔ ("hello world", "ab", 5, "b")
 ```
 
-`.upper()`, `.lower()`, `.replace()` and `.strip()` are `ToUpperCase`,
-`ToLowerCase`, `StringReplace(s, target, replacement)` and
-`Trim`/`TrimStart`/`TrimEnd`; `.zfill()`/`.rjust()` are `PadStart`/`PadEnd`,
-`s * n` is `StringRepeat(s, n)` and `float(s)`/`int(s)` are `NumberFrom(s)`
+`.upper()`, `.lower()`, `.replace()` and `.strip()` are `toUpperCase`,
+`toLowerCase`, `stringReplace(s, target, replacement)` and
+`trim`/`trimStart`/`trimEnd`; `.zfill()`/`.rjust()` are `padStart`/`padEnd`,
+`s * n` is `stringRepeat(s, n)` and `float(s)`/`int(s)` are `numberFrom(s)`
 (which answers an error value, never NaN, on text that is not a numeral).
-`.find()`/`.index()` is `RangeOf(s, needle)`, which answers the *span* of the
-first occurrence (a `range`) or `Nothing` — feed it straight to `Slice`;
-`needle in s` (substring) is `ContainsSequence(s, needle)`, and
-`.startswith()`/`.endswith()` are `StartsWith`/`EndsWith`. Note that Epsil's
+`.find()`/`.index()` is `rangeOf(s, needle)`, which answers the *span* of the
+first occurrence (a `range`) or `nothing` — feed it straight to `slice`;
+`needle in s` (substring) is `containsSequence(s, needle)`, and
+`.startswith()`/`.endswith()` are `startsWith`/`endsWith`. Note that Epsil's
 `c in s` is **character** membership, not substring search.
 
-`.casefold()` is `CaseFold(s)`, and `StringCompare(a, b)` gives the `-1/0/1`
+`.casefold()` is `caseFold(s)`, and `stringCompare(a, b)` gives the `-1/0/1`
 code-point ordering that `<` on two multi-character strings does not (it
 compares UTF-16 code units, which sorts the astral characters below
 U+E000–U+FFFF).
 
 A string is an indexed collection of `character`
-values, so the generic collection operators apply directly (`Length`,
-`Reverse`, `Filter`, `Sort`, `Contains`, `IndexOf`, `Map` — the
-element-preserving ones return a string, `Map` returns a list; rejoin with
-`String(...)`). For a specific decomposition use `Characters`,
-`UnicodeScalars`, `Utf8`/`Utf16`; `StringSplit`, `StringJoin`, `Join`,
-`StringFrom` and `String` round out the library.
+values, so the generic collection operators apply directly (`length`,
+`reverse`, `filter`, `sort`, `contains`, `indexOf`, `map` — the
+element-preserving ones return a string, `map` returns a list; rejoin with
+`String(...)`). For a specific decomposition use `characters`,
+`unicodeScalars`, `utf8`/`utf16`; `stringSplit`, `stringJoin`, `join`,
+`stringFrom` and `String` round out the library.
 
 ## Errors
 
@@ -1985,11 +2112,11 @@ There are no exceptions. A runtime problem becomes an ordinary
 not abort the rest of the work:
 
 ```epsil
-Map(x => Sqrt(x), [16, -4, "banana", 81])
+map(x => sqrt(x), [16, -4, "banana", 81])
 // ➔ [4, 2i, NaN, 9]
 ```
 
-Note also `Sqrt(-4)` → `2i` rather than a `ValueError`: the engine works over
+Note also `sqrt(-4)` → `2i` rather than a `ValueError`: the engine works over
 the complex numbers. Malformed *source* is different — it produces
 **diagnostics** with source positions, reported separately from the value.
 
@@ -2021,21 +2148,21 @@ still returns a plausible-looking value.
 
 | You write | What actually happens | Write instead |
 |:--|:--|:--|
-| `7 // 2` | `//` starts a comment, so the statement is just `7` | `Floor(7 / 2)` |
+| `7 // 2` | `//` starts a comment, so the statement is just `7` | `floor(7 / 2)` |
 | `xs[0]` | Silently `NaN` — indexing is 1-based | `xs[1]` |
 | `f(a = 1)` as a keyword argument | There are no keyword arguments; inside an expression `=` is `Equal`, so this passes the boolean `a == 1` | pass positionally |
-| `d["missing"]` | An absence value, not a `KeyError` (`NaN` for a numeric field, otherwise `Missing`) | `Coalesce(d["missing"], fallback)` or test with `IsMissing` |
+| `d["missing"]` | An absence value, not a `KeyError` (`NaN` for a numeric field, otherwise `missing`) | `Coalesce(d["missing"], fallback)` or test with `isMissing` |
 | `xs[1:3]` | Python's half-open slice; `xs[2..3]` is 1-based and inclusive | check both ends |
-| `x^1/2` | `(x^1)/2` — `^` binds tighter than `/` | `Sqrt(x)` or `x^(1/2)` |
+| `x^1/2` | `(x^1)/2` — `^` binds tighter than `/` | `sqrt(x)` or `x^(1/2)` |
 | `x = 5` inside an expression | Compares, rather than assigning — only a whole statement assigns | `:=` to assign in place, `==` to be explicit |
 | `print(x)` | Inert, nothing is printed | the program's value is its last statement |
-| `Round(2.5)` | `3` (half away from zero), not Python's `2` | *(intentional)* |
+| `round(2.5)` | `3` (half away from zero), not Python's `2` | *(intentional)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
 | `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
 | `"\(xs)"` with a list `xs` | Broadcasts into a *list of strings* | interpolate scalars only |
 | `x && y` on fresh symbols | Types those symbols `boolean` for the engine's lifetime | use distinct names for boolean work |
 
-One more, specific to a symbolic language: a `Take(xs, 3)` (or any lazy
+One more, specific to a symbolic language: a `take(xs, 3)` (or any lazy
 operator) stored inside a **tuple** stays unevaluated, because a tuple does
 not materialize its operands. Aggregate or index where you stand if you need
 the work done now.
@@ -2070,11 +2197,12 @@ Epsil example on this page is executed by the documentation test suite and
 its `// ➔` output verified.
 
 **What carries over.** Almost all of the mental model. Values are symbolic
-expressions; evaluation is exact unless you ask for a number; capitalized
-names are the library and lowercase names are yours; `Simplify`, `Solve`, `D`,
-`Integrate`, `Limit`, `Series`, `Factor`, `Expand`, `N` and the linear-algebra
-operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
-`Product`, `Integrate`, `D` and `Table`; `Range(5)` starts at 1; indexing is
+expressions; evaluation is exact unless you ask for a number; the library
+is written in lowercase (`simplify`, `solve`, `integrate`, `limit`, `series`,
+`factor`, `expand`) and the Wolfram spelling with a capital works too
+(`simplify`, `solve`); `D`, `N` and the linear-algebra operators keep their
+names; user names are lowercase and shadow a library name by scope; `{k, 1, n}` iterator triples work in `sum`,
+`product`, `integrate`, `D` and `table`; `Range(5)` starts at 1; indexing is
 1-based and `-1` is the last element; arithmetic threads over lists the way a
 `Listable` function does.
 
@@ -2094,25 +2222,25 @@ operators all keep their names; `{k, 1, n}` iterator triples work in `Sum`,
 
 | Wolfram | Epsil |
 |:--|:--|
-| `f[x]`, `Sin[x]` | `f(x)`, `Sin(x)` |
+| `f[x]`, `sin[x]` | `f(x)`, `sin(x)` |
 | `x = 5` | `let x = 5` |
 | `f[x_] := x^2` | `f(x) = x^2` |
 | `f = Function[x, x^2]` | `f = x => x^2` |
 | `#^2 &` | `x => x^2` — no slot/`&` syntax |
-| `expr /. x -> 3` | `ReplaceAll(expr, Rule(x, 3))` |
+| `expr /. x -> 3` | `replaceAll(expr, Rule(x, 3))` |
 | `a == b`, `SameQ[a, b]` | `a == b`, `a === b` — see below |
 | `expr // N` | `expr \|> N` (or `~>`) |
 | `N[expr]`, `N[expr, 25]` | `N(expr)`, `N(expr, 25)` |
 | `Hold[expr]` | `HoldValues(expr)` — evaluate with assigned symbols kept symbolic |
 | `SetAttributes[f, HoldAll]; f[e_] := …` | `hold f(e) = …` — the whole definition holds its arguments; there is no per-argument `HoldFirst`/`HoldRest` (read an argument once into a `let` to evaluate it) |
-| `Print[x]` | *(no printing)* — the program's value is its **last statement** |
+| `print[x]` | *(no printing)* — the program's value is its **last statement** |
 | `%`, `Out[3]` | *(no history)* — bind with `let` |
 | `(* comment *)` | `// comment` or `/* comment */` |
 | `expr;` to suppress output | `;` is a statement separator, nothing is suppressed |
 
 ```epsil
 f(x) = x^2 + 1
-(f(3), D(f(x), x), Integrate(f(x), {x, 0, 1}))
+(f(3), D(f(x), x), integrate(f(x), {x, 0, 1}))
 // ➔ (10, 2x, 4/3)
 ```
 
@@ -2123,12 +2251,12 @@ silently.
 ### `==` vs `===` (Wolfram's `SameQ`) {#equality-vs-sameq}
 
 `==` is the semantic comparison: it evaluates, compares within tolerance, and
-may stay an unresolved *condition* (`x == y` is what you hand to `Solve`).
+may stay an unresolved *condition* (`x == y` is what you hand to `solve`).
 `===` is `SameQ`: structural identity, no tolerance, and **total** — it always
 answers `True` or `False`.
 
 ```epsil
-(Sqrt(2) == 1.4142135623730951, Sqrt(2) === 1.4142135623730951, x === y, 1 === 1.0)
+(sqrt(2) == 1.4142135623730951, sqrt(2) === 1.4142135623730951, x === y, 1 === 1.0)
 // ➔ (True, False, False, True)
 ```
 
@@ -2143,35 +2271,35 @@ by exact value, so `0.5 === 1/2` is `True` too.
 |:--|:--|
 | `{1, 2, 3}` (list) | `[1, 2, 3]` — braces make a **set** |
 | `xs[[i]]` | `xs[i]` — 1-based, as in Wolfram |
-| `xs[[-1]]`, `First`, `Last`, `Rest` | `xs[-1]`, `First(xs)`, `Last(xs)`, `Rest(xs)` |
+| `xs[[-1]]`, `first`, `last`, `rest` | `xs[-1]`, `first(xs)`, `last(xs)`, `rest(xs)` |
 | `xs[[2 ;; 4]]` | `xs[2..4]` |
 | `m[[i, j]]` | `m[i, j]` (or `m[i][j]`) |
 | `Range[5]`, `Range[2, 10, 2]` | `Range(5)` or `1..5`; `Range(2, 10, 2)` |
-| `Length`, `Sort`, `Reverse`, `Flatten` | same names |
-| `Total[xs]` | `Sum(xs)` |
-| `Select[xs, f]` | `Filter(xs, f)` |
-| `Count[xs, v]`, `Count[xs, f]` | `Count(xs, v)`, `Count(xs, f)` — `Count(xs)` is the length |
-| `Map[f, xs]`, `f /@ xs` | `Map(f, xs)` — same order |
-| `Fold[f, init, xs]` | `Fold(f, init, xs)` |
-| `Apply[f, {a, b}]`, `f @@ t` | `Apply(f, (a, b))`, or spread: `f(...t)` |
-| `Position[xs, v]` | `IndexOf(xs, v)` |
-| `Append[xs, v]`, `Join` | `Append(xs, v)`, `Join(xs, ys)` |
-| `Tally`, `Partition` | same names (`Tally` returns a `(values, counts)` pair) |
-| `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]` or `d.a`, enumerate with `Keys`/`Values` |
-| `Union`, `Intersection` | same names, returning a set |
+| `length`, `sort`, `reverse`, `flatten` | same names |
+| `Total[xs]` | `sum(xs)` |
+| `Select[xs, f]` | `filter(xs, f)` |
+| `count[xs, v]`, `count[xs, f]` | `count(xs, v)`, `count(xs, f)` — `count(xs)` is the length |
+| `map[f, xs]`, `f /@ xs` | `map(f, xs)` — same order |
+| `fold[f, init, xs]` | `fold(f, init, xs)` |
+| `apply[f, {a, b}]`, `f @@ t` | `apply(f, (a, b))`, or spread: `f(...t)` |
+| `position[xs, v]` | `indexOf(xs, v)` |
+| `append[xs, v]`, `join` | `append(xs, v)`, `join(xs, ys)` |
+| `tally`, `partition` | same names (`tally` returns a `(values, counts)` pair) |
+| `<\|"a" -> 1\|>` (association) | `{"a" -> 1}`; read with `d["a"]` or `d.a`, enumerate with `keys`/`values` |
+| `union`, `intersection` | same names, returning a set |
 
 ```epsil
 let xs = [3, 1, 4, 1, 5]
-(xs[1], xs[-1], xs[2..4], Length(xs), Sort(xs))
+(xs[1], xs[-1], xs[2..4], length(xs), sort(xs))
 // ➔ (3, 5, [1,4,1], 5, [1,1,3,4,5])
 ```
 
-`Count` covers all three Wolfram spellings — the plain length, a value to
+`count` covers all three Wolfram spellings — the plain length, a value to
 match, and a predicate:
 
 ```epsil
 let xs = [3, 1, 4, 1, 5, 1]
-(Count(xs), Count(xs, 1), Count(xs, k => k > 2))
+(count(xs), count(xs, 1), count(xs, k => k > 2))
 // ➔ (6, 3, 3)
 ```
 
@@ -2179,7 +2307,7 @@ Lists and sets are genuinely different types, so the brace/bracket distinction
 is not cosmetic:
 
 ```epsil
-(Type({1, 2, 3}), Type([1, 2, 3]))
+(type({1, 2, 3}), type([1, 2, 3]))
 // ➔ (TypeFrom("set<integer>"), TypeFrom("vector<integer^3>"))
 ```
 
@@ -2189,42 +2317,42 @@ Arithmetic and the elementary functions thread over lists, so a `Listable`
 habit transfers directly. Matrices multiply as matrices:
 
 ```epsil
-([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], Sin([0, Pi]))
+([1, 2, 3] + 1, [1, 2, 3] * [4, 5, 6], sin([0, pi]))
 // ➔ ([2,3,4], [4,10,18], [0,0])
 ```
 
 ```epsil
 let A = [[2, 1], [1, 3]]
-(Determinant(A), Inverse(A), A * [1, 1])
+(determinant(A), inverse(A), A * [1, 1])
 // ➔ (5, [[3/5,-1/5],[-1/5,2/5]], [3,4])
 ```
 
 ## Iterators and Table
 
-Iterator triples in braces work exactly as in Wolfram — `Sum`, `Product`,
-`Integrate`, `D` and `Table` all read `{var, lo, hi}` (and `{var, lo, hi,
+Iterator triples in braces work exactly as in Wolfram — `sum`, `product`,
+`integrate`, `D` and `table` all read `{var, lo, hi}` (and `{var, lo, hi,
 step}`) positionally:
 
 ```epsil
-let squares = Table(k^2, {k, 1, 5})
-(Sum(squares), Sum(1/k^2, {k, 1, Infinity}), Product(k, {k, 1, 5}))
+let squares = table(k^2, {k, 1, 5})
+(sum(squares), sum(1/k^2, {k, 1, Infinity}), product(k, {k, 1, 5}))
 // ➔ (55, 1/6 * pi^2, 120)
 ```
 
-`Sum`, `Product`, `Integrate` and `Table` all accept the tuple spelling
+`sum`, `product`, `integrate` and `table` all accept the tuple spelling
 `(k, 1, 5)` as well. `D(expr, {x, 2})` takes a second derivative.
 
 ```epsil
-Sum(Table(k^2, (k, 1, 5)))
+sum(table(k^2, (k, 1, 5)))
 // ➔ 55
 ```
 
-`Table` is a lazy generator, so the value above is materialized by `Sum`. When
-you want an ordinary list, index it, aggregate it, or build it with `Map`:
+`table` is a lazy generator, so the value above is materialized by `sum`. When
+you want an ordinary list, index it, aggregate it, or build it with `map`:
 
 ```epsil
 let g = x => x^2 + 1
-(g(3), Sum(Map(g, 1..4)))
+(g(3), sum(map(g, 1..4)))
 // ➔ (10, 34)
 ```
 
@@ -2235,7 +2363,7 @@ let g = x => x^2 + 1
 | `If[c, a, b]` | `a if c else b`, or `if c { a } else { b }` — an expression |
 | `Which[c1, a, c2, b, True, z]` | `if c1 { a } else if c2 { b } else { z }` |
 | `Switch[x, 0, "zero", _, "other"]` | `match x { 0 => "zero"; _ => "other" }` |
-| `Cases[xs, patt]` | `Filter` with a predicate, or `Map` over a `match` |
+| `Cases[xs, patt]` | `filter` with a predicate, or `map` over a `match` |
 | `Do[body, {k, 1, n}]` | `for k in 1..n { body }` |
 | `While[c, body]` | `while c { body }` |
 | `Module[{t}, body]` | `do { let t = …; body }`, or a `function` block |
@@ -2252,7 +2380,7 @@ classify(z) = match z {
   n if n > 0 => "positive"
   _ => "negative"
 }
-Map(classify, [-2, 0, 5])
+map(classify, [-2, 0, 5])
 // ➔ ["negative", "zero", "positive"]
 ```
 
@@ -2268,7 +2396,7 @@ Scoping constructs are blocks:
 
 ```epsil
 function area(r) {
-  let c = Pi
+  let c = pi
   c * r^2
 }
 (area(2), area(3))
@@ -2281,33 +2409,33 @@ This is the part that needs the least translation:
 
 | Wolfram | Epsil |
 |:--|:--|
-| `Simplify`, `Expand`, `Factor` | same names |
-| `Solve[x^2 == 4, x]` | `Solve(x^2 == 4, x)` |
-| `Solve[{e1, e2}, {x, y}]` | `Solve([e1, e2], [x, y])` — lists in brackets |
+| `simplify`, `expand`, `factor` | same names |
+| `solve[x^2 == 4, x]` | `solve(x^2 == 4, x)` |
+| `solve[{e1, e2}, {x, y}]` | `solve([e1, e2], [x, y])` — lists in brackets |
 | `D[f, x]`, `D[f, {x, 2}]` | `D(f, x)`, `D(f, {x, 2})` |
-| `Integrate[f, x]`, `Integrate[f, {x, a, b}]` | same, with parentheses |
-| `Limit[f, x -> 0]` | `Limit(f, x, 0)` |
-| `Series[f, {x, 0, n}]` | `Series(f, x, 0)` — the tail is a `BigO` term |
-| `Det`, `Inverse`, `Transpose`, `Eigenvalues` | `Determinant`, `Inverse`, `Transpose`, `Eigenvalues` |
-| `Dot`, `Cross`, `LinearSolve` | same names |
-| `Pi`, `Infinity`, `I`, `E` | `Pi`, `Infinity`, **`i`**, **`e`** — lowercase |
-| `PrimeQ`, `NextPrime`, `FactorInteger`, `Divisors` | `IsPrime`, `NextPrime`, `FactorInteger`, `Divisors` |
-| `Binomial`, `GCD`, `LCM`, `n!` | same |
+| `integrate[f, x]`, `integrate[f, {x, a, b}]` | same, with parentheses |
+| `limit[f, x -> 0]` | `limit(f, x, 0)` |
+| `series[f, {x, 0, n}]` | `series(f, x, 0)` — the tail is a `bigO` term |
+| `Det`, `inverse`, `transpose`, `eigenvalues` | `determinant`, `inverse`, `transpose`, `eigenvalues` |
+| `dot`, `cross`, `linearSolve` | same names |
+| `pi`, `Infinity`, `I`, `E` | `pi`, `Infinity`, **`i`**, **`e`** — lowercase |
+| `PrimeQ`, `nextPrime`, `factorInteger`, `divisors` | `isPrime`, `nextPrime`, `factorInteger`, `divisors` |
+| `binomial`, `gcd`, `lcm`, `n!` | same |
 
 ```epsil
-(Solve(x^2 - 5x + 6 == 0, x), Simplify((x^2 - 1)/(x - 1)), Factor(x^2 - 4))
+(solve(x^2 - 5x + 6 == 0, x), simplify((x^2 - 1)/(x - 1)), factor(x^2 - 4))
 // ➔ ([3,2], x + 1, (x - 2) * (x + 2))
 ```
 
 ```epsil
-(Limit((1 + 1/n)^n, n, Infinity), Series(Cos(x), x, 0))
+(limit((1 + 1/n)^n, n, Infinity), series(cos(x), x, 0))
 // ➔ (e, 1 - 1/2 * x^2 + 1/24 * x^4 + BigO(x^6))
 ```
 
 `N` takes an optional precision, and the engine works to arbitrary precision:
 
 ```epsil
-N(Pi, 25)
+N(pi, 25)
 // ➔ 3.141592653589793238462643
 ```
 
@@ -2320,27 +2448,27 @@ Surface forms that look like Wolfram but behave differently.
 | `f[x]` | `f` *indexed* at `x` — an `incompatible-type` error value, not a call | `f(x)` |
 | `{1, 2, 3}` for a list | A **set**: unordered, deduplicated, not indexable by position | `[1, 2, 3]` |
 | `E`, `I` | Ordinary undeclared symbols — they stay symbolic, silently | `e`, `i` |
-| `expr /. x -> 3` | `->` builds a `KeyValuePair`, not a `Rule` | `ReplaceAll(expr, Rule(x, 3))` |
+| `expr /. x -> 3` | `->` builds a `KeyValuePair`, not a `Rule` | `replaceAll(expr, Rule(x, 3))` |
 | `%` for the last result | `%` is the `Mod` operator | bind results with `let` |
-| `x = 4` inside `Solve` | Works as expected — inside an expression `=` is `Equal`, so `Solve(x^2 = 4, x)` is the equation | *(nothing to change)* |
+| `x = 4` inside `solve` | Works as expected — inside an expression `=` is `Equal`, so `solve(x^2 = 4, x)` is the equation | *(nothing to change)* |
 | `expr;` to suppress | `;` only separates statements | *(nothing to suppress)* |
-| `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Epsil operator | `Sum`, `Filter`, `Filter`, `Contains(xs, v)`, `Scan`, `Iterate` |
-| `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `Ceil`, `Floor(a/b)`, `Floor` |
-| `StringLength` | `Length(s)` — a string is a collection of its characters | |
-| `ToUpperCase`, `ToLowerCase` | Same names, same meaning | *(nothing to change)* |
-| `StringReplace[s, t -> r]` | `StringReplace` takes positional arguments, not rules | `StringReplace(s, t, r)` |
-| `StringJoin["ab", "cd"]` | **Silently different.** `StringJoin` takes ONE collection plus an optional separator, and a string is a collection of its characters — so this reads as "join `"ab"`'s characters with the separator `"cd"`" and gives `"acdb"` | `Join("ab", "cd")`, or `"\(a)\(b)"` |
-| `StringRiffle[parts, sep]` | Unknown name: the call stays **symbolic and inert**. The collection-plus-separator form is `StringJoin`'s second argument | `StringJoin(parts, sep)` |
-| `StringPosition`, `StringContainsQ`, `StringStartsQ`, `StringEndsQ` | Unknown names: **inert**. The Epsil family is generic over indexed collections and character-wise on strings, and `RangeOf` answers one *span* (or `Nothing`), not a list of spans | `RangeOf(s, t)`, `ContainsSequence`, `StartsWith`, `EndsWith` |
-| `StringTrim`, `StringPadLeft`, `StringPadRight` | Unknown names: **inert** (`StringTrim` gets a did-you-mean warning) | `Trim`/`TrimStart`/`TrimEnd`, `PadStart`, `PadEnd` |
-| `ToExpression["3.14"]` | Unknown name: **inert**. Parsing a numeral is its own operator, and answers an error value (never `NaN`) on text that is not one | `NumberFrom("3.14")` |
-| `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `Random()`, `Random(1..n)` |
+| `Total`, `Select`, `Cases`, `MemberQ`, `Accumulate`, `Nest` | Unknown names: the call stays **symbolic and inert**, with a did-you-mean warning naming the Epsil operator | `sum`, `filter`, `filter`, `contains(xs, v)`, `scan`, `iterate` |
+| `Ceiling`, `Quotient`, `IntegerPart` | Inert (with a did-you-mean warning) | `ceil`, `floor(a/b)`, `floor` |
+| `StringLength` | `length(s)` — a string is a collection of its characters | |
+| `toUpperCase`, `toLowerCase` | Same names, same meaning | *(nothing to change)* |
+| `stringReplace[s, t -> r]` | `stringReplace` takes positional arguments, not rules | `stringReplace(s, t, r)` |
+| `StringJoin["ab", "cd"]` | **Silently different.** `stringJoin` takes ONE collection plus an optional separator, and a string is a collection of its characters — so this reads as "join `"ab"`'s characters with the separator `"cd"`" and gives `"acdb"` | `join("ab", "cd")`, or `"\(a)\(b)"` |
+| `StringRiffle[parts, sep]` | Unknown name: the call stays **symbolic and inert**. The collection-plus-separator form is `stringJoin`'s second argument | `stringJoin(parts, sep)` |
+| `StringPosition`, `StringContainsQ`, `StringStartsQ`, `StringEndsQ` | Unknown names: **inert**. The Epsil family is generic over indexed collections and character-wise on strings, and `rangeOf` answers one *span* (or `nothing`), not a list of spans | `rangeOf(s, t)`, `containsSequence`, `startsWith`, `endsWith` |
+| `StringTrim`, `StringPadLeft`, `StringPadRight` | Unknown names: **inert** (`StringTrim` gets a did-you-mean warning) | `trim`/`trimStart`/`trimEnd`, `padStart`, `padEnd` |
+| `ToExpression["3.14"]` | Unknown name: **inert**. Parsing a numeral is its own operator, and answers an error value (never `NaN`) on text that is not one | `numberFrom("3.14")` |
+| `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `random()`, `random(1..n)` |
 | `SameQ[1, 1.]` | `1 === 1.0` is `True` — the lexer folds `1.0` to `1` | *(nothing — but don't read `===` as type-aware)* |
 | `3!^2` | Diagnostic — the lexer reads `!^` as one token | `3! ^ 2` |
 | `a +b` | Diagnostic — an infix operator needs spaces on both sides or neither | `a + b` or `a+b` |
 
-The rows about inert names deserve emphasis: **an unknown capitalized name is
-not an error.** Epsil leaves the call symbolic (with a did-you-mean warning
+The rows about inert names deserve emphasis: **an unknown name is not an
+error.** Epsil leaves the call symbolic (with a did-you-mean warning
 when a close library name exists), exactly the way Wolfram leaves `Foo[1]`
 unevaluated. A program that calls `Total(xs)` therefore returns the unevaluated
 `Total([…])` rather than a number — when a result looks unfinished, check for
@@ -2350,13 +2478,13 @@ The most-reached-for Wolfram names are curated into that warning, so
 `Total(xs)` reports `did you mean Sum` and `Select(xs, f)` reports
 `did you mean Filter`. The suggestion is only a pointer to the right
 neighborhood — it is **not** an alias, and the call shape may differ
-(`Accumulate[xs]` becomes `Scan(xs, Add)`, with an explicit combining
-function). `MemberQ[xs, v]` maps directly to `Contains(xs, v)`, same
+(`Accumulate[xs]` becomes `scan(xs, Add)`, with an explicit combining
+function). `MemberQ[xs, v]` maps directly to `contains(xs, v)`, same
 argument order.
 
-Also worth knowing: lazy collection operators (`Range`, `Map`, `Filter`,
-`Take`, `Table`) enumerate only when materialized, and a tuple does **not**
-materialize its operands — `(Table(k, {k, 1, 3}), 5)` keeps the unevaluated
+Also worth knowing: lazy collection operators (`Range`, `map`, `filter`,
+`take`, `table`) enumerate only when materialized, and a tuple does **not**
+materialize its operands — `(table(k, {k, 1, 3}), 5)` keeps the unevaluated
 `Tabulate(…)`. Aggregate or index where you stand.
 
 ## Next
@@ -2411,7 +2539,7 @@ markdown**, use `///` for single line comments and `/** */` for block comments.
 
 A documentation comment written **immediately before a function definition**
 is attached to it as the function's **description** — markers stripped, 
-`///` lines joined, the ` * ` gutter of a block removed. It is what `About(f)` 
+`///` lines joined, the ` * ` gutter of a block removed. It is what `about(f)` 
 prints, what an editor hover shows. Markdown is the intended format.
 
 ```epsil
@@ -2758,11 +2886,11 @@ annotation. This page is about using them.
 ## Every value already has a type
 
 You never have to introduce types into a program: they are there from the
-start. `Type` reports the one a value has. For a number literal that is the
+start. `type` reports the one a value has. For a number literal that is the
 most precise claim there is — the value itself:
 
 ```epsil-live
-(Type(42), Type(2.5), Type("hi"), Type(True))
+(type(42), type(2.5), type("hi"), type(True))
 // ➔ (TypeFrom("42"), TypeFrom("2.5"), TypeFrom("string"), TypeFrom("boolean"))
 ```
 
@@ -2770,8 +2898,8 @@ A literal type sits inside its numeric tier — `42` is an `integer`, `2.5` a
 `real` — so a literal is accepted anywhere its tier is. An exact value no
 machine number holds — `1/3`, `√2`, an astronomically large integer — has no
 literal type to report, so it is typed by the narrowest safe claim instead:
-its tier, narrowed by a range that encloses the value. `Type(1/3)` reports
-`rational<0.33..0.34>` and `Type(Sqrt(2))` reports `real<1.4..1.5>` — bounds
+its tier, narrowed by a range that encloses the value. `type(1/3)` reports
+`rational<0.33..0.34>` and `type(sqrt(2))` reports `real<1.4..1.5>` — bounds
 wide enough to be certainly true, which is also what fixes the sign. And
 anything *stored* carries the tier: `let n = 42` declares `n: integer`, and
 the `radius` example below infers `real`.
@@ -2779,7 +2907,7 @@ the `radius` example below infers `real`.
 Collections carry the type of what is in them, and how many:
 
 ```epsil-live
-(Type([1, 2, 3]), Type({1, 2}), Type((1, "a")), Type({x -> 1}))
+(type([1, 2, 3]), type({1, 2}), type((1, "a")), type({x -> 1}))
 // ➔ (TypeFrom("vector<integer^3>"), TypeFrom("set<integer>"), TypeFrom("tuple<integer, string>"), TypeFrom("record{x: integer}"))
 ```
 
@@ -2803,8 +2931,8 @@ would have written:
 
 ```epsil-live
 let radius = 2.5
-let area = Pi * radius^2
-Type(area)
+let area = pi * radius^2
+type(area)
 // ➔ TypeFrom("real")
 ```
 
@@ -2829,7 +2957,7 @@ at the call site. Without the annotation the string would have flowed into the
 division and come back as something symbolic and mystifying.
 
 A **return** annotation (`-> real`) is a different kind of thing: it is
-recorded in the function's signature and shown by `About`, but the current
+recorded in the function's signature and shown by `about`, but the current
 runtime does not reject a returned value for disagreeing with it. Write it for
 the reader; don't rely on it as a check.
 
@@ -2870,7 +2998,7 @@ starts at the bottom of the lattice:
 
 ```epsil-live
 let xs = []
-Type(xs)
+type(xs)
 // ➔ TypeFrom("list<never>")
 ```
 
@@ -2878,7 +3006,7 @@ Say what you mean instead:
 
 ```epsil-live
 let xs: list<integer> = []
-Type(xs)
+type(xs)
 // ➔ TypeFrom("list<integer>")
 ```
 
@@ -2938,11 +3066,35 @@ u: integer | boolean
 A `:` that does not follow a declaration target is not an annotation at all, so
 this rule never reaches into the rest of your program.
 
+### Glyph type names {#glyph-type-names}
+
+The double-struck letters spell the primitive number types, as they do in
+Lean:
+
+| Glyph | Type            |
+| :---- | :-------------- |
+| `ℝ`   | `real`          |
+| `ℤ`   | `integer`       |
+| `ℚ`   | `rational`      |
+| `ℂ`   | `complex`       |
+| `ℕ`   | `integer<0..>`  |
+
+```epsil
+c: ℝ = 3
+function f(x: ℝ, n: ℕ) -> ℂ { x^n }
+xs: list<ℤ>
+```
+
+A glyph is an input spelling only: the type is the primitive it names, and
+serializes as such (`ℝ<0..1>` is `real<0..1>`). `ℕ` is already a range and
+takes no range of its own. In expression position the same glyphs are the set
+constants (`3.1 ∈ ℝ`); see [Naming](/naming/#glyph-aliases).
+
 Named functions may also declare their **effects**, between the parameter list
 and the return type:
 
 ```epsil
-function roll(n: integer) random -> integer { Random(n) }
+function roll(n: integer) random -> integer { random(n) }
 ```
 
 Effect labels are part of the function type. See
@@ -2986,7 +3138,7 @@ order you write your statements in does not change what the program means.
 **Annotated types are not.** What you write is a commitment; only guesses move.
 
 One inherited behavior can surprise you: evaluating a bare symbol as a boolean
-operand (`And`/`Or`/`Xor`/`Not`) infers that symbol `boolean` for the lifetime
+operand (`And`/`Or`/`xor`/`Not`) infers that symbol `boolean` for the lifetime
 of the engine, and a later numeric use of the same name then errors. The
 convention is to keep boolean-only names distinct — uppercase `A`, `B`, `C` is
 the usual choice.
@@ -3116,7 +3268,7 @@ A value built this way carries its type with it, wherever it goes:
 ```epsil-live
 type point = tuple<x: number, y: number>
 let ps = [point(1, 2), point(3, 4)]
-Type(ps)
+type(ps)
 // ➔ TypeFrom("list<point^2>")
 ```
 
@@ -3147,7 +3299,7 @@ the type. This is how a `record`-bodied type gets its constructor:
 ```epsil-live
 type circle = record{x: number, y: number, r: number}
 function circle(x, y, r) { {x -> x, y -> y, r -> r} }
-Type(circle(1, 2, 3))
+type(circle(1, 2, 3))
 // ➔ TypeFrom("circle")
 ```
 
@@ -3159,7 +3311,7 @@ existence, so validation or normalization written there cannot be bypassed:
 ```epsil-live
 type frac = record{n: integer, d: integer}
 function frac(n: integer, d: integer) {
-  {n -> n / GCD(n, d), d -> d / GCD(n, d)}
+  {n -> n / gcd(n, d), d -> d / gcd(n, d)}
 }
 frac(2, 4) == frac(1, 2)
 // ➔ True
@@ -3196,7 +3348,7 @@ that take a tuple apart do not reach inside one:
 type point = tuple<x: number, y: number>
 let q: point = (1, 2)   // error: a tuple is not a point
 let p = point(1, 2)
-First(p)                // error
+first(p)                // error
 let (a, b) = p          // error
 ```
 
@@ -3230,7 +3382,7 @@ p.x + p.y
 
 On a dictionary, `d.x` is exactly `d["x"]`, absent-key behavior included.
 The accessor reads one named field through the type's definition; it does
-not make the value a collection — `First(p)`, `p["x"]` and destructuring
+not make the value a collection — `first(p)`, `p["x"]` and destructuring
 keep rejecting. (The dot must touch the value it reads: `p.x` is a field
 access, `p .x` is not; and a number never takes a field — `2.x` is a
 multiplication.)
@@ -3333,7 +3485,7 @@ error. Unlike a plain alias, a generic one declares **no**
 namespace: a `function` of the same name is an ordinary function,
 declared before or after. A dependent alias **snapshots** the
 definitions it was built from: re-running the `type` statement for
-`Keyed` leaves `Table` as it was until `Table`'s own statement is re-run
+`Keyed` leaves `table` as it was until `table`'s own statement is re-run
 too — which re-running the cell does.
 
 A parameterized **nominal** type takes a clause the same way. The difference is
@@ -3343,7 +3495,7 @@ never expanded — which is exactly what lets its body mention itself:
 ```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t = tree(1, [tree(2, [])])
-Type(t)
+type(t)
 // ➔ TypeFrom("tree<integer>")
 ```
 
@@ -3359,7 +3511,7 @@ arguments**, so it comes back at the type the application supplied, not at
 ```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t: tree<number> = tree(1, [])
-Type(t.value)
+type(t.value)
 // ➔ TypeFrom("number")
 ```
 
@@ -3370,7 +3522,7 @@ the annotation's:
 ```epsil-live
 type tree<T> = tuple<value: T, children: list<tree<T>>>
 let t: tree<number> = tree(1, [])
-match t { tree(v, cs) => Type(v) }
+match t { tree(v, cs) => type(v) }
 // ➔ TypeFrom("integer")
 ```
 
@@ -3423,7 +3575,7 @@ optional payload expressible:
 ```epsil-live
 type opt<T> = T | missing
 let a = opt(1)
-Type(a)
+type(a)
 // ➔ TypeFrom("opt<integer>")
 ```
 
@@ -3433,8 +3585,8 @@ family, and (under `out`) a subtype of every other:
 
 ```epsil-live
 type opt<T> = T | missing
-let b = opt(Missing)
-Type(b)
+let b = opt(missing)
+type(b)
 // ➔ TypeFrom("opt<never>")
 ```
 
@@ -3487,27 +3639,27 @@ implicit "for all `T`".
 
 Epsil distinguishes three related kinds of absence:
 
-- `Nothing` means “no value here” and is removed from function arguments and
+- `nothing` means “no value here” and is removed from function arguments and
   collection literals.
-- `Missing` is a position-preserving missing value. Its type is `missing`.
+- `missing` is a position-preserving missing value. Its type is `missing`.
 - `NaN` is the numeric form of an absent or undefined result. Its type is
   `nan`, which sits outside `real` and `complex` and inside `number`. Numeric
   operations and missing numeric fields generally normalize absence to `NaN`.
 
-`IsMissing(x)` recognizes both `Missing` and `NaN`, regardless of how the
+`isMissing(x)` recognizes both `missing` and `NaN`, regardless of how the
 value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
 first value that is not missing; if every argument is missing, it returns the
 last one unchanged.
 
 ```epsil-live
-(Length([1, Missing, 3]), IsMissing(Missing), IsMissing(NaN),
-  Coalesce(Missing, 0), Missing + 1)
+(length([1, missing, 3]), isMissing(missing), isMissing(NaN),
+  Coalesce(missing, 0), missing + 1)
 // ➔ (3, True, True, 0, NaN)
 ```
 
 A missing dictionary field follows the expected value domain: a numeric field
-produces `NaN`, while a string or other nonnumeric field produces `Missing`.
-Use `IsMissing` when the distinction between those representations is not
+produces `NaN`, while a string or other nonnumeric field produces `missing`.
+Use `isMissing` when the distinction between those representations is not
 important, and [`??`](/operators/#absence-coalescing) — the operator form
 of `Coalesce` — to supply a fallback.
 
@@ -3575,7 +3727,7 @@ signature.
 Subtyping also quietly absorbs a classic use of polymorphism: the empty
 list needs no "for all" type — it is simply `list<never>`, and since
 `never` is the bottom of the lattice (joining it with anything gives the
-other type back), `Join([], [1, 2])` comes out as `list<integer>`
+other type back), `join([], [1, 2])` comes out as `list<integer>`
 with no quantifier anywhere.
 
 For the representation a type declaration lowers to, see
@@ -3636,7 +3788,7 @@ reassignment (see below).
 A `let` or `const` may bind the components of a **tuple** in one statement:
 
 ```epsil
-divmod(a, b) = (Floor(a / b), a % b)
+divmod(a, b) = (floor(a / b), a % b)
 let (q, r) = divmod(17, 5)
 (q, r)
 // ➔ (3, 2)
@@ -3813,6 +3965,37 @@ introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
 lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
+A name is declared **once per scope**. A `let`/`const` of a name that the same
+scope already declares — an earlier `let`/`const` of the same block or
+program, a parameter of the function whose body this is, or the index of the
+loop whose body this is — is the `variable-redeclaration` error, reported
+before the program runs:
+
+```epsil
+function f(x) {
+  let x = x + 1   // error: x is a parameter of f
+  x
+}
+```
+
+To update a binding, assign to it (`x = x + 1`); to hold a second value,
+choose another name. A `let` in a **nested** block is not a re-declaration:
+it shadows the outer name for that block, and its initializer reads the outer
+value.
+
+```epsil
+let t = 1
+for k in 1..3 {
+  if k > 1 {
+    let t = t * 2   // shadows the outer t; reads 1, so t is 2 here
+    t
+  }
+}
+```
+
+Across programs — a re-run notebook cell, a later REPL line — a top-level
+`let` re-declares legally; only a repeat within one program is reported.
+
 [Type declarations](/types/) are the exception: types (and their
 constructors) are **global** — a `type` statement is only allowed at the top
 level of a program, and the declared name means the same thing everywhere on
@@ -3897,11 +4080,24 @@ precedence (for example `+` and `-`, or `*` and `/`).
 | 90   | Not                   | `!`    | `¬`   | prefix  |               |
 | 100  | Power                 | `^`    |       | infix   | right         |
 | 100  | Power                 | `**`   |       | infix   | right         |
+| 101  | Sqrt, Root            |        | `√` `∛` `∜` | prefix |          |
 | 110  | Factorial             | `!`    |       | postfix |               |
+| 110  | Power                 |        | `x²` `xⁿ⁺¹` | postfix |        |
+| 110  | Subscript             |        | `xₖ₊₁` | postfix |              |
 
 Postfix calls and indexing (`f(x)`, `xs[i]`) bind tighter than every entry in
 this table — they are handled directly by the parser rather than through the
 operator table, since they are not spelled with an operator symbol.
+
+The three Unicode-only rows — the radical signs, and the superscript and
+subscript runs — have no ASCII spelling. By default the serializer writes the
+ASCII forms `sqrt(x)`, `x ^ 2` and `Subscript(x, k + 1)`. In its
+fancy-symbol mode (the `fancySymbols` option of `serializeEpsil`, or
+`epsil --epsil --fancy-symbols`) it writes `√x`, `∛x`, `∜x`, and an
+integer-literal exponent as a superscript (`x²`, `x⁻¹`); a symbolic exponent
+keeps `^`, and a subscript expression keeps `Subscript(…)`. See
+[Radical signs](#radical-signs) and
+[Superscripts and subscripts](#scripts).
 
 The conditional expression `a if c else b` is not an operator row either, but
 it has a place in this order: between `KeyValuePair` (30) and `Or` (40), so it
@@ -3949,7 +4145,7 @@ more useful to the author than silently ending the statement.
 the order they happen instead of inside-out:
 
 ```epsil-live
-[3, 1, 2] |> Sort |> Reverse
+[3, 1, 2] |> sort |> reverse
 // ➔ [3, 2, 1]
 ```
 
@@ -3957,14 +4153,14 @@ A stage that takes more than one argument is written as a call, with `_` in the
 slot the piped value fills:
 
 ```epsil-live
-1..10 |> Filter(_, n => n % 2 == 1) |> Map(n => n^2, _) |> Sum
+1..10 |> filter(_, n => n % 2 == 1) |> map(n => n^2, _) |> sum
 // ➔ 165
 ```
 
 The `_` may be left out: a call stage that is missing required arguments
 receives the piped value in the first slot its type fits, so
-`xs |> Take(10)` means `xs |> Take(_, 10)` and `xs |> Map(f)` means
-`xs |> Map(f, _)` (the mapping function is `Map`'s first argument). This
+`xs |> take(10)` means `xs |> take(_, 10)` and `xs |> map(f)` means
+`xs |> map(f, _)` (the mapping function is `map`'s first argument). This
 only fills a hole — a call that is already complete keeps its ordinary
 meaning, and an explicit `_` anywhere in the call says exactly where the
 piped value goes.
@@ -3972,25 +4168,25 @@ piped value goes.
 A stage may also be a **lambda**, written inline without parentheses — after
 `|>` the arrow binds tighter than the pipe, and the lambda's body ends at the
 next `|>`. When the piped value is a collection, a one-parameter lambda stage
-is applied **to each element** (an implicit `Map`); `_^2` is shorthand for
+is applied **to each element** (an implicit `map`); `_^2` is shorthand for
 such a lambda. The following three pipelines are equivalent:
 
 ```epsil-live
-1..oo |> Take(_, 10) |> Map(_^2, _) |> Sum
+1..oo |> take(_, 10) |> map(_^2, _) |> sum
 // ➔ 385
 ```
 
 ```epsil
-1..oo |> Take(10) |> x => x^2 |> Sum
-1..oo |> Take(10) |> _^2 |> Sum
+1..oo |> take(10) |> x => x^2 |> sum
+1..oo |> take(10) |> _^2 |> sum
 ```
 
 Note the two readings of `_`: in a **call** stage it is the piped value
-(`Take(_, 10)`); in an **operator-written** stage (`_^2`, `_ + 1`) it is the
+(`take(_, 10)`); in an **operator-written** stage (`_^2`, `_ + 1`) it is the
 element of the implicit lambda. A **named** function stage always receives
-the whole value — `xs |> Sum` sums the collection, it does not map — as does
+the whole value — `xs |> sum` sums the collection, it does not map — as does
 a lambda whose annotated parameter accepts it
-(`xs |> (l: list<number>) => Length(l)`).
+(`xs |> (l: list<number>) => length(l)`).
 
 A pipe hands its stage exactly **one** value, so a stage that declares more
 than one parameter is a `pipe-stage-arity` error rather than a partial
@@ -4003,7 +4199,7 @@ produce:
 ```
 
 The fix is the **call** form above, with `_` marking the piped value's slot
-(`xs |> Fold(f, 0, _)`). The same applies to a named stage: `xs |> add` on a
+(`xs |> fold(f, 0, _)`). The same applies to a named stage: `xs |> add` on a
 two-parameter `add` is this error, not a partially applied `add`.
 
 When the piped value is a collection whose elements are tuples and you want to
@@ -4033,7 +4229,7 @@ intermediate reads better.
 ## Absence coalescing: `??` {#absence-coalescing}
 
 `a ?? b` is `Coalesce(a, b)`: the value of `a` unless `a` is **absent**
-(`Missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
+(`missing` or `NaN`), in which case the value of `b`. It is lazy — `b` is not
 evaluated when `a` is present.
 
 ```epsil
@@ -4115,7 +4311,7 @@ parentheses. It is still ONE parameter — it takes one argument, a tuple, and
 binds a name to each component:
 
 ```epsil
-[(True, True), (True, False)] |> Map(((p, q)) => p && q, _)
+[(True, True), (True, False)] |> map(((p, q)) => p && q, _)
 // ➔ [True, False]
 ```
 
@@ -4142,21 +4338,21 @@ emit code that binds the wrong names.
 **Callbacks and arity.** An ordinary call with too few arguments partially
 applies the function — `f(1)` on a two-parameter `f` is a function awaiting
 the second argument. Inside a collection operator that never happens: the
-operator decides how many arguments the callback receives (`Map` supplies
-one element per source collection, `Filter`/`Any`/`All`/`Count`/`TakeWhile`
-supply one, `Reduce`/`Fold` supply the accumulator and the element), and a
+operator decides how many arguments the callback receives (`map` supplies
+one element per source collection, `filter`/`any`/`all`/`count`/`takeWhile`
+supply one, `reduce`/`fold` supply the accumulator and the element), and a
 lambda whose parameter count cannot match is a `callback-arity` error at
 parse/canonicalization time rather than a list of leftover closures. The
 message names both sides and, for the pair case, the fix:
 
 ```epsil
-Map((p, q) => p + q, [(1, 2), (3, 4)])
+map((p, q) => p + q, [(1, 2), (3, 4)])
 // error: Map calls its callback with 1 argument (each element of the
 // collection); `(p, q) => p + q` declares 2 parameters. To take a pair
 // apart, use a tuple pattern parameter: ((p, q)) => …
 ```
 
-`Sort` (a key or a comparator) and `Iterate` (`f(previous)` or
+`sort` (a key or a comparator) and `iterate` (`f(previous)` or
 `f(index, previous)`) accept either of their two arities; a `() => …`
 literal is a constant and fits any slot. A callback whose arity is not
 statically known — a value typed `function` or `callback<…>`, a generic
@@ -4225,7 +4421,7 @@ arguments: the tuple's elements become ordinary positional arguments.
 f(...t)          // t's elements become f's arguments
 f(1, ...t, q)    // splices between positional arguments
 g(...p, ...q)    // several spreads splice in order
-Max(...t)        // variadic built-ins accept spreads
+max(...t)        // variadic built-ins accept spreads
 ```
 
 In a call, only **tuples** spread — argument lists are tuple-shaped, so a
@@ -4251,7 +4447,7 @@ let s = {2, 3}
 
 The splice happens at canonicalization: literal collections splice
 immediately, and a symbolic or lazy segment lowers to the equivalent
-`Join` expression — a lone spread `[...xs]` is `Join(xs)`, the list
+`join` expression — a lone spread `[...xs]` is `join(xs)`, the list
 materialization of `xs`, and an infinite segment stays lazy
 (`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
 usual.
@@ -4333,6 +4529,79 @@ Because `Power` binds tighter than `Multiply`/`Divide`:
 x^1/2     // (x^1)/2, not x^(1/2)
 ```
 
+## Radical signs: `√`, `∛`, `∜` {#radical-signs}
+
+A radical sign is a prefix operator: `√x` is `sqrt(x)`, `∛x` is `root(x, 3)`,
+`∜x` is `root(x, 4)`. Its operand is what a function call would take — a
+primary with its postfix clauses and scripts, or another prefix operator — but
+not an infix operator:
+
+```epsil
+√3          // Sqrt(3)
+√(x + 1)    // Sqrt(x + 1)
+√x²         // Sqrt(x^2) — the script belongs to the operand
+√f(x)       // Sqrt(f(x))
+√√2         // Sqrt(Sqrt(2))
+-√2         // Negate(Sqrt(2))
+√x^2        // Sqrt(x)^2 — `^` does not
+√x + 1      // Sqrt(x) + 1
+```
+
+This is how Lean reads `√`, and it keeps `√2x` the "√2 times x" every reader
+expects (see [Invisible multiplication](#invisible-multiplication)). Unlike `-`
+and `!`, a radical sign may be separated from its operand by whitespace
+(`√ 2`): it has no infix reading, so there is nothing for the whitespace to
+disambiguate.
+
+## Superscripts and subscripts {#scripts}
+
+A run of superscript characters written against an operand is its exponent:
+
+```epsil
+x²          // x^2
+x¹⁰         // x^10
+x⁻¹         // x^(-1)
+xⁿ⁺¹        // x^(n + 1)
+xʸ          // x^y
+(x + 1)²    // (x + 1)^2
+f(x)²       // f(x)^2
+2²          // 2^2
+```
+
+The exponent may use the superscript digits `⁰`–`⁹`, the signs `⁺` `⁻`, the
+parentheses `⁽` `⁾`, and the superscript Latin letters (`ⁱ`, `ⁿ`, `ˣ`, `ʸ`,
+…). A script binds like the postfix factorial — tighter than `^` and than the
+prefix minus — and composes with `!` in written order:
+
+```epsil
+-x²         // -(x^2)
+2x²         // 2·(x^2)
+2^x²        // 2^(x^2)
+x²^3        // (x^2)^3
+x²!         // (x^2)!
+3!²         // (3!)^2
+```
+
+A subscript run of letters and digits directly after a name is part of the
+name (`xₙ` is the symbol `x_n`; see [Naming](/naming/#subscripts)). Any
+other subscript run — one holding a sign or a parenthesis, or one written
+after a non-symbol operand — is a `Subscript`:
+
+```epsil
+xₖ₊₁        // Subscript(x, k + 1)
+(a + b)ₖ    // Subscript(a + b, k)
+xₙ²         // (x_n)^2
+```
+
+A `Subscript` whose index evaluates to an integer or a symbol names the same
+symbol the folded spelling names: with `k = 3`, `xₖ₊₁` evaluates to `x_4`, and
+to the value of `x_4` if it has one. An index that stays unknown, or is not an
+integer, keeps the expression symbolic.
+
+Like the factorial, a script must **abut** its operand: `x ²` ends the
+expression at `x`, and the stray `²` is a diagnostic. A run that is not an
+expression (`x⁺`) is diagnosed at the run.
+
 ## Modulo: `%` {#modulo}
 
 `%` is `Mod`, an infix operator at the multiplicative tier (the same
@@ -4393,6 +4662,20 @@ or an opening parenthesis is read as an implicit `Multiply`:
 2(2 + 1)  // 2 * (2 + 1)
 ```
 
+A number literal under radical signs and superscript exponents is a numeric
+coefficient too, so it leads (and continues) an invisible multiplication
+exactly as a bare literal does, and a radical sign may follow a literal:
+
+```epsil
+2√3       // 2 * Sqrt(3)
+√2x       // Sqrt(2) * x
+√2(x + 1) // Sqrt(2) * (x + 1)
+2²x       // 2^2 * x
+2√3x      // 2 * Sqrt(3) * x
+```
+
+Only the glyph spellings qualify: `Sqrt(2)x` and `2^2x` are still diagnostics.
+
 Note that a **symbol** immediately followed by `(` is a **function call**, not
 an invisible multiplication: `x(2+1)` calls `x`, and `(a+b)(2+1)` calls the
 value of `a+b`. Only a *number* on the left means multiplication. See
@@ -4448,7 +4731,7 @@ Three spellings, two meanings:
 - **`==` always compares** (and `===` is `Same`, structural identity).
   A third comparison tier asks the prover whether the two sides are equal
   for **every** value of their free variables:
-  `IdenticallyEqual(Sin(t)^2 + Cos(t)^2, 1)` is `True`, where `==` leaves
+  `identicallyEqual(sin(t)^2 + cos(t)^2, 1)` is `True`, where `==` leaves
   the equation as an inert condition. It is deliberately spelled as a call,
   never as an operator — the equivalence glyphs `≡`, `≢`, and `≣` are
   rejected outright, because their bar counts cross the `=`-run lengths
@@ -4469,7 +4752,7 @@ count = count + 1
 a reader of mathematics expects:
 
 ```epsil
-Solve(x^2 = 4, x)        // Equal — the equation, not an assignment
+solve(x^2 = 4, x)        // Equal — the equation, not an assignment
 if a = true { 1 } else { 2 }
 [a = 1, b = 2]
 ```
@@ -4567,16 +4850,16 @@ Values stay **exact** unless you ask otherwise. A transcendental of an exact
 argument stays symbolic —
 
 ```epsil
-Ln(2)
+ln(2)
 ```
 
-evaluates to the symbolic `Ln(2)` (`ln(2)`), not a decimal approximation.
+evaluates to the symbolic `ln(2)` (`ln(2)`), not a decimal approximation.
 
 **Numeric approximation is explicit**, via `N(expr)` — it is a function
 call, not a language mode:
 
 ```epsil
-N(Ln(2))
+N(ln(2))
 ```
 
 evaluates to `0.6931471805599453…`.
@@ -4606,17 +4889,17 @@ Build the value you want and rebind the name:
 
 ```epsil
 let xs = [1, 2, 3]
-xs = Join([xs[1]], [9], [xs[3]])
+xs = join([xs[1]], [9], [xs[3]])
 xs
 // ➔ [1, 9, 3]
 ```
 
-Operators never modify what you hand them — `Append`, `Sort`, `Join`,
-`Map`, `Filter` all return a **new** collection:
+Operators never modify what you hand them — `append`, `sort`, `join`,
+`map`, `filter` all return a **new** collection:
 
 ```epsil
 let xs = [3, 1, 2]
-let ys = Sort(xs)
+let ys = sort(xs)
 (xs, ys)
 // ➔ ([3, 1, 2], [1, 2, 3])
 ```
@@ -4709,12 +4992,12 @@ A call evaluates its arguments first and hands the function their values:
 with `let a = 3`, `f(a + 1)` receives `4`. A function declared with the
 `hold` prefix instead receives each argument **as written** — canonicalized
 and bound in the caller's scope, but not evaluated — and evaluates it only
-where its body reads it, so it can inspect the expression (`Head(e)`),
+where its body reads it, so it can inspect the expression (`head(e)`),
 transform it, or decide whether to evaluate it at all:
 
 ```epsil
 let a = 3
-hold f(e) = Head(e)
+hold f(e) = head(e)
 f(a + 1)
 // ➔ Add
 ```
@@ -4731,13 +5014,19 @@ dictionary — evaluates its elements when the statement executes. Assigning
 one to a variable stores a snapshot of the element *values*:
 
 ```epsil
-let xs = []
-for k in 1..3 { xs = Join(xs, [k]) }
+let k = 1
+let xs = [k, k + 1]
+k = 10
 xs
-// ➔ [1, 2, 3]
+// ➔ [1, 2]
 ```
 
-Lazy collection **operators** — `Range`, `Map`, `Filter`, `Take`, `Join` —
+(A spread inside a literal, `[...xs, k]`, is the exception: it is the lazy
+`join` described next, not a snapshot — see the
+[Style Guide](/style/#building-a-list-one-element-at-a-time) before
+growing a list in a loop.)
+
+Lazy collection **operators** — `Range`, `map`, `filter`, `take`, `join` —
 are *generators*: their operands (bounds, sources, functions) are evaluated
 when the expression is, but enumeration is deferred until the collection is
 materialized (displayed, indexed, aggregated, or iterated). A deferred
@@ -4751,8 +5040,9 @@ operation (an aggregate, an index) at the point of definition.
 
 Per [Principles](/principles/), "errors are values": a *runtime*
 problem — a type error, an out-of-domain argument, reassigning a `const` —
-becomes an `Error` value embedded in the result, not a thrown exception. A
-program never throws to its host for a runtime problem.
+becomes an `Error` value that propagates outward through the enclosing
+expressions and becomes their result, not a thrown exception. A program never
+throws to its host for a runtime problem.
 
 *Parse*-time problems are different: a malformed program surfaces as a
 **diagnostic**, not as a value. So do the few execution-time problems that are
@@ -4766,13 +5056,36 @@ a `runtime-error` diagnostic — for example an indexed assignment
 (`xs[2] = 9`, which is rejected: element assignment is not supported), or
 reassigning a `const` in the middle of a program.
 
+A program constructs an error value of its own with `RuntimeError`:
+
+```epsil-live
+function reciprocal(x) {
+  if x == 0 { RuntimeError("zero-has-no-reciprocal") } else { 1 / x }
+}
+[reciprocal(4), reciprocal(0)]
+// ➔ [1/4, Error("zero-has-no-reciprocal")]
+```
+
+The call evaluates to `Error("zero-has-no-reciprocal")`, which a caller takes
+apart with [`if let`](/control-flow/#if-let) or
+[`match`](/control-flow/#match) like any other error value. The
+argument is a code string, or an `ErrorCode("code", details…)` when the
+error carries data.
+
+Do not write `Error("…")` for this. A written `Error(…)` is a *static*
+diagnostic — the node the engine itself inserts where a program is wrong,
+such as a type mismatch — and it marks the whole expression around it as
+invalid: a function whose body spells `Error("neg")` never gets defined. The
+two spellings make the distinction explicit: `Error` is a problem *with the
+program*, `RuntimeError` is a failure *produced by running it*.
+
 ## Console input and output
 
 `print` writes its operands to the host console — the terminal for the
 command-line tools, the developer console in a browser — separated by
 spaces and followed by a newline. Strings print their content, without the
 quotes; every other value prints its ordinary textual form. It evaluates to
-`Nothing`:
+`nothing`:
 
 ```epsil
 let x = 6
@@ -4784,7 +5097,7 @@ print("x is", x * 7)
 trailing newline. An optional operand is a prompt, displayed before
 reading. In a terminal it reads from the terminal (piped standard input
 works too); in a browser it opens the `prompt()` dialog. At end-of-input —
-or when the dialog is canceled — it evaluates to `Nothing`; on a host with
+or when the dialog is canceled — it evaluates to `nothing`; on a host with
 no interactive input at all, the call stays symbolic.
 
 ```text
@@ -4794,10 +5107,10 @@ Who? Arno
 Hello, Arno
 ```
 
-`print` and `input` follow the lowercase command convention. They are
-ordinary library aliases for the `Print` and `Input` operators — not
-keywords — so a local declaration of `print` shadows the command like any
-other library name.
+`print` and `input` are the lowercase spellings of the `Print` and `Input`
+operators, like `sin` for `sin` — not keywords — so a local declaration of
+`print` shadows the command like any other library name. See
+[Naming](/naming/).
 
 ## Pragma security
 
@@ -4812,7 +5125,7 @@ in an unfamiliar environment, both are **gated off by default**:
 ```
 
 by default produces a `host-pragma-disabled` diagnostic and no host read — the
-pragma evaluates to `Nothing`. A host can opt back in and let `#env`/
+pragma evaluates to `nothing`. A host can opt back in and let `#env`/
 `#navigator` read as documented in [Pragmas](/pragmas/).
 
 The benign pragmas — `#line`, `#column`, `#url`, `#filename`, `#date`,
@@ -4916,7 +5229,7 @@ body:
   expression — a local `let`, a `match`, a loop. It is also the only form that
   carries a name *and* a multi-statement body.
 - **Anonymous** (`x => …`) when the function is an argument to another
-  function and a name would add nothing: `Map(x => x^2, xs)`.
+  function and a name would add nothing: `map(x => x^2, xs)`.
 
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
@@ -4928,7 +5241,7 @@ A definition can state the effects that calling it may perform. The specifier
 sits after the parameter list and before the return arrow:
 
 ```epsil
-function roll(n) random -> integer { Random(n) }
+function roll(n) random -> integer { random(n) }
 ```
 
 The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
@@ -4946,7 +5259,7 @@ in which case its declared result is `unknown`. In the math form, a written
 effect specifier must be followed by a return arrow:
 
 ```epsil
-roll(n) random -> integer = Random(n)
+roll(n) random -> integer = random(n)
 ```
 
 See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
@@ -4993,12 +5306,12 @@ value — the clause is selected only when the argument *is* that value.
 
 If no clause matches the evaluated arguments, the call is a
 `no-matching-clause` error. To inspect the clause set of a function, use
-`About`:
+`about`:
 
 ```epsil
 f(0) = 1
 f(n: integer) = n + 1
-About(f)
+about(f)
 ```
 
 The listing shows one line per clause, in declaration order, and annotates
@@ -5015,7 +5328,7 @@ transform it, serialize it, or decide whether to evaluate it at all — is
 declared with the `hold` prefix, in either form:
 
 ```epsil
-hold f(e) = Head(e)
+hold f(e) = head(e)
 hold function twice(e) { let v = e; v + v }
 ```
 
@@ -5030,18 +5343,18 @@ the expression itself:
 
 ```epsil
 let a = 3
-hold f(e) = Head(e)
+hold f(e) = head(e)
 f(a + 1)
 // ➔ Add          (an ordinary function would answer Integer: it receives 4)
 ```
 
 Because the argument is never evaluated by the call, a hold function can
-decide whether it runs at all — here `Random()` draws only when the
+decide whether it runs at all — here `random()` draws only when the
 condition is false:
 
 ```epsil
-hold unless(cond, body) = if !cond { body } else { Nothing }
-unless(a > 5, Random())
+hold unless(cond, body) = if !cond { body } else { nothing }
+unless(a > 5, random())
 ```
 
 `hold` applies to the **whole definition** — every parameter is held — and
@@ -5066,12 +5379,12 @@ else (`let hold = 5`, `hold(2)`). Anonymous functions have no hold form.
 
 ### Bound-variable parameters: `bind`
 
-A hold function can define its own **binder** — an operator like `Sum` or
+A hold function can define its own **binder** — an operator like `sum` or
 `D` that takes a variable to bind. Mark the parameter that receives the
 variable with `bind`:
 
 ```epsil
-hold mySum(body, bind i, n) = Sum(body, (i, 1, n))
+hold mySum(body, bind i, n) = sum(body, (i, 1, n))
 mySum(k^2, k, 3)
 // ➔ 14
 ```
@@ -5079,9 +5392,9 @@ mySum(k^2, k, 3)
 The caller passes a **symbol** at a `bind` position (anything else is a
 `bind-symbol-expected` error), and the function's parameter is *substituted*
 by that symbol throughout the body — including where the body's own binder
-uses it, so `Sum(body, (i, 1, n))` becomes `Sum(k^2, (k, 1, 3))` and the
+uses it, so `sum(body, (i, 1, n))` becomes `sum(k^2, (k, 1, 3))` and the
 sum runs over the caller's `k`. The call declares that symbol in its own
-scope, exactly as `Sum` does with its index: a `let k = 5` outside the call
+scope, exactly as `sum` does with its index: a `let k = 5` outside the call
 does not leak in, and `mySum(k * j, j, 3)` with `k = 5` is `30`. `bind` is
 contextual (`f(bind) = …` declares an ordinary parameter named `bind`) and
 requires `hold` (`bind-requires-hold`): a bound variable can only be received
@@ -5089,7 +5402,7 @@ unevaluated. Every parameter of the function is held; `bind` says which of
 them names a variable.
 
 The substitution is by **name**, and deliberately reaches inside the body's
-own binders (that is what ties `Sum`'s index to the caller's variable), so it
+own binders (that is what ties `sum`'s index to the caller's variable), so it
 also reaches any *other* use of that name in the body: do not reuse a `bind`
 parameter's name for an unrelated local or index inside the same function.
 
@@ -5119,13 +5432,13 @@ number = …`), like an effect specifier. `commutative`/`associative` need at
 least two parameters (`associative` exactly two), `idempotent`/`involution`
 exactly one; a `hold` function cannot carry them (its calls are neither
 reordered nor flattened); every clause of a multi-clause function must state
-the same ones. `About(op)` lists them.
+the same ones. `about(op)` lists them.
 
 ### Documenting a function
 
 A **doc comment** — `///` lines or a `/** … */` block — written immediately
 before a definition becomes the function's *description*: it is shown by
-`About(f)`, by an editor hover, and it is the one comment that survives a
+`about(f)`, by an editor hover, and it is the one comment that survives a
 serialization round trip (it comes back as `///` lines). Ordinary `//`
 comments are not attached.
 
@@ -5133,7 +5446,7 @@ comments are not attached.
 /// Doubles its argument.
 /// Accepts anything `*` accepts.
 twice(x) = 2x
-About(twice)
+about(twice)
 ```
 
 ### Anonymous functions
@@ -5166,6 +5479,46 @@ arrow:
 ```epsil
 () => 42
 ```
+
+The last parameter can be a **rest parameter**, written `...name`. It has no
+position of its own: it binds one name to a tuple of every argument after the
+parameters before it, and that tuple is empty when the call supplies none. So a
+lambda with a rest parameter accepts any number of arguments:
+
+```epsil
+(a, ...rest) => (a, rest)
+```
+
+Applied to `(1, 2, 3)` this yields `(1, (2, 3))`; applied to `(1)` it yields
+`(1, ())`. Spreading the tuple back into a call — the `...` of a call argument
+list — passes the collected arguments on unchanged, which is what a wrapper
+needs:
+
+```epsil
+(...args) => Conjugate(g(...args))
+```
+
+A named definition takes a rest parameter in the same position and with the
+same meaning, in the equation form and in the braced form alike:
+
+```epsil
+h(a, ...rest) = Length(rest)
+```
+
+```epsil
+function h(a, ...rest) {
+  Length(rest)
+}
+```
+
+Either one behaves exactly like `let h = (a, ...rest) => Length(rest)`, and the
+name it declares reports the arity it really accepts — `h` above has the type
+`(unknown, any*) -> integer`, "one argument or more".
+
+Only the last parameter may be a rest parameter, and it carries no type
+annotation. A rest parameter is an interpreted-only feature: `compile()`
+refuses a function that has one, because no compile target collects the
+trailing arguments.
 
 Writing `->` where a function was meant — `(x, y) -> x + y`,
 `(n: integer) -> n^2` — is a diagnosed typo: the parser suggests `=>` with a
@@ -5278,12 +5631,12 @@ symbolic (unbound) `x` as the subject above, `match` selects the `_` case: `x`
 is structurally not `0`, even though it *could* be zero semantically. Use
 `if`/`Which` when you want that kind of semantic case-split instead.
 
-A list pattern matches a list *value* whatever produced it: `Rest(xs)`,
-`Drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
+A list pattern matches a list *value* whatever produced it: `rest(xs)`,
+`drop(xs, 1)` or `Range(1, 3)` evaluate to a lazy collection rather than a
 list literal, and the case holding the list pattern reads it as a list —
-element by element for the positions the pattern names, with a copy only for
-a named `...rest`. (A lazy list of more than 100 000 elements is left as it
-is, and then matches only the wildcard.)
+element by element for the positions the pattern names, at any nesting, with
+a copy only for a named `...rest`. (A copy of more than 100 000 elements is
+refused, and the case then does not match.)
 
 The final catch-all may also be spelled `otherwise`, a synonym for a bare
 `_` pattern (it takes a guard the same way, and binds nothing):
@@ -5304,7 +5657,7 @@ a bare identifier in a nested pattern position *binds* (next section).
 
 A bare identifier in pattern position **binds** a new variable to the value
 at that position — for *any* name, including ones that happen to name an
-engine constant (`e`, `i`, `Pi`). A pattern is parsed as an ordinary
+engine constant (`e`, `i`, `pi`). A pattern is parsed as an ordinary
 expression first, so this applies inside nested patterns too:
 
 ```epsil
@@ -5314,7 +5667,7 @@ match p {
 ```
 
 Matching `(2, 7)` against this case binds `x` to `2` and `e` to `7` — the
-body's `e` is the captured value, not `ExponentialE`. Because a bare binding
+body's `e` is the captured value, not `exponentialE`. Because a bare binding
 matches unconditionally, a *non-final* case consisting of just a binding (or
 `_`) makes every case after it unreachable; this is flagged as a
 `match-irrefutable-case` diagnostic (a final catch-all is expected and not
@@ -5329,10 +5682,10 @@ match x {
 }
 ```
 
-This does **not** match the constant π — `Pi` in pattern position binds a new
-variable named `Pi`, shadowing the constant, and the diagnostic is the safety
+This does **not** match the constant π — `pi` in pattern position binds a new
+variable named `pi`, shadowing the constant, and the diagnostic is the safety
 net for that: it fires because the `Pi => 1` case is non-final and matches
-anything, not because `Pi` is a reserved name. To test against the value of
+anything, not because `pi` is a reserved name. To test against the value of
 the constant, use a pin.
 
 ### Pins
@@ -5343,7 +5696,7 @@ variable, since a bare identifier always binds instead:
 
 ```epsil
 match x {
-  == Pi => "is-pi"
+  == pi => "is-pi"
   _ => "no"
 }
 ```
@@ -5369,7 +5722,7 @@ matched:
 
 ```epsil
 match x {
-  1 | 2 | == Pi => "small"
+  1 | 2 | == pi => "small"
   _ => "big"
 }
 ```
@@ -5555,13 +5908,19 @@ match z {
 This is symbolic destructuring, evaluated by the engine's general pattern
 matcher — it works when evaluating a `match` expression, but such patterns
 are not supported by `compile()`; compiling a `match` with an operator
-pattern fails closed, naming the offending pattern in the error.
+pattern fails closed, naming the offending pattern in the error. A typed
+binding, by contrast, compiles when its type has a faithful test on the
+JavaScript value model — the machine numbers, strings and booleans, literal
+values, numeric ranges, unions of those, and the variants and sums a `type`
+statement declares when they are tagged and not generic; a binding typed
+`!error`, or with a collection, record, erased-sum or generic-sum type, keeps
+failing closed.
 
 ### No match
 
 If no case matches, `match` evaluates to an `Error` value tagged
 `'match-no-case'` carrying the subject, rather than throwing or silently
-producing `Nothing` — errors are ordinary values in Epsil (see
+producing `nothing` — errors are ordinary values in Epsil (see
 [Evaluation](/evaluation/)):
 
 ```epsil
@@ -5571,6 +5930,44 @@ match 3 {
 ```
 
 Evaluating this expression yields `Error("match-no-case", 3)`.
+
+### Exhaustiveness
+
+When the subject's type is **closed** — a sum declared with `type light = red |
+green | yellow` (see [Types](/types/)), or `boolean` — `epsil check` and
+a program run both report a `match-not-exhaustive` warning if some value of
+that type reaches no case, spelling each uncovered value as the pattern that
+would match it:
+
+```epsil
+type light = red | green | yellow
+function canGo(t: light) -> boolean {
+  match t {
+    green() => true
+  }
+}
+// warning: The "match" on a "light" value has no case for red(), yellow()
+```
+
+A case covers a value only when it matches it unconditionally: a constructor
+pattern whose operands are all bindings, `_` or `...` (`node(v, cs)`,
+`node(v, ...)`), a typed binding (`g: green`, or `x: light` for the whole
+sum), a wildcard or bare binding, or an or-alternative of those. A case with
+an `if` guard, a literal operand (`jnum(0)`) or a pin (`== value`) is
+conditional and counts for nothing, since the check does not reason about
+conditions. The subject's type is read from its annotation — a parameter, a
+typed `let`/`const`, or a typed `match` binding — and only a type the check
+can enumerate from a declaration is ever reported: an unannotated subject, an
+ordinary type like `integer`, or a union with a member that is not a variant
+(`light | nothing`) stays silent. It is a warning, not an error: the program
+still runs, and an uncovered subject evaluates to the `match-no-case` error
+value above.
+
+Silence is not a proof of totality. A `boolean` subject that stays symbolic
+(an undecided comparison such as `x < 3` with `x` unknown) is neither `true`
+nor `false`, and a declared name with no value (`let u: light` without an
+initializer) is not one of its constructors; both reach no case even when
+every alternative is covered. A final `_` case handles them.
 
 ### `if let` {#if-let}
 
@@ -5588,7 +5985,7 @@ if let (x, y) = point { x * y } else { 0 }
 It is sugar over `match`: the statement above is
 `match point { (x, y) => do { x * y }; _ => do { 0 } }`, and the two forms
 lower to the same expression. Without an `else`, a subject that does not
-match evaluates to `Missing`, as a false `if` without an `else` does.
+match evaluates to `missing`, as a false `if` without an `else` does.
 
 The form earns its keep with a typed binding, which is how a result that may
 have failed is taken apart without a `match` block:
@@ -5608,6 +6005,17 @@ value; the typed binding `h: !error` refuses it and the `else` branch runs.
 With `head([4, 5])`, `4` binds to `h`. The same test reads absence:
 `if let v: !missing = First(xs) { … }` binds `v` only when the list has a
 first element.
+
+A function that fails on purpose returns
+[`RuntimeError`](/evaluation/#errors-are-values):
+
+```epsil-live
+function reciprocal(x) {
+  if x == 0 { RuntimeError("zero-has-no-reciprocal") } else { 1 / x }
+}
+if let r: !error = reciprocal(0) { r } else { "no reciprocal" }
+// ➔ "no reciprocal"
+```
 
 `if let` chains with `else if` in either direction, and a plain `if` can
 follow an `if let`:
@@ -5667,9 +6075,9 @@ undecidable condition can stay inert. When you want the semantic question —
 ## Loops
 
 There is one loop keyword form for each of the two common shapes. Both are
-evaluated **for effect**, not for their value — a loop's value is `Nothing`.
+evaluated **for effect**, not for their value — a loop's value is `nothing`.
 Value-producing iteration over a collection belongs to the library functions
-`Map`/`Filter`/`Reduce`, not to a loop statement.
+`map`/`filter`/`reduce`, not to a loop statement.
 
 `while cond { … }` repeats its body until the condition becomes false:
 
@@ -5732,7 +6140,7 @@ for x in a in b { x }
 
 ## Pipelines
 
-`x |> f` means exactly `f(x)`. For a single call that is a wash — `Sqrt(2)`
+`x |> f` means exactly `f(x)`. For a single call that is a wash — `sqrt(2)`
 says it better than `2 |> Sqrt`. What the pipe buys you is **reading order**
 once several transformations are applied one after another.
 
@@ -5743,7 +6151,7 @@ Nested calls:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-Mean(Map(s => s + 5, Filter(scores, s => s >= 60)))
+mean(map(s => s + 5, filter(scores, s => s >= 60)))
 // ➔ 337/4
 ```
 
@@ -5751,16 +6159,16 @@ Named intermediates:
 
 ```epsil-live
 let scores = [88, 42, 95, 61, 73]
-let passing = Filter(scores, s => s >= 60)
-let curved = Map(s => s + 5, passing)
-Mean(curved)
+let passing = filter(scores, s => s >= 60)
+let curved = map(s => s + 5, passing)
+mean(curved)
 // ➔ 337/4
 ```
 
 A pipeline:
 
 ```epsil-live
-[88, 42, 95, 61, 73] |> Filter(s => s >= 60) |> s => s + 5 |> Mean
+[88, 42, 95, 61, 73] |> filter(s => s >= 60) |> s => s + 5 |> mean
 // ➔ 337/4
 ```
 
@@ -5776,7 +6184,7 @@ naming two values that exist only to be handed to the next line.
 A stage that needs only the piped value is named bare:
 
 ```epsil-live
-16 |> Sqrt |> N
+16 |> sqrt |> N
 // ➔ 4
 ```
 
@@ -5785,18 +6193,18 @@ marking the slot the piped value fills. It does not have to be the first
 argument:
 
 ```epsil-live
-[3, 1, 2] |> Sort |> Take(_, 2)
+[3, 1, 2] |> sort |> take(_, 2)
 // ➔ [1, 2]
 ```
 
 The `_` may be left out entirely: a call that is missing required arguments
 receives the piped value in the first slot its type fits — first for a
-collection piped into `Take(3)`, second for one piped into the
-callback-first `Map(f)` — so these are the same pipeline:
+collection piped into `take(3)`, second for one piped into the
+callback-first `map(f)` — so these are the same pipeline:
 
 ```epsil
-[1, 2, 3] |> Map(n => n^2, _)      // [1, 4, 9]
-[1, 2, 3] |> Map(n => n^2)         // [1, 4, 9] — implicit argument
+[1, 2, 3] |> map(n => n^2, _)      // [1, 4, 9]
+[1, 2, 3] |> map(n => n^2)         // [1, 4, 9] — implicit argument
 ```
 
 The implicit argument only fills a hole. A call that is already complete is
@@ -5804,7 +6212,7 @@ never rewritten: `xs |> f(y)` applies the *value* of `f(y)` to `xs`, exactly
 as if the pipe were not there.
 
 A one-parameter **lambda** stage over a collection is applied to each
-element (an implicit `Map`), so the pipeline above can shed its `Map`
+element (an implicit `map`), so the pipeline above can shed its `map`
 entirely — `[1, 2, 3] |> n => n^2` and `[1, 2, 3] |> _^2` also produce
 `[1, 4, 9]`. See [the pipe operator](/operators/#pipe) for the exact
 rules.
@@ -5818,9 +6226,9 @@ Reach for a pipeline when:
 - the intermediate values have no name worth inventing.
 
 Prefer a nested call when the expression is **mathematical** rather than a
-sequence of stages. `Sqrt(1 + x^2)` is how the formula is written on paper;
+sequence of stages. `sqrt(1 + x^2)` is how the formula is written on paper;
 `1 + x^2 |> Sqrt` is the same value spelled worse. One or two calls rarely
-benefit either way — `Mean(xs)` needs no pipe.
+benefit either way — `mean(xs)` needs no pipe.
 
 Prefer named intermediates when a value is **used twice**, deserves a name that
 explains what it is, or is worth inspecting while you develop. A pipeline is a
@@ -5853,7 +6261,7 @@ introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
 is a set.
 
 Each block pushes its own lexical scope. A block's value is its last
-expression; an empty block's value is `Nothing`:
+expression; an empty block's value is `nothing`:
 
 ```epsil
 if a { }
@@ -6040,17 +6448,18 @@ The conforming type must be a **named, concrete type**: a built-in
 type](/types/#nominal-type). A union, an anonymous tuple or
 record shape, or a `type alias` name cannot conform
 (`protocol-conformance-target-invalid`) — wrap the shape in a nominal type
-first. A new nominal type can declare its conformance in the same
-statement:
+first. A sum type is the one exception, and it is a spelling, not a new
+kind of conformer: see [Conforming a sum type](#conforming-a-sum-type). A
+new nominal type can declare its conformance in the same statement:
 
 ```epsil-live
 protocol Area { function area(self: Self) -> number }
 
 type Circle = tuple<radius: number> is Area {
-  function area(self: Circle) -> number { Pi * self.radius^2 }
+  function area(self: Circle) -> number { pi * self.radius^2 }
 }
 
-area(Circle(1)) == Pi
+area(Circle(1)) == pi
 // ➔ True
 ```
 
@@ -6069,6 +6478,50 @@ is `protocol-signature-mismatch`. Parameter types may be *wider* than the
 requirement and the result *narrower*; parameter names are not significant
 for matching. Implementing the same protocol twice for one type in a single
 program is `protocol-implementation-duplicate`; a later run replaces.
+
+### Conforming a sum type {#conforming-a-sum-type}
+
+A sum type (`type light = red | green | yellow`) is a name for the union of
+its variants, and a union cannot conform. Write the conformance for the sum
+anyway: it declares the conformance once **for each variant**, with the
+same implementation block, and `Self` is that variant in each of them. It
+is the same as writing the block once per variant:
+
+```epsil-live
+protocol Area { function area(self: Self) -> number }
+
+type shape = circle(r: number) | square(s: number)
+
+type shape is Area {
+  function area(self: Self) -> number {
+    match self {
+      circle(r) => 3 * r * r
+      square(s) => s * s
+    }
+  }
+}
+
+area(square(3))
+// ➔ 9
+```
+
+Because the conformance is per variant, dispatch is unchanged: a value of
+any variant finds the implementation, and each variant may still be given
+its own block instead.
+
+Three rules follow from that:
+
+- If a variant already has its own implementation of the protocol, the sum
+  block is a second implementation of that variant:
+  `protocol-implementation-duplicate`, naming the variant. Nothing is
+  registered — the sum spelling is all or nothing.
+- A variant the sum gains **later** — a second `type shape = … | triangle`
+  statement in a later program or notebook cell — is given the same
+  implementation as it is declared.
+- A generic sum (`type tree<T> = leaf | node(value: T, kids: list<tree<T>>)`)
+  cannot be written this way: each variant is declared with only the type
+  parameters its own payload uses, so there is no one spelling that fits
+  every variant. Write the conformance for each variant.
 
 ## Calling a protocol function
 
@@ -6124,7 +6577,7 @@ function is expected:
 protocol Negatable { function negated(self: Self) -> Self }
 type number is Negatable { function negated(self) -> number { -self } }
 
-Map(Negatable.negated, [1, 2, 3])
+map(Negatable.negated, [1, 2, 3])
 // ➔ [-1, -2, -3]
 ```
 
@@ -6133,6 +6586,53 @@ functions in both spellings, and the call dispatches on the argument bound
 to the declared first parameter wherever it is written:
 `tag(prefix: "n", self: 5)` and `Tagged.tag(prefix: "n", self: 5)` both
 dispatch on `5`.
+
+### The dot form: `c.area()` {#dot-call}
+
+A protocol function can also be called **with the dot**, the value first:
+`c.area()` is exactly `area(c)`, and `c.scale(2)` is `scale(c, 2)`. The
+value before the dot becomes the first argument, which is the argument the
+call dispatches on. Because any expression can be the receiver, calls
+chain from left to right:
+
+```epsil-live
+protocol Shape {
+  function area(self: Self) -> number
+  function scale(self: Self, k: number) -> Self
+}
+type Circle = tuple<r: number> is Shape {
+  function area(self: Circle) -> number { pi * self.r^2 }
+  function scale(self: Circle, k: number) -> Circle { Circle(self.r * k) }
+}
+
+let c = Circle(1)
+(c.area(), c.scale(2).area(), c.scale(k: 2))
+// ➔ (pi, 4pi, Circle(2))
+```
+
+The parentheses are what make the dot a call. Without them, `c.area` is a
+field or [property](#properties) read, and on a `function` member it is
+the `protocol-function-not-a-field` error; `c.area` is never a function
+value that remembers `c`. And the dot reaches **members** only: a field, a
+property, or a protocol function. A library function or a plain function is
+not a member of anything, so `xs.Sort()` is the error
+`dot-call-not-a-protocol-function`; write `sort(xs)`, or chain such calls
+with the [pipe](/operators/#pipe), `xs |> sort |> reverse`.
+
+Two details follow from the rest of the language. A field the receiver's
+type declares wins over a protocol function of the same name, so on a
+record or object whose field `f` holds a function, `v.f(2)` still calls the
+stored function. And a number literal never takes a dot (`5.name()` reads as
+`5.` followed by `name()`, the same rule that makes `2.x` a multiplication):
+bind the number to a name first.
+
+When two protocols the type conforms to declare the same member, the bare
+call and the dot form are both `protocol-call-ambiguous`; the qualified
+dot form names the protocol: `c.(Shape.area)()`. And because the dot names
+a member, it reaches the protocol even when a definition of your own has
+taken the bare name (see [above](#when-the-bare-name-is-taken-qualify)):
+with your own `area` in scope, `area(c)` calls yours and `c.area()` still
+calls the protocol's.
 
 ## Properties
 
@@ -6228,7 +6728,7 @@ type integer is Summable { function total(self) -> number { self } }
 
 type list<T> is Summable where T is Summable {
   function total(self: list<T>) -> number {
-    Reduce(self, (acc, x) => acc + total(x), 0)
+    reduce(self, (acc, x) => acc + total(x), 0)
   }
 }
 
@@ -6251,7 +6751,7 @@ inferred from its body instead:
 protocol Summable { function total(self: Self) -> number }
 
 type list<T> is Summable where T: number {
-  function total(self: Self) pure -> number { Sum(self) }
+  function total(self: Self) pure -> number { sum(self) }
 }
 ```
 
@@ -6373,14 +6873,14 @@ Some common environment variables include:
 
 `#env()` reads host state and is therefore disabled by default: without
 opting in, it produces a `host-pragma-disabled` diagnostic and the value
-`Nothing`. A trusted host can enable it.
+`nothing`. A trusted host can enable it.
 
 ### Navigator Properties
 
 Navigator properties are available when parsing takes place in a browser.
 
 Use `#navigator()` to read a property of the browser's `navigator` object. Like
-`#env()`, it is disabled unless the host opts in. It returns `Nothing` when the
+`#env()`, it is disabled unless the host opts in. It returns `nothing` when the
 browser property is
 not available.
 
@@ -6413,9 +6913,9 @@ The following pragmas are replaced with the indicated value:
 
 - `#line`: the current source line number. The first line is line 1.
 - `#column`: the current column number. The first column is column 1.
-- `#url`: the source URL the host supplied for the program, or `Nothing` when
+- `#url`: the source URL the host supplied for the program, or `nothing` when
   none was.
-- `#filename`: the final path component of the source URL, or `Nothing` when no
+- `#filename`: the final path component of the source URL, or `nothing` when no
   URL was supplied.
 - `#date`: the current date in the `YYYY-MM-DD` format.
 - `#time`: the current time in the `HH:MM:SS` format.
@@ -6596,8 +7096,12 @@ _field-clause_ → **`.`** _symbol_
 &nbsp;&nbsp;&nbsp;&nbsp;— the `.` must abut the base; not after a number
 literal
 
-_postfix-expression_ → _primary_ (_call-clause_ | _index-clause_ |
-_field-clause_ | **`!`**)\*
+_member-call-clause_ → _field-clause_ _call-clause_
+&nbsp;&nbsp;&nbsp;&nbsp;— the `(` must abut the member name; a protocol
+function called on the base, `c.area(2)`
+
+_postfix-expression_ → _primary_ (_member-call-clause_ | _call-clause_ |
+_index-clause_ | _field-clause_ | **`!`**)\*
 
 _expression_ → _primary_ | _prefix-expression_ | _infix-expression_ |
 _postfix-expression_
@@ -6856,6 +7360,16 @@ the number, so `2.x` is the multiplication `2. * x`, and `1..5` stays a
 range. See [Types](/types/#values-of-a-new-type-are-opaque) for what
 `p.x` means on values of declared types, records and dictionaries.
 
+A field clause immediately followed — again with no whitespace — by a
+parenthesized argument list is a **member call**: `c.area()` calls the
+protocol function `area` with `c` as its first argument, the same call as
+`area(c)`, and `c.scale(2)` is `scale(c, 2)`. Only a protocol function is
+reached this way; on a value whose type declares a field of that name, the
+form keeps meaning "read the field, then call what it holds" (`p.x(2)`
+above). The parenthesized read `(c.area)(2)` is that field read applied to
+arguments, never a member call. See
+[Protocols](/protocols/#dot-call).
+
 In all three cases the `(`, `[` or `.` must directly abut the
 callee/indexed expression: whitespace before it means the form is a
 separate primary (or, for `.`, a diagnosed stray token), not a
@@ -7081,6 +7595,16 @@ Use `Floor(a / b)` for the integer quotient.
 
 To stop a pipeline early, restructure with a condition or a Take/Filter stage instead of breaking out of a callback.
 
+## `match-not-exhaustive`
+
+A `match` whose subject has a CLOSED type — a sum declared with `type light = red | green | yellow`, or `boolean` — has no case for some of the values the subject can hold; the message spells each uncovered value as the pattern that would match it (`yellow()`, `node(_, _)`, `false`). Such a subject evaluates to the `match-no-case` error value, which is rarely what was meant.
+
+Add a case for each uncovered value, or a final `_` case if they share a result. A case covers a value only when it matches it UNCONDITIONALLY: a constructor pattern whose operands are all wildcards or bindings (`node(v, cs)`, `node(v, ...)`), a typed binding (`x: green`), a wildcard or bare binding, or an or-alternative of those. A case with an `if` guard, a literal operand (`lit(0)`) or a pin (`== value`) is conditional and counts for nothing, because the check does not reason about conditions.
+
+The check reads the subject's type from its annotation — a parameter (`function f(t: light)`), a typed `let`/`const`, or a typed `match` binding — and only ever reports a type it can enumerate from a declaration. A subject without an annotation, or of an open type (`integer`, `string`, a union with a member that is not a variant such as `light | nothing`), is never reported. It is a warning: the program still runs.
+
+No warning does not make the `match` total. A `boolean` subject that stays symbolic (an undecided comparison) is neither `true` nor `false`, and a declared name with no value (`let u: light` without an initializer) is not one of its constructors; both reach no case even when every alternative is covered. A final `_` case handles them.
+
 ## `symbol-expected`
 
 A name was required at this position — after `let` or `const`, as a `for` loop's variable, as a function's or parameter's name — but something else was found there (`let = 42`).
@@ -7113,6 +7637,14 @@ A lambda and its type annotation name the same parameter differently — `const 
 
 Rename one side so the two agree — the quick fix renames the annotation's parameters to match the lambda's — or leave the annotation's parameters unnamed (`(number) -> number`): an annotation's parameter names are optional documentation, while the lambda's are the real binding.
 
+## `variable-redeclaration`
+
+A `let` or `const` declares a name that the same scope already declares: an earlier `let`/`const` of the same block or program, a parameter of the function whose body this is, or the index of the loop whose body this is. In `function f(x) { let x = x + 1 … }` the second `x` is such a re-declaration.
+
+A second declaration in one scope is a mistake in practice — a `let` where an assignment was meant, or a copied line — and the language cannot tell it from a legitimate second run of the same statement (a loop body on its next turn), so it used to overwrite the binding without a word. To update a binding, assign to it: `x = x + 1`. To hold a second value, choose another name.
+
+A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k = 1 … } }` and a closure body that declares a name its enclosing scope also has are ordinary shadowing, and stay legal. The initializer of such a shadowing `let` reads the OUTER name. Across programs — a re-run notebook cell, a later REPL line — a top-level `let` re-declares legally; only a repeat within one program is reported.
+
 ## `function-redefinition`
 
 Two clauses of one function in a single program have the same dispatch domain, so the second would silently replace the first — `f(x) = x` followed by `f(x) = 2 * x`. Parameter NAMES are not part of a clause's identity: `g(n) = n` then `g(m) = 2 * m` collides all the same, so renaming a parameter never resolves this error.
@@ -7143,9 +7675,17 @@ A `type` statement appears inside a block or a function body. Types are engine-g
 
 A protocol's `function` member was read with a dot, as if it were a field or a property.
 
-A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot: `b.area`. So `b.span` is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to.
+A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`, or with the dot and parentheses, `b.span()`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot and no parentheses: `b.area`. So `b.span` — no parentheses — is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to. The parentheses are what make the dot a call; `b.span` is never a function value bound to `b`.
 
 The mirror mistake, calling a property (`area(b)`), is reported as `protocol-property-not-callable`.
+
+## `dot-call-not-a-protocol-function`
+
+A function that is not a protocol member was called with a dot, as in `xs.Sort()`.
+
+The dot reaches the MEMBERS of a value: its fields, its protocol properties, and — with parentheses — its protocol functions. `c.area()` calls the protocol function `area` with `c` as its first argument, and is the same call as `area(c)`. A library function or a plain user function is not a member of anything, so it is not reached this way: write the call directly, `Sort(xs)`, or pipe the value into it, `xs |> Sort`. Pipelines are the spelling for chaining such functions: `xs |> Sort |> Reverse`.
+
+To make a function callable with the dot, declare it in a `protocol` and conform the type to that protocol.
 
 ## `protocol-declaration-not-top-level`
 
@@ -7158,6 +7698,16 @@ Runtime problems in Epsil are VALUES, not exceptions: a failing subexpression ev
 The parenthesized chain in the message ("in Characters argument 1, in Map argument 2") is the propagation path, innermost first — where the error was born, then the calls it traveled through. The caret in the report points at the innermost location the source can show.
 
 Only the last statement's value is a program's result, so an error produced by an EARLIER statement would vanish silently; that is why it is reported as a diagnostic. The final statement's error simply is the program's value.
+
+A program produces an error value of its own with `RuntimeError("code")` (or `RuntimeError(ErrorCode("code", details))`). Do not write `Error("code")` for that: a written `Error` is a STATIC diagnostic node and marks the expression around it as invalid, so a function whose body spells one is never defined.
+
+## `capability-denied`
+
+The program used a capability of the host — the quoted name, for example `console` for `print` and `input` — and the host that runs the program does not allow it. The call evaluates to this error value instead of reaching the host; nothing was printed or read.
+
+Which capabilities a program may use is a decision of the embedding application, not of the program: an application that runs programs it does not trust denies the capabilities they must not reach. There is nothing to fix in the program except to remove the call, or to run the program in a host that allows the capability.
+
+For the author of the host: capabilities are the handlers of `ce.effects`. A handler set to `null` is a denial; `ce.withEffects({ console: null }, () => …)` denies one for the duration of a callback.
 
 ## `static-type-error`
 
@@ -7247,7 +7797,7 @@ can be made directly executable with a hashbang:
 #!/usr/bin/env epsil
 
 let radius = 3
-Pi * radius^2
+pi * radius^2
 ```
 
 ## Options
@@ -7257,24 +7807,36 @@ Pi * radius^2
 | `-e`, `--eval <source>` | Evaluate Epsil source supplied on the command line. |
 | `--json` | Write the result as formatted [MathJSON](/implementation/), the representation Epsil programs are evaluated in. Finite lazy collections (`Range`, `Map` results, …) are materialized into their elements, up to 10,000. |
 | `--epsil` | Write the result as serialized Epsil source. |
+| `--fancy-symbols` | With `--epsil`, write the Unicode notations instead of the ASCII spellings: `√x` for `sqrt(x)`, `∛x` and `∜x` for cube and fourth roots, `x²` for `x ^ 2`, and `×`, `÷`, `−`, `≠`, `⩽`, `⩾`, `∈`, `⇒` for the operators. Every notation reads back to the same expression. |
 | `--diagnostics <fmt>` | Write diagnostics as `text` (the default) or as a `json` array. |
 | `--time-limit <ms>` | Set the evaluation deadline in milliseconds. The default is `10000`; `0` disables it. |
 | `--no-color` | Disable color in diagnostics. The [`NO_COLOR`](https://no-color.org/) environment variable is also honored. |
 | `-h`, `--help` | Display command help. |
 | `-v`, `--version` | Display the package version. |
 
-`--json` and `--epsil` are mutually exclusive. With neither option, results
-use the ordinary textual representation of a value.
+`--json` and `--epsil` are mutually exclusive, and `--fancy-symbols` requires
+`--epsil`. With neither output option, results use the ordinary textual
+representation of a value.
+
+```bash
+$ npx epsil --epsil -e 'Sqrt(2) * x^2'
+Sqrt(2) * x ^ 2
+$ npx epsil --epsil --fancy-symbols -e 'Sqrt(2) * x^2'
+√2 × x²
+```
 
 ## Checking a Program Without Evaluating It
 
 `epsil check` parses a program and reports its diagnostics — syntax errors,
-malformed strings, invalid type annotations, `match` shape problems, and the
+malformed strings, invalid type annotations, `match` shape problems (a
+`match` over a sum type that leaves a variant uncovered included), and the
 trap lints (`=` inside a call argument, a literal index `0`, a `//` comment
 that reads as floor division) — without evaluating anything. It also prepares
 the program to run (still without running it) and reports the problems that
-surface there — type errors such as `"a" + 1`, but also a wrong argument
-count — as `static-type-error` diagnostics anchored to the offending statement.
+surface there — type errors such as `"a" + 1`, a wrong argument count, or a
+call whose argument cannot satisfy a parameter annotation of the function it
+names (`let k = (n: integer) => n + 1` then `k(1.5)`) — as
+`static-type-error` diagnostics anchored to the offending statement.
 An `Error(…)` value the program itself builds is not reported: errors are
 values. It accepts the same source forms as evaluation: a file,
 `--eval`, or standard input.
@@ -7312,6 +7874,37 @@ $ npx epsil check --eval 'a+ b' --json
 are 1-based. A `fixits` entry is a replacement (`value`) for the source range
 `[start, end)`. The same structured form is available during evaluation with
 `--diagnostics json`, which writes the array to standard error.
+
+### Reporting the effects of each function
+
+With `--effects`, `check` also reports what the engine inferred about the
+**effects** of each top-level function the program defines — a `function`
+statement (any of its spellings), or a `let`/`const` whose value is written
+as a lambda. The report goes to standard output, one line per function:
+
+```shell
+$ npx epsil check --effects --eval 'function f(x) { Print(x); x + 1 }
+function g(x) pure { x * 2 }
+let k = x => Random() + x'
+f (line 1): console
+g (line 2): pure (declared)
+k (line 3): random
+```
+
+The labels are the [effect labels](/control-flow/#effect-specifiers) the body
+reaches (`console`, `random`, `state`, …), `pure` when there are none, and
+`any` when the body calls something the engine does not know, so nothing can
+be ruled out. `(declared)` marks a contract the author wrote on the
+definition (`pure`, `random`, …); the labels are then what the author
+promised, which the check has verified against the body. A multi-clause
+function is one entry, the union of its clauses, at the line of its first
+clause. Functions defined inside a block are not listed.
+
+With `--json`, the same report is the `effects` array of the envelope:
+`name`, `effects` (a list of labels, or `"any"`, or `null` when nothing could
+be inferred), `declared`, and the position of the name (`start`/`end`
+offsets, `line`/`column`). The MCP `check` tool accepts `"effects": true` for
+the same array.
 
 Because `check` does not evaluate, it does not report runtime problems —
 unknown-function suggestions, type mismatches at call sites, or error values.
@@ -7491,8 +8084,9 @@ behavior may change between releases.
 
 ## Installation
 
-The extension is not yet published to the Visual Studio Code Marketplace. To
-install it from the repository:
+The extension is available on the Visual Studio Code Marketplace. 
+
+You can also install it from the repository:
 
 ```shell
 git clone https://github.com/cortex-js/compute-engine.git
@@ -7508,9 +8102,10 @@ Reinstall the `.vsix` after pulling changes to the extension.
 ## Editing
 
 Opening a file with the `.epsil` extension activates the language support.
-Highlighting follows the conventions of the language: capitalized identifiers
-(`Sin`, `Simplify`) are library operators, lowercase identifiers are user
-symbols, and merely-reserved words are not highlighted as keywords.
+Highlighting marks the keywords, the literal words, the type names, the
+operators and the big-operator glyphs (`∫`, `∑`, `∏`). Identifiers are not
+colored — a library name (`sin`, `simplify`) and a name you declare look the
+same — and merely-reserved words are not highlighted as keywords.
 
 Diagnostics appear inline (squiggles) and in the Problems panel. They are the
 same diagnostics `epsil check` reports: syntax errors, lints such as
@@ -7520,7 +8115,7 @@ long-running computation in a file does not affect editing.
 
 ```epsil
 let radius = 1/2
-let area = Pi * radius^2
+let area = pi * radius^2
 N(area)
 ```
 
@@ -7725,11 +8320,11 @@ and monitoring.
 
 | Tool        | Purpose                                                        |
 | :---------- | :------------------------------------------------------------- |
-| `evaluate`  | Run an Epsil program and return its value — as display text, Epsil source, and [MathJSON](/implementation/) — along with any diagnostics |
-| `check`     | Validate a program's syntax without evaluating it              |
+| `evaluate`  | Run an Epsil program and return its value — as display text, Epsil source, and [MathJSON](/implementation/) — along with any diagnostics; `fancySymbols: true` writes the Epsil source with the Unicode notations (`√x`, `x²`, `×`, `⩽`, …) |
+| `check`     | Validate a program without evaluating it; `effects: true` adds the inferred effects of each top-level function |
 | `doc`       | Look up a library function by name, or search the library by keywords |
 | `parse`     | Convert Epsil source to MathJSON                              |
-| `serialize` | Convert MathJSON to Epsil source                              |
+| `serialize` | Convert MathJSON to Epsil source; `fancySymbols: true` for the Unicode notations |
 
 The server also publishes the [language card for AI agents](/for-agents/)
 as a resource (`epsil://docs/for-agents`), and its setup instructions tell
@@ -7744,7 +8339,7 @@ mention Epsil if it doesn't reach for the tools on its own:
 - _"Use Epsil to compute the exact value of the sum of 1/k² for k from 1
   to 100."_
 - _"Solve x³ − 6x² + 11x − 6 = 0 exactly with Epsil."_
-- _"What does the Epsil function `Reduce` do?"_
+- _"What does the Epsil function `reduce` do?"_
 
 The assistant writes a small Epsil program, runs it with the `evaluate`
 tool, and reports the result — exact fractions, radicals, and symbolic
@@ -7791,7 +8386,7 @@ output verified — the examples cannot drift from the implementation. Epsil is
 
 Epsil is a programming language for scientific computing built on the Compute
 Engine. It is **symbolic and exact by default**: `1/3` is the rational one
-third, not `0.333…`, and `Ln(2)` or `Sqrt(2)` stay symbolic. Ask for a decimal
+third, not `0.333…`, and `ln(2)` or `sqrt(2)` stay symbolic. Ask for a decimal
 explicitly with `N(expr)`. A program is a sequence of statements (separated by
 newlines or `;`); its result is the **value of the last statement**. There is
 no `print` — produce the value you want as the final statement. Runtime
@@ -7808,11 +8403,14 @@ deviation"`. Add `--diagnostics json` to a run for machine-readable runtime
 diagnostics. Embed via `executeEpsil(ce, source)` from
 `@cortex-js/compute-engine/epsil`. See [CLI](/cli/).
 
-**Naming convention**: `Capitalized` names are library operators (`Sin`,
-`Map`, `Simplify`); `lowercase` names are your variables and functions.
-Calling an unknown function is not an error — the call stays symbolic (a
-warning diagnostic with a did-you-mean suggestion fires when a close library
-name exists, e.g. `len` → `Length`).
+**Naming convention**: library operators are written in lowercase (`sin`,
+`map`, `simplify`, `pi`) and also answer to their MathJSON names (`Sin`,
+`map`, `simplify`, `pi`). Your variables and functions are lowercase too and
+shadow a library name by scope (`let sum = 0` makes `sum` a variable).
+Operators with their own syntax have no lowercase spelling (`Add` is `+`,
+`If` is `if`, `List` is `[…]`). Calling an unknown function is not an
+error — the call stays symbolic (a warning diagnostic with a did-you-mean
+suggestion fires when a close library name exists, e.g. `len` → `length`).
 
 ## Core Syntax
 
@@ -7827,8 +8425,8 @@ function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
   t * 2                   // a block's value is its last expression
 }
-hold h(e) = Head(e)       // hold: arguments arrive UNEVALUATED (h(x + 1) ➔ Add)
-hold mySum(body, bind i, n) = Sum(body, (i, 1, n))  // bind: a bound-variable slot; mySum(k^2, k, 3) ➔ 14
+hold h(e) = head(e)       // hold: arguments arrive UNEVALUATED (h(x + 1) ➔ Add)
+hold mySum(body, bind i, n) = sum(body, (i, 1, n))  // bind: a bound-variable slot; mySum(k^2, k, 3) ➔ 14
 function op(a, b) commutative associative -> number { a + b }  // algebraic words in the specifier slot
 /// A doc comment right before a definition is its description (About, hover)
 let parity = "even" if x % 2 == 0 else "odd"  // conditional expression; if is also an expression: if c { a } else { b }
@@ -7853,7 +8451,7 @@ g(x) + f(2)
   component); a matrix (list of lists)
   indexes as `m[2, 1]` or `m[2][1]`.
 - **Spread**: in a call argument list, `...t` splices a **tuple**'s elements
-  in as positional arguments (`f(...p)`, `Max(...t)`, `g(1, ...p, ...q)`).
+  in as positional arguments (`f(...p)`, `max(...t)`, `g(1, ...p, ...q)`).
   Tuples only — spreading a list is an `incompatible-type` error — and `...`
   is valid nowhere else.
 - **Destructuring**: `let (q, r) = divmod(17, 5)` binds a tuple's components
@@ -7884,8 +8482,8 @@ actually happens → write instead:**
 | Reflex | What happens in Epsil | Write instead |
 |:--|:--|:--|
 | `xs[0]` for first element | **Silently** yields `NaN` — indexing is **1-based** | `xs[1]`; negative indices work: `xs[-1]` is the last element |
-| `7 // 2` floor division | **Silent wrong value**: `//` starts a comment, so this is just `7` | `Floor(7 / 2)` |
-| `7 / 2` integer division | Exact rational `7/2`, not `3` or `3.5` | `Floor(7 / 2)` for `3`; `N(7 / 2)` for `3.5` |
+| `7 // 2` floor division | **Silent wrong value**: `//` starts a comment, so this is just `7` | `floor(7 / 2)` |
+| `7 / 2` integer division | Exact rational `7/2`, not `3` or `3.5` | `floor(7 / 2)` for `3`; `N(7 / 2)` for `3.5` |
 | `range(1, 5)` excludes end | Inert call + did-you-mean; `Range(1, 5)` **includes** 5: `[1,2,3,4,5]` | `Range(1, n)` or `1..n` for 1…n inclusive |
 | `x = 5` at top level | Assigns — `=` assigns only as a whole statement with a name on the left | `x == 5` for the equation |
 | `# comment` | Diagnostic (`#` introduces pragmas) | `// comment` or `/* … */` |
@@ -7895,14 +8493,14 @@ actually happens → write instead:**
 | `return` | Reserved word, **not implemented** | A block's value is its last expression |
 | `break` / `continue` | Work as expected inside a `while`/`for` body; the loop context resets at every function and lambda boundary | *(nothing to change)* |
 | `print(x)` | Inert unknown call; nothing prints | The program's value is its **last statement** |
-| `len(xs)` | Inert + did-you-mean | `Length(xs)` |
-| `s[0]` / `len(s)` on a string | Works — a string is a collection of its characters (grapheme clusters), 1-based | `s[1]`, `Length(s)` |
-| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `Join(a, b)` |
-| `xs[2] = 9` | Runtime error value — no element assignment; collections are immutable values | Rebuild: `Map`, `Join(xs, [v])`, `Append(xs, v)` |
+| `len(xs)` | Inert + did-you-mean | `length(xs)` |
+| `s[0]` / `len(s)` on a string | Works — a string is a collection of its characters (grapheme clusters), 1-based | `s[1]`, `length(s)` |
+| `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `join(a, b)` |
+| `xs[2] = 9` | Runtime error value — no element assignment; collections are immutable values | Rebuild: `map`; in a loop, `listFrom(join(xs, [v]))` |
 | `and` / `or` / `not` | Parse diagnostics (reserved words) | `&&`, `\|\|`, `!` |
-| `x**0.5` habits: `x^1/2` | Parses as `(x^1)/2` — precedence, not a root | `Sqrt(x)` or `x^(1/2)` |
-| `math.floor`, `np.mean` | No modules/namespaces | Everything is global: `Floor`, `Mean`, `Sin`, … |
-| `for` loop building a value | Loops are for **effect**; their value is `Nothing` | Accumulate into a `let`, or use `Map`/`Filter`/`Reduce` |
+| `x**0.5` habits: `x^1/2` | Parses as `(x^1)/2` — precedence, not a root | `sqrt(x)` or `x^(1/2)` |
+| `math.floor`, `np.mean` | No modules/namespaces | Everything is global: `floor`, `mean`, `sin`, … |
+| `for` loop building a value | Loops are for **effect**; their value is `nothing` | Accumulate into a `let`, or use `map`/`filter`/`reduce` |
 | f-strings / template literals | Backtick is the verbatim-symbol quote; `${}` invalid | `"x is \(x)"` works in any string |
 
 Comfortable habits that **do** transfer: `**` is an accepted alias of `^`
@@ -7914,12 +8512,15 @@ work; `2 in [1, 2, 3]` works; lowercase `true`/`false` are accepted
 
 ## Verified Idioms
 
+The [Style Guide](/style/) states each idiom with its reason; this
+section is the short form.
+
 Exactness and numeric approximation:
 
 ```epsil
 let exact = 1/3 + 1/6      // stays the exact rational 1/2
-let sym = Sqrt(2) * Sqrt(2) // symbolic radicals reduce exactly
-"\(exact), \(sym), \(N(Pi, 10))"
+let sym = sqrt(2) * sqrt(2) // symbolic radicals reduce exactly
+"\(exact), \(sym), \(N(pi, 10))"
 // ➔ "1/2, 2, 3.141592654"
 ```
 
@@ -7934,16 +8535,16 @@ add10(fact(5))
 // ➔ 130
 ```
 
-Collections pipeline — `Map`/`Filter`/`Reduce` for value-producing iteration,
+Collections pipeline — `map`/`filter`/`reduce` for value-producing iteration,
 `|>` to chain; `1..n` is an inclusive range:
 
 ```epsil
-1..10 |> Filter(_, k => k % 2 == 0) |> Map(k => k^2, _)
+1..10 |> filter(_, k => k % 2 == 0) |> map(k => k^2, _)
 // ➔ [4, 16, 36, 64, 100]
 ```
 
 ```epsil
-Reduce([1, 2, 3, 4], (acc, x) => acc + x, 0) + Sum(1..100)
+reduce([1, 2, 3, 4], (acc, x) => acc + x, 0) + sum(1..100)
 // ➔ 5060
 ```
 
@@ -7961,11 +8562,13 @@ a
 // ➔ 21
 ```
 
-Building a list in a loop (each `[k]` literal snapshots the current value):
+Building a list in a loop — spread the old list into a new literal (each
+literal snapshots the current value); never `join(xs, [k])` on every turn,
+which nests a lazy recipe per turn and takes seconds by a thousand elements:
 
 ```epsil
 let xs = []
-for k in 1..3 { xs = Join(xs, [k * k]) }
+for k in 1..3 { xs = [...xs, k * k] }
 xs
 // ➔ [1, 4, 9]
 ```
@@ -7986,10 +8589,10 @@ classify(-5)
 Symbolic computation:
 
 ```epsil
-let poly = Simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
-let roots = Solve(x^2 + x - 6 == 0, x)
+let poly = simplify(2 + 3x^3 + 2x^2 + x^3 + 1)
+let roots = solve(x^2 + x - 6 == 0, x)
 let deriv = D(x^3 + x, x)
-let area = Integrate(Sin(x), (x, 0, Pi))
+let area = integrate(sin(x), (x, 0, pi))
 (poly, roots, deriv, area)
 // ➔ (4x^3 + 2x^2 + 3, [2,-3], 3x^2 + 1, 2)
 ```
@@ -7998,7 +8601,7 @@ Lists, slices, and common operators (all indexing is 1-based):
 
 ```epsil
 let xs = [10, 20, 30, 40]
-(xs[1..2], First(xs), Last(xs), Sort([3, 1, 2]), IndexOf(xs, 30))
+(xs[1..2], first(xs), last(xs), sort([3, 1, 2]), indexOf(xs, 30))
 // ➔ ([10,20], 10, 40, [1,2,3], 3)
 ```
 
@@ -8007,65 +8610,66 @@ keys):
 
 ```epsil
 let d = {one -> 1, two -> 2}
-(d.two, d["two"], IsMissing(d.missing), Coalesce(d.missing, 0))
+(d.two, d["two"], isMissing(d.missing), Coalesce(d.missing, 0))
 // ➔ (2, 2, True, 0)
 ```
 
 An absent numeric field evaluates to `NaN`; an absent nonnumeric field remains
-`Missing`. `IsMissing` recognizes both forms.
+`missing`. `isMissing` recognizes both forms.
 
 ## Library Quick Roster
 
-Verified operator names, so you don't have to guess (search for more with
-`epsil doc <keywords>`):
+Verified operator names, so you don't have to guess. The complete index, by
+category with signatures, is the [Standard Library](/library/) page;
+search by concept with `epsil doc <keywords>`.
 
-- **Numbers**: `Abs`, `Floor`, `Ceil` (not `Ceiling`), `Round`, `Sqrt`,
-  `Max`, `Min` (each takes a list or varargs), `Mod`, `GCD`, `LCM`,
-  `IsPrime`, `Random(a..b)`.
-- **Lists**: `Length`, `First`, `Last`, `Rest`, `Take`, `Drop`, `Reverse`,
-  `Sort` (optional comparator — see below), `IndexOf`, `Join`, `Append`,
-  `Sum`, `Mean`, `StandardDeviation` (sample, n−1), `Map`, `Filter`,
-  `Count(xs)` / `Count(xs, v)` / `Count(xs, pred)`,
-  `Reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
-- **Strings**: `Characters`, `StringSplit(s)` (splits on whitespace by
-  default), `String(x)`, `Join(a, b)` to concatenate strings,
+- **Numbers**: `abs`, `floor`, `ceil` (not `Ceiling`), `round`, `sqrt`,
+  `max`, `min` (each takes a list or varargs), `Mod`, `gcd`, `lcm`,
+  `isPrime`, `random(a..b)`.
+- **Lists**: `length`, `first`, `last`, `rest`, `take`, `drop`, `reverse`,
+  `sort` (optional comparator — see below), `indexOf`, `join`, `append`,
+  `sum`, `mean`, `standardDeviation` (sample, n−1), `map`, `filter`,
+  `count(xs)` / `count(xs, v)` / `count(xs, pred)`,
+  `reduce(list, f, init)`, `Range(a, b)` inclusive, `Range(a, b, step)`.
+- **Strings**: `characters`, `stringSplit(s)` (splits on whitespace by
+  default), `String(x)`, `join(a, b)` to concatenate strings,
   `StringJoin(xs, sep?)` to join ONE collection with an optional separator
-  (a string subject means its characters, so `StringJoin("ab", "cd")` is
-  `"acdb"`, not `"abcd"` — use `Join` or `"\(a)\(b)"` to concatenate).
-  Substring search is `RangeOf(s, needle)` (a span, or `Nothing`),
-  `ContainsSequence`, `StartsWith`, `EndsWith` — `c in s` is *character*
+  (a string subject means its characters, so `stringJoin("ab", "cd")` is
+  `"acdb"`, not `"abcd"` — use `join` or `"\(a)\(b)"` to concatenate).
+  Substring search is `rangeOf(s, needle)` (a span, or `nothing`),
+  `containsSequence`, `startsWith`, `endsWith` — `c in s` is *character*
   membership. Also `StringReplace(s, target, replacement, count?)`,
-  `Trim`/`TrimStart`/`TrimEnd`, `StringRepeat`, `PadStart`/`PadEnd`,
-  `ToUpperCase`/`ToLowerCase`/`CaseFold`, `StringCompare(a, b)` (`-1/0/1`,
+  `trim`/`trimStart`/`trimEnd`, `stringRepeat`, `padStart`/`padEnd`,
+  `toUpperCase`/`toLowerCase`/`caseFold`, `stringCompare(a, b)` (`-1/0/1`,
   code-point order) and `NumberFrom(s, base?)`.
-- **Dictionaries**: `Keys`, `Values`.
-- **Absence**: `Missing` preserves a missing position; `Nothing` is omitted
-  from arguments and collections; `IsMissing`, `Coalesce`.
-- **Symbolic**: `Simplify`, `HoldValues(body)` (evaluate `body` with its
-  assigned symbols kept symbolic), `Solve(eq == v, x)`, `D(expr, x)`,
-  `Derivative(f)`, `Integrate`, `N`, `Type`, `IsError(x)` (true for an error
+- **Dictionaries**: `keys`, `values`.
+- **Absence**: `missing` preserves a missing position; `nothing` is omitted
+  from arguments and collections; `isMissing`, `Coalesce`.
+- **Symbolic**: `simplify`, `HoldValues(body)` (evaluate `body` with its
+  assigned symbols kept symbolic), `solve(eq == v, x)`, `D(expr, x)`,
+  `derivative(f)`, `integrate`, `N`, `type`, `isError(x)` (true for an error
   value, or an expression carrying one).
 
-Caution: `Head` and `Tail` exist but are **structural** operators
-(`Head([1,2,3])` is the *operator name* `"List"`, not the first element) —
-for elements use `First`/`Rest`.
+Caution: `head` and `tail` exist but are **structural** operators
+(`head([1,2,3])` is the *operator name* `"List"`, not the first element) —
+for elements use `first`/`rest`.
 
 ```epsil
-Sort([3, 1, 4, 1, 5], (a, b) => a > b)
+sort([3, 1, 4, 1, 5], (a, b) => a > b)
 // ➔ [5,4,3,1,1]
 ```
 
 ## Watch Out For
 
-- **Laziness**: `Range`, `Map`, `Filter`, `Take`, `Drop`, `Join` are
+- **Laziness**: `Range`, `map`, `filter`, `take`, `drop`, `join` are
   generators — they enumerate when materialized (indexed, aggregated, or
-  iterated; e.g. a `Take(xs, 3)` stored inside a tuple stays an unevaluated
+  iterated; e.g. a `take(xs, 3)` stored inside a tuple stays an unevaluated
   `Take(...)`), and a deferred mapping function reads variables **at
   materialization time**. Collection *literals* snapshot their element values
   immediately. To force work now, aggregate or index where you stand.
 - **Output is the engine's textual form**: strings and booleans print
   *quoted* (`"True"`, `"florb"`) — that quoted `"True"` is a boolean, not a
-  string. Derived collections (`Range`, `Map`/`Filter` results, loop-built
+  string. Derived collections (`Range`, `map`/`filter` results, loop-built
   lists) preview-elide above 10 elements (`[1,2,3,4,5,...,]`); the value is
   complete — the CLI's `--json` output materializes the full elements (up to
   10,000). Literals print in full.
@@ -8075,7 +8679,7 @@ Sort([3, 1, 4, 1, 5], (a, b) => a > b)
   (call-by-name: `hold twice(e) = e + e` evaluates `e` twice; `let v = e`
   once). Every parameter of a hold function is held; there is no
   per-parameter form.
-- **Binder variables stay symbolic**: `D(expr, x)` and `Integrate(expr, x)`
+- **Binder variables stay symbolic**: `D(expr, x)` and `integrate(expr, x)`
   treat `x` symbolically even if `x` has an assigned value; the *result*
   then evaluates with the value. So `let x = 2` followed by
   `N(D(x^3 + x, x))` is `13` — the derivative is taken first.
@@ -8092,8 +8696,12 @@ Sort([3, 1, 4, 1, 5], (a, b) => a > b)
 - **`3!^2` is a diagnostic** — the lexer reads `!^` as one operator token.
   Space it: `3! ^ 2`.
 - **`match` binds bare names**: `match x { Pi => … }` does not compare with π
-  — it binds a new variable named `Pi`. Pin values with `==`:
+  — it binds a new variable named `pi`. Pin values with `==`:
   `match x { == Pi => … }`.
+- **The dot calls protocol functions only**: `c.area()` is `area(c)` when
+  `area` is a `protocol` function the type of `c` conforms to. A library
+  function is not reached that way — `xs.Sort()` is the error
+  `dot-call-not-a-protocol-function`; write `sort(xs)` or `xs |> sort`.
 
 For the full reference start at [Epsil](/introduction/), the complete grammar in
 [Syntax](/syntax/), and ~70 more verified programs in
@@ -8209,6 +8817,14 @@ Ignoring source-location metadata, the expression is:
 The parser recovers from most syntax errors and returns a partial expression
 alongside its diagnostics. Every parsed node also carries source offsets so a
 host can associate a diagnostic or expression with the original text.
+
+The tree is exactly what was written: the lowercase spelling of a library
+name (`sin`, `pi`) is still `sin` and `pi` at this point. A host that boxes
+or evaluates the tree itself must first run `resolveLibraryNames(expression,
+source, ce)`, which rewrites every free occurrence of a spelling to the
+library name it stands for (`Sin`, `Pi`) while leaving names the program or
+the engine binds alone — `executeEpsil` does this itself. See
+[Naming](/naming/).
 
 ### Execution
 
@@ -8585,7 +9201,7 @@ An effect specifier is folded into a full function-type string carried by a
 `Typed` node around the body:
 
 ```epsil
-function roll(n) random -> integer { Random(n) }
+function roll(n) random -> integer { random(n) }
 ```
 
 ```json
@@ -8776,7 +9392,7 @@ structurally:
 
 ```epsil
 match x {
-  == Pi => "is-pi"
+  == pi => "is-pi"
   _ => "no"
 }
 ```
@@ -9194,3 +9810,1369 @@ The remaining divergences are intentional: in Epsil a juxtaposed name is a
 single identifier (`sin` is one symbol, not `s·i·n`), `f(x, y)` is a function
 call, and `**` is exponentiation. The two parsers do agree that `|>` produces
 `Pipe`. Do not rely on them agreeing except on the rows marked *same*.
+
+---
+
+# Epsil Standard Library
+
+Source: https://epsil.dev/library/
+
+# Epsil Standard Library
+
+The 674 functions and constants of the standard library, by category.
+Each row gives a name, its signature (for a function) or its kind and type
+(for a constant or variable), and the first sentence of its description —
+the same description `epsil doc <name>` prints in full and the editor
+shows as a hover. The examples are executed when this page is generated,
+and the value each one evaluates to is written after it as `// ➔`; the
+documentation test runs them again, so an example that stops being true
+fails the build.
+
+To search the library by concept rather than by name, use
+`epsil doc <keywords>` (see the [CLI](/cli/)); the
+[guide for agents](/for-agents/) lists the names most often needed.
+
+- [Core](#core) — 110 definitions
+- [Control structures](#control-structures) — 14 definitions
+- [Logic](#logic) — 27 definitions
+- [Collections](#collections) — 122 definitions
+- [Colors](#colors) — 19 definitions
+- [Regular expressions](#regular-expressions) — 4 definitions
+- [Fractals](#fractals) — 2 definitions
+- [Relations](#relations) — 30 definitions
+- [Arithmetic](#arithmetic) — 96 definitions
+- [Trigonometry](#trigonometry) — 42 definitions
+- [Calculus](#calculus) — 19 definitions
+- [Polynomials](#polynomials) — 17 definitions
+- [Combinatorics](#combinatorics) — 11 definitions
+- [Number theory](#number-theory) — 52 definitions
+- [Special functions](#special-functions) — 14 definitions
+- [Linear algebra](#linear-algebra) — 42 definitions
+- [Statistics](#statistics) — 35 definitions
+- [Units](#units) — 7 definitions
+- [Physics](#physics) — 11 definitions
+
+## Core
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `about` | `About` | `(any) -> dictionary<any>` | Return information about an expression as a dictionary: its kind (symbol, constant, function, number, string, expression), its static type and, when applicable, its name, value, signature, clause listing, algebraic attributes, description,… |
+| `angle` | `Angle` | `(any+) -> number` | Angle mark / measure (`\angle ABC`, `\varangle XYZ`, `∠ABC`) — opaque typed head; not evaluated. |
+| — | `Annotated` | `(expression, dictionary<any>) -> expression` | Attach metadata or style annotations to an expression. |
+| `apply` | `Apply` | `(name: any, arguments: any*) -> unknown` | Apply a function to a list of arguments |
+| `arc` | `Arc` | `(any+) -> number` | Arc / wide-hat accent measure (`\widehat{ABC}`) — opaque typed head; not evaluated. |
+| — | `Assign` | `(expression \| symbol, any) scope -> any` | Assign a value to a symbol or define a sequence. |
+| `assume` | `Assume` | `(any) scope -> string` | Record an assumption about a symbol. |
+| `baseForm` | `BaseForm` | `(T, (number \| string)?) -> T where T: number` | `BaseForm(expr, base=10)` |
+| — | `BuiltinFunction` | `(string \| symbol) -> symbol` | Return a built-in function symbol by name. |
+| `canonicalForm` | `CanonicalForm` | `(any, symbol*) -> any` | Return the canonical form of an expression |
+| `caseFold` | `CaseFold` | `(string) -> string` | CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. |
+| `characterFrom` | `CharacterFrom` | `(string) -> character` | CharacterFrom(s): the character `s` denotes. |
+| `characters` | `Characters` | `(string) -> list<character>` | Characters(s): split a string into a list of user-perceived characters (grapheme clusters). |
+| — | `Coalesce` | `(any+) -> unknown` | Return the first operand that is not ABSENT (`Missing`, `Undefined` or `NaN`), evaluated left-to-right. |
+| — | `Colon` | `(any, any) -> expression` | Type annotation (`a : b`) — opaque typed head. |
+| `conforms` | `Conforms` | `(subject: any, protocols: string+) -> boolean` | True iff the subject conforms to EVERY named protocol. |
+| — | `Declare` | `(symbol, type: (string \| symbol)?, value: any?, attributes: dictionary<any>?) scope -> any` | Declare a symbol in the current scope, optionally assigning a type and an initial value. |
+| — | `DeclareConformance` | `(target: string \| symbol, protocols: any, whereClauseOrImplementation: any?, implementation: dictionary<any>?) scope -> nothing` | Declare that a type CONFORMS to one or more protocols — the lowering of the Epsil `type string is Hashable & Comparable` statement. |
+| — | `DeclareProtocol` | `(string \| symbol, members: dictionary<any>?) scope -> nothing` | Declare a PROTOCOL: a set of function and property requirements a type may declare itself to satisfy. |
+| — | `DeclareSumType` | `(string \| symbol, any*) scope -> nothing` | Declare a SUM TYPE: N nominal variants plus the transparent union that names them, in one statement — the lowering of the Epsil sugar `type node = lit(num: number) \| plus(op1: node, op2: node)`. |
+| — | `DeclareType` | `(string \| symbol, type: string \| symbol \| type, attributes: dictionary<any>?) scope -> nothing` | Declare a type. |
+| — | `DefineFunction` | `(symbol, function, dictionary<any>?) scope -> nothing` | Define one clause of a (possibly multi-clause) function: `DefineFunction(f, Function(body, params…))`. |
+| — | `Delimiter` | `(any, string?) -> any` | Group expressions with explicit delimiters. |
+| `digitsFrom` | `DigitsFrom` | `(string, (integer \| string)?) -> integer` | Return an integer representation of the string `s` in base `base`. |
+| `error` | `Error` | `(expression<ErrorCode> \| string, expression?) -> nothing` | Represent an error expression. |
+| — | `ErrorCode` | `(string, any*) -> error` | Structured error code with optional arguments. |
+| `evaluate` | `Evaluate` | `(any) -> unknown` | Evaluate an expression. |
+| `evaluateAt` | `EvaluateAt` | `(function, lower: expression, upper: expression) -> unknown` | Evaluate a function at one point or between two bounds. |
+| `findRoot` | `FindRoot` | `(any, any) -> dictionary` | FindRoot(equations, params): numerically find parameter values that |
+| — | `Function` | `(expression, (function \| symbol)*) -> function` | A function literal |
+| `geometricVector` | `GeometricVector` | `(any, any) -> expression` | Geometric vector (directed segment between two points) — opaque typed head. |
+| `graphemeClusters` | `GraphemeClusters` | `(string) -> list<character>` | A collection of grapheme clusters from a string. |
+| `head` | `Head` | `(any) -> symbol` | Return the head of an expression, the name of the operator |
+| — | `Hold` | `(any) -> unknown` | Hold an expression, preventing it from being canonicalized or evaluated until `ReleaseHold` is applied to it |
+| — | `HoldValues` | `(any, any?) -> expression` | HoldValues(body): evaluate `body` with its assigned free symbols |
+| — | `HorizontalSpacing` | `(number) -> nothing` | Horizontal spacing annotation. |
+| `identity` | `Identity` | `(T) -> T where T` | Return the argument unchanged |
+| — | `IndexedSequence` | `(any, symbol, any, any?) -> expression` | Indexed sequence `\{a_n\}_{n=1}^{\infty}` — inert head `IndexedSequence(term, index, lower, upper?)`; not evaluated. |
+| `input` | `Input` | `(prompt: string?) console -> nothing \| string` | Read one line of text from the host: the terminal in a command-line host, the `prompt()` dialog in a browser. |
+| `integerString` | `IntegerString` | `(integer, integer?) -> string` | `IntegerString(n, base=10)` return a string representation of the integer `n` in base `base`. |
+| — | `InvisibleOperator` | `function` | Implicit operator used for juxtapositions such as function application or multiplication. |
+| `isError` | `IsError` | `(any) -> boolean` | True if the expression is an `Error` value, or a frozen expression embedding one (`"a" + 1`). |
+| `isMissing` | `IsMissing` | `(any) -> boolean` | True if the value is ABSENT — the `Missing` or `Undefined` symbol, or a `NaN` number (regardless of provenance). |
+| — | `Latex` | `(any+) -> string` | Serialize an expression to LaTeX |
+| — | `LatexString` | `(string) -> string` | Value preserving type conversion/tag indicating the string is a LaTeX string |
+| — | `MatchesType` | `(subject: any, type: string \| type) -> boolean` | True iff the first operand, EVALUATED, is a value of the given type — the engine form of the Epsil `x is T` test and of `match` type patterns, which both lower here. |
+| `missing` | `Missing` | variable `missing` | A value that is absent but whose position is preserved (Julia `missing`, R `NA`); the sole member of the `missing` type. |
+| — | `N` | `(any, integer?) -> unknown` | N(expr): numerically evaluate an expression |
+| — | `NamedArgument` | `(string, any) -> nothing` | NamedArgument(name, value): one named argument of a call (Epsil |
+| `nothing` | `Nothing` | variable `nothing` | The absence of a value; the sole member of the unit type. |
+| `numberFrom` | `NumberFrom` | `(string, base: (integer \| string)?) -> number` | NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN". |
+| — | `Object` | `(any, string?) -> unknown` | Provenance head for the snapshot of a mutable object: `["Object", <record>, "'TypeName'"]`. |
+| — | `OverParen` | `(any+) -> expression` | Over-paren accent (`\overparen{BC}`) — opaque typed head; not evaluated. |
+| `padEnd` | `PadEnd` | `(string, n: integer, pad: string?) -> string` | PadEnd(s, n, pad=" "): `s` padded at the END to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
+| `padStart` | `PadStart` | `(string, n: integer, pad: string?) -> string` | PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
+| `parallel` | `Parallel` | `(any, any) -> expression` | Parallelism relation (`AB \parallel CD`) — opaque typed head; not evaluated. |
+| `parse` | `Parse` | `(string) -> any` | Parse a LaTeX string and evaluate to a corresponding expression |
+| `perpendicular` | `Perpendicular` | `(any, any) -> expression` | Perpendicularity relation (`AB \perp CD`) — opaque typed head; not evaluated. |
+| — | `Pipe` | `(value, function) -> unknown` | Apply a function to a value: `Pipe(x, f)` evaluates to `f(x)`. |
+| `polygon` | `Polygon` | `(any+) -> expression` | Polygon primitive — opaque typed head. |
+| `prime` | `Prime` | `(T, integer?) -> T where T` | Derivative or prime notation (`f'`, `f^{(n)}`) — opaque typed head until a derivative library handler runs. |
+| `print` | `Print` | `(any*) console -> nothing` | Print the operands to the host console, separated by spaces and followed by a newline. |
+| — | `ProtocolMember` | `(protocol: string, member: string, arguments: any*) -> unknown` | Invoke a protocol member on a value — the lowering of a QUALIFIED protocol call (`Comparable.compare(x, y)` in Epsil, whose parse, a `MemberCall` on the protocol name, canonicalizes to `Apply(Field(Comparable, "compare"), x, y)`). |
+| — | `ProtocolProperty` | `(protocol: string, property: string, receiver: any, value: any?) -> unknown` | Read (or write) a protocol PROPERTY through a NAMED protocol — the lowering of the qualified field form `person.(Nameable.name)` (protocols design P6, amending the D16 field grammar). |
+| `quadrilateral` | `Quadrilateral` | `(any+) -> expression` | Quadrilateral mark (`\square ABCD`) — opaque typed head; not evaluated. |
+| `random` | `Random` | `((collection<any> \| set<real>)?) random -> any` | Random(): non-deterministic real in [0, 1) |
+| `randomChoice` | `RandomChoice` | `((T, number) random -> T where T: string) & ((collection<any> \| set<real>, number) random -> list<any>)` | RandomChoice(domain, k): a list of k independent draws from `domain`, with replacement. |
+| `randomExpression` | `RandomExpression` | `() entropy -> expression` | Generate a random expression. |
+| — | `ReleaseHold` | `(any) -> unknown` | Release an expression held by `Hold` |
+| `replaceAll` | `ReplaceAll` | `(any, any+) -> any` | ReplaceAll(expr, rules): apply one or more replacement rules to `expr`, |
+| — | `Rule` | `(match: expression, replace: expression, predicate: function?) -> expression` | Pattern replacement rule. |
+| — | `RuntimeError` | `(expression<ErrorCode> \| string) -> never` | Construct an error value when evaluated: the runtime counterpart of a written `Error(…)`, which is a static diagnostic node. |
+| `segment` | `Segment` | `(any+) -> expression` | Segment primitive — opaque typed head. |
+| — | `Sequence` | `function` | Ordered sequence of expressions. |
+| — | `Signature` | `(symbol) -> nothing \| string` | Return the signature string of an operator. |
+| `simplify` | `Simplify` | `(any, any?) -> expression` | Simplify(expr): simplify an expression. |
+| `solve` | `Solve` | `(any, any*) -> list` | Solve(equation, unknown): the list of solutions of an equation for the |
+| `sphere` | `Sphere` | `(any+) -> expression` | Sphere primitive — opaque typed head. |
+| — | `Spread` | `(any) -> unknown` | Spread(t): splice the elements of the tuple `t` into the enclosing |
+| — | `String` | `(any*) -> string` | A string created by joining its arguments. |
+| `stringCompare` | `StringCompare` | `(string, string) -> integer` | StringCompare(a, b): -1 when `a` sorts before `b`, 0 when they are equal, 1 when `a` sorts after `b`. |
+| `stringFrom` | `StringFrom` | `(any, format: string?) -> string` | StringFrom(value, format?): create a string from `value`. |
+| `stringJoin` | `StringJoin` | `(collection<character \| string>, separator: string?) -> string` | StringJoin(xs): join the elements of the finite collection `xs` (strings or characters) into a string. |
+| `stringRepeat` | `StringRepeat` | `(string, n: integer) -> string` | StringRepeat(s, n): `n` copies of the string `s`, concatenated. |
+| `stringReplace` | `StringReplace` | `((string, string, string, count: integer?) -> string) & ((string, regexp, string, count: integer?) -> string) & ((string, regexp, function, count: integer?) -> string)` | StringReplace(s, target, replacement): replace every non-overlapping occurrence of `target` in `s`, scanning left to right over whole characters. |
+| `stringSplit` | `StringSplit` | `((string, string?) -> list<string>) & ((string, regexp) -> list<string>)` | StringSplit(s): split a string on runs of whitespace (the Unicode White_Space code points), dropping empty parts. |
+| — | `Subscript` | `(collection<any>, any) -> any` | Subscript notation for indexing or compound symbols. |
+| — | `Subtype` | `(subtype: string \| type, supertype: string \| type) -> boolean` | True iff the FIRST operand is a subtype of the second — `Subtype("integer", "number")` is `True`, `Subtype("number", "integer")` is `False`. |
+| `symbol` | `Symbol` | `function` | Construct a new symbol with a name formed by concatenating the arguments |
+| `tail` | `Tail` | `(any) -> collection` | Return the tail of an expression, the operands of the expression |
+| — | `Text` | `(any*) -> string` | A sequence of strings, annotated expressions and other Text expressions |
+| `timing` | `Timing` | `(value, repeat: integer?) -> tuple<time: number, result: value>` | `Timing(expr)` evaluates `expr` and returns a pair: the time the evaluation took, in microseconds, then the value. |
+| `to` | `To` | `(any, any) -> nothing` | Action arrow / mapping (`a \to b`) — opaque typed head. |
+| `toLowerCase` | `ToLowerCase` | `(string) -> string` | ToLowerCase(s): the string `s` mapped to lower case using the Unicode default (locale-independent) mappings. |
+| `toUpperCase` | `ToUpperCase` | `(string) -> string` | ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (locale-independent) mappings. |
+| `triangle` | `Triangle` | `(any+) -> expression` | Triangle primitive — opaque typed head. |
+| `trim` | `Trim` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | Trim(s): remove leading and trailing whitespace (the Unicode White_Space characters). |
+| `trimEnd` | `TrimEnd` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimEnd(s): remove trailing whitespace (the Unicode White_Space characters). |
+| `trimStart` | `TrimStart` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimStart(s): remove leading whitespace (the Unicode White_Space characters). |
+| `type` | `Type` | `(any) -> type` | The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. |
+| `typeFrom` | `TypeFrom` | `(text: string) -> type` | A type expression as a first-class value, constructed from its text: `TypeFrom("list<integer>")`. |
+| — | `Typed` | `(any, string \| symbol) -> unknown` | Ascribe a type to an expression. |
+| — | `Unevaluated` | `(any) -> unknown` | Prevent an expression from being evaluated |
+| `unicodeScalars` | `UnicodeScalars` | `(string) -> list<integer>` | A collection of Unicode scalars from a string, same as UTF-32 |
+| `utf16` | `Utf16` | `(string) -> list<integer>` | A collection of UTF-16 code units from a string. |
+| `utf8` | `Utf8` | `(string) -> list<integer>` | A collection of UTF-8 code units from a string. |
+| — | `Wildcard` | `(symbol) -> symbol` | Single-expression pattern wildcard. |
+| — | `WildcardOptionalSequence` | `(symbol) -> symbol` | Pattern wildcard matching zero or more expressions. |
+| — | `WildcardSequence` | `(symbol) -> symbol` | Pattern wildcard matching one or more expressions. |
+| `withRandomSeed` | `WithRandomSeed` | `(real \| string, any) -> expression` | WithRandomSeed(seed, body): evaluate `body` with a random seed frame |
+
+## Control structures
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| — | `Alternatives` | `(expression+) -> nothing` | Inside a `Match` pattern, `Alternatives(p1, p2, …)` matches if any alternative matches. |
+| — | `Block` | `(unknown*) -> unknown` | Evaluate a sequence of expressions in a local scope, **sequentially**. |
+| — | `Break` | `(value: any?) -> nothing` | Exit the enclosing loop immediately, optionally with a value (`Break(v)`) that becomes the loop value. |
+| — | `Comprehension` | `(body: expression, iterators: expression+) -> indexed_collection` | Value-producing comprehension: evaluate `body` in nested iteration over one or more `Element` clauses and collect the results into an indexed collection (a `List`). |
+| — | `Condition` | `(expression, symbol?) -> boolean` | Test whether a value satisfies one or more conditions. |
+| — | `Continue` | `() -> nothing` | Skip to the next iteration of the enclosing loop. |
+| `fixedPoint` | `FixedPoint` | `(any) -> unknown` | Iterate a function until a fixed point is reached. |
+| — | `If` | `(expression, expression, expression?) -> any` | Conditional branch: evaluate one of two expressions. |
+| — | `Loop` | `(body: expression, iterators: expression*) -> any` | Imperative loop, evaluated **for effect**. |
+| — | `Match` | `(expression, expression+) -> unknown` | Structural pattern match. |
+| — | `MatchCase` | `(expression, expression, expression?) -> nothing` | A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. |
+| — | `Pin` | `(expression) -> nothing` | Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure. |
+| `when` | `When` | `(expression, boolean) -> any` | Conditional/restriction value. |
+| — | `Which` | `(expression+) -> unknown` | Return the value for the first condition that is true. |
+
+## Logic
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| — | `And` | `(boolean+) -> boolean` | Logical conjunction (AND): true when all operands are true. |
+| `boole` | `Boole` | `(boolean) -> integer` | Return 1 if the argument is true, 0 otherwise. |
+| `equivalent` | `Equivalent` | `(boolean, boolean) -> boolean` | Logical equivalence (if and only if): true when both operands have the same truth value. |
+| `exists` | `Exists` | `(value, boolean) -> boolean` | Existential quantifier (there exists): true when the predicate holds for at least one value. |
+| `existsUnique` | `ExistsUnique` | `(value, boolean) -> boolean` | Unique existential quantifier (there exists exactly one value satisfying the predicate). |
+| — | `False` | constant `boolean` | The boolean truth value false. |
+| `forAll` | `ForAll` | `(value, boolean) -> boolean` | Universal quantifier (for all): true when the predicate holds for every value. |
+| `implies` | `Implies` | `(boolean, boolean) -> boolean` | Logical implication: false only when the antecedent is true and the consequent is false. |
+| `isSatisfiable` | `IsSatisfiable` | `(boolean) -> boolean` | Check satisfiability using brute-force enumeration. |
+| `isTautology` | `IsTautology` | `(boolean) -> boolean` | Check if expression is a tautology using brute-force enumeration. |
+| `kroneckerDelta` | `KroneckerDelta` | `(value+) -> integer` | Return 1 if the arguments are equal, 0 otherwise. |
+| `minimalCNF` | `MinimalCNF` | `(boolean) -> boolean` | Convert to minimal CNF using Quine-McCluskey. |
+| `minimalDNF` | `MinimalDNF` | `(boolean) -> boolean` | Convert to minimal DNF using Quine-McCluskey. |
+| `nand` | `Nand` | `(boolean+) -> boolean` | Logical NAND: the negation of AND (n-ary). |
+| `nor` | `Nor` | `(boolean+) -> boolean` | Logical NOR: the negation of OR (n-ary). |
+| — | `Not` | `(boolean) -> boolean` | Logical negation (NOT). |
+| `notExists` | `NotExists` | `(value, boolean) -> boolean` | Negated existential quantifier (there does not exist): true when the predicate holds for no value. |
+| `notForAll` | `NotForAll` | `(value, boolean) -> boolean` | Negated universal quantifier (not for all): true when the predicate fails for at least one value. |
+| — | `Or` | `(boolean+) -> boolean` | Logical disjunction (OR): true when at least one operand is true. |
+| — | `Predicate` | `(symbol, value+) -> boolean` | Apply a predicate to arguments, returning a boolean |
+| `primeImplicants` | `PrimeImplicants` | `(boolean) -> list` | Find all prime implicants using Quine-McCluskey. |
+| `primeImplicates` | `PrimeImplicates` | `(boolean) -> list` | Find all prime implicates using Quine-McCluskey. |
+| `toCNF` | `ToCNF` | `(boolean) -> boolean` | Convert a boolean expression to conjunctive normal form (CNF), an AND of ORs. |
+| `toDNF` | `ToDNF` | `(boolean) -> boolean` | Convert a boolean expression to disjunctive normal form (DNF), an OR of ANDs. |
+| — | `True` | constant `boolean` | The boolean truth value true. |
+| `truthTable` | `TruthTable` | `(boolean) -> list` | Generate truth table for expression. |
+| `xor` | `Xor` | `(boolean+) -> boolean` | Exclusive or: true when an odd number of operands are true |
+
+## Collections
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `adjoin` | `Adjoin` | `(set<any>, any+) -> set` | The ring obtained by adjoining one or more elements to a base ring. |
+| `all` | `All` | `(collection<T>, predicate: ((T) any -> boolean)?) -> boolean where T` | Return True if the predicate holds for every element of the collection (or if every element is True when no predicate is given). |
+| `any` | `Any` | `(collection<T>, predicate: ((T) any -> boolean)?) -> boolean where T` | Return True if the predicate holds for at least one element of the collection (or if any element is True when no predicate is given). |
+| `append` | `Append` | `(collection<any>, value+) -> collection` | Add one or more elements to the end of a collection. |
+| `argMax` | `ArgMax` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that maximizes the given key function (or the element itself when no key is given). |
+| `argMin` | `ArgMin` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that minimizes the given key function (or the element itself when no key is given). |
+| — | `At` | `(value: any, index: (boolean \| indexed_collection<any> \| number \| string)+) -> unknown` | Access an element of an indexed collection. |
+| `chunk` | `Chunk` | `((S, integer) -> list<string> where S: string) & ((collection, integer) -> list<list>)` | Split the collection into `k` nearly equal-sized groups. |
+| `chunkBy` | `ChunkBy` | `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((collection<T>, key: (T) any -> unknown) -> list<list<T>> where T)` | Split the collection into maximal runs of consecutive elements over which the key function yields the same value. |
+| `complement` | `Complement` | `(set<any>+) -> set` | Return the elements of the first set that are not in any of the subsequent sets. |
+| `complexNumbers` | `ComplexNumbers` | constant `set<complex>` | The set of all finite complex numbers. |
+| `contains` | `Contains` | `(collection<any>, element: any) -> boolean` | Return True if the collection contains the given element (structural identity, like `===`), False otherwise. |
+| `containsSequence` | `ContainsSequence` | `(indexed_collection<T>, indexed_collection<T>) -> boolean where T` | Return `True` when `needle` occurs as a contiguous subsequence of the indexed collection. |
+| `count` | `Count` | `(collection<any>, any?) -> infinity \| integer` | `Count(xs)`: the number of elements in the collection. |
+| `countIf` | `CountIf` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the number of elements in the collection satisfying the predicate. |
+| `cycle` | `Cycle` | `(list<any>) -> list` | Produce an infinite sequence by cycling through the elements of a finite collection. |
+| `dedup` | `Dedup` | `(collection<any>) -> collection` | Return the collection with consecutive duplicate elements collapsed to a single element. |
+| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
+| — | `Dictionary` | `(tuple<string, unknown>*) -> dictionary` | A collection of key -&gt; value entries with string keys (`{x -> 1, y -> 2}` in Epsil). |
+| `dictionaryFrom` | `DictionaryFrom` | `(collection<any>) -> dictionary` | Create a dictionary from the elements of a collection of (key, value) pairs. |
+| `differences` | `Differences` | `(collection<any>) -> indexed_collection` | Return the successive differences of a collection: a collection whose k-th element is `x(k+1) − xk`, of length one less than the input. |
+| `drop` | `Drop` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T)` | Return the collection without the first n elements. |
+| `dropWhile` | `DropWhile` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the collection with its leading elements for which the predicate returns True removed; the remaining elements are returned unfiltered. |
+| — | `Element` | `(any, any, boolean?) -> boolean` | Test whether a value is an element of a collection. |
+| `emptySet` | `EmptySet` | constant `set` | The empty set, a set containing no elements. |
+| `endsWith` | `EndsWith` | `(indexed_collection<T>, suffix: indexed_collection<T>) -> boolean where T` | Return `True` when the indexed collection ends with `suffix` as a contiguous subsequence. |
+| `extendedComplexNumbers` | `ExtendedComplexNumbers` | constant `set<complex \| infinity>` | The set of all complex numbers, including infinities. |
+| `extendedIntegers` | `ExtendedIntegers` | constant `set<integer \| signed_infinity>` | The set of all integers, including infinities. |
+| `extendedRationalNumbers` | `ExtendedRationalNumbers` | constant `set<rational \| signed_infinity>` | The set of all rational numbers, including infinities. |
+| `extendedRealNumbers` | `ExtendedRealNumbers` | constant `set<real \| signed_infinity>` | The set of all real numbers, including infinities. |
+| `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
+| `fill` | `Fill` | `(function, tuple) -> list` | Produce a 2D list (matrix) by applying a function to each pair of row and column indexes. |
+| `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
+| `find` | `Find` | `(collection<T>, predicate: (T) any -> boolean) -> any where T` | Return the first element of the collection satisfying the predicate, or Nothing if none found. |
+| `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
+| `flatMap` | `FlatMap` | `(collection<T>, mapping: (T) any -> U) -> list where T, U` | Map a function over a collection and concatenate the results into a single list, splicing collection-valued results and keeping scalar results as single elements. |
+| `fold` | `Fold` | `(reducer: (unknown, T) any -> unknown, initial: value, collection<T>) -> value where T` | Fold a collection to a single value, applying a binary function f(accumulator, element) left to right from an initial value. |
+| `groupBy` | `GroupBy` | `(collection<T>, key: (T) any -> unknown) -> dictionary<list> where T` | Partition the collection into a dictionary of lists based on the key returned by the function. |
+| `imaginaryNumbers` | `ImaginaryNumbers` | constant `set<imaginary>` | The set of all imaginary numbers. |
+| `indexOf` | `IndexOf` | `(collection<any>, any) -> integer` | Return the 1-based index of the first occurrence of value in collection, or 0 if not found. |
+| `indexWhere` | `IndexWhere` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the 1-based index of the first element satisfying the predicate, or 0 if not found. |
+| `insert` | `Insert` | `(indexed_collection<T>, integer, T) -> list<T> where T` | Return a copy of the indexed collection with `value` inserted before the 1-based `index`. |
+| `integers` | `Integers` | constant `set<integer>` | The set of all finite integers. |
+| `intersection` | `Intersection` | `(any+) -> set` | Return the intersection of one or more collections as a set. |
+| `interval` | `Interval` | `(number, number) -> set<real>` | A set of real numbers between two endpoints. |
+| `isEmpty` | `IsEmpty` | `(collection<any>) -> boolean` | Return True if the collection is empty, False otherwise. |
+| `iterate` | `Iterate` | `(function, initial: any?) -> list` | Produce an infinite sequence by repeatedly applying a function to the previous value, starting with an initial value. |
+| `join` | `Join` | `((T+) -> T where T: string) & ((collection<any>*) -> collection)` | Join the elements of some collections into a flat collection. |
+| — | `KeyValuePair` | `(key: string, value: T) -> tuple<string, T> where T` | A key/value pair |
+| `keys` | `Keys` | `(dictionary<any>) -> list<string>` | Return a list of the keys of a dictionary. |
+| `last` | `Last` | `(xs: indexed_collection<any>) -> any` | The last element of a collection. |
+| `length` | `Length` | `(any) -> infinity \| integer` | Number of elements in a collection. |
+| `linspace` | `Linspace` | `(start: number, end: number?, count: number?) -> indexed_collection` | A sequence of evenly spaced numbers between a start and end value, both endpoints included. |
+| — | `List` | `(any*) -> list` | An ordered collection of elements (a list). |
+| `listFrom` | `ListFrom` | `(value*) -> list` | Create a list from the elements of a collection. |
+| `map` | `Map` | `(mapping: (T) any -> U, collection<T>+) -> indexed_collection where T, U` | Return the collection where each element has been transformed by the mapping function. |
+| `maxBy` | `MaxBy` | `(collection<T>, key: (T) any -> unknown) -> value where T` | Return the element of the collection that maximizes the given key function. |
+| — | `MemberCall` | `(receiver: any, member: string, arguments: any*) -> unknown` | Call the member `name` of a value with the value as its first argument: `c.area(2)` in Epsil. |
+| `minBy` | `MinBy` | `(collection<T>, key: (T) any -> unknown) -> value where T` | Return the element of the collection that minimizes the given key function. |
+| `most` | `Most` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T)` | Return the collection without the last element. |
+| `negativeIntegers` | `NegativeIntegers` | constant `set<integer>` | The set of all negative integers. |
+| `negativeNumbers` | `NegativeNumbers` | constant `set<real>` | The set of all negative real numbers. |
+| `nonNegativeIntegers` | `NonNegativeIntegers` | constant `set<integer>` | The set of all non-negative integers. |
+| `nonNegativeNumbers` | `NonNegativeNumbers` | constant `set<real>` | The set of all non-negative real numbers. |
+| `nonPositiveIntegers` | `NonPositiveIntegers` | constant `set<integer>` | The set of all non-positive integers. |
+| `nonPositiveNumbers` | `NonPositiveNumbers` | constant `set<real>` | The set of all non-positive real numbers. |
+| — | `NotElement` | `(any, any) -> boolean` | Test whether a value is not an element of a collection. |
+| — | `NotSubset` | `(lhs: any, rhs: any) -> boolean` | Test whether the first collection is not a strict subset of the second. |
+| — | `NotSuperset` | `(lhs: any, rhs: any) -> boolean` | Test whether the first collection is not a strict superset of the second. |
+| — | `NotSupersetEqual` | `(lhs: any, rhs: any) -> boolean` | Test whether the first collection is not a superset (possibly equal) of the second. |
+| `numbers` | `Numbers` | constant `set<number>` | The set of all numbers. |
+| `ordering` | `Ordering` | `(indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<integer> where T` | Return the indexes that would sort the collection. |
+| — | `Pair` | `(first: T, second: U) -> tuple<T, U> where T, U` | A tuple of two elements |
+| `partition` | `Partition` | `(collection<T>, ((T) any -> boolean) \| integer, integer?) -> list<list<T>> where T` | Partition a collection into consecutive chunks each of size `n`; the trailing chunk may be shorter when `n` does not divide the length. |
+| `pointList` | `PointList` | `(any+) -> any` | A list of points: zips collection components into a List of point-tuples (Desmos point-list idiom); a plain point when no component is a collection. |
+| `pointX` | `PointX` | `(xs: collection<any> \| tuple) -> any` | The x-coordinate of a point, broadcasting over a list of points. |
+| `pointY` | `PointY` | `(xs: collection<any> \| tuple) -> any` | The y-coordinate of a point, broadcasting over a list of points. |
+| `pointZ` | `PointZ` | `(xs: collection<any> \| tuple) -> any` | The z-coordinate of a point, broadcasting over a list of points. |
+| `position` | `Position` | `(collection<T>, predicate: (T) any -> boolean) -> list<integer> where T` | Return a list of indexes of elements in the collection satisfying the predicate. |
+| `positiveIntegers` | `PositiveIntegers` | constant `set<integer>` | The set of all positive integers. |
+| `positiveNumbers` | `PositiveNumbers` | constant `set<real>` | The set of all positive real numbers. |
+| `primes` | `Primes` | constant `set<integer>` | The set of all prime numbers. |
+| `quotientRing` | `QuotientRing` | `(set<any>, any) -> set` | The quotient of a ring by the ideal generated by the second argument. |
+| `randomShuffle` | `RandomShuffle` | `((T) random -> T where T: string) & ((indexed_collection<T>) random -> list<T> where T)` | Randomize the order of the elements in the collection. |
+| — | `Range` | `(number, number?, step: number?) -> indexed_collection<number>` | A sequence of numbers from a start to an end value with an optional step. |
+| `rangeOf` | `RangeOf` | `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> nothing \| range where T` | Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Nothing` when it does not occur. |
+| `rationalNumbers` | `RationalNumbers` | constant `set<rational>` | The set of all finite rational numbers. |
+| `realNumbers` | `RealNumbers` | constant `set<real>` | The set of all finite real numbers. |
+| `reduce` | `Reduce` | `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> value where T` | Reduce (fold) a collection to a single value by repeatedly applying a binary function, with an optional initial value. |
+| `repeat` | `Repeat` | `(value: any, count: integer?) -> list` | Produce a sequence by repeating a single value. |
+| `replaceAt` | `ReplaceAt` | `(indexed_collection<T>, integer, T) -> list<T> where T` | Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`. |
+| `rest` | `Rest` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T)` | Return the collection without the first element. |
+| `reverse` | `Reverse` | `((T) -> T where T: string) & ((T) -> T where T: list) & ((indexed_collection<T>) -> list<T> where T)` | Reverse the order of the elements of an indexed collection. |
+| `rotateLeft` | `RotateLeft` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T)` | Rotate the elements of the collection to the left by n positions. |
+| `rotateRight` | `RotateRight` | `((T, integer?) -> T where T: string) & ((T, integer?) -> T where T: list) & ((indexed_collection<T>, integer?) -> list<T> where T)` | Rotate the elements of the collection to the right by n positions. |
+| `scan` | `Scan` | `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> indexed_collection where T` | Return the cumulative fold of a collection: a same-length collection whose k-th element is the running result of applying a binary function left to right (optionally seeded by an initial value). |
+| `second` | `Second` | `(xs: indexed_collection<any>) -> any` | The second element of a collection. |
+| — | `Set` | `(any*) -> set` | An unordered collection of distinct elements (a set). |
+| `setFrom` | `SetFrom` | `(value*) -> set` | Create a set from the elements of a collection. |
+| `setMinus` | `SetMinus` | `(set<any>, value*) -> set` | Return the set difference between the first set and subsequent values. |
+| — | `Single` | `(value: T) -> tuple<T> where T` | A tuple with a single element |
+| `slice` | `Slice` | `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing \| range) -> T \| nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T) & ((value: indexed_collection<T>, span: nothing \| range) -> list<T> \| nothing where T) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T)` | Return a contiguous run of elements from an indexed collection. |
+| `sort` | `Sort` | `((T, order: (((character) any -> unknown) \| ((character, character) any -> boolean \| number))?) -> T where T: string) & ((indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<T> where T)` | Return the elements of the collection sorted according to the given comparison function. |
+| `startsWith` | `StartsWith` | `(indexed_collection<T>, prefix: indexed_collection<T>) -> boolean where T` | Return `True` when the indexed collection begins with `prefix` as a contiguous subsequence. |
+| `subset` | `Subset` | `(any, any*) -> boolean` | Test whether the first collection is a strict subset of the second. |
+| `subsetEqual` | `SubsetEqual` | `(any, any*) -> boolean` | Test whether the first collection is a subset (possibly equal) of the second. |
+| `superset` | `Superset` | `(any, any*) -> boolean` | Test whether the first collection is a strict superset of the second. |
+| `supersetEqual` | `SupersetEqual` | `(any, any*) -> boolean` | Test whether the first collection is a superset (possibly equal) of the second. |
+| `symmetricDifference` | `SymmetricDifference` | `(set<any>, set<any>) -> set` | Return the symmetric difference of two sets (elements in either set but not both). |
+| `table` | `Table` | `(function, integer, integer?) -> collection` | An alias for `Tabulate` (the preferred name) that additionally accepts |
+| `tabulate` | `Tabulate` | `(generator: function, integer, integer?) -> indexed_collection` | Create a collection by applying a function to each index in the specified dimensions. |
+| `take` | `Take` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T)` | Return `n` elements from a collection. |
+| `takeWhile` | `TakeWhile` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the leading elements of the collection for which the predicate returns True, stopping at the first element that does not. |
+| `tally` | `Tally` | `(collection<T>) -> tuple<list<T>, list<integer>> where T` | Return a tuple with the unique elements of the collection and their respective counts. |
+| `third` | `Third` | `(xs: indexed_collection<any>) -> any` | The third element of a collection. |
+| — | `Triple` | `(first: T, second: U, third: V) -> tuple<T, U, V> where T, U, V` | A tuple of three elements |
+| — | `Tuple` | `(any*) -> tuple` | A fixed number of heterogeneous elements |
+| `tupleFrom` | `TupleFrom` | `(value*) -> tuple` | Create a tuple from the elements of a collection. |
+| `union` | `Union` | `(any+) -> set` | Return the union of two or more collections as a set. |
+| `unique` | `Unique` | `((T) -> T where T: string) & ((collection<T>) -> list<T> where T)` | Return a list of the unique elements of the collection. |
+| `values` | `Values` | `(dictionary<any>) -> list` | Return a list of the values of a dictionary. |
+| `zip` | `Zip` | `(indexed_collection<any>+) -> list` | Combine multiple collections element-wise into a list of tuples. |
+
+## Colors
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `asHsl` | `AsHsl` | `(color \| string \| tuple) -> color` | Convert any color to HSL (hue degrees, s/l 0-1) |
+| `asHsv` | `AsHsv` | `(color \| string \| tuple) -> color` | Convert any color to HSV (hue degrees, s/v 0-1) |
+| `asOklab` | `AsOklab` | `(color \| string \| tuple) -> color` | Convert any color to OKLab |
+| `asOklch` | `AsOklch` | `(color \| string \| tuple) -> color` | Convert any color to OKLCh |
+| `asRgb` | `AsRgb` | `(color \| string \| tuple) -> color` | Convert any color to sRGB (channels 0-1) |
+| `color` | `Color` | `(string) -> color` | Parse a CSS-style color string to an Oklch color |
+| `colorContrast` | `ColorContrast` | `(color \| string \| tuple, color \| string \| tuple) -> number` | APCA contrast ratio between two colors |
+| `colorDelta` | `ColorDelta` | `(color \| string \| tuple, color \| string \| tuple) -> number` | Perceptual color difference (ΔE_OK) between two colors |
+| `colorFromColorspace` | `ColorFromColorspace` | `(color \| tuple, string) -> color` | Build a color from channel values in a named color space. |
+| `colorMix` | `ColorMix` | `(color \| string \| tuple, color \| string \| tuple, number?) -> color` | Mix two colors in OKLCh space |
+| `colorToColorspace` | `ColorToColorspace` | `(color \| string \| tuple, string) -> tuple` | Convert a color to components in a target color space |
+| `colorToString` | `ColorToString` | `(color \| string \| tuple, string?) -> string` | Convert a color to a string in the specified format |
+| `colormap` | `Colormap` | `(string, number?) -> color \| list<color>` | Sample colors from a named palette |
+| `contrastingColor` | `ContrastingColor` | `(color \| string \| tuple, (color \| string \| tuple)?, (color \| string \| tuple)?) -> color` | Choose the foreground color with better APCA contrast against a background, answered as given: the interpreter keeps the color head the candidate was written with, and a compiled target answers the same color in its canonical form |
+| `hsl` | `Hsl` | `(number, number, number, number?) -> color` | HSL color (hue degrees, saturation/lightness 0-1, optional alpha) |
+| `hsv` | `Hsv` | `(number, number, number, number?) -> color` | HSV color (hue degrees, saturation/value 0-1, optional alpha) |
+| `oklab` | `Oklab` | `(number, number, number, number?) -> color` | OKLab color (L 0-1, a/b ~ -0.4..0.4, optional alpha) |
+| `oklch` | `Oklch` | `(number, number, number, number?) -> color` | OKLCh color (L 0-1, C 0-~0.4, hue degrees, optional alpha) |
+| `rgb` | `Rgb` | `(number, number, number, number?) -> color` | sRGB color (channels 0-1, optional alpha 0-1) |
+
+## Regular expressions
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `isMatch` | `IsMatch` | `(subject: string, pattern: regexp) -> boolean` | Whether a string contains a match for a regular expression. |
+| `regExp` | `RegExp` | `(pattern: string, flags: string?) -> regexp` | A compiled regular expression, using the host JavaScript dialect. |
+| `stringMatch` | `StringMatch` | `(subject: string, pattern: regexp) -> nothing \| record` | The first match of a regular expression in a string, as a record. |
+| `stringMatchAll` | `StringMatchAll` | `(subject: string, pattern: regexp) -> list<record>` | Every non-overlapping match of a regular expression in a string, as a list of records. |
+
+## Fractals
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `julia` | `Julia` | `(number, number, integer) -> real` | Smooth escape-time value for a Julia set with parameter c. |
+| `mandelbrot` | `Mandelbrot` | `(number, integer) -> real` | Smooth escape-time value for the Mandelbrot set. |
+
+## Relations
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| — | `Approx` | `(any, any*) -> boolean` | Approximate-equality relation (approximately equal). |
+| — | `ApproxEqual` | `(any, any*) -> boolean` | Approximately-equal relation. |
+| — | `ApproxNotEqual` | `(any, any*) -> boolean` | Approximately-not-equal relation. |
+| `congruent` | `Congruent` | `(number, number, modulo: number) -> boolean` | Indicate that two expressions are congruent modulo a number |
+| — | `Equal` | `(any, any) -> boolean` | Equality comparison (equal to). |
+| — | `Greater` | `(any, any*) -> boolean` | Greater-than comparison (strictly greater than). |
+| — | `GreaterEqual` | `(any, any*) -> boolean` | Greater-than-or-equal comparison (greater than or equal to). |
+| `identicallyEqual` | `IdenticallyEqual` | `(any, any) -> boolean` | Identity comparison (`\equiv`). |
+| `isSame` | `IsSame` | `(any, any) -> boolean` | Compare two expressions for structural equality |
+| — | `Less` | `(any, any*) -> boolean` | Less-than comparison (strictly less than). |
+| — | `LessEqual` | `(any, any*) -> boolean` | Less-than-or-equal comparison (less than or equal to). |
+| — | `NotApprox` | `(any, any*) -> boolean` | Negated approximate-equality relation (not approximately equal). |
+| — | `NotApproxEqual` | `(any*) -> unknown` | Negated approximately-equal relation. |
+| — | `NotApproxNotEqual` | `(any, any*) -> boolean` | Negated approximately-not-equal relation. |
+| — | `NotEqual` | `(any, any) -> boolean` | Inequality comparison (not equal to). |
+| — | `NotGreater` | `(any, any*) -> boolean` | Negated greater-than relation (not greater than). |
+| — | `NotGreaterNotEqual` | `(any, any*) -> boolean` | Neither greater than nor equal to. |
+| — | `NotLess` | `(any, any*) -> boolean` | Negated less-than relation (not less than). |
+| — | `NotLessNotEqual` | `(any, any*) -> boolean` | Neither less than nor equal to. |
+| — | `NotPrecedes` | `(any, any*) -> boolean` | Negated precedes relation (does not precede). |
+| — | `NotSucceeds` | `(any, any*) -> boolean` | Negated succeeds relation (does not succeed). |
+| — | `NotTilde` | `(any, any*) -> boolean` | Negated similarity relation (not similar). |
+| — | `NotTildeEqual` | `(any, any*) -> boolean` | Negated approximately/asymptotically-equal relation (not approximately equal). |
+| — | `NotTildeFullEqual` | `(any, any*) -> boolean` | Negated isomorphism/congruence relation (not isomorphic or congruent). |
+| — | `Precedes` | `(any, any*) -> boolean` | Precedes relation in an ordering (comes before). |
+| — | `Same` | `(any, any*) -> boolean` | Structural identity comparison (Epsil `===`). |
+| — | `Succeeds` | `(any, any*) -> boolean` | Succeeds relation in an ordering (comes after). |
+| — | `Tilde` | `(any, any*) -> boolean` | Generic similarity relation (`\sim`): similar geometric figures, asymptotic equivalence, or "is distributed as". |
+| — | `TildeEqual` | `(any, any*) -> boolean` | Approximately or asymptotically equal |
+| — | `TildeFullEqual` | `(any, any*) -> boolean` | Indicate isomorphism, congruence and homotopic equivalence |
+
+## Arithmetic
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `abs` | `Abs` | `(complex \| infinity) -> number` | Absolute value (magnitude) of a number. |
+| `absArg` | `AbsArg` | `(complex \| infinity) -> tuple<+oo \| real, real>` | Tuple of magnitude and argument of a complex number. |
+| — | `Add` | `(value+) -> value` | Sum of two or more values. |
+| `airyAi` | `AiryAi` | `(complex \| infinity) -> number` | Airy function of the first kind |
+| `airyAiPrime` | `AiryAiPrime` | `(complex \| infinity) -> number` | Derivative of the Airy function of the first kind |
+| `airyBi` | `AiryBi` | `(complex \| infinity) -> number` | Airy function of the second kind |
+| `airyBiPrime` | `AiryBiPrime` | `(complex \| infinity) -> number` | Derivative of the Airy function of the second kind |
+| `arg` | `Arg` | `(complex \| infinity) -> number` | `Arg` is an alias for `Argument`, which is the preferred name. |
+| `argument` | `Argument` | `(complex \| infinity) -> number` | Complex argument (phase angle) of a number. |
+| `besselI` | `BesselI` | `(order: complex, complex \| infinity) -> number` | Modified Bessel function of the first kind |
+| `besselJ` | `BesselJ` | `(order: complex, complex \| infinity) -> number` | Bessel function of the first kind |
+| `besselK` | `BesselK` | `(order: complex, complex \| infinity) -> number` | Modified Bessel function of the second kind (Macdonald function) |
+| `besselY` | `BesselY` | `(order: complex, complex \| infinity) -> number` | Bessel function of the second kind (Neumann function) |
+| `beta` | `Beta` | `(complex \| infinity, complex \| infinity) -> number` | Euler beta function |
+| `catalanConstant` | `CatalanConstant` | constant `real<0.915965594177219..0.9159655941772191>` = `0.915965594177219015055` | Catalan's constant G ≈ 0.9160. |
+| `ceil` | `Ceil` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number up to the next largest integer |
+| `chop` | `Chop` | `(T) -> T where T: number` | Replace tiny numeric values with zero. |
+| `clamp` | `Clamp` | `(real \| signed_infinity, real \| signed_infinity, real \| signed_infinity) -> real \| signed_infinity` | Clamp a value to the range [lo, hi] = min(max(x, lo), hi). |
+| `complex` | `Complex` | `(real: number, imaginary: number) -> complex` | Construct a complex number from real and imaginary parts. |
+| `complexInfinity` | `ComplexInfinity` | constant `number` = `~oo` | Complex infinity, a single unsigned infinity in the complex plane. |
+| `complexRoots` | `ComplexRoots` | `(complex, integer) -> list<number>` | All n-th complex roots of a number. |
+| `conjugate` | `Conjugate` | `(T) -> T where T: number` | Complex conjugate of a number, or the pointwise conjugate of a function. |
+| — | `ContinuationPlaceholder` | constant `unknown` | This symbol indicates that some elements in a collection have been omitted, for example in a long list of numbers, or in an infinite set |
+| `denominator` | `Denominator` | `(number) -> nothing \| number` | Denominator of an expression |
+| `digamma` | `Digamma` | `(complex \| infinity) -> number` | Digamma function, the logarithmic derivative of the gamma function |
+| `distance` | `Distance` | `(list<list<number>> \| list<number> \| list<tuple> \| tuple, list<list<number>> \| list<number> \| list<tuple> \| tuple) -> number` | Euclidean distance between two points, broadcasting over a list of points. |
+| — | `Divide` | `(complex \| infinity, (complex \| infinity)+) -> number` | Quotient of a numerator and one or more denominators. |
+| `elementMax` | `ElementMax` | `(real \| signed_infinity, (real \| signed_infinity)+) -> real \| signed_infinity` | Element-wise maximum: broadcasts scalars over collections (and zips collections), returning a collection; all-scalar arguments give a scalar. |
+| `elementMin` | `ElementMin` | `(real \| signed_infinity, (real \| signed_infinity)+) -> real \| signed_infinity` | Element-wise minimum: broadcasts scalars over collections (and zips collections), returning a collection; all-scalar arguments give a scalar. |
+| `eulerGamma` | `EulerGamma` | constant `real<0.5772156649015328..0.5772156649015329>` = `0.577215664901532860607` | The Euler–Mascheroni constant γ ≈ 0.5772. |
+| `exp` | `Exp` | `(number) -> number` | Natural exponential function: e^x. |
+| `exp2` | `Exp2` | `(number) -> number` | Base-2 exponential: 2^x |
+| `exponentialE` | `ExponentialE` | constant `real<2.718281828459045..2.718281828459046>` = `2.71828182845904523536` | Euler's number e ≈ 2.71828, the base of the natural logarithm. |
+| — | `Factorial` | `(complex \| infinity) -> number` | Factorial function: the product of all positive integers less than or equal to n |
+| `factorial2` | `Factorial2` | `(complex \| infinity) -> number` | Double Factorial Function |
+| `floor` | `Floor` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number down to the nearest integer. |
+| `fract` | `Fract` | `(real \| signed_infinity) -> real<0..1>` | Fractional part of a number: x - floor(x) |
+| `gcd` | `GCD` | `(any*) -> number` | Greatest Common Divisor |
+| `gamma` | `Gamma` | `(complex \| infinity, (complex \| infinity)?) -> number` | Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt. |
+| `gammaLn` | `GammaLn` | `(complex \| infinity) -> number` | Natural logarithm of the gamma function. |
+| `goldenRatio` | `GoldenRatio` | constant `real<1.618033988749894..1.618033988749895>` = `1/2 * (1 + sqrt(5))` | The golden ratio φ = (1+√5)/2 ≈ 1.618. |
+| `half` | `Half` | constant `rational` = `1/2` | The rational number one half (1/2). |
+| `heaviside` | `Heaviside` | `(real \| signed_infinity) -> rational<0..1>` | Heaviside step function. |
+| `im` | `Im` | `(complex \| infinity) -> number` | `Im` is an alias for `Imaginary`, which is the preferred name. |
+| `imaginary` | `Imaginary` | `(complex \| infinity) -> number` | Imaginary part of a complex number. |
+| `imaginaryUnit` | `ImaginaryUnit` | constant `imaginary` = `i` | The imaginary unit, whose square is −1. |
+| `infimum` | `Infimum` | `(value*) -> number` | Like Min, but defined for open sets |
+| `interpret` | `Interpret` | `(any) -> any` | Interpret a notational expression as its mathematical meaning. |
+| `isComposite` | `IsComposite` | `(number) -> boolean` | `IsComposite(n)` returns `True` if `n` is a composite number |
+| `isEven` | `IsEven` | `(number) -> boolean` | `IsEven(n)` returns `True` if `n` is an even number |
+| `isOdd` | `IsOdd` | `(number) -> boolean` | `IsOdd(n)` returns `True` if `n` is an odd number |
+| `isPrime` | `IsPrime` | `(number) -> boolean` | `IsPrime(n)` returns `True` if `n` is a prime number |
+| `lcm` | `LCM` | `(any*) -> number` | Least Common Multiple |
+| `lambertW` | `LambertW` | `(complex \| infinity, number?) -> number` | Lambert W function (product logarithm) |
+| `lb` | `Lb` | `(number) -> number` | Base-2 Logarithm |
+| `lg` | `Lg` | `(number) -> number` | Base-10 Logarithm |
+| `ln` | `Ln` | `(complex \| infinity, base: (complex \| infinity)?) -> complex \| infinity` | Natural Logarithm |
+| `log` | `Log` | `(complex \| infinity, base: (complex \| infinity)?) -> number` | Log(z, b = 10) = Logarithm of base b |
+| `log10` | `Log10` | `(number) -> number` | Base-10 Logarithm |
+| `log2` | `Log2` | `(number) -> number` | Base-2 Logarithm |
+| `machineEpsilon` | `MachineEpsilon` | constant `real` = `2.220446049250313e-16` | The difference between 1 and the next larger floating point number (machine epsilon). |
+| `max` | `Max` | `(value*) -> number` | Maximum of two or more numbers |
+| `measurement` | `Measurement` | `(value, value) -> value` | A nominal value carrying a 1σ absolute uncertainty. |
+| `min` | `Min` | `(value+) -> number` | Minimum of two or more numbers |
+| — | `Mod` | `(real, real) -> real` | Modulo: the remainder of the floored division of x by y. |
+| — | `Multiply` | `(number*) -> number` | Product of two or more values. |
+| — | `NaN` | constant `number` = `NaN` | Not a Number, the result of an undefined or unrepresentable numeric operation. |
+| — | `Negate` | `(complex \| infinity) -> number` | Additive Inverse |
+| `negativeInfinity` | `NegativeInfinity` | constant `-oo` = `-oo` | Negative infinity (−∞). |
+| `numerator` | `Numerator` | `(number) -> nothing \| number` | Numerator of an expression |
+| `numeratorDenominator` | `NumeratorDenominator` | `(number) -> nothing \| tuple<number, number>` | Sequence of Numerator and Denominator of an expression |
+| — | `PlusMinus` | `(T, U) -> tuple<T, U> where T: value, U: value` | Plus or Minus |
+| `polyGamma` | `PolyGamma` | `(order: integer, complex \| infinity) -> number` | Polygamma function, the n-th derivative of the digamma function |
+| `positiveInfinity` | `PositiveInfinity` | constant `+oo` = `+oo` | Positive infinity (+∞). |
+| — | `Power` | `(complex \| infinity, complex \| signed_infinity) -> number` | Exponentiation: raise a base to a power. |
+| — | `PreDecrement` | `(number) -> number` | Decrement a number by one. |
+| — | `PreIncrement` | `(number) -> number` | Increment a number by one. |
+| `product` | `Product` | `(any, tuple*) -> number` | `Product(f, a, b)` computes the product of `f` from `a` to `b` |
+| `rational` | `Rational` | `((integer, integer) -> rational) \| ((real) -> rational)` | Construct a rational number from a numerator and denominator. |
+| `rationalize` | `Rationalize` | `(real, real<0..>?) -> rational` | Approximate a real number by a rational. |
+| `re` | `Re` | `(complex \| infinity) -> number` | `Re` is an alias for `Real`, which is the preferred name. |
+| `real` | `Real` | `(complex \| infinity) -> number` | Real part of a complex number. |
+| `remainder` | `Remainder` | `(T, T) -> T where T: number` | IEEE remainder: the signed remainder after dividing x by y, with the quotient rounded to the nearest integer (ties round toward +Infinity, matching JavaScript `Math.round`) |
+| `root` | `Root` | `(complex \| infinity, complex \| infinity) -> number` | n-th root of a value. |
+| `round` | `Round` | `(real \| signed_infinity, integer?) -> real \| signed_infinity` | Rounds a number to the nearest integer, or (with a precision argument) to `n` decimal places. |
+| `sign` | `Sign` | `(complex \| signed_infinity) -> complex` | Sign of a number: -1, 0, or 1 for a real; `z/\|z\|`, the point of the unit circle in its direction, for a complex `z`. |
+| `sqrt` | `Sqrt` | `(complex \| infinity) -> complex \| infinity` | Square Root |
+| — | `Square` | `(number) -> number` | Square of a number: x^2. |
+| — | `Subtract` | `(number+) -> number` | Difference between two or more values. |
+| `sum` | `Sum` | `(any, tuple*) -> number` | `Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L` |
+| `supremum` | `Supremum` | `(value*) -> number` | Like Max, but defined for open sets |
+| `trigamma` | `Trigamma` | `(complex \| infinity) -> number` | Trigamma function, the derivative of the digamma function |
+| `truncate` | `Truncate` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number towards zero (removes the fractional part) |
+| `zeta` | `Zeta` | `(complex \| infinity) -> number` | Riemann zeta function |
+| — | `e` | constant `real<2.718281828459045..2.718281828459046>` = `e` | Euler's number e ≈ 2.71828, the base of the natural logarithm. |
+| — | `i` | constant `imaginary` = `i` | The imaginary unit, whose square is −1. |
+
+### Examples
+
+```epsil
+rationalize(1.75)
+// ➔ 7/4
+```
+
+```epsil
+rationalize(sqrt(3), 1/500)
+// ➔ 26/15
+```
+
+## Trigonometry
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `arccos` | `Arccos` | `(complex) -> number` | Arccosine, the inverse cosine function. |
+| `arccot` | `Arccot` | `(complex \| signed_infinity) -> number` | Arccotangent, the inverse cotangent function. |
+| `arccsc` | `Arccsc` | `(complex \| infinity) -> number` | Arccosecant, the inverse cosecant function. |
+| `arcosh` | `Arcosh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic cosine (area hyperbolic cosine). |
+| `arcoth` | `Arcoth` | `(complex \| infinity) -> number` | Inverse hyperbolic cotangent (area hyperbolic cotangent). |
+| `arcsch` | `Arcsch` | `(complex \| infinity) -> number` | Inverse hyperbolic cosecant (area hyperbolic cosecant). |
+| `arcsec` | `Arcsec` | `(complex \| infinity) -> number` | Arcsecant, the inverse secant function. |
+| `arcsin` | `Arcsin` | `(complex) -> number` | Arcsine, the inverse sine function. |
+| `arctan` | `Arctan` | `(complex \| signed_infinity) -> number` | Inverse tangent. |
+| `arctan2` | `Arctan2` | `(y: real \| signed_infinity, x: real \| signed_infinity) -> real` | Two-argument arctangent giving the angle of a vector. |
+| `arsech` | `Arsech` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic secant (area hyperbolic secant). |
+| `arsinh` | `Arsinh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic sine (area hyperbolic sine). |
+| `artanh` | `Artanh` | `(complex \| signed_infinity) -> number` | Inverse hyperbolic tangent (area hyperbolic tangent). |
+| `cos` | `Cos` | `(complex) -> number` | Cosine of an angle. |
+| `cosIntegral` | `CosIntegral` | `(complex \| infinity) -> number` | Cosine integral: γ + ln(x) + ∫₀ˣ (cos(t)−1)/t dt. |
+| `cosh` | `Cosh` | `(complex \| signed_infinity) -> number` | Hyperbolic cosine. |
+| `coshIntegral` | `CoshIntegral` | `(complex \| infinity) -> number` | Hyperbolic cosine integral: γ + ln\|x\| + ∫₀ˣ (cosh(t)−1)/t dt. |
+| `cot` | `Cot` | `(complex) -> number` | Cotangent, the reciprocal of tangent. |
+| `coth` | `Coth` | `(complex \| signed_infinity) -> number` | Hyperbolic cotangent, the reciprocal of hyperbolic tangent. |
+| `csc` | `Csc` | `(complex) -> number` | Cosecant, the reciprocal of sine. |
+| `csch` | `Csch` | `(complex \| signed_infinity) -> number` | Hyperbolic cosecant, the reciprocal of hyperbolic sine. |
+| `dms` | `DMS` | `(number, number?, number?) -> number` | Construct an angle from degrees, minutes, and seconds. |
+| `degrees` | `Degrees` | `(real) -> real` | Convert an angle in degrees. |
+| `fresnelC` | `FresnelC` | `(complex \| signed_infinity) -> complex` | Fresnel cosine integral. |
+| `fresnelS` | `FresnelS` | `(complex \| signed_infinity) -> complex` | Fresnel sine integral. |
+| `haversine` | `Haversine` | `(real) -> number` | Haversine function. |
+| `hypot` | `Hypot` | `(infinity \| real, infinity \| real) -> +oo \| nan \| real` | Hypotenuse length: sqrt(x^2 + y^2). |
+| `inverseFunction` | `InverseFunction` | `(function) -> function` | Inverse of a function. |
+| `inverseHaversine` | `InverseHaversine` | `(real) -> number` | Inverse haversine function. |
+| `pi` | `Pi` | constant `real<3.141592653589793..3.141592653589794>` = `3.14159265358979323846` | The constant π ≈ 3.14159, the ratio of a circle's circumference to its diameter. |
+| `sec` | `Sec` | `(complex) -> number` | Secant, the reciprocal of cosine. |
+| `sech` | `Sech` | `(complex \| signed_infinity) -> number` | Hyperbolic secant, the reciprocal of hyperbolic cosine. |
+| `sin` | `Sin` | `(complex) -> number` | Sine of an angle. |
+| `sinIntegral` | `SinIntegral` | `(complex \| infinity) -> number` | Sine integral: ∫₀ˣ sin(t)/t dt. |
+| `sinc` | `Sinc` | `(complex \| signed_infinity) -> complex` | Unnormalized sinc function: sin(x)/x with sinc(0)=1. |
+| `sinh` | `Sinh` | `(complex \| signed_infinity) -> number` | Hyperbolic sine. |
+| `sinhIntegral` | `SinhIntegral` | `(complex \| infinity) -> number` | Hyperbolic sine integral: ∫₀ˣ sinh(t)/t dt. |
+| `tan` | `Tan` | `(complex) -> number` | Tangent of an angle. |
+| `tanh` | `Tanh` | `(complex \| signed_infinity) -> number` | Hyperbolic tangent. |
+| `trigExpand` | `TrigExpand` | `(value) -> value` | Expand trigonometric and hyperbolic functions of sums and integer multiples of angles. |
+| `trigReduce` | `TrigReduce` | `(value) -> value` | Rewrite products and integer powers of trigonometric and hyperbolic functions as a linear combination of functions of multiple angles (the inverse of TrigExpand). |
+| `trigToExp` | `TrigToExp` | `(value) -> value` | Rewrite trigonometric and hyperbolic functions in terms of the complex exponential, exactly. |
+
+## Calculus
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `bigO` | `BigO` | `(value) -> number` | Landau big-O remainder term. |
+| `circularIntegrate` | `CircularIntegrate` | `(function, limits+) -> number` | Contour (closed-path) integral. |
+| — | `D` | `(expression, variables: symbol*) -> expression` | Symbolic partial derivative with respect to one or more variables. |
+| `dSolve` | `DSolve` | `(expression, symbol, symbol) -> expression` | Symbolic differential equation solver. |
+| `derivative` | `Derivative` | `(function, order: number*) -> function` | Derivative operator that returns a derivative function. |
+| `integrate` | `Integrate` | `(function, limits+) -> number` | Symbolic integral with optional bounds. |
+| `interpolatingFunction` | `InterpolatingFunction` | `(list<any>, number?) -> number` | Piecewise-quartic dense-output interpolant of a numeric ODE solution (produced by `NDSolveFunction`). |
+| `jacobianMatrix` | `JacobianMatrix` | `(any, any?) -> value` | JacobianMatrix(fs, vars): the matrix of partial derivatives |
+| `limit` | `Limit` | `(function, point: number, direction: number?) -> number` | Limit of a function |
+| `limits` | `Limits` | `(index: symbol, lower: value, upper: value) -> tuple` | Limits of a function |
+| `nd` | `ND` | `(function, at: number) -> list<number> \| number \| tuple` | Numerical derivative evaluated at a point. |
+| `ndSolve` | `NDSolve` | `(expression, symbol, limits: symbol \| tuple, number, number?) -> list` | Numerical differential equation solver. |
+| `ndSolveFunction` | `NDSolveFunction` | `(expression, symbol, limits: symbol \| tuple, number) -> function` | Numerically solve an ordinary differential equation and return the solution as an applicable function (a `Function` literal wrapping an `InterpolatingFunction`), usable at any point of the integration interval. |
+| `nIntegrate` | `NIntegrate` | `(function, limits: (symbol \| tuple)?) -> number` | Numerical approximation of a definite integral. |
+| `nLimit` | `NLimit` | `(function, point: number, direction: number?) -> number` | Numerical approximation of the limit of a function |
+| `normal` | `Normal` | `(value) -> value` | Strip Big-O remainder terms from a series, yielding the truncated polynomial. |
+| `rSolve` | `RSolve` | `(expression, symbol, symbol) -> expression` | Symbolic recurrence equation solver. |
+| `residue` | `Residue` | `(expression, variable: symbol, point: value) -> number` | Residue of a function at a point (the coefficient of (x-a)⁻¹ in its Laurent expansion) |
+| `series` | `Series` | `(expression, variable: symbol?, point: value?, order: number?) -> number` | Taylor series expansion of an expression about a point (or an asymptotic expansion at ±∞), including Laurent, Puiseux (fractional-power), and log-aware expansions at poles and branch points. |
+
+## Polynomials
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `apart` | `Apart` | `(value, symbol?) -> value` | Alias for PartialFraction. |
+| `cancel` | `Cancel` | `(value, symbol?) -> value` | Cancel common polynomial factors in the numerator and denominator of a rational expression. |
+| `coefficientList` | `CoefficientList` | `(value, symbol?) -> list<value>` | Return the list of coefficients of a polynomial, from highest to lowest degree. |
+| `discriminant` | `Discriminant` | `(value, symbol?) -> value` | Return the discriminant of a polynomial. |
+| `distribute` | `Distribute` | `(value) -> value` | Distribute multiplication over addition |
+| `expand` | `Expand` | `(value) -> value` | Expand out products and positive integer powers |
+| `expandAll` | `ExpandAll` | `(value) -> value` | Recursively expand out products and positive integer powers |
+| `factor` | `Factor` | `(value, symbol?) -> value` | Factor a polynomial expression into a product of irreducible factors. |
+| `partialFraction` | `PartialFraction` | `(value, symbol?) -> value` | Decompose a rational expression into partial fractions. |
+| `polynomial` | `Polynomial` | `(list<value>, symbol) -> value` | Construct a polynomial from a list of coefficients (highest to lowest degree) and a variable. |
+| `polynomialDegree` | `PolynomialDegree` | `(value, symbol?) -> integer` | Return the degree of a polynomial with respect to a variable. |
+| `polynomialGCD` | `PolynomialGCD` | `(a: value, b: value, variable: symbol?) -> value` | Return the greatest common divisor of two polynomials. |
+| `polynomialQuotient` | `PolynomialQuotient` | `(dividend: value, divisor: value, variable: symbol?) -> value` | Return the quotient of polynomial division of dividend by divisor. |
+| `polynomialRemainder` | `PolynomialRemainder` | `(dividend: value, divisor: value, variable: symbol?) -> value` | Return the remainder of polynomial division of dividend by divisor. |
+| `polynomialRoots` | `PolynomialRoots` | `(value, symbol?) -> set<value>` | Return the roots of a polynomial expression. |
+| `resultant` | `Resultant` | `(a: value, b: value, variable: symbol?) -> value` | Return the resultant of two polynomials with respect to a variable. |
+| `together` | `Together` | `(value) -> value` | Combine rational expressions into a single fraction |
+
+## Combinatorics
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `bellNumber` | `BellNumber` | `(integer) -> integer` | Compute the Bell number B(n), the number of partitions of a set of n elements. |
+| `binomial` | `Binomial` | `(complex \| infinity, complex \| infinity) -> number` | Compute the binomial coefficient C(n, k) = n! / (k! |
+| `cartesianProduct` | `CartesianProduct` | `(set<any>+) -> set` | Return the Cartesian product of input sets. |
+| `choose` | `Choose` | `(n: complex \| infinity, m: complex \| infinity) -> number` | Binomial coefficient: number of ways to choose k items from n. |
+| `combinations` | `Combinations` | `((S, integer) -> list<string> where S: string) & ((collection, integer) -> list<list>)` | Return all k-element combinations of a collection. |
+| `fibonacci` | `Fibonacci` | `(integer) -> integer` | Compute the nth Fibonacci number. |
+| `multinomial` | `Multinomial` | `(integer+) -> integer` | Compute the multinomial coefficient for multiple integers. |
+| `permutations` | `Permutations` | `((S, integer?) -> list<string> where S: string) & ((collection, integer?) -> list<list>)` | Return all permutations of length k (default full length) of a collection. |
+| `pochhammer` | `Pochhammer` | `(complex \| infinity, complex \| infinity) -> number` | Rising factorial (Pochhammer symbol) (a)_k = a(a+1)…(a+k-1). |
+| `powerSet` | `PowerSet` | `(set<any>) -> set` | Return the power set of a set (set of all subsets). |
+| `subfactorial` | `Subfactorial` | `(integer) -> integer` | Compute the number of derangements (subfactorial) of n items. |
+
+## Number theory
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `bernoulliB` | `BernoulliB` | `(integer) -> rational` | Return the nth Bernoulli number Bₙ as an exact rational, using the convention B₁ = -1/2. |
+| `carmichaelLambda` | `CarmichaelLambda` | `(integer) -> integer` | Return the Carmichael function λ(n) (the reduced totient): the smallest positive integer `m` such that `a^m ≡ 1 (mod n)` for every `a` coprime to `n`. |
+| `catalanNumber` | `CatalanNumber` | `(integer) -> integer` | Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`. |
+| `chineseRemainder` | `ChineseRemainder` | `(collection<any>, collection<any>) -> integer` | Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. |
+| `continuedFraction` | `ContinuedFraction` | `(real, integer?) -> list<integer>` | Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. |
+| `digitCount` | `DigitCount` | `(integer, integer?, integer?) -> integer \| list<integer>` | Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. |
+| `digitSum` | `DigitSum` | `(integer, integer?) -> integer` | Return the sum of the digits of `n` in the given `base` (default 10). |
+| `divides` | `Divides` | `(integer, integer) -> boolean` | `Divides(a, b)` returns `True` if `a` divides `b` (i.e. |
+| `divisorSigma` | `DivisorSigma` | `(integer, integer) -> integer` | The divisor function σ_k(n) = Σ_&#123;d \| n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. |
+| `divisors` | `Divisors` | `(integer) -> list<integer>` | Return the sorted list of positive divisors of an integer `n`. |
+| `eulerian` | `Eulerian` | `(integer, integer) -> integer` | Eulerian number A(n, m): number of permutations of &#123;1..n&#125; with exactly m ascents. |
+| `extendedGCD` | `ExtendedGCD` | `(integer, integer) -> tuple<integer, integer, integer>` | Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients). |
+| `factorInteger` | `FactorInteger` | `(integer) -> list<tuple<integer, integer>>` | Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. |
+| `fromContinuedFraction` | `FromContinuedFraction` | `(collection<any>) -> number` | Reconstruct the (rational) value of a continued fraction given its list of integer terms `[a0, a1, …]`. |
+| `fromDigits` | `FromDigits` | `(collection<any>, integer?) -> integer` | Reconstruct an integer from its list of digits (most-significant first) in the given `base` (default 10). |
+| `integerDigits` | `IntegerDigits` | `(integer, integer?, integer?) -> list<integer>` | Return the digits of `n` in the given `base` (default 10), most-significant first. |
+| `integerSqrt` | `IntegerSqrt` | `(integer) -> integer` | Return the integer square root of `n`, i.e. the largest integer `m` such that `m² ≤ n`. |
+| `isAbundant` | `IsAbundant` | `(integer) -> boolean` | True if n is an abundant number (sum of divisors &gt; 2n). |
+| `isCenteredSquare` | `IsCenteredSquare` | `(integer) -> boolean` | True if n is a centered square number. |
+| `isHappy` | `IsHappy` | `(integer) -> boolean` | True if n is a happy number, a number which eventually reaches 1 when the number is replaced by the sum of the square of each digit |
+| `isOctahedral` | `IsOctahedral` | `(integer) -> boolean` | True if n is an octahedral number. |
+| `isPerfect` | `IsPerfect` | `(integer) -> boolean` | Returns "True" if n is a perfect number, a positive integer which equals the sum of all its divisors. |
+| `isPerfectPower` | `IsPerfectPower` | `(integer) -> boolean` | Return `"True"` if `n` is a perfect power `a^b` for integers `a` and `b ≥ 2` (a negative `n` requires an odd exponent). |
+| `isSquare` | `IsSquare` | `(integer) -> boolean` | True if n is a perfect square. |
+| `isSquareFree` | `IsSquareFree` | `(integer) -> boolean` | Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). |
+| `isTriangular` | `IsTriangular` | `(integer) -> boolean` | True if n is a triangular number. |
+| `jacobiSymbol` | `JacobiSymbol` | `(integer, integer) -> integer` | The Jacobi symbol (a/n) for an odd `n > 0`. |
+| `legendreSymbol` | `LegendreSymbol` | `(integer, integer) -> integer` | The Legendre symbol (a/p) for an odd prime `p`. |
+| `lucas` | `Lucas` | `(integer) -> integer` | `Lucas` is an alias for `LucasL`, which is the preferred name. |
+| `lucasL` | `LucasL` | `(integer) -> integer` | Return the nth Lucas number: `LucasL(0)` is 2, `LucasL(1)` is 1, and `LucasL(n) = LucasL(n-1) + LucasL(n-2)`. |
+| `modularInverse` | `ModularInverse` | `(integer, integer) -> integer` | Return the modular multiplicative inverse of `a` modulo `m`: the integer `x` in [0, m) with `a·x ≡ 1 (mod m)`. |
+| `moebiusMu` | `MoebiusMu` | `(integer) -> integer` | Return the Möbius function μ(n): 0 if `n` is divisible by a perfect square &gt; 1, otherwise (-1) raised to the number of distinct prime factors. |
+| `multiplicativeOrder` | `MultiplicativeOrder` | `(integer, integer) -> integer` | The multiplicative order of `a` modulo `n`: the smallest `k > 0` such that `a^k ≡ 1 (mod n)`. |
+| `nPartition` | `NPartition` | `(integer) -> integer` | Number of integer partitions of n. |
+| `nextPrime` | `NextPrime` | `(integer, integer?) -> integer` | Return the smallest prime greater than `n`. |
+| `notDivides` | `NotDivides` | `(integer, integer) -> boolean` | `NotDivides(a, b)` returns `True` if `a` does not divide `b`, corresponding to the notation `a ∤ b`. |
+| `nthPrime` | `NthPrime` | `(integer) -> integer` | Return the nth prime number (1-based): `NthPrime(1)` is 2, `NthPrime(2)` is 3, … |
+| `powerMod` | `PowerMod` | `(integer, integer, integer) -> integer` | Return `a^b mod m` (modular exponentiation). |
+| `primeFactors` | `PrimeFactors` | `(integer) -> list<integer>` | Return the sorted list of distinct prime factors of an integer `n`. |
+| `primeNu` | `PrimeNu` | `(integer) -> integer` | Return ω(n), the number of distinct prime factors of `n`. |
+| `primeNumber` | `PrimeNumber` | `(integer) -> integer` | The nth prime number. |
+| `primeOmega` | `PrimeOmega` | `(integer) -> integer` | Return Ω(n), the number of prime factors of `n` counted with multiplicity. |
+| `primePi` | `PrimePi` | `(real) -> integer` | Return π(n), the prime-counting function: the number of primes less than or equal to `n`. |
+| `primitiveRoot` | `PrimitiveRoot` | `(integer) -> integer` | The smallest primitive root modulo `n` (a generator of the multiplicative group of integers mod `n`), or undefined if none exists (which happens unless `n` is 1, 2, 4, pᵏ, or 2pᵏ for an odd prime p). |
+| `radical` | `Radical` | `(integer) -> integer` | Return the radical of `n` (its square-free kernel): the product of its distinct prime factors. |
+| `randomPrime` | `RandomPrime` | `(integer, integer?) random -> integer` | Return a random prime. |
+| `sigma0` | `Sigma0` | `(integer) -> integer` | Number of positive divisors of n. |
+| `sigma1` | `Sigma1` | `(integer) -> integer` | Sum of positive divisors of n. |
+| `sigmaMinus1` | `SigmaMinus1` | `(integer) -> rational` | Sum of reciprocals of positive divisors of n. |
+| `stirling` | `Stirling` | `(integer, integer) -> integer` | Stirling number of the second kind S(n, m): ways to partition n elements into m non-empty subsets. |
+| `stirlingS1` | `StirlingS1` | `(integer, integer) -> integer` | Signed Stirling number of the first kind s(n, m): the coefficient of x^m in the falling factorial x(x−1)…(x−n+1). |
+| `totient` | `Totient` | `(integer) -> integer` | Euler's totient function φ(n): count of positive integers ≤ n that are coprime to n. |
+
+### Examples
+
+```epsil
+bernoulliB(2)
+// ➔ 1/6
+```
+
+```epsil
+carmichaelLambda(15)
+// ➔ 4
+```
+
+```epsil
+catalanNumber(5)
+// ➔ 42
+```
+
+```epsil
+chineseRemainder([2, 3, 2], [3, 5, 7])
+// ➔ 23
+```
+
+```epsil
+continuedFraction(43/19)
+// ➔ [2,3,1,4]
+```
+
+```epsil
+digitCount(122, 10, 2)
+// ➔ 2
+```
+
+```epsil
+digitSum(1234)
+// ➔ 10
+```
+
+```epsil
+divides(3, 12)
+// ➔ "True"
+```
+
+```epsil
+divisorSigma(2, 6)
+// ➔ 50
+```
+
+```epsil
+divisors(12)
+// ➔ [1,2,3,4,6,12]
+```
+
+```epsil
+extendedGCD(12, 18)
+// ➔ (6, -1, 1)
+```
+
+```epsil
+factorInteger(360)
+// ➔ [(2, 3),(3, 2),(5, 1)]
+```
+
+```epsil
+fromContinuedFraction([2, 3, 1, 4])
+// ➔ 43/19
+```
+
+```epsil
+fromDigits([1, 2, 3, 4])
+// ➔ 1234
+```
+
+```epsil
+integerDigits(255, 16)
+// ➔ [15,15]
+```
+
+```epsil
+integerSqrt(17)
+// ➔ 4
+```
+
+```epsil
+isPerfectPower(64)
+// ➔ "True"
+```
+
+```epsil
+isSquareFree(30)
+// ➔ "True"
+```
+
+```epsil
+jacobiSymbol(5, 21)
+// ➔ 1
+```
+
+```epsil
+legendreSymbol(3, 7)
+// ➔ -1
+```
+
+```epsil
+lucasL(10)
+// ➔ 123
+```
+
+```epsil
+modularInverse(3, 7)
+// ➔ 5
+```
+
+```epsil
+moebiusMu(30)
+// ➔ -1
+```
+
+```epsil
+multiplicativeOrder(2, 7)
+// ➔ 3
+```
+
+```epsil
+nextPrime(10)
+// ➔ 11
+```
+
+```epsil
+nextPrime(10, -1)
+// ➔ 7
+```
+
+```epsil
+nthPrime(10)
+// ➔ 29
+```
+
+```epsil
+powerMod(2, 10, 1000)
+// ➔ 24
+```
+
+```epsil
+primeFactors(360)
+// ➔ [2,3,5]
+```
+
+```epsil
+primeNu(360)
+// ➔ 3
+```
+
+```epsil
+primeOmega(360)
+// ➔ 6
+```
+
+```epsil
+primePi(10)
+// ➔ 4
+```
+
+```epsil
+primitiveRoot(7)
+// ➔ 3
+```
+
+```epsil
+radical(360)
+// ➔ 30
+```
+
+```epsil
+randomPrime(100)
+```
+
+```epsil
+stirlingS1(5, 2)
+// ➔ -50
+```
+
+## Special functions
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `agm` | `AGM` | `(complex \| infinity, (complex \| infinity)?) -> number` | Arithmetic-geometric mean. |
+| `appellF1` | `AppellF1` | `(complex \| infinity, complex \| infinity, complex \| infinity, complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Appell hypergeometric function F₁(a; b₁, b₂; c; x, y), double series for \|x\|, \|y\| &lt; 1. |
+| `dedekindEta` | `DedekindEta` | `(complex \| infinity) -> number` | Dedekind eta function η(τ), Im(τ) &gt; 0. |
+| `eisensteinE` | `EisensteinE` | `(number, complex \| infinity) -> number` | Normalized Eisenstein series Eₛ(τ) of even weight s ≥ 2, Im(τ) &gt; 0. |
+| `ellipticE` | `EllipticE` | `(complex \| infinity, (complex \| infinity)?) -> number` | Elliptic integral of the second kind: complete E(m) with one argument, incomplete E(φ\|m) with two (amplitude first, parameter convention m = k², as in Mathematica). |
+| `ellipticF` | `EllipticF` | `(complex \| infinity, complex \| infinity) -> number` | Incomplete elliptic integral of the first kind F(φ\|m) (amplitude first, parameter convention m = k², as in Mathematica). |
+| `ellipticK` | `EllipticK` | `(complex \| infinity) -> number` | Complete elliptic integral of the first kind K(m), parameter convention m = k². |
+| `ellipticPi` | `EllipticPi` | `(complex \| infinity, complex \| infinity, (complex \| infinity)?) -> number` | Elliptic integral of the third kind: complete Π(n\|m) with two arguments, incomplete Π(n; φ\|m) with three (characteristic first, amplitude second, parameter convention m = k², as in Mathematica). |
+| `expIntegralEi` | `ExpIntegralEi` | `(complex \| infinity) -> number` | Exponential integral Ei(x) = PV ∫_&#123;−∞&#125;^x eᵗ/t dt. |
+| `hypergeometric1F1` | `Hypergeometric1F1` | `(complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Kummer confluent hypergeometric function ₁F₁(a; b; z) = M(a, b, z). |
+| `hypergeometric2F1` | `Hypergeometric2F1` | `(complex \| infinity, complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Gauss hypergeometric function ₂F₁(a, b; c; z). |
+| `jacobiTheta` | `JacobiTheta` | `(number, complex \| infinity, complex \| infinity, number?) -> number` | Jacobi theta function θⱼ(z, τ), j ∈ &#123;1,2,3,4&#125;, nome q = e^&#123;iπτ&#125; (Fungrim convention). |
+| `logIntegral` | `LogIntegral` | `(complex \| infinity) -> number` | Logarithmic integral li(x) = PV ∫₀ˣ dt/ln t = Ei(ln x). |
+| `polyLog` | `PolyLog` | `(complex \| infinity, complex \| infinity) -> number` | Polylogarithm Liₛ(z) = Σ_&#123;k≥1&#125; zᵏ/kˢ. |
+
+## Linear algebra
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `adjugateMatrix` | `AdjugateMatrix` | `(matrix) -> matrix` | Adjugate (classical adjoint) of a square matrix. |
+| `characteristicPolynomial` | `CharacteristicPolynomial` | `(matrix, any?) -> expression` | Characteristic polynomial det(x·I − A) of a square matrix (monic). |
+| `choleskyDecomposition` | `CholeskyDecomposition` | `(matrix) -> matrix` | Cholesky decomposition of a positive-definite matrix. |
+| `conjugateTranspose` | `ConjugateTranspose` | `(value, axis1: integer?, axis2: integer?) -> value` | Conjugate transpose (Hermitian adjoint) of a matrix or tensor. |
+| `cross` | `Cross` | `(tuple \| vector, tuple \| vector) -> tuple \| vector` | Cross product of two 3-vectors. |
+| `degree` | `Degree` | `(value) -> integer` | Degree of an object |
+| `determinant` | `Determinant` | `(matrix) -> number` | Determinant of a square matrix. |
+| `diagonal` | `Diagonal` | `(value) -> value` | Extract a matrix diagonal or build a diagonal matrix. |
+| `dimension` | `Dimension` | `(value) -> integer` | Dimension of an object |
+| `dot` | `Dot` | `(list<tuple> \| matrix \| tuple \| vector, list<tuple> \| matrix \| tuple \| vector) -> value` | Dot product (vector inner product) or matrix product. |
+| `eigen` | `Eigen` | `(matrix) -> tuple` | Eigenvalue-eigenvector decomposition of a square matrix. |
+| `eigenvalues` | `Eigenvalues` | `(matrix) -> list` | Eigenvalues of a square matrix. |
+| `eigenvectors` | `Eigenvectors` | `(matrix) -> list` | Eigenvectors of a square matrix. |
+| `flatten` | `Flatten` | `(value, integer?) -> list` | Flatten a tensor or collection into a list. |
+| `hadamardProduct` | `HadamardProduct` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Hadamard (element-wise) product of two vectors or matrices of the same shape. |
+| `hom` | `Hom` | `(value*) -> value` | Hom-set of morphisms between objects |
+| `identityMatrix` | `IdentityMatrix` | `(integer) -> matrix` | n-by-n identity matrix. |
+| `inverse` | `Inverse` | `(T) -> T where T: matrix` | Multiplicative inverse of a square matrix. |
+| `isDiagonal` | `IsDiagonal` | `(value) -> boolean` | Whether the matrix is diagonal (all off-diagonal entries are zero). |
+| `isSquareMatrix` | `IsSquareMatrix` | `(value) -> boolean` | Whether the value is a square matrix. |
+| `isSymmetric` | `IsSymmetric` | `(value) -> boolean` | Whether the matrix is symmetric (A equals its transpose). |
+| `kernel` | `Kernel` | `(value) -> list` | Kernel (null space) of a linear map |
+| `luDecomposition` | `LUDecomposition` | `(matrix) -> tuple` | LU decomposition of a square matrix. |
+| `linearSolve` | `LinearSolve` | `(matrix, matrix \| vector) -> value` | Solve the linear system A·x = b for x. |
+| `matrix` | `Matrix` | `(matrix, string?, string?) -> matrix` | Matrix constructor and canonicalizer. |
+| `matrixMultiply` | `MatrixMultiply` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Matrix and vector multiplication. |
+| `matrixPower` | `MatrixPower` | `(matrix, real) -> matrix` | Square matrix raised to a power. |
+| `matrixRank` | `MatrixRank` | `(value) -> integer` | Rank of a matrix (number of linearly independent rows/columns). |
+| `norm` | `Norm` | `(list<number> \| list<tuple> \| number \| tuple, (+oo \| real \| string)?) -> +oo \| nan \| real` | Vector or matrix norm. |
+| `onesMatrix` | `OnesMatrix` | `(integer, integer?) -> matrix` | Matrix filled with ones. |
+| `pseudoInverse` | `PseudoInverse` | `(matrix) -> matrix` | Moore-Penrose pseudoinverse of a matrix. |
+| `qrDecomposition` | `QRDecomposition` | `(matrix) -> tuple` | QR decomposition of a matrix. |
+| `rank` | `Rank` | `(value) -> integer` | The length of the shape of the expression. |
+| `reshape` | `Reshape` | `(value, tuple) -> value` | Reshape a tensor or collection to a target shape. |
+| `rowReduce` | `RowReduce` | `(matrix) -> matrix` | Reduced row echelon form (RREF) of a matrix. |
+| `svd` | `SVD` | `(matrix) -> tuple` | Singular value decomposition of a matrix. |
+| `shape` | `Shape` | `(value) -> tuple` | Return the shape tuple of an expression. |
+| `singularValues` | `SingularValues` | `(matrix) -> list` | The singular values of a matrix, sorted in descending order (including any zero values). |
+| `trace` | `Trace` | `(list<number> \| number, axis1: integer?, axis2: integer?) -> list<number> \| number` | Trace of a matrix or pair of tensor axes. |
+| `transpose` | `Transpose` | `(value, axis1: integer?, axis2: integer?) -> value` | Transpose a matrix or swap two tensor axes. |
+| `vector` | `Vector` | `(any+) -> vector` | Construct a column vector. |
+| `zeroMatrix` | `ZeroMatrix` | `(integer, integer?) -> matrix` | Matrix filled with zeros. |
+
+## Statistics
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `betaRegularized` | `BetaRegularized` | `(complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Regularized incomplete beta function I_x(a, b) |
+| `binCounts` | `BinCounts` | `(collection<any>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
+| `binomialDistribution` | `BinomialDistribution` | `(integer<0..>, real<0..1>) -> expression<BinomialDistribution>` | Binomial distribution: number of successes in n independent trials, each with success probability p. |
+| `cdf` | `CDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..1>` | Cumulative distribution function P(X ≤ x) of a distribution. |
+| `correlation` | `Correlation` | `(collection<any>, collection<any>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `covariance` | `Covariance` | `(collection<any>, collection<any>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `erf` | `Erf` | `(complex \| signed_infinity) -> complex` | Gauss error function |
+| `erfInv` | `ErfInv` | `(complex \| infinity) -> number` | Inverse of the error function |
+| `erfc` | `Erfc` | `(complex \| signed_infinity) -> complex` | Complementary error function: 1 - Erf(x) |
+| `erfi` | `Erfi` | `(complex \| signed_infinity) -> complex \| signed_infinity` | Imaginary error function: -i·Erf(i·x) |
+| `exponentialDistribution` | `ExponentialDistribution` | `(real<0<..>) -> expression<ExponentialDistribution>` | Exponential distribution with rate parameter λ. |
+| `findFit` | `FindFit` | `(any, any, any, any) -> dictionary` | Nonlinear least-squares fit of a model to data. |
+| `gammaRegularized` | `GammaRegularized` | `(complex \| infinity, complex \| infinity) -> number` | Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a) |
+| `histogram` | `Histogram` | `(collection<any>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
+| `interquartileRange` | `InterquartileRange` | `((collection<any> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
+| `kurtosis` | `Kurtosis` | `((collection<any> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
+| `linearRegression` | `LinearRegression` | `(any+) -> tuple<number, number>` | Least-squares linear fit b0 + b1·x. |
+| `mean` | `Mean` | `((collection<any> \| distribution \| number)+) -> number` | Arithmetic mean (average) of a collection of numbers. |
+| `median` | `Median` | `((collection<any> \| number)+) -> nan \| real \| signed_infinity` | Median of a collection of numbers. |
+| `mode` | `Mode` | `((collection<any> \| number)+) -> nan \| real \| signed_infinity` | Most frequently occurring value in a collection. |
+| `normalDistribution` | `NormalDistribution` | `(real, real<0<..>) -> expression<NormalDistribution>` | Normal (Gaussian) distribution with mean μ and standard deviation σ. |
+| `pdf` | `PDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..>` | Probability density (continuous) or mass (discrete) function of a distribution, evaluated at x. |
+| `poissonDistribution` | `PoissonDistribution` | `(real<0<..>) -> expression<PoissonDistribution>` | Poisson distribution with rate parameter λ. |
+| `polynomialFit` | `PolynomialFit` | `(any+) -> list<number>` | Least-squares polynomial fit of the given degree. |
+| `populationCovariance` | `PopulationCovariance` | `(collection<any>, collection<any>?) -> nan \| real` | Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `populationStandardDeviation` | `PopulationStandardDeviation` | `((collection<any> \| number)+) -> nan \| real<0..>` | Population Standard Deviation of a collection of numbers. |
+| `populationVariance` | `PopulationVariance` | `((collection<any> \| number)+) -> nan \| real<0..>` | Population variance of a collection of numbers. |
+| `quantile` | `Quantile` | `(collection<any> \| distribution, real<0..1>) -> nan \| real \| signed_infinity` | Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. |
+| `quartiles` | `Quartiles` | `((collection<any> \| number)+) -> tuple<lower: nan \| real \| signed_infinity, mid: nan \| real \| signed_infinity, upper: nan \| real \| signed_infinity>` | Lower quartile, median, and upper quartile of a collection. |
+| `randomSample` | `RandomSample` | `((T, number) random -> T where T: string) & ((indexed_collection, number) random -> list)` | RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`, without replacement. "Without replacement" is over POSITIONS, not values: on a multiset, repeats are expected — RandomSample([1, 1, 2], 2) can return [1, 1]. |
+| `skewness` | `Skewness` | `((collection<any> \| number)+) -> nan \| real` | Skewness of a collection of numbers. |
+| `slidingWindow` | `SlidingWindow` | `((S, integer, integer?) -> list<string> where S: string) & ((collection, integer, integer?) -> list<list>)` | Return overlapping sliding windows of fixed size over the collection. |
+| `standardDeviation` | `StandardDeviation` | `((collection<any> \| distribution \| number)+) -> nan \| real<0..>` | Sample Standard Deviation of a collection of numbers. |
+| `uniformDistribution` | `UniformDistribution` | `(real, real) -> expression<UniformDistribution>` | Continuous uniform distribution on the interval [a, b]. |
+| `variance` | `Variance` | `((collection<any> \| distribution \| number)+) -> nan \| real<0..>` | Sample variance of a collection of numbers. |
+
+### Examples
+
+```epsil
+binCounts([1, 2, 2, 3], 3)
+// ➔ [1,2,1]
+```
+
+```epsil
+histogram([1, 2, 2, 3], 3)
+// ➔ [(1, 1),(1.6666666666666665, 2),(2.333333333333333, 1)]
+```
+
+```epsil
+median([3, 1, 4, 2])
+// ➔ 5/2
+```
+
+```epsil
+mode([1, 2, 2, 3])
+// ➔ 2
+```
+
+```epsil
+quartiles([1, 2, 3, 4, 5])
+// ➔ (3/2, 3, 9/2)
+```
+
+```epsil
+slidingWindow([1, 2, 3, 4], 2)
+// ➔ [[1,2],[2,3],[3,4]]
+```
+
+```epsil
+slidingWindow("abcd", 2)
+// ➔ ["ab","bc","cd"]
+```
+
+## Units
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `isCompatibleUnit` | `IsCompatibleUnit` | `(value, value) -> value` | Check if two units have the same dimension |
+| `quantity` | `Quantity` | `(value, value) -> value` | A value paired with a physical unit |
+| `quantityMagnitude` | `QuantityMagnitude` | `(value) -> value` | Extract the numeric value from a quantity |
+| `quantityUnit` | `QuantityUnit` | `(value) -> value` | Extract the unit from a quantity |
+| `unitConvert` | `UnitConvert` | `(value, value) -> value` | Convert a quantity to a different compatible unit |
+| `unitDimension` | `UnitDimension` | `(value) -> value` | Return the dimension vector of a unit |
+| `unitSimplify` | `UnitSimplify` | `(value) -> value` | Simplify a quantity unit to a named derived unit if possible |
+
+## Physics
+
+| Epsil | MathJSON | Signature | Summary |
+|:------|:---------|:----------|:--------|
+| `avogadroConstant` | `AvogadroConstant` | constant `value` = `602214075999999987023872 mol^-1` | Avogadro constant |
+| `boltzmannConstant` | `BoltzmannConstant` | constant `value` = `1.380649e-23 J/K` | Boltzmann constant |
+| `elementaryCharge` | `ElementaryCharge` | constant `value` = `1.602176634e-19 C` | Elementary electric charge |
+| `gasConstant` | `GasConstant` | constant `value` = `8.314462618 J/mol⋅K` | Molar gas constant |
+| `gravitationalConstant` | `GravitationalConstant` | constant `value` = `6.6743e-11 m^3/kg⋅s^2` | Newtonian constant of gravitation |
+| `mu0` | `Mu0` | constant `value` = `0.00000125663706212 N/A^2` | Vacuum permeability |
+| `planckConstant` | `PlanckConstant` | constant `value` = `6.62607015e-34 J⋅s` | Planck constant |
+| `speedOfLight` | `SpeedOfLight` | constant `value` = `299792458 m/s` | Speed of light in vacuum |
+| `standardGravity` | `StandardGravity` | constant `value` = `9.80665 m/s^2` | Standard acceleration due to gravity |
+| `stefanBoltzmannConstant` | `StefanBoltzmannConstant` | constant `value` = `5.670374419e-8 W/m^2⋅K^4` | Stefan-Boltzmann constant |
+| `vacuumPermittivity` | `VacuumPermittivity` | constant `value` = `8.8541878128e-12 F/m` | Vacuum permittivity (electric constant) |
+
+---
+
+# Epsil Style Guide
+
+Source: https://epsil.dev/style/
+
+# Style Guide
+
+The idioms of well-written Epsil, in one place. Each rule says what to write,
+why, and where the full reference is. Every example on this page is executed
+by the documentation test, so the code is current.
+
+## Declarations
+
+**`const` for what is fixed, `let` for what varies.** A `const` reports an
+accidental write; a `let` is the honest choice for an accumulator, loop
+state, or a value refined as you go.
+
+```epsil
+const g = 9.81
+let total = 0
+for step in 1..3 { total = total + g * step }
+total
+// ➔ 58.86
+```
+
+**Annotate a contract, not a fact the engine already knows.** A parameter
+type on a function others call is a contract worth writing; a local whose
+value is `5` is already an integer. Inference types locals and infers a
+parameter's type from its use, so an annotation should say something the
+code does not.
+
+```epsil
+function area(r: real) -> real { pi * r^2 }
+let side = 3
+N(area(side), 8)
+// ➔ 28.274334
+```
+
+**Destructure with a tuple pattern.** `let (q, r) = …` declares several names
+at once; `(a, b) := (b, a)` writes names that exist, and evaluates the whole
+right side first, so it swaps. A bare `=` at statement level assigns only to
+a plain name; anywhere else it compares.
+
+```epsil
+let (q, r) = (floor(17 / 5), 17 % 5)
+(q, r) := (r, q)
+(q, r)
+// ➔ (2, 3)
+```
+
+See [Declarations](/declarations/) and
+[When to write an annotation](/types/#when-to-write-an-annotation).
+
+## Functions and recursion
+
+**Math style for a formula, block style for a body with statements.**
+`f(x) = …` reads as the equation it is; `function f(x) { … }` is for a body
+with a local `let`, a loop, or a `match`.
+
+```epsil
+h(x) = x^2 + 1
+function sumOfSquares(xs: list<number>) -> number {
+  let s = 0
+  for x in xs { s = s + h(x) }
+  s
+}
+sumOfSquares([1, 2, 3])
+// ➔ 17
+```
+
+**Base cases as clauses.** A literal parameter selects a clause by value, so
+a recursive definition states its base cases without an `if`.
+
+```epsil
+fib(0) = 0
+fib(1) = 1
+fib(n: integer) = fib(n - 1) + fib(n - 2)
+fib(20)
+// ➔ 6765
+```
+
+**Recursion needs no ceremony.** A one-step definition may call itself, and
+two definitions may call each other, in every form; nothing has to be
+declared first.
+
+```epsil
+even(n) = true if n == 0 else odd(n - 1)
+odd(n) = false if n == 0 else even(n - 1)
+[even(10), odd(7)]
+// ➔ [True, True]
+```
+
+**A lambda is for an argument.** Write `x => x^2` where a function is passed
+along and a name would add nothing; name a function you call more than once.
+
+See [Functions](/control-flow/#functions).
+
+## Collections and pipelines
+
+**Produce values with `map`, `filter`, `fold`; loop for effect.** A `for`
+loop evaluates to nothing and exists to update state. A value that is a
+transformation of a collection is a pipeline.
+
+```epsil
+1..10 |> filter(_, k => k % 3 == 0) |> map(k => k^2, _)
+// ➔ [9, 36, 81]
+```
+
+```epsil
+fold((acc, k) => acc + 1/k, 0, 1..10)
+// ➔ 7381/2520
+```
+
+**Mark the piped slot with `_`.** `xs |> f` passes the value as the only
+argument; when the function takes several, `_` says which.
+
+**Pipelines are lazy; materialize where you stand.** `Range`, `map`,
+`filter`, `take`, `drop`, and `join` are generators that enumerate when they
+are indexed, aggregated, or iterated, and a deferred mapping reads its
+variables at that moment. A collection literal snapshots its elements at
+once. When a later step will change a variable the pipeline reads, aggregate
+or index first.
+
+See [Pipelines](/control-flow/#pipelines) and
+[Collections: literals are values, pipelines are generators](/evaluation/#collections-literals-are-values-pipelines-are-generators).
+
+## Building a list one element at a time
+
+**Prefer a pipeline when the list has a formula.** A list whose element `k`
+depends only on `k` is a `map`; a running value is a `fold` whose accumulator
+is a scalar; a filtered selection is a `filter`. These build the list once,
+and their cost does not grow with the length in any way that matters.
+
+```epsil
+map(k => k^2, 1..5)
+// ➔ [1, 4, 9, 16, 25]
+```
+
+```epsil
+fold((acc, k) => acc + 1/k, 0, 1..10)
+// ➔ 7381/2520
+```
+
+**Growing a list in a loop is fine for lists of a few thousand elements.**
+`join(xs, [k])`, `append(xs, k)` and the spread literal `[...xs, k]` all
+produce a plain list literal when `xs` holds one: the engine folds a join of
+list literals into one literal. Each turn copies the current list, so the
+whole loop costs the square of its length — a thousand turns take under a
+second on a typical machine, a hundred take a few milliseconds. Past a few
+thousand elements, write the pipeline instead.
+
+```epsil
+let seen = []
+for word in ["a", "b", "a"] {
+  if !(word in seen) { seen = join(seen, [word]) }
+}
+seen
+// ➔ ["a", "b"]
+```
+
+The default `iterationLimit` stops a loop after 1024 turns, so a loop that
+builds anything larger needs the engine's limit raised (see
+[Interruptibility](/evaluation/#interruptibility)). The measurement
+behind these figures is in the
+[performance note](#loop-accumulation-measured) at the end of this page.
+
+## Indexing
+
+**Indexing is 1-based, and a slice is a range.** `xs[1]` is the first
+element and `xs[n]` the n-th; `xs[2..3]` is a slice; `first`, `last`,
+`take`, and `drop` name the common cases.
+
+```epsil
+let xs = [10, 20, 30, 40]
+(xs[1], xs[2..3], last(xs), first(drop(xs, 1)))
+// ➔ (10, [20,30], 40, 20)
+```
+
+**A tuple is a unit, a list is a sequence.** Destructure a tuple; iterate a
+list. A function that returns several values returns a tuple.
+
+## Errors as values
+
+**A failure is a value, not an exception.** A failing subexpression
+evaluates to an error value that propagates outward; the program keeps
+running. Construct one with `RuntimeError`, and let a caller decide what to
+do with it.
+
+```epsil
+function reciprocal(x: number) {
+  if x == 0 { RuntimeError("zero-has-no-reciprocal") } else { 1 / x }
+}
+[reciprocal(4), reciprocal(0) is error]
+// ➔ [1/4, True]
+```
+
+**Handle an error where the value is used.** `if let v: !error = f(x)`
+binds the successful value and falls to `else` otherwise; `while let`
+drains a partial function; a `match` case typed `!error` does the same in
+a case list. Do not test for an error with a comparison.
+
+```epsil
+function head(xs: list) { match xs { [h, ...] => h } }
+if let h: !error = head([]) { h } else { "empty" }
+// ➔ "empty"
+```
+
+See [Errors are values](/evaluation/#errors-are-values) and
+[`if let`](/control-flow/#if-let).
+
+## Effects
+
+**Effects are inferred; a specifier is a contract.** A definition that
+declares no effects gets them read from its body: a function that draws a
+random value is `random` whether or not it says so. The engine tracks ten
+effect labels (`random`, `console`, `state`, …); a function whose body
+performs none is pure by inference.
+
+```epsil
+roll(n) = random(1..n)
+type(roll)
+// ➔ TypeFrom("(unknown) random -> integer")
+```
+
+**Write the specifier where the effect is part of the interface.** A
+written specifier — between the parameter list and the return arrow — is a
+promise the engine checks: the body's inferred effects must fit it, and
+`pure` promises none, so a body that draws a random value under a `pure`
+contract is rejected. Declare the effect on a function others call, so a
+later edit that adds an effect is caught at the definition instead of
+surprising a caller; leave inference to the rest.
+
+```epsil
+function roll(n: integer) random -> integer { random(1..n) }
+let r = roll(6)
+1 <= r <= 6
+// ➔ True
+```
+
+**Keep effects at the edges.** A pure core is easy to test, easy to reuse
+in a pipeline, and safe to evaluate lazily; put the randomness, the input,
+and the printing in the function that needs them, not in a helper called
+from everywhere. For a reproducible simulation, wrap the effectful part in
+`withRandomSeed`.
+
+See [Effect specifiers](/control-flow/#effect-specifiers) for the
+labels, subtyping, and callback checks.
+
+## Pattern matching
+
+**A bare name binds; pin a value with `==`.** `match x { Pi => … }` binds a
+new variable named `pi`. To compare against a value, pin it.
+
+```epsil
+classify(x) = match x {
+  == pi => "pi"
+  0 => "zero"
+  n if n > 0 => "positive"
+  _ => "other"
+}
+[classify(pi), classify(0), classify(3), classify(-1)]
+// ➔ ["pi","zero","positive","other"]
+```
+
+**Cover every case of a closed type.** A `match` on a sum type or a
+boolean that leaves a variant uncovered is reported by `epsil check`; a
+final `_` case is the idiom when the remaining variants share a result.
+
+```epsil
+type light = red | green | yellow
+function canGo(t: light) -> boolean {
+  match t {
+    green() => true
+    _ => false
+  }
+}
+canGo(red())
+// ➔ False
+```
+
+See [`match`](/control-flow/#match).
+
+## Strings
+
+**Interpolate scalars.** `"\(expr)"` splices the value of `expr`; a
+collection-valued `expr` maps the string over its elements and yields a
+list of strings, which is rarely what was meant.
+
+```epsil
+let n = 3
+"n = \(n), n² = \(n^2)"
+// ➔ "n = 3, n² = 9"
+```
+
+See [Strings](/literals/#strings).
+
+## Naming
+
+Library operators and constants are written in lowercase (`map`, `pi`,
+`print`); their MathJSON names (`Map`, `Pi`, `Print`) work too. A
+user-defined variable, function, or type is lowercase as well (`total`,
+`area`, `type point = …`), and a sum's variants are its constructors
+(`red()`). A user name shadows a library name by scope. See
+[Naming](/naming/).
+
+## Loop accumulation, measured {#loop-accumulation-measured}
+
+The figures in [Building a list one element at a time](#building-a-list-one-element-at-a-time)
+come from this measurement, taken on one machine with the interpreter
+(a compiled program copies a native array per turn and is faster still):
+
+| Turns / elements | `map(k => k, 1..n)` | `xs = join(xs, [k])` in a loop | `xs = [...xs, k]` in a loop | `xs = listFrom(join(xs, [k]))` in a loop |
+|:-----------------|--------------------:|-------------------------------:|----------------------------:|-----------------------------------------:|
+| 250 | 15 ms | 127 ms | 125 ms | 165 ms |
+| 500 | 8 ms | 276 ms | 272 ms | 370 ms |
+| 1000 | 12 ms | 857 ms | 859 ms | 1246 ms |
+
+The pipeline does not grow with `n` in any way that matters; every
+element-per-turn form grows by a factor of about three per doubling, the
+cost of copying a list that is twice as long twice as often. Before the
+engine folded a join of list literals into one literal (2026-09-04), the
+same loop kept a lazy `join` view with one operand per turn and re-checked
+all of them on every turn: 4.7 s at 250 turns and 16.6 s at 500 on the same
+kind of machine.

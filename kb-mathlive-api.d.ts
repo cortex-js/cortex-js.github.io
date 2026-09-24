@@ -606,21 +606,15 @@ export declare type Expression = number | string | {
 | `"latex-expanded"`    | All macros are recursively expanded to their definition. |
 | `"latex-unstyled"`    | Styling (background color, color) is ignored |
 | `"latex-without-placeholders"`    | Replace `\placeholder` commands with their body |
-| `"math-json"`         | A MathJSON abstract syntax tree, as an object literal formated as a JSON string. Note: you must import the CortexJS Compute Engine to obtain a result. |
 | `"math-ml"`           | A string of MathML markup. |
 | `"plain-text"`        | A plain text rendering of the content. |
 | `"spoken"`            | Spoken text rendering, using the default format defined in config, which could be either text or SSML markup. |
 | `"spoken-text"`       | A plain spoken text rendering of the content. |
 | `"spoken-ssml"`       | A SSML (Speech Synthesis Markup Language) version of the content, which can be used with some text-to-speech engines such as AWS. |
 | `"spoken-ssml-with-highlighting"`| Like `"spoken-ssml"` but with additional annotations necessary for synchronized highlighting (read aloud). |
-
-   To use the`"math-json"` format the Compute Engine library must be loaded. Use for example:
-
-```js
-```
    * @category Mathfield
    */
-export type OutputFormat = 'ascii-math' | 'latex' | 'latex-expanded' | 'latex-unstyled' | 'latex-without-placeholders' | 'typst' | 'math-json' | 'math-ml' | 'plain-text' | 'spoken' | 'spoken-text' | 'spoken-ssml' | 'spoken-ssml-with-highlighting';
+export type OutputFormat = 'ascii-math' | 'latex' | 'latex-expanded' | 'latex-unstyled' | 'latex-without-placeholders' | 'typst' | 'math-ml' | 'plain-text' | 'spoken' | 'spoken-text' | 'spoken-ssml' | 'spoken-ssml-with-highlighting';
 /**
  * @category Mathfield
  */
@@ -900,11 +894,10 @@ declare global {
 }
 export {};
 /* 0.110.0 */import type { Selector } from './commands';
-import type { Expression, LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
+import type { LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
 import type { InsertStyleHook, Mathfield } from './mathfield';
 import type { InlineShortcutDefinitions, Keybinding, MathfieldOptions } from './options';
 import type { MenuItem } from './ui-menu-types';
-import type { ComputeEngine } from '@cortex-js/compute-engine';
 import { KeyboardModifiers } from './ui-events-types';
 /**
  *  **Event re-targeting**
@@ -1143,18 +1136,18 @@ export interface MathfieldElementAttributes {
  * document.body.style.setProperty("--hue", "10");
  * ```
  *
- * Read more about the [CSS variables](/mathfield/guides/customizing/#css-variables) available for customization.
+ * Read more about the [CSS variables](https://mathlive.io/mathfield/guides/customizing/#css-variables) available for customization.
  *
  * You can customize the appearance and zindex of the virtual keyboard panel
  * with some CSS variables associated with a selector that applies to the
  * virtual keyboard panel container.
  *
- * Read more about [customizing the virtual keyboard appearance](/mathfield/guides/virtual-keyboards/#custom-appearance)
+ * Read more about [customizing the virtual keyboard appearance](https://mathlive.io/mathfield/guides/virtual-keyboard/#custom-appearance)
  *
  * #### MathfieldElement CSS Parts
  *
  * In addition to the CSS variables, the mathfield exposes [CSS
- * parts that can be used to style the mathfield](/mathfield/guides/customizing/#mathfield-parts).
+ * parts that can be used to style the mathfield](https://mathlive.io/mathfield/guides/customizing/#mathfield-parts).
  *
  * For example, to hide the menu button:
  *
@@ -1623,8 +1616,8 @@ export declare class MathfieldElement extends HTMLElement implements Mathfield {
      * A custom compute engine instance. If none is provided, a default one is
      * used. If `null` is specified, no compute engine is used.
      */
-    static get computeEngine(): ComputeEngine | null;
-    static set computeEngine(value: ComputeEngine | null);
+    static get computeEngine(): any | null;
+    static set computeEngine(value: any | null);
     /** @internal */
     get computeEngine(): never;
     /** @internal */
@@ -1719,18 +1712,6 @@ export declare class MathfieldElement extends HTMLElement implements Mathfield {
     get mode(): ParseMode;
     set mode(value: ParseMode);
     /**
-     * If the Compute Engine library is available, return a boxed MathJSON expression representing the value of the mathfield.
-     *
-     * To load the Compute Engine library, use:
-     * ```js
-  import 'https://esm.run/@cortex-js/compute-engine';
-  ```
-     *
-     * @category Accessing and changing the content
-     */
-    get expression(): any | null;
-    set expression(mathJson: Expression | any);
-    /**
      * Return an array of LaTeX syntax errors, if any.
      * @category Accessing and changing the content
      */
@@ -1783,13 +1764,7 @@ export declare class MathfieldElement extends HTMLElement implements Mathfield {
     /**
      * Return a textual representation of the content of the mathfield.
      *
-     * @param format - The format of the result. If using `math-json`
-     * the Compute Engine library must be loaded, for example with:
-     *
-     * ```js
-  import "https://esm.run/@cortex-js/compute-engine";
-  ```
-     *
+     * @param format - The format of the result.
      *
      * **Default:** `"latex"`
      *

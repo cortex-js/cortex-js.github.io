@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -38,7 +38,7 @@
 </ul>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="greatest-common-divisor">Greatest common divisor<a href="#greatest-common-divisor" class="hash-link" aria-label="Direct link to Greatest common divisor" title="Direct link to Greatest common divisor" translate="no">​</a></h2>
 <p><code class="language-math math-inline">\gcd(p, q)=1</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/062423" target="_blank" rel="noopener noreferrer" class=""><code>062423</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -124,7 +124,7 @@ Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/4366b2" target="_blank" rel="noopener noreferrer" class=""><code>4366b2</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\gcd(p^{m}, q^{n})=1</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q\land m\in\N\land n\in\N</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q\land m\in\N\land n\in\N</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/499cfc" target="_blank" rel="noopener noreferrer" class=""><code>499cfc</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -173,7 +173,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/720766" target="_blank" rel="noopener noreferrer" class=""><code>720766</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\lcm(a, a-2)=\frac{1}{2}(\vert a(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))</code></p>
+<p><code class="language-math math-inline">\lcm(a, a-2)=\frac{1}{2}(\vert a\times(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\Z</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/7a1799" target="_blank" rel="noopener noreferrer" class=""><code>7a1799</code> · Fungrim entry ↗</a></p>
@@ -285,7 +285,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/dc0823" target="_blank" rel="noopener noreferrer" class=""><code>dc0823</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\lcm(a, a-1)=a(a-1)</code></p>
+<p><code class="language-math math-inline">\lcm(a, a-1)=a\times(a-1)</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">a\in\Z</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/e19e40" target="_blank" rel="noopener noreferrer" class=""><code>e19e40</code> · Fungrim entry ↗</a></p>
@@ -322,7 +322,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/fdae67" target="_blank" rel="noopener noreferrer" class=""><code>fdae67</code> · Fungrim entry ↗</a></p>
 <hr>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="prime-numbers">Prime numbers<a href="#prime-numbers" class="hash-link" aria-label="Direct link to Prime numbers" title="Direct link to Prime numbers" translate="no">​</a></h2>
-<p><code class="language-math math-inline">\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathrm{Primes}, p\mapsto p\le x))</code></p>
+<p><code class="language-math math-inline">\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathbb{P}, p\mapsto p\le x))</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">x\in\R</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/04427b" target="_blank" rel="noopener noreferrer" class=""><code>04427b</code> · Fungrim entry ↗</a></p>
@@ -349,7 +349,7 @@ Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/11a56b" target="_blank" rel="noopener noreferrer" class=""><code>11a56b</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Totient}(p^{k})=p^{k-1}(p-1)</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land k\in\N^*</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land k\in\N^*</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/1d731f" target="_blank" rel="noopener noreferrer" class=""><code>1d731f</code> · Fungrim entry ↗</a></p>
 <hr>
@@ -374,7 +374,7 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/c0e088" target="_blank" rel="noopener noreferrer" class=""><code>c0e088</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{Totient}(p)=p-1</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}</code>.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/cb410e" target="_blank" rel="noopener noreferrer" class=""><code>cb410e</code> · Fungrim entry ↗</a></p>
 <hr>

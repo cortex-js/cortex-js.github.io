@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -50,13 +50,13 @@ Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/47d430" target="_blank" rel="noopener noreferrer" class=""><code>47d430</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1</code>.
 <strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator; <strong>DirichletCharacter</strong> — Dirichlet character; <strong>DiscreteLog</strong> — Discrete logarithm.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/4cf4e4" target="_blank" rel="noopener noreferrer" class=""><code>4cf4e4</code> · Fungrim entry ↗</a></p>
 <hr>
 <p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\begin{cases}10&amp;p=40\,487\\7&amp;p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1))&amp;\top\end{cases}</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}</code>.
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land p\ge3\land p\lt10^{12}</code>.
 <strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/540931" target="_blank" rel="noopener noreferrer" class=""><code>540931</code> · Fungrim entry ↗</a></p>
@@ -67,8 +67,8 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/62f7d5" target="_blank" rel="noopener noreferrer" class=""><code>62f7d5</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p(p-1)))</code></p>
-<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathrm{Primes}\land p\ge3</code>.
+<p><code class="language-math math-inline">\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p\times(p-1)))</code></p>
+<p><strong>Holds when</strong> <code class="language-math math-inline">p\in\mathbb{P}\land p\ge3</code>.
 <strong>Symbols:</strong> <strong>ConreyGenerator</strong> — Conrey generator.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/75231e" target="_blank" rel="noopener noreferrer" class=""><code>75231e</code> · Fungrim entry ↗</a></p>
@@ -411,7 +411,7 @@ Used by the Compute Engine for expansion.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/51fd98" target="_blank" rel="noopener noreferrer" class=""><code>51fd98</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star</code></p>
+<p><code class="language-math math-inline">\mathrm{RiemannZetaZero}(-n)=\overline{\mathrm{RiemannZetaZero}(n)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">n\in\Z\land n\ne0</code>.
 <strong>Symbols:</strong> <strong>RiemannZetaZero</strong> — Nontrivial zero of the Riemann zeta function.
 Used by the Compute Engine for simplification.
@@ -429,7 +429,7 @@ Used by the Compute Engine for simplification.
 Used by the Compute Engine for simplification.
 <a href="https://fungrim.org/entry/687b4d" target="_blank" rel="noopener noreferrer" class=""><code>687b4d</code> · Fungrim entry ↗</a></p>
 <hr>
-<p><code class="language-math math-inline">\Zeta(s^\star)=\Zeta(s)^\star</code></p>
+<p><code class="language-math math-inline">\Zeta(\overline{s})=\overline{\Zeta(s)}</code></p>
 <p><strong>Holds when</strong> <code class="language-math math-inline">s\in\C\land s\ne1</code>.
 Used by the Compute Engine for expansion.
 <a href="https://fungrim.org/entry/69348a" target="_blank" rel="noopener noreferrer" class=""><code>69348a</code> · Fungrim entry ↗</a></p>

@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.9753dc55.js" defer="defer"></script>
-<script src="/assets/js/main.088f98ed.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
+<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -48,7 +48,24 @@
       font-weight: 400
     }
   
-    </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01100-2026-06-08">0.110.0 <em>2026-06-08</em><a href="#01100-2026-06-08" class="hash-link" aria-label="Direct link to 01100-2026-06-08" title="Direct link to 01100-2026-06-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories">Security Advisories<a href="#security-advisories" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><ul>
+    </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes">Breaking Changes<a href="#breaking-changes" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
+<li class="">The <code>@cortex-js/compute-engine</code> package is no longer a dependency of
+MathLive. The Compute Engine was never bundled with MathLive; it was only
+used for its TypeScript types. If your application loads the Compute Engine
+(for example with <code>import &quot;https://esm.run/@cortex-js/compute-engine&quot;</code>),
+MathLive continues to pick it up from the global scope and
+<code>MathfieldElement.computeEngine</code> still works, but it is now typed as <code>any</code>.
+Applications that need the types should add the package to their own
+dependencies.</li>
+<li class="">The <code>mathfield.expression</code> getter and setter have been removed. Use
+<code>MathfieldElement.computeEngine.parse(mf.getValue())</code> to obtain a boxed
+expression, and <code>mf.setValue(expr.latex)</code> (or <code>mf.setValue(expr)</code>, which
+still accepts a MathJSON object) to set one.</li>
+<li class="">The <code>&quot;math-json&quot;</code> output format has been removed from <code>getValue()</code>. Use
+<code>MathfieldElement.computeEngine.parse(mf.getValue()).json</code> instead.</li>
+<li class="">The <strong>Evaluate</strong>, <strong>Simplify</strong> and <strong>Solve</strong> items have been removed from the
+default context menu.</li>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01100-2026-06-08">0.110.0 <em>2026-06-08</em><a href="#01100-2026-06-08" class="hash-link" aria-label="Direct link to 01100-2026-06-08" title="Direct link to 01100-2026-06-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories">Security Advisories<a href="#security-advisories" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><ul>
 <li class=""><strong>#3028</strong> Fixed a cross-site scripting (XSS) vulnerability in the rendering of
 text-mode content. The body of <code>\text{}</code>, <code>\mbox{}</code> and similar commands
 accepts arbitrary characters, which were reflected <strong>unescaped</strong> into both the
@@ -575,7 +592,7 @@ will insert the command in the mathfield and close the popover.</li>
 <li class=""><strong>#2658</strong> Improved localization for Italian.</li>
 <li class=""><strong>#2671</strong> When inserting a command with an argument with the suggestion
 popover, position the cursor inside the argument.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01050-2025-03-27">0.105.0 <em>2025-03-27</em><a href="#01050-2025-03-27" class="hash-link" aria-label="Direct link to 01050-2025-03-27" title="Direct link to 01050-2025-03-27" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes">Breaking Changes<a href="#breaking-changes" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><p>In order to support alternate CDNs, in particular <code>jsdelivr</code>, the file layout of
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01050-2025-03-27">0.105.0 <em>2025-03-27</em><a href="#01050-2025-03-27" class="hash-link" aria-label="Direct link to 01050-2025-03-27" title="Direct link to 01050-2025-03-27" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes-1">Breaking Changes<a href="#breaking-changes-1" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><p>In order to support alternate CDNs, in particular <code>jsdelivr</code>, the file layout of
 the <strong>npm</strong> package has changed. The files that were previously in the <code>./dist/</code>
 directory are now in the root of the package. This should not affect most users,
 but if you are importing the library or auxiliary files from the <code>dist</code>
@@ -730,7 +747,7 @@ inherited from the parent element.</li>
 <li class="">In some cases, the inherent style of a macro could get overriden. For example
 typing the &quot;RR&quot; inline shortcut resulted in an unstyled R instead of the
 expected blackboard R.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01010-2024-07-17">0.101.0 <em>2024-07-17</em><a href="#01010-2024-07-17" class="hash-link" aria-label="Direct link to 01010-2024-07-17" title="Direct link to 01010-2024-07-17" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes-1">Breaking Changes<a href="#breaking-changes-1" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01010-2024-07-17">0.101.0 <em>2024-07-17</em><a href="#01010-2024-07-17" class="hash-link" aria-label="Direct link to 01010-2024-07-17" title="Direct link to 01010-2024-07-17" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes-2">Breaking Changes<a href="#breaking-changes-2" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
 <li class="">The properties <code>mathVirtualKeyboard.actionKeycap</code>,
 <code>mathVirtualKeyboard.shiftKeycap</code>, <code>mathVirtualKeyboard.backspaceKeycap</code>, and
 <code>mathVirtualKeyboard.tabKeycap</code> have been removed. Use the more general
@@ -822,7 +839,7 @@ with the event.</p>
 <p>To handle the event, add an event listener to the mathfield element:</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token plain">mf</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">addEventListener</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token string" style="color:var(--base-0b)">&#x27;customEvent&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token parameter">ev</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token plain"> </span><span class="token operator" style="color:var(--base-06)">=&gt;</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain">  console</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">log</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token plain">ev</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token plain">detail</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><span class="token plain"></span><br></div><div class="token-line" style="color:var(--console-color)"><span class="token plain"></span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="0990-2024-06-10">0.99.0 <em>2024-06-10</em><a href="#0990-2024-06-10" class="hash-link" aria-label="Direct link to 0990-2024-06-10" title="Direct link to 0990-2024-06-10" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes-2">Breaking Changes<a href="#breaking-changes-2" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="0990-2024-06-10">0.99.0 <em>2024-06-10</em><a href="#0990-2024-06-10" class="hash-link" aria-label="Direct link to 0990-2024-06-10" title="Direct link to 0990-2024-06-10" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes-3">Breaking Changes<a href="#breaking-changes-3" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
 <li class="">
 <p>The <code>mf.offsetFromPoint()</code> method has been renamed <code>mf.getOffsetFromPoint()</code></p>
 </li>

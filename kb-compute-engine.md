@@ -3569,6 +3569,124 @@ ce.box(["assertPure", ["Assign", "q", 1]]).evaluate();
 //                 "'an operand with scope effects'"]]
 ```
 
+### Host Capabilities: Redirecting and Denying Console I/O
+
+Some operators reach outside the engine. `Print` writes to the console and
+`Input` reads a line from the terminal or from the browser's `prompt()` dialog.
+They do not call the host directly: they use a **handler** that the engine
+holds in `ce.effects`, and your application can replace that handler or deny it.
+
+**To redirect console output and supply input**, assign a `console` handler:
+
+```js
+const lines = [];
+
+ce.effects = {
+  console: {
+    log: (line) => lines.push(line),
+    readLine: (prompt) => "Ada",
+  },
+};
+
+ce.box(["Print", "'Hello'", ["Add", 1, 2]]).evaluate();
+// lines ➔ ["Hello 3"]
+
+ce.box(["Input", "'Name? '"]).evaluate();
+// ➔ "Ada"
+```
+
+`log(line)` receives each printed line, without a trailing newline.
+`readLine(prompt)` is synchronous and returns one of three things:
+
+- a string: the line that was read;
+- `null`: end of input, or the user canceled. `Input` evaluates to `Nothing`;
+- `undefined`: this host has no interactive input. `Input` stays unevaluated.
+
+The registry is per engine, and an assignment is a complete description:
+`ce.effects = {}` puts the default handler back.
+
+**To deny a capability**, set its handler to `null`. The operator then
+evaluates to an error value and does not reach the host. It does not throw.
+
+```js
+ce.effects = { console: null };
+
+ce.box(["Print", "'secret'"]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'capability-denied'", "'console'"]]
+```
+
+**To make a change for one block of code only**, use `ce.withEffects()`. The
+previous handlers come back when the callback returns or throws, and, when the
+callback returns a promise, when that promise settles. This is how to evaluate
+an expression you do not trust:
+
+```js
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+Calls nest: a capability that an inner call does not mention keeps the handler
+of the outer call.
+
+Each evaluation uses the handlers that were installed **when it started**.
+Assigning `ce.effects` while an evaluation runs does not change that
+evaluation, and a `withEffects()` call made for one asynchronous evaluation does
+not change another one that is suspended on the same engine. One consequence to
+know: while the promise of an asynchronous `withEffects()` callback is pending,
+its handlers are the installed ones, so an unrelated evaluation that *starts*
+during that time also uses them.
+
+**To use a capability in your own operator**, declare the effect label in the
+signature and read the handler from the `options` argument of the `evaluate`
+handler — not from `ce.effects`, so that your operator follows the rule above:
+
+```js
+ce.declare("Warn", {
+  signature: "(string) console -> nothing",
+  evaluate: ([message], { engine, effects }) => {
+    if (effects.console === null)
+      return engine.error(["capability-denied", "console"]);
+    effects.console.log("warning: " + message.string);
+    return engine.Nothing;
+  },
+});
+```
+
+An `evaluateAsync` handler that starts nested evaluations must hand the
+handlers on: pass the `options` it received to `evaluateAsync()`. To change
+one option, copy the others — `op.evaluateAsync({ ...options,
+numericApproximation: true })` — and do not build the object from nothing.
+
+**The `entropy` handler** is the unseeded source of randomness: an object with
+one method, `random()`, that returns a uniform number in `[0, 1)`
+(`Math.random` by default). `RandomExpression` draws from it, and so does every
+random operator — `Random`, `RandomShuffle`, `RandomChoice`, `RandomPrime`, the
+Monte-Carlo estimators — when it is evaluated **outside** a `WithRandomSeed`
+frame. Inside a frame the draws come from the seeded stream and the handler is
+not consulted. A constant handler makes unframed random results reproducible in
+a test; `entropy: null` makes each unframed random operator evaluate to a
+`capability-denied` error value that names the operator:
+
+```js
+ce.effects = { entropy: { random: () => 0.25 } };
+ce.box(["Random"]).evaluate();
+// ➔ 0.25
+
+ce.effects = { entropy: null };
+ce.box(["Random"]).evaluate();
+// ➔ ["Error", ["ErrorCode", "'capability-denied'", "'entropy'"], "'Random'"]
+
+ce.box(["WithRandomSeed", 42, ["Random"]]).evaluate();
+// ➔ 0.7367300395263549   (seeded: the handler is not used)
+```
+
+A compiled function draws from the same handler, but a denied handler makes it
+throw a `CapabilityDeniedError` at run time: compiled code has no error-value
+channel.
+
+Only `console` and `entropy` have a handler today. The other capability labels
+(`network`, `fs_read`, `fs_write`, `time`, `environment`) will get one together
+with the first library operator that needs it.
+
 ### Declaring an Operator that Binds a Variable
 
 Some operators own a **bound variable**: the `k` of a summation, the `x` of a
@@ -4347,6 +4465,61 @@ example, a one-sided delimiter group written with a TeX *null delimiter* —
 Read more about the **errors** that can be returned. <Icon name="chevron-right-bold" />
 </ReadMore>
 
+### Symbol Types and Ambiguous Applications
+
+The meaning of `f(x)` depends on what `f` represents. Declare known symbols
+before parsing expressions that use them:
+
+```js
+ce.declare('f', '(real) -> real');
+ce.declare('a', 'real');
+ce.declare('L', 'list<real>');
+
+ce.parse('f(x)').json;   // ["f", "x"]
+ce.parse('a(x+1)').json; // ["Multiply", "a", ["Add", "x", 1]]
+```
+
+Declarations also affect subscript parsing: a subscript can index a known
+collection rather than form a new symbol name. If a host discovers types after
+an initial parse, it should reparse the authored source under the final
+declarations. Reboxing an already chosen MathJSON structure cannot recover the
+original ambiguity.
+
+Use `resolveSymbol(name)` to supply facts held outside the engine:
+
+```js
+ce.latexOptions = {
+  ...ce.latexOptions,
+  resolveSymbol: (name) => name === 'g' ? { type: 'function' } : undefined,
+};
+```
+
+Explicit declarations and lexical parameters take precedence, including an
+explicit `unknown` declaration. Inferred, unassigned guesses can yield to the
+handler. Answers must be stable within a parse. The returned boxed expression
+retains these facts for deferred canonicalization without declaring them in the
+caller's scope; exporting only its MathJSON does not export that type environment.
+
+Use `resolveApplication(context)` for a notation policy that varies by
+occurrence. It runs only when declarations and symbol facts have not settled the
+parenthesized head. Return `'apply'`, `'multiply'`, or `undefined` to keep the
+engine's default reading:
+
+```js
+const raw = ce.parse('u(x+1)', {
+  form: 'raw',
+  resolveApplication: ({ head }) => head === 'u' ? 'multiply' : undefined,
+});
+raw.canonical.json; // ["Multiply", "u", ["Add", "x", 1]]
+```
+
+The context contains the head, parsed arguments, source offsets, and enclosing
+operators with one-based operand indices. A host can therefore distinguish a
+complete definition head from an occurrence inside its body. Offsets refer to
+the normalized LaTeX input. Explicit application decisions are encoded in raw
+MathJSON and survive later canonicalization or JSON transport; they do not
+declare the symbol. Both handlers can be set per parse or on `ce.latexOptions`.
+
 ### Geometry Notation
 
 Geometry commands parse to **inert structural heads**: they capture the notation
@@ -4646,7 +4819,9 @@ console.log(ce.parse("f(x)\\left\\{0 < x < 2\\right\\}").json);
 ```
 
 When `cond` evaluates to `True`, the expression evaluates to its left
-operand; when `False`, to `Undefined`. Indeterminate predicates hold.
+operand; when `False`, to `Missing`, the absent-value marker — the same
+value a `Which` with no matching clause gives. Indeterminate predicates
+hold.
 
 Stacked restrictions chain and canonicalize to a single `When` with an
 `And` predicate:
@@ -5847,6 +6022,12 @@ For example:
 console.log(ce.parse("3.14").type);
 ```
 
+The type of a number literal is its **literal type** — `3.14` here, the
+most precise claim about that one value (see [Literal Type](#literal-type)).
+A literal type belongs to the literal node only: a type built from the
+literal, such as the type of a tuple or list that holds it, carries the
+literal's tier instead (see [Literal Types Are Not Stored](#literal-types-are-not-stored)).
+
 The type of a symbol can be declared explicitly, or it can be inferred from 
 the context in which it is used, such as the value that is assigned to it
 or the operation that is performed on it.
@@ -6085,12 +6266,15 @@ by omitting the endpoint.
 For example: `real<..1.0>` is the type of real numbers less than $1.0$, 
 and is equivalent to `real< -oo..1.0 >`.
 
-To represent an open interval, use a negation and a literal type to exclude the endpoints.
-For example `real<0..> & !0` is the type of real numbers greater than $0$.
+To exclude an endpoint, write the inequality marker `<` next to it:
+`real<0<..>` is the type of real numbers greater than $0$ (`0<..` reads
+"$0 < x$"), `real<..<1>` the type of real numbers less than $1$, and
+`real<0<..<1>` the open interval $0 < x < 1$. A closed endpoint has no
+marker: `real<0..<1>` is $0 \le x < 1$.
 
-When using integers, you can adjust the endpoint instead, so for example 
-`integer<1..>` is the type of integers greater than or equal to $1$, which 
-is equivalent to `integer<0..> & !0`.
+On the integer tiers an open endpoint normalizes to the next closed one:
+`integer<0<..>` is the same type as `integer<1..>`, the integers greater than
+or equal to $1$.
 
 Note that `complex` and `imaginary` types do not support ranges, as they are not ordered types.
 
@@ -6189,6 +6373,13 @@ ce.parse("(7, 5, 7)").type
 // ➔ "tuple<integer, integer, integer>"
 ```
 
+Each element type is the **tier** of the element, never a literal's own
+value type: `(7, 5, 7)` is a `tuple<integer, integer, integer>`, not
+`tuple<7, 5, 7>`, and `(\\sqrt2, 1/3)` is `tuple<real, rational>` even though
+`ce.parse("\\sqrt2").type` is the enclosure `real<1.4..1.5>`. A component
+that is not a literal keeps its own type, ranges included: with `r`
+declared `real`, `(|r|, 1)` is `tuple<real<0..>, integer>`.
+
 The elements of a tuple can be named: `tuple<x: integer, y: integer>`. 
 
 If an element is named, all elements must be named and the names must be unique
@@ -6246,6 +6437,12 @@ The type of a list literal is **honest**: it reports the actual (widened)
 element type and the dimensions. Since element types are covariant, the
 honest type is a subtype of every broader form — `vector<integer^3>`
 matches `vector<3>`, `vector`, `list<number>`, and `list`.
+
+The element type is the **tier** of the elements, never a literal's own
+value type: `[0.5, 1]` is a `vector<real^2>`, and `[\\sqrt2, 1/3]` is a
+`vector<real^2>` even though each element's own type is an enclosing range.
+The same rule types a set (`{\\sqrt2}` is `set<real>`) and a record
+(`{x: 1/3}` is `record{x: rational}`).
 
 The **empty list** has no elements, so its element type is the bottom type 
 `never`. Covariance then makes it a member of every list type, which is what 
@@ -7409,6 +7606,10 @@ console.info(ce.box(["identity", 5]).type);
 console.info(ce.box(["List", 1, 2, 3]).type);
 // ➔ "vector<integer^3>" — cells widen to their tier
 
+console.info(ce.parse("(\\sqrt2, 1/3)").type);
+// ➔ "tuple<real, rational>" — components carry their tier, never the
+//    enclosing range each literal reports on its own
+
 console.info(ce.box(["Function", 21]).type);
 // ➔ "() -> integer" — a derived signature stores the tier
 ```
@@ -8001,11 +8202,26 @@ Inference writes happen at these moments:
    a list argument whole instead of broadcasting over it.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
-   (`v[1]`) narrows it to `dictionary<any> | indexed_collection<any>`
-   through `At`'s signature, arithmetic infers numeric, boolean use infers
-   `boolean`. The lambda's stored signature carries what the body proved and
-   nothing more.
-4. **Declared placeholders refined by definitions**: a declared `unknown`
+   (`v[1]`) narrows it to a collection through `At`'s signature, arithmetic
+   infers numeric, boolean use infers `boolean`. The lambda's stored
+   signature carries what the body proved and nothing more.
+4. **Uses of an element**: a use of an element taken out of a collection
+   refines the collection's *element* type. `xs[1] + 1` makes an undeclared
+   `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
+   `dictionary<number>`, `First(xs) + 1` an `indexed_collection<number>`,
+   and `k(xs[1])` with `k: (integer) -> integer` an
+   `indexed_collection<integer>`. A chained access reaches the outer
+   collection (`m[1][2] + 1` makes `m` an
+   `indexed_collection<indexed_collection<number>>`), and a lambda
+   parameter shows the refinement on its arrow: `(v) => v[1] + 1` types
+   `(v: indexed_collection<number>) -> broadcastable<number>`. The element
+   written is the scalar reading — `number`, exactly as `x + 1` infers a
+   bare `x` — and a boolean use commits `boolean` the same way, so a later
+   numeric use of that element is an `incompatible-type` error, as it is
+   for a scalar after `And(x, B)`. The write is inference: a later
+   assignment replaces it, and a *declared* type — a contract such as
+   `list<any>`, or the bare placeholder `list` — is never moved by a use.
+5. **Declared placeholders refined by definitions**: a declared `unknown`
    *slot* in a function type is a placeholder, not a constraint — assigning
    a body to `f: (unknown) -> unknown` replaces each `unknown` slot with the
    slot the body's inference produced, and the refined signature is what is
@@ -10205,7 +10421,15 @@ console.log(g.run({ x: 3 }));
 When no condition matches, compiled `Which` returns `NaN`. The interpreter
 answers `Missing` for the same input — the absence marker has no value in the
 target's floating-point model, so it projects to `NaN`. See
-[Non-Finite Results](#non-finite-results).
+[Non-Finite Results](#non-finite-results). A selection whose arms are all
+provably not numbers — strings, lists — answers the target's missing-object
+literal instead, `undefined` in JavaScript and `None` in Python, so that
+`IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
+type is unknown counts as a number. An `If` with no else-branch is
+the one-clause `Which`: `If(c, t)` compiles on every target and returns
+`NaN` when `c` is false. An `If` whose branch is a statement — an
+assignment, a loop — is a guard statement, not a value, and keeps its own
+rules (see the statement sections below).
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -10496,12 +10720,12 @@ console.log(f.run({ x: 0 }));    // ➔ Infinity
 console.log(f.run({ x: -0 }));   // ➔ -Infinity
 ```
 
-Absence markers project the same way. `Missing` — what an unmatched `Which`
-returns — is not a number, so the chained ternary ends in a literal `NaN` (see
+Absence markers project the same way. `Missing` — what an unmatched `Which`,
+an else-less `If` and a false restriction `e\{c\}` return — is not a
+number, so the chained ternary ends in a literal `NaN` (see
 [`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
-when the expression was never compiled at all: an else-less `If` declines and
-falls back to interpretation, and its `Missing` crosses the boundary as `NaN`
-too.
+when the expression was never compiled at all and fell back to
+interpretation: its `Missing` crosses the boundary as `NaN` too.
 
 **Type guards follow the finite-by-default lattice.** Every bare numeric type
 name denotes a **finite** value, so the guard a compiled parameter test emits
@@ -13845,6 +14069,10 @@ ce.expr(['Norm', ['List', 3, 4], 3]).evaluate();
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → √30 ≈ 5.477
 
+// Spectral norm (order 2): the largest singular value
+ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 2]).evaluate();
+// → √(15 + √221) ≈ 5.465
+
 // L1 norm: max column sum = max(4, 6) = 6
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
 // → 6
@@ -15982,6 +16210,41 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~effects~~ {#effects-3}
+
+```ts
+get effects(): EffectHandlers
+set effects(handlers: EffectHandlerOverrides): void
+```
+
+The host capabilities of this engine: the handlers the library operators
+use to reach the host. `Print` and `Input` use `effects.console`.
+
+The registry is an immutable object. Reading returns the registry that a
+new evaluation would use. Assigning installs a new registry: the assigned
+object is a COMPLETE description — a handler it does not mention returns
+to its default, so `ce.effects = {}` restores every default. A `null`
+handler denies the capability: an operator that needs it evaluates to an
+`Error("capability-denied", …)` value.
+
+```ts
+const lines: string[] = [];
+ce.effects = {
+  console: { log: (line) => lines.push(line), readLine: () => undefined },
+};
+```
+
+Each evaluation (`evaluate()`, `N()`, `evaluateAsync()`) uses the registry
+that was installed when it started. An assignment does not change the
+handlers of an evaluation that is already running.
+
+For a change that must last for one block of code only, use
+[`withEffects`](#witheffects).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~precision~~ {#precision-1}
 
 ```ts
@@ -16162,6 +16425,51 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~withEffects()~~ {#witheffects-1}
+
+```ts
+withEffects<T>(overrides, fn): T
+```
+
+Run `fn` with some host capabilities replaced or denied, then put the
+previous ones back. Evaluations that START inside `fn` use the changed
+registry.
+
+`overrides` is applied on top of the registry in effect when
+`withEffects` is called, so calls nest: a capability an inner call does
+not mention keeps the handler of the outer call. A `null` value denies the
+capability, even if it has a default handler — this is how to evaluate an
+expression that is not trusted:
+
+```ts
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+The previous registry is put back when `fn` returns or throws. If `fn`
+returns a promise, it is put back when that promise settles (fulfilled or
+rejected), and `withEffects` returns a promise that settles the same way.
+
+An asynchronous evaluation keeps the registry it started with, so an
+evaluation that started BEFORE `withEffects` was called is not changed by
+it. But while the promise of an asynchronous `fn` is pending, the changed
+registry is the installed one: an unrelated evaluation that starts during
+that time, from other code, also uses it. Start such evaluations before
+calling `withEffects`, or use a separate engine.
+
+• T
+
+####### overrides
+
+[`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~chop()~~ {#chop-1}
 
 ###### chop(n)
@@ -16247,6 +16555,59 @@ box(expr, options?): Expression
 ###### Deprecated
 
 Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~rebind()~~ {#rebind-1}
+
+```ts
+rebind(expr, options?): Expression
+```
+
+Rebuild `expr` as if `ce.expr(expr.json, { form, scope })` had been
+called — every symbol resolves afresh in `scope` (or the current scope)
+— without serializing `expr` to MathJSON.
+
+`ce.expr(expr, { scope })` on an already-boxed expression keeps the
+bindings the expression was boxed with; it never re-resolves a symbol.
+This is the operation that does. Use it when an expression built under
+one set of declarations must be read under another: a body boxed in a
+shadow scope, a row re-classified after a declaration changed.
+
+For the canonical and partial forms the MathJSON is built as a DAG — one
+array per DISTINCT function node, shared by every parent that reads it
+(a leaf contributes its own constant-size MathJSON) — where
+`expr.json` writes a tree, one copy of a shared node per path. That
+MathJSON is then boxed by the ordinary route, so the result matches
+`ce.expr(expr.json, …)` by construction, including for an expression
+that already holds an `Error` node. Canonical boxing still visits every
+path, as it does for any MathJSON. The raw and structural forms
+canonicalize nothing, so each distinct node is rebuilt once and a shared
+sub-expression stays shared in the result as well.
+
+- `form`: `'canonical'` (default), `'structural'`, `'raw'`, or a
+  partial form such as `['Flatten', 'Order']`.
+- `scope`: the lexical scope the rebuild resolves and declares in.
+
+Verbatim LaTeX and source positions are dropped, as the MathJSON route
+drops them. A mutable object is rebuilt as its record snapshot, as that
+route boxes it.
+
+####### expr
+
+[`Expression`](#expression-5)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
 
 </MemberCard>
 
@@ -16583,6 +16944,35 @@ tuple(...elements): Expression
 ####### elements
 
 ...readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~list()~~ {#list-1}
+
+```ts
+list(values): Expression
+```
+
+A `List` of numbers, built without boxing each element.
+
+The elements are copied into a frozen array of machine numbers that the
+list keeps as its store: `count`, `at`, `type`, `isSame` and `array`
+answer from it, and the boxed operands are built only if `ops` is read.
+The result is an ordinary canonical `List` in every other respect.
+
+`values` may be a `number[]`, a `Float64Array` or any array-like of
+numbers. Its `length` must be a non-negative safe integer and each
+element a JS number; anything else throws a `TypeError`. `-0` is stored
+as `+0`.
+
+Use it to hand a large numeric list to the engine cheaply, and read it
+back with `expr.array`.
+
+####### values
+
+`ArrayLike`\<`number`\>
 
 </MemberCard>
 
@@ -17000,6 +17390,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -17071,6 +17464,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
@@ -17784,6 +18180,23 @@ readonly nops: number;
 
 <MemberCard>
 
+##### FunctionInterface.\_numericStore {#_numericstore}
+
+```ts
+readonly _numericStore: readonly number[] | undefined;
+```
+
+Internal. The numeric store of a `List` built by `ce.list()`: its
+elements as frozen machine numbers, from which the operands are boxed on
+the first read of `ops`. `undefined` for every other function
+expression. A walker that only looks for symbols or effects skips a node
+with a store instead of reading `ops`, which would box every element.
+The public view is `array`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### FunctionInterface.op1 {#op1}
 
 ```ts
@@ -17809,6 +18222,21 @@ readonly op2: Expression;
 ```ts
 readonly op3: Expression;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### FunctionInterface.\_isLiteralData() {#_isliteraldata}
+
+```ts
+_isLiteralData(): boolean
+```
+
+Internal. Is this node written-out DATA: a canonical `List` or `Tuple`
+bound to the standard library whose every element is a number literal,
+or such a `List` or `Tuple` in turn? Such a node holds no symbol and
+evaluates to itself. The answer is computed once per node.
 
 </MemberCard>
 
@@ -18476,6 +18904,7 @@ type CompiledExpression = {
 ```ts
 type OperatorCompileContext = {
   language: string;
+  typeOf: (expr) => Type;
 };
 ```
 
@@ -18533,6 +18962,7 @@ ce.declare('MyGcd', {
 type EvaluateHandlerOptions = Partial<EvaluateOptions> & {
   engine: ComputeEngine;
   expression: Expression;
+  effects: EffectHandlers;
 };
 ```
 
@@ -18576,6 +19006,23 @@ each held operand it consumes).
 
 Read-only: do not mutate it, and do not assume it is present (a handler
 invoked outside the evaluation driver may not receive one).
+
+#### EvaluateHandlerOptions.effects
+
+```ts
+effects: EffectHandlers;
+```
+
+The host capabilities of THIS evaluation: the `ce.effects` registry as it
+was when the evaluation started. A handler that reaches a host capability
+reads it from here, never from `ce.effects`, so that a change of registry
+made while the evaluation runs — or made for a different, concurrent
+asynchronous evaluation — has no effect on it.
+
+A handler may use a capability only if its operator declares the
+corresponding effect label: `options.effects.console` requires `console`
+in the signature. A `null` handler is a denial: return
+`ce.error(['capability-denied', '<capability>'])`.
 
 </MemberCard>
 
@@ -19070,6 +19517,7 @@ type OperandStructure =
   | {
   kind: "symbol";
   name: string;
+  system: boolean;
   inferred: boolean;
  }
   | {
@@ -19078,6 +19526,7 @@ type OperandStructure =
  }
   | {
   kind: "number";
+  tier: Type;
   literal: 0 | 1;
   rational: readonly [bigint, bigint];
  }
@@ -19091,6 +19540,7 @@ type OperandStructure =
   parameters: ReadonlyArray<{
      name: string;
      annotated: Type;
+     rest: boolean;
     }>;
   body: OperandStructure;
  }
@@ -19117,8 +19567,21 @@ holding an expression.
 \{
   `kind`: `"symbol"`;
   `name`: `string`;
+  `system`: `boolean`;
   `inferred`: `boolean`;
  \}
+
+#### OperandStructure.system?
+
+```ts
+optional system?: boolean;
+```
+
+Present (`true`) when the symbol resolves to the definition the
+engine's SYSTEM scope binds under this name — the library constant
+or operator, not a user or local declaration that shadows it. The
+ring arms of `At` and `Subscript` read it: `Integers[k]` is a
+quotient-ring adjunction only for the library `Integers`.
 
 #### OperandStructure.inferred?
 
@@ -19139,9 +19602,26 @@ to trust an operand's type. Lives on the structure node, not in
 
 \{
   `kind`: `"number"`;
+  `tier`: [`Type`](#type-3);
   `literal`: `0` \| `1`;
   `rational`: readonly \[`bigint`, `bigint`\];
  \}
+
+#### OperandStructure.tier
+
+```ts
+tier: Type;
+```
+
+The tier the literal contributes to a COMPOSITE type: `integer`,
+`rational`, `real`, `complex`, `imaginary`, `nan`, `infinity`, or
+the signed pair `+oo | -oo`. A literal's handler-visible type
+(`type` on the descriptor) carries its value or an enclosing range;
+a composite built from the literal — a tuple's component, a list's
+element, a record's field — is a stored contract and carries the
+tier instead, so a container handler reads it here and never
+builds the literal type only to widen it away. Read off the value
+(`numberLiteralTierType`, `boxed-expression/literal-tier.ts`).
 
 #### OperandStructure.rational?
 
@@ -19169,9 +19649,27 @@ non-finite literal.
   `parameters`: `ReadonlyArray`\<\{
      `name`: `string`;
      `annotated`: [`Type`](#type-3);
+     `rest`: `boolean`;
     \}\>;
   `body`: [`OperandStructure`](#operandstructure);
  \}
+
+#### OperandStructure.parameters
+
+```ts
+parameters: ReadonlyArray<{
+  name: string;
+  annotated: Type;
+  rest: boolean;
+}>;
+```
+
+One entry per parameter operand, in order. `rest` marks the REST
+parameter (`(a, ...rest) => …`): it is always the last entry, it
+takes no annotation, and it binds a tuple of every argument from its
+own position onwards rather than occupying one positional slot. A
+consumer reading arity must therefore treat the entries before it as
+the required count and admit any number after.
 
 \{
   `kind`: `"tuple"`;
@@ -19377,11 +19875,7 @@ It answers `undefined` for an unknown operator.
 ### OperatorTypeHandlerOnTypes {#operatortypehandlerontypes}
 
 ```ts
-type OperatorTypeHandlerOnTypes = (operands, context) => 
-  | Type
-  | TypeString
-  | BoxedType
-  | undefined;
+type OperatorTypeHandlerOnTypes = (operands, context) => BoxedType | undefined;
 ```
 
 The `type` handler of an operator definition: a function of operand
@@ -19391,6 +19885,10 @@ state-purity contract of
 `docs/plans/2026-08-22-type-handlers-on-types.md`. Under test, and with
 `CE_TYPE_PURITY_GUARD` set elsewhere, a handler that writes engine state
 throws.
+Return a `BoxedType` (for example `context.engine.type('real')`), or
+`undefined` to use the declared signature. Numeric literal cargo in a
+boxed result is widened at the application boundary; intentional ranges
+remain intact. Built-ins use `BoxedType.forResult()` to share that work.
 
 </MemberCard>
 
@@ -19437,8 +19935,12 @@ examples: string | string[];
 
 A list of examples of how to use this symbol or operator.
 
-Each example is a string, which can be a MathJSON expression or LaTeX, bracketed by `$` signs.
-For example, `["Add", 1, 2]` or `$\\sin(\\pi/4)$`.
+Each example is one line of Epsil source — `Rationalize(1.75)` — that
+evaluates on a fresh engine to a value worth showing. A trailing `//`
+comment is allowed and is replaced by the value the example evaluates
+to when the standard-library page is generated
+(`scripts/build-library-docs.ts`); that page executes every example, so
+one that stops evaluating fails the documentation build.
 
 </MemberCard>
 
@@ -20118,7 +20620,8 @@ type: BoxedType;
 The type known in the CURRENT state: declaredType narrowed by
 everything the assumptions in force prove about this definition. Reading
 it is what makes a fact visible; nothing derived from it may be STORED
-(see declaredType).
+(see declaredType). Writing it reports a `type-write` state
+event, so cached results that read this type are computed again.
 
 </MemberCard>
 
@@ -20522,6 +21025,21 @@ The eager producer's element count — see the `elementCount` contract on
 
 <MemberCard>
 
+##### BoxedOperatorDefinition.inferOperandTypes? {#inferoperandtypes}
+
+```ts
+optional inferOperandTypes?: (ops, requirement) => 
+  | readonly (Type | undefined)[]
+  | undefined;
+```
+
+Use-driven element inference — see the `inferOperandTypes` contract on
+[OperatorDefinition](#operatordefinition).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedOperatorDefinition.canonical? {#canonical}
 
 ```ts
@@ -20721,6 +21239,131 @@ neq: (a, b) => boolean | undefined;
 ```ts
 type Hold = "none" | "all" | "first" | "rest" | "last" | "most";
 ```
+
+</MemberCard>
+
+## Host Capabilities
+
+### ConsoleHandler {#consolehandler}
+
+The host console, as the engine sees it: the implementation behind the
+`console` effect label. The `Print` operator calls `log`; the `Input`
+operator calls `readLine`.
+
+<MemberCard>
+
+##### ConsoleHandler.log() {#log}
+
+```ts
+log(line): void
+```
+
+Write one line of text. The line has no trailing newline; the handler
+adds the line break its output medium needs.
+
+####### line
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ConsoleHandler.readLine() {#readline}
+
+```ts
+readLine(prompt?): string | null | undefined
+```
+
+Read one line of text, synchronously. `prompt`, when given, is displayed
+before the read.
+
+The three results are distinct:
+- a string: the line, without its trailing newline;
+- `null`: end of input, or the user canceled the read — `Input`
+  evaluates to `Nothing`;
+- `undefined`: this host has no interactive input — `Input` stays
+  unevaluated.
+
+####### prompt?
+
+`string`
+
+</MemberCard>
+
+### EntropyHandler {#entropyhandler}
+
+The unseeded source of randomness of the host: the implementation behind
+the `entropy` effect label. `RandomExpression` draws from it, and so does
+every random operator (`Random`, `Shuffle`, `RandomChoice`, …) when it is
+evaluated OUTSIDE a `WithRandomSeed` frame — inside a frame the draws come
+from the seeded, deterministic stream and this handler is not consulted.
+
+<MemberCard>
+
+##### EntropyHandler.random() {#random}
+
+```ts
+random(): number
+```
+
+Return a uniformly distributed number in `[0, 1)`.
+
+</MemberCard>
+
+### EffectHandlers {#effecthandlers}
+
+The host capabilities of an engine: one handler for each capability the
+library operators can reach. This is the value of `ce.effects`.
+
+A handler is either an implementation or **`null`**. `null` is a denial:
+an operator that needs the capability evaluates to an
+`Error("capability-denied", …)` value instead of reaching the host.
+
+The object is immutable. To change a handler, install a new registry:
+assign `ce.effects`, or call `ce.withEffects()` for a change that lasts for
+one callback.
+
+Only `console` and `entropy` have a handler today, because the console
+operators and the random operators are the only library operators that
+reach a host capability. The other capability labels of the effect system
+(`network`, `fs_read`, `fs_write`, `time`, `environment`) get a handler when
+the first operator that needs one is added: a handler that no operator
+reads would accept an override and silently do nothing.
+
+<MemberCard>
+
+##### EffectHandlers.console {#console}
+
+```ts
+readonly console: ConsoleHandler | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### EffectHandlers.entropy {#entropy}
+
+```ts
+readonly entropy: EntropyHandler | null;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+### EffectHandlerOverrides {#effecthandleroverrides}
+
+```ts
+type EffectHandlerOverrides = { readonly [K in keyof EffectHandlers]?: EffectHandlers[K] };
+```
+
+A partial change to the host capabilities, for `ce.withEffects()` and the
+`ce.effects` setter. For each capability:
+- an implementation replaces the current handler;
+- `null` denies the capability, even when the default handler exists;
+- an absent key, or `undefined`, keeps the current handler.
 
 </MemberCard>
 
@@ -21390,6 +22033,7 @@ type ParseLatexOptions = NumberFormat & {
   skipSpace: boolean;
   parseNumbers: "auto" | "rational" | "decimal" | "never";
   resolveSymbol: (symbol) => SymbolResolution | undefined;
+  resolveApplication: (context) => "apply" | "multiply" | undefined;
   parseUnexpectedToken: (lhs, parser) => MathJsonExpression | null;
   preserveLatex: boolean;
   diagnostics: boolean;
@@ -21461,13 +22105,37 @@ a symbol declared with an `unknown` type is still declared (return
 `{ type: 'unknown' }` for it), which is distinct from returning
 `undefined`.
 
-Through `ce.parse()` this handler *supplements* the engine scope: it is
-consulted first, and a symbol it does not resolve (`undefined`) falls
-back to the scope's definitions. Use it to inject knowledge the scope
-cannot have yet — e.g. names a later pass of a multi-pass document load
-will declare.
+Lexical bindings and explicit engine declarations take precedence. This
+handler supplies facts for names without an authoritative declaration;
+speculative types inferred from earlier uses do not suppress it.
+Answers are cached by name for a single parse. Use `resolveApplication`
+for notation choices that depend on an occurrence's syntax or position.
+
+Supplied facts belong to the resulting expression: they are retained for
+deferred canonicalization, including per-call handlers, without declaring
+symbols in the caller's scope. Changing a handler later does not change
+the meaning of an already parsed expression.
 
 The `symbol` argument is a [valid symbol](#symbols).
+
+#### ParseLatexOptions.resolveApplication?
+
+```ts
+optional resolveApplication?: (context) => "apply" | "multiply" | undefined;
+```
+
+Interpret an unresolved symbol followed by parentheses.
+
+Called after structural parsing for heads without an authoritative type.
+Explicit declarations, external symbol facts and lexical parameters take
+precedence. Return `undefined` to retain the usual notation heuristics.
+Return `apply` or `multiply` to commit an occurrence's reading without
+declaring its head. The decision is retained in raw MathJSON and survives
+later canonicalization, including when this handler is supplied per-call.
+
+This is a pure syntax policy, not a definition recognizer: a host that uses
+`=` for definitions should discover headers and declare them before parsing
+bodies. The hook is not called for bare juxtaposition or square brackets.
 
 #### ParseLatexOptions.parseUnexpectedToken
 
@@ -21665,6 +22333,7 @@ resolveSymbol(id):
   | {
   type: BoxedType;
   subscriptEvaluate: boolean;
+  inferred: boolean;
  }
   | undefined
 ```
@@ -21674,7 +22343,7 @@ The single symbol oracle: everything the parser knows about `id`.
 Merges (in priority order) parser-local bindings — sum indices, `Block`/
 `Function` parameters, tracked in the parser's symbol table — over the
 [ParseLatexOptions.resolveSymbol](#parselatexoptions) handler (which `ce.parse()` wires
-to consult per-call/engine-wide handlers first, then the engine scope).
+to consult explicit engine declarations before external handlers).
 
 Returns `undefined` if `id` is undeclared. A declared symbol always gets
 a record — declaration *presence* is the `!== undefined` check, distinct
@@ -21847,7 +22516,7 @@ was expected.
 
 <MemberCard>
 
-##### Parser.sourceOffsets() {#sourceoffsets}
+##### Parser.sourceOffsets() {#sourceoffsets-1}
 
 ```ts
 sourceOffsets(startToken, endToken?): [number, number]
@@ -24050,6 +24719,32 @@ A prototype-free [SymbolTable.ids](#ids) map — see the note there.
 
 <MemberCard>
 
+### ApplicationContext {#applicationcontext}
+
+```ts
+type ApplicationContext = {
+  head: MathJsonSymbol;
+  arguments: ReadonlyArray<MathJsonExpression>;
+  sourceOffsets: readonly [number, number];
+  headSourceOffsets: readonly [number, number];
+  ancestors: ReadonlyArray<{
+     operator: MathJsonSymbol;
+     operandIndex: number;
+    }>;
+};
+```
+
+A syntactically ambiguous symbol followed by parentheses.
+
+The arguments and ancestry describe the parsed structure, not LaTeX tokens.
+Source offsets are half-open UTF-16 offsets in normalized LaTeX, as for parse
+diagnostics. Ancestry runs from the outermost expression to the nearest
+parent, with one-based operand indices; it includes written Delimiters.
+
+</MemberCard>
+
+<MemberCard>
+
 ### OperatorDefinition {#operatordefinition}
 
 ```ts
@@ -24077,6 +24772,9 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   collection: CollectionHandlers;
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
+  inferOperandTypes: (ops, requirement) => 
+     | ReadonlyArray<Type | undefined>
+     | undefined;
 };
 ```
 
@@ -24483,6 +25181,40 @@ Contract, mirroring `canEnumerate`:
 Consulted only when the definition has no `collection.count` handler —
 a declared `count` owns the answer, including its `undefined`.
 
+#### OperatorDefinition.inferOperandTypes?
+
+```ts
+optional inferOperandTypes?: (ops, requirement) => 
+  | ReadonlyArray<Type | undefined>
+  | undefined;
+```
+
+Use-driven element inference. Called when a type REQUIREMENT reaches
+an application of this operator: its result is an operand of a typed
+parameter (`k(xs[1])` with `k: (integer) -> integer` requires
+`integer`) or of an arithmetic operator, which requires a scalar
+numeric result (`xs[1] + 1` requires `real`). The handler answers the
+type each OPERAND must have for the result to satisfy the requirement:
+one entry per operand, `undefined` where that operand learns nothing,
+or `undefined` for the whole call to decline.
+
+The engine writes each entry onto the operand through the ordinary
+inference path, so only an operand whose type is inferred (or still
+unknown) moves, a declared type never does, and an operand that is
+itself an application forwards to its own operator's handler
+(`m[1][2] + 1` reaches `m`). A `widen` never reaches the handler: it
+carries a result possibility, not a constraint on the operands.
+
+Only a VALUE requirement reaches the handler: never `any`, `unknown`,
+`value`, `nothing`, an absence marker alone, or a function type. An
+absence arm (`real | missing`) is stripped before the call.
+
+`At` answers `dictionary<r> | indexed_collection<r>` for its base and
+`First`/`Second`/`Third`/`Last` answer `indexed_collection<r>`. The
+scalar reading is written on purpose: `xs[1] + 1` requires `number`
+of the element, exactly as `x + 1` infers a bare `x` as `number`.
+Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
+
 </MemberCard>
 
 <MemberCard>
@@ -24744,6 +25476,31 @@ Conformances are add-only (monotone); only their implementations replace.
 
 <MemberCard>
 
+### SumConformanceRecord {#sumconformancerecord}
+
+```ts
+type SumConformanceRecord = {
+  sum: string;
+  impl: Record<string, Expression | JSImplementation>;
+  block: Expression;
+};
+```
+
+A whole-SUM conformance, as the author wrote it: `type shape is Area { … }`
+where `shape` is a sum type (user ruling of 2026-09-22).
+
+The statement itself registers one ordinary edge per variant — a sum names a
+transparent alias of its variants, and an alias cannot conform — so this
+record is bookkeeping, not an edge: it is what lets a variant the sum gains
+in a LATER batch receive the same implementation block. The block is kept as
+the author wrote it, BEFORE `Self` is bound: each variant's edge substitutes
+`Self` with its own target, so the substituted block of one variant is the
+wrong body for another.
+
+</MemberCard>
+
+<MemberCard>
+
 ### ProtocolRecord {#protocolrecord}
 
 ```ts
@@ -24752,6 +25509,7 @@ type ProtocolRecord = {
   members: Record<string, ProtocolMember>;
   conformances: ConformanceRecord[];
   declaredByStatement: boolean;
+  _sumConformances: SumConformanceRecord[];
   _declOrigin: DeclarationOrigin;
 };
 ```
@@ -25215,6 +25973,41 @@ A list of the function calls to the current evaluation context
 
 <MemberCard>
 
+##### IComputeEngine.effects {#effects-2}
+
+```ts
+get effects(): EffectHandlers
+set effects(handlers: EffectHandlerOverrides): void
+```
+
+The host capabilities of this engine: the handlers the library operators
+use to reach the host. `Print` and `Input` use `effects.console`.
+
+The registry is an immutable object. Reading returns the registry that a
+new evaluation would use. Assigning installs a new registry: the assigned
+object is a COMPLETE description — a handler it does not mention returns
+to its default, so `ce.effects = {}` restores every default. A `null`
+handler denies the capability: an operator that needs it evaluates to an
+`Error("capability-denied", …)` value.
+
+```ts
+const lines: string[] = [];
+ce.effects = {
+  console: { log: (line) => lines.push(line), readLine: () => undefined },
+};
+```
+
+Each evaluation (`evaluate()`, `N()`, `evaluateAsync()`) uses the registry
+that was installed when it started. An assignment does not change the
+handlers of an evaluation that is already running.
+
+For a change that must last for one block of code only, use
+[`withEffects`](#witheffects).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.precision {#precision}
 
 ```ts
@@ -25395,6 +26188,51 @@ that point runs **outside** the deadline and is never cancelled (see
 
 <MemberCard>
 
+##### IComputeEngine.withEffects() {#witheffects}
+
+```ts
+withEffects<T>(overrides, fn): T
+```
+
+Run `fn` with some host capabilities replaced or denied, then put the
+previous ones back. Evaluations that START inside `fn` use the changed
+registry.
+
+`overrides` is applied on top of the registry in effect when
+`withEffects` is called, so calls nest: a capability an inner call does
+not mention keeps the handler of the outer call. A `null` value denies the
+capability, even if it has a default handler — this is how to evaluate an
+expression that is not trusted:
+
+```ts
+const result = ce.withEffects({ console: null }, () => expr.evaluate());
+```
+
+The previous registry is put back when `fn` returns or throws. If `fn`
+returns a promise, it is put back when that promise settles (fulfilled or
+rejected), and `withEffects` returns a promise that settles the same way.
+
+An asynchronous evaluation keeps the registry it started with, so an
+evaluation that started BEFORE `withEffects` was called is not changed by
+it. But while the promise of an asynchronous `fn` is pending, the changed
+registry is the installed one: an unrelated evaluation that starts during
+that time, from other code, also uses it. Start such evaluations before
+calling `withEffects`, or use a separate engine.
+
+• T
+
+####### overrides
+
+[`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.chop() {#chop}
 
 ###### chop(n)
@@ -25480,6 +26318,59 @@ box(expr, options?): Expression
 ###### Deprecated
 
 Use `expr()` instead.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.rebind() {#rebind}
+
+```ts
+rebind(expr, options?): Expression
+```
+
+Rebuild `expr` as if `ce.expr(expr.json, { form, scope })` had been
+called — every symbol resolves afresh in `scope` (or the current scope)
+— without serializing `expr` to MathJSON.
+
+`ce.expr(expr, { scope })` on an already-boxed expression keeps the
+bindings the expression was boxed with; it never re-resolves a symbol.
+This is the operation that does. Use it when an expression built under
+one set of declarations must be read under another: a body boxed in a
+shadow scope, a row re-classified after a declaration changed.
+
+For the canonical and partial forms the MathJSON is built as a DAG — one
+array per DISTINCT function node, shared by every parent that reads it
+(a leaf contributes its own constant-size MathJSON) — where
+`expr.json` writes a tree, one copy of a shared node per path. That
+MathJSON is then boxed by the ordinary route, so the result matches
+`ce.expr(expr.json, …)` by construction, including for an expression
+that already holds an `Error` node. Canonical boxing still visits every
+path, as it does for any MathJSON. The raw and structural forms
+canonicalize nothing, so each distinct node is rebuilt once and a shared
+sub-expression stays shared in the result as well.
+
+- `form`: `'canonical'` (default), `'structural'`, `'raw'`, or a
+  partial form such as `['Flatten', 'Order']`.
+- `scope`: the lexical scope the rebuild resolves and declares in.
+
+Verbatim LaTeX and source positions are dropped, as the MathJSON route
+drops them. A mutable object is rebuilt as its record snapshot, as that
+route boxes it.
+
+####### expr
+
+[`Expression`](#expression-5)
+
+####### options?
+
+####### form?
+
+[`FormOption`](#formoption)
+
+####### scope?
+
+`Scope`
 
 </MemberCard>
 
@@ -25816,6 +26707,35 @@ tuple(...elements): Expression
 ####### elements
 
 ...readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.list() {#list}
+
+```ts
+list(values): Expression
+```
+
+A `List` of numbers, built without boxing each element.
+
+The elements are copied into a frozen array of machine numbers that the
+list keeps as its store: `count`, `at`, `type`, `isSame` and `array`
+answer from it, and the boxed operands are built only if `ops` is read.
+The result is an ordinary canonical `List` in every other respect.
+
+`values` may be a `number[]`, a `Float64Array` or any array-like of
+numbers. Its `length` must be a non-negative safe integer and each
+element a JS number; anything else throws a `TypeError`. `-0` is stored
+as `+0`.
+
+Use it to hand a large numeric list to the engine cheaply, and read it
+back with `expr.array`.
+
+####### values
+
+`ArrayLike`\<`number`\>
 
 </MemberCard>
 
@@ -26233,6 +27153,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
@@ -26304,6 +27227,9 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `collection`: [`CollectionHandlers`](#collectionhandlers);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `inferOperandTypes`: (`ops`, `requirement`) => 
+     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
 
@@ -27281,6 +28207,49 @@ The contract:
 
 <MemberCard>
 
+##### Expression.digest {#digest}
+
+```ts
+readonly digest: string;
+```
+
+A 128-bit digest of this expression's **serialized structure** — the
+MathJSON `.json` writes — as 32 hexadecimal characters: an **in-memory
+cache key** that needs no compare on hit, computed without writing the
+MathJSON out.
+
+It replaces `JSON.stringify(expr.json)` as a key, and keys the same
+way: two expressions digest alike exactly when their MathJSON is the
+same tree (a collision between two distinct trees is not expected in
+practice — 128 bits from a non-cryptographic mixer, on the engine's own
+serializations), with two deliberate exceptions where the digest is
+coarser than the text — a dictionary's entry order does not enter it,
+and a character digests like the one-cluster string with the same
+content, as the two are the same value.
+
+It is therefore **not an `isSame` key**, in both directions, and
+`hash` remains the `isSame` companion:
+- two symbols of the same name digest alike whatever they are bound to
+  (a symbol serializes as its name), even when `isSame` — which reads
+  binding identity — says they differ;
+- the exact rational `1/2` and the float `0.5` are `isSame` but
+  serialize apart, and digest apart.
+
+- **Cost**: memoized per node, so it is linear in the DISTINCT nodes of
+  the expression — except at and above a mutable object, whose record
+  snapshot is read fresh like `.json`, so a store to it is seen by every
+  node that contains it. `JSON.stringify(expr.json)` is
+  linear in the PATHS, which on a value that shares its sub-expressions
+  is exponential in the depth.
+- **Stability**: deterministic within a release, across engine
+  instances and processes. **Not stable across releases** and not
+  cryptographic: never persist it, never use it to authenticate.
+- **Bound variables**: folds bound-variable names, as the MathJSON does.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.engine {#engine-1}
 
 ```ts
@@ -27414,7 +28383,7 @@ If the expression was constructed from a LaTeX string, the verbatim LaTeX
 
 <MemberCard>
 
-##### Expression.sourceOffsets? {#sourceoffsets-1}
+##### Expression.sourceOffsets? {#sourceoffsets-2}
 
 ```ts
 optional sourceOffsets?: [number, number];
@@ -27573,7 +28542,7 @@ effect channel: "no impurity label in `effectsOf(expr)`" (see
 
 <MemberCard>
 
-##### Expression.effects {#effects-2}
+##### Expression.effects {#effects-4}
 
 ```ts
 readonly effects: 
@@ -28930,6 +29899,64 @@ body — tuple, string and fixed-shape branches enumerate too), or
 
 <MemberCard>
 
+##### Expression.array {#array-1}
+
+```ts
+readonly array: readonly number[] | undefined;
+```
+
+The elements of a `List` as plain machine numbers, or `undefined`.
+
+Defined for a `List` whose every element is a machine number: an
+integer, a finite double, an infinity or `NaN`. A list built by
+`ce.list()` answers its own frozen array without boxing an element; an
+ordinary list answers a frozen array computed once from its elements.
+An element that is not a machine number — an exact rational such as
+`1/3`, a radical, a bignum with more digits than a double holds, a
+complex number, a symbol, a nested list — makes the answer `undefined`:
+the value is never approximated. Evaluate with `.N()` first to get the
+floats of an exact list.
+
+The array is frozen. It may be passed as is into a compiled function's
+argument bag.
+
+:category: Collections
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.isMachineNumeric {#ismachinenumeric}
+
+```ts
+readonly isMachineNumeric: boolean;
+```
+
+Does `array` reproduce this expression, exactness included?
+
+For a `List`: `true` when `array` is defined and `ce.list(expr.array)`
+is this list element for element, as the interpreter computes with it.
+A list built by `ce.list()` answers `true` in constant time. An
+ordinary list answers `true` when every element is a float or an
+integer a double holds, and `false` when some element is an exact
+non-integer such as the rational `1/2`: `array` admits it, since a
+double holds `0.5` with no rounding, but re-boxing `0.5` gives a float,
+which computes as one (`0.5 / 3` is `0.1666…` where `1/2 ÷ 3` is
+`1/6`). A consumer that must keep exact values exact takes `array` only
+when this is `true`.
+
+For a number: `true` when the number is a float, an integer a double
+holds, `NaN` or an infinity; `false` for an exact non-integer, a
+radical or a complex number.
+
+`false` for every other expression.
+
+:category: Collections
+
+</MemberCard>
+
+<MemberCard>
+
 ##### Expression.isIndexedCollection {#isindexedcollection}
 
 ```ts
@@ -29942,6 +30969,7 @@ controlled by the `notation` / `avoidExponentsInRange` options.
 ```ts
 type JsonSerializationOptions = {
   prettify: boolean;
+  inferredAnnotations: boolean;
   exclude: string[];
   shorthands: ("all" | "number" | "symbol" | "function" | "string" | "dictionary")[];
   metadata: ("all" | "wikidata" | "latex" | "sourceOffsets")[];
@@ -31231,7 +32259,7 @@ static setInteger: BoxedType;
 ##### BoxedType.type {#type}
 
 ```ts
-type: Type;
+readonly type: Type;
 ```
 
 </MemberCard>
@@ -31251,6 +32279,14 @@ Computed ONCE, here, at construction: every per-call dispatch check
 (argument validation, result typing) reads this boolean and is O(1) — it
 must never become a tree walk. Polytypes are legal only as signatures, so
 the computation itself is a shallow field test.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.facts {#facts}
+
+Lazily shared facts of this type, independent of any expression.
 
 </MemberCard>
 
@@ -31307,6 +32343,141 @@ ce.type('number').effects;                 // ➔ undefined
 <MemberCard>
 
 ##### BoxedType.isUnknown {#isunknown}
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.from() {#from}
+
+```ts
+static from(type, resolver?): BoxedType
+```
+
+Box an ordinary type, sharing immutable type values within a resolver.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedType.forResult() {#forresult}
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): undefined
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+`undefined`
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): BoxedType
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
+
+###### forResult(type, resolver)
+
+```ts
+static forResult(type, resolver?): BoxedType | undefined
+```
+
+A type-handler result: widen numeric literal cargo to its stored tier,
+retaining intentional ranges and resolver context. Undefined declines.
+Normalization is shared only for immutable input types.
+
+####### type
+
+  \| `string`
+  \| [`AlgebraicType`](#algebraictype)
+  \| [`NegationType`](#negationtype)
+  \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
+  \| [`SetType`](#settype)
+  \| [`BroadcastableType`](#broadcastabletype)
+  \| [`RecordType`](#recordtype)
+  \| [`ObjectType`](#objecttype)
+  \| [`DictionaryType`](#dictionarytype)
+  \| [`TupleType`](#tupletype)
+  \| [`SymbolType`](#symboltype)
+  \| [`ExpressionType`](#expressiontype)
+  \| [`NumericType`](#numerictype)
+  \| [`FunctionSignature`](#functionsignature)
+  \| [`ValueType`](#valuetype)
+  \| [`TypeVariable`](#typevariable)
+  \| [`TypeReference`](#typereference)
+  \| [`BoxedType`](#boxedtype)
+  \| `undefined`
+
+####### resolver?
+
+[`TypeResolver`](#typeresolver)
 
 </MemberCard>
 
@@ -33206,8 +34377,8 @@ Evaluate to `True` if `a` is congruent to `b` modulo `modulus`.
 - If `value` is greater than `upper`, evaluate to `upper`
 - Otherwise, evaluate to `value`
 
-All three arguments are required. (A single-argument form with default
-bounds is on the roadmap; today `["Clamp", 0.42]` is an arity error.)
+All three arguments are required: `["Clamp", 0.42]` is an arity error. There
+is no one-argument form with default bounds (decided 2026-09-21).
 
 ```json example
 ["Clamp", 4.2, -1, 1]
@@ -34993,9 +36164,8 @@ This renders as:
 
 **Expansion of an unknown function.** If _f_ applies an undeclared function, the
 result is the textbook Taylor form with symbolic derivative coefficients
-$f(0), f'(0), \tfrac{1}{2}f''(0), \dots$ (use the MathJSON application
-`["f", "x"]` — the LaTeX `f(x)` parses as an implicit product when `f` is not a
-declared function):
+$f(0), f'(0), \tfrac{1}{2}f''(0), \dots$ (the LaTeX `f(x)` parses as the
+application `["f", "x"]` when `f` is undeclared):
 
 ```json example
 ["Series", ["f", "x"], "x", 0, 3]
@@ -38910,8 +40080,17 @@ the `Which[]` function in Mathematica.
 <Signature name="When">_expr_, _condition_</Signature>
 
 Returns the value of `expr` when `condition` evaluates to `True`, and
-`Undefined` when `condition` evaluates to `False`. When `condition` cannot
-be determined, the expression holds unevaluated.
+`Missing` — the absent-value marker, the same value a `Which` with no
+matching clause and an `If` with no else-branch give — when `condition`
+evaluates to `False`. When `condition` cannot be determined, the
+expression holds unevaluated.
+
+The type of a `When` expression admits the absent case: `When(5, x > 0)`
+has type `integer | missing`, and a list that holds a restricted element has
+type `list<integer | missing>`. Only a restriction whose condition is the
+literal `True` keeps the bare type of `expr`. A consumer that tests
+`type.matches("number")` must set the `missing` member aside first, as it
+must for a `Which` with no default clause.
 
 `["When"]` is the AST head produced by **restriction-brace** syntax:
 `expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
@@ -38921,7 +40100,7 @@ separated from the base expression by spacing commands
 
 ```json example
 ["When", ["Square", "x"], ["Greater", "x", 0]]
-// Evaluates to x^2 when x > 0, Undefined otherwise.
+// Evaluates to x^2 when x > 0, Missing otherwise.
 ```
 
 **Stacked restrictions canonicalize** to a single `When` with an `And`
@@ -38937,8 +40116,12 @@ Downstream simplification, interval intersection, and compilation operate on
 the canonical form, so source variants (stacked braces or a single brace
 with `\wedge`) are interchangeable.
 
-When compiled to JavaScript or GLSL, `When(e, cond)` emits a ternary
-`(cond ? e : NaN)`. This makes `When` suitable for plot-domain masking.
+When compiled, `When(e, cond)` emits a ternary whose masked branch is the
+absence marker of the value's domain: `(cond ? e : NaN)` for a number, on
+every target, and on JavaScript `(cond ? e : undefined)` for a value that is
+provably not a number, such as a string, so that a compiled `IsMissing`
+agrees with the interpreter. This makes `When` suitable for plot-domain
+masking.
 
 </FunctionDefinition>
 
@@ -39288,7 +40471,7 @@ f(x)\left\{0 < x < 2\right\}
 Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
 
 When the condition is `True`, the expression evaluates to its left operand;
-when `False`, it evaluates to `Undefined`. This is distinct from a set
+when `False`, it evaluates to `Missing`. This is distinct from a set
 literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
 disambiguation is positional — trailing braces after a complete expression
 attach as a `When` restriction.
@@ -42713,11 +43896,18 @@ For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
 // ➔ sqrt(30) ≈ 5.477
 ```
 
-- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
+- **Frobenius norm** (_p_ = `"Frobenius"`, the default): Square root of the sum of the squared moduli of the entries
 
 ```json example
 ["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
 // ➔ sqrt(30) ≈ 5.477
+```
+
+- **Spectral norm** (_p_ = 2): The largest singular value, sqrt(λmax(Aᴴ A)). The result is exact for a matrix with one or two rows or columns, or with at most one nonzero entry in each row and column. Any other exact matrix stays unevaluated under `evaluate()` and gives a number under `N()`. On a tensor of rank 3 or more, _p_ = 2 is the Frobenius norm.
+
+```json example
+["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
+// ➔ sqrt(15 + sqrt(221)) ≈ 5.465
 ```
 
 - **L1 norm** (_p_ = 1): Maximum column sum of absolute values
@@ -47481,10 +48671,22 @@ Convert the argument to a string, using the specified _format_.
 
 | _format_ | Description |
 | :--- | :--- |
-| _(omitted)_ | The argument's default string representation |
+| _(omitted)_ | A finite non-negative integer, or a list of such integers, is read as Unicode scalars. Any other argument uses its default string representation |
+| `default` | The argument's default string representation |
 | `utf-8` | The argument is a collection of UTF-8 bytes |
 | `utf-16` | The argument is a collection of UTF-16 code units |
 | `unicode-scalars` | The argument is a collection of Unicode scalars (same as UTF-32), or a single Unicode scalar |
+
+When _format_ is omitted and the argument is a finite non-negative integer,
+or a list of such integers, the integers are decoded as Unicode scalars, as
+with the `unicode-scalars` format: `["StringFrom", 65]` is `"A"`. A number
+that cannot be a code point (`NaN`, an infinity, a non-integer, a negative
+number, a complex number) and any other argument — a string, a boolean, a
+symbol, an expression — keep their default string representation. To print
+an integer instead of decoding it, give the `default` format.
+
+A **tuple** of numbers is not decoded, because a tuple carries the coordinates
+of a point. Use a list, or give the `unicode-scalars` format.
 
 The three explicit formats require a collection of integers (or, for
 `unicode-scalars`, a single integer). A **string** argument is a type error:
@@ -47495,6 +48697,18 @@ bytes would be nonsense. Convert it with [`Utf8`](#utf8) /
 For example: 
 
 ```json example
+["StringFrom", 128287]
+// ➔ "🔟"
+
+["StringFrom", ["List", 127467, 127479]]
+// ➔ "🇫🇷"
+
+["StringFrom", 65]
+// ➔ "A"
+
+["StringFrom", 128287, {str: "default"}]
+// ➔ "128287"
+
 ["StringFrom", ["List", 72, 101, 108, 108, 111], {str: "utf-8"}]
 // ➔ "Hello"
 
@@ -49511,21 +50725,27 @@ full <code>Explanation</code> API <Icon name="chevron-right-bold" /></ReadMore>
 
 ## Options and the Load Report
 
-`loadIntegrationRules()` returns a report and accepts a per-integral time
-budget:
+`loadIntegrationRules()` returns a report and accepts a per-integral step
+budget and a wall-clock limit:
 
 ```js
 const report = loadIntegrationRules(ce, {
-  timeLimitMs: 10000, // per-Integrate wall-clock budget (default 10000)
+  stepBudget: 300000, // per-Integrate step budget (default 300000)
+  timeLimitMs: 30000, // per-Integrate wall-clock limit (default 30000)
 });
 
 console.log(report.ruleCount); // number of compiled rules registered (~2600)
 console.log(report.skipped);   // corpus rules skipped at compile time
 ```
 
-The `timeLimitMs` budget bounds each `Integrate` call, so a pathological
-integrand cannot hang the engine — if the rule driver exceeds the budget it
-yields and the built-in antiderivative is used instead.
+The `stepBudget` decides when the rule driver gives up on an integrand. A step
+is one internal checkpoint of the engine, so the same integrand gives up at
+the same point on every machine: the answer does not depend on the speed or
+the load of the machine. When the driver gives up, the built-in
+antiderivative is used instead.
+
+The `timeLimitMs` limit is only a guard against a hang in code that does not
+count steps, so a pathological integrand cannot hang the engine.
 
 ## Performance
 
@@ -50548,6 +51768,50 @@ mutable state** — a type narrowing through either scope is visible in both.
 That aliasing is the intended semantics for sequential pass-seeding, and is
 documented rather than prevented.
 
+### Rebinding a Boxed Expression in Another Scope
+
+The `scope` option steers a **construction**. On an expression that is
+already boxed it changes nothing:
+
+```ts
+const a = ce.parse("x + 1", { scope: outer }); // `x` resolved in `outer`
+ce.expr(a, { scope: inner }); // returns `a` — the bindings stay `outer`'s
+```
+
+`ce.expr` on a boxed input returns its canonical form and never re-resolves
+a symbol. Until now, an expression that had to be read under other
+declarations was serialized and boxed again:
+
+```ts
+ce.expr(a.json, { scope: inner }); // works, but serializes `a`
+```
+
+`.json` writes a **tree**. An expression is a DAG — one sub-expression
+object can be an operand of many parents — and a value with substituted
+helper bodies can hold a few hundred thousand distinct nodes that a tree
+walk visits billions of times. `ce.rebind` is the operation that re-resolves
+without the serialization:
+
+```ts
+ce.rebind(a, { scope: inner }); // a fresh box of `a`, bound in `inner`
+ce.rebind(a, { form: "structural", scope: inner });
+ce.rebind(a, { form: "raw" });
+```
+
+The result is what `ce.expr(a.json, { form, scope })` would have returned.
+For the canonical form (and a partial form such as `["Flatten", "Order"]`),
+`rebind` builds the MathJSON as a DAG — one array per distinct node, shared
+by every parent that reads it, with operands taken from the node's
+structural form as `.json` takes them — and boxes that by the ordinary
+route. The match with the MathJSON route therefore holds by construction,
+including for an expression that already holds an `Error` node. Canonical
+boxing still visits every path, as it does for any MathJSON — what `rebind`
+removes is the tree-sized serialization. The raw and structural forms
+canonicalize nothing, so there each distinct node is rebuilt once and a
+shared sub-expression stays shared in the result too. Verbatim LaTeX and source positions are dropped, as the
+MathJSON route drops them; a mutable object is rebuilt as the record
+snapshot that route boxes as data.
+
 ### Reading Back What a Parse Declared
 
 `createScope()` returns an `InspectableScope` — structurally a `Scope`,
@@ -50683,7 +51947,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0$$
+$$z\mapsto C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z)^{\doubleprime}(z)-z\times(C\operatorname{Ai}(z)+D_{var}\operatorname{Bi}(z))=0$$
 
 **Holds when** $z\in\C\land C\in\C\land D_{var}\in\C$.
 Used by the Compute Engine for simplification.
@@ -50808,7 +52072,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{\frac{1}{3}}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}({(3z)/2^{1/3}}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -50824,7 +52088,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{I}_{\nu}(z)=\frac{z(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{I}_{\nu}(z)=\frac{z\times(\operatorname{I}_{\nu-1}(z)-\operatorname{I}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -50896,7 +52160,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)+\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{-(\frac{1}{3})}(z)=\frac{3\operatorname{Ai}(-{(3z)/2^{1/3}}^2)+\sqrt{3}\operatorname{Bi}(-{(3z)/2^{1/3}}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -50913,7 +52177,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r\times(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{K}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -51004,7 +52268,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r\times(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{J}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -51012,7 +52276,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\nu}(z)=-(\frac{z(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})$$
+$$\operatorname{K}_{\nu}(z)=-(\frac{z\times(\operatorname{K}_{\nu-1}(z)-\operatorname{K}_{\nu+1}(z))}{2\nu})$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51069,7 +52333,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{Y}_{\nu}(z)=\frac{z(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{Y}_{\nu}(z)=\frac{z\times(\operatorname{Y}_{\nu-1}(z)+\operatorname{Y}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51085,7 +52349,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}((3z)/2^{1/3}^2)}{(3z)/2^{1/3}^2})$$
+$$\operatorname{K}_{\frac{2}{3}}(z)=-(\frac{\sqrt{3}\pi w\mapsto\operatorname{Ai}(w)^{\prime}({(3z)/2^{1/3}}^2)}{{(3z)/2^{1/3}}^2})$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51109,7 +52373,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-(3z)/2^{1/3}^2)-\sqrt{3}\operatorname{Bi}(-(3z)/2^{1/3}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{J}_{\frac{1}{3}}(z)=\frac{3\operatorname{Ai}(-{(3z)/2^{1/3}}^2)-\sqrt{3}\operatorname{Bi}(-{(3z)/2^{1/3}}^2)}{2\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51117,7 +52381,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\nu}(z)=\frac{z(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}$$
+$$\operatorname{J}_{\nu}(z)=\frac{z\times(\operatorname{J}_{\nu-1}(z)+\operatorname{J}_{\nu+1}(z))}{2\nu}$$
 
 **Holds when** $\nu\in\Z\setminus\lbrace0\rbrace\land z\in\C$ &nbsp;_or_&nbsp; $\nu\in\C\setminus\lbrace0\rbrace\land z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51133,7 +52397,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
+$$(\frac{z^2(r^2+7r+12)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{(r\times(r+4)-z^2-\nu^2+4)z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+2)!})-\frac{2zz\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z)}{(r+1)!}-\frac{1}{r!}(z\mapsto\operatorname{I}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\Z\land z\in\C\land r\in\N$ &nbsp;_or_&nbsp; $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -51141,7 +52405,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-(3z)/2^{1/3}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-(3z)/2^{1/3}^2)}{2(3z)/2^{1/3}^2}$$
+$$\operatorname{J}_{\frac{2}{3}}(z)=\frac{3w\mapsto\operatorname{Ai}(w)^{\prime}(-{(3z)/2^{1/3}}^2)+\sqrt{3}w\mapsto\operatorname{Bi}(w)^{\prime}(-{(3z)/2^{1/3}}^2)}{2{(3z)/2^{1/3}}^2}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51149,7 +52413,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
+$$\frac{z^2(r^2+7r+12)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+4)!}+\frac{z\times(2r^2+11r+15)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+3)!}+\frac{((r\times(r+4)+z^2)-\nu^2+4)z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+2)!}+\frac{2zz\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z)}{(r+1)!}+\frac{1}{r!}(z\mapsto\operatorname{Y}_{\nu}(z)^{\prime}(z))=0$$
 
 **Holds when** $\nu\in\C\land z\in\C\setminus\lbrace0\rbrace\land r\in\N$.
 Used by the Compute Engine for simplification.
@@ -51190,7 +52454,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}((3z)/2^{1/3}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
+$$\operatorname{K}_{-(\frac{1}{3})}(z)=\frac{\sqrt{3}\pi\operatorname{Ai}({(3z)/2^{1/3}}^2)}{\sqrt[3]{\frac{3z}{2}}}$$
 
 **Holds when** $z\in\C\setminus\lbrace0\rbrace$.
 Used by the Compute Engine for simplification.
@@ -51525,7 +52789,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\mathrm{Hypergeometric2F1}(a^\star, b^\star, c^\star, z^\star)^\star$$
+$$\mathrm{Hypergeometric2F1}(a, b, c, z)=\overline{\mathrm{Hypergeometric2F1}(\overline{a}, \overline{b}, \overline{c}, \overline{z})}$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -51612,7 +52876,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(z(1-z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F1}(a, b, c, z)=0$$
+$$(z\times(1-z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\doubleprime}(z)+(c-(a+b+1)z)z\mapsto\mathrm{Hypergeometric2F1}(a, b, c, z)^{\prime}(z))-ab\mathrm{Hypergeometric2F1}(a, b, c, z)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land c\in\C\setminus\Z_{\le0}\land z\in\C\setminus\lbrack1, \infty\rparen$.
 Used by the Compute Engine for simplification.
@@ -51674,7 +52938,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Re(z)=\frac{z+z^\star}{2}$$
+$$\Re(z)=\frac{z+\overline{z}}{2}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -51715,7 +52979,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert z^\star\vert=\vert z\vert$$
+$$\vert\overline{z}\vert=\vert z\vert$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -51761,7 +53025,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(x+y\imaginaryI)^\star=x-y\imaginaryI$$
+$$\overline{x+y\imaginaryI}=x-y\imaginaryI$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for simplification.
@@ -51785,7 +53049,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$zz^\star=\vert z\vert^2$$
+$$z\overline{z}=\vert z\vert^2$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -51809,7 +53073,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Im(z)=\frac{z-z^\star}{2\imaginaryI}$$
+$$\Im(z)=\frac{z-\overline{z}}{2\imaginaryI}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -51881,7 +53145,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\imaginaryI^\star=-\imaginaryI$$
+$$\overline{\imaginaryI}=-\imaginaryI$$
 
 Used by the Compute Engine for simplification.
 [`44ae4a` · Fungrim entry ↗](https://fungrim.org/entry/44ae4a)
@@ -52001,7 +53265,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\exp(z^\star)=\exponentialE^{z}^\star$$
+$$\exp(\overline{z})=\overline{\exponentialE^{z}}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -52191,9 +53455,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x(x+y))^{-1})$$
+$$\arctan(x+y)=\arctan(x)+\arctan((y)(1+x\times(x+y))^{-1})$$
 
-**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x(x+y)\gt-1$.
+**Holds when** $x\in\C\land y\in\C\land\vert x+y\vert\lt1\land\vert x\vert\lt1$ &nbsp;_or_&nbsp; $x\in\R\land y\in\R\land x\times(x+y)\gt-1$.
 Used by the Compute Engine for simplification.
 [`268c9e` · Fungrim entry ↗](https://fungrim.org/entry/268c9e)
 
@@ -52230,7 +53494,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x(x+y))$$
+$$\vert\arctan(x+y)-\arctan(x)\vert=\arctan(\vert y\vert, 1+x\times(x+y))$$
 
 **Holds when** $x\in\R\land y\in\R$.
 Used by the Compute Engine for expansion.
@@ -52254,7 +53518,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\arctan(z^\star)=\arctan(z)^\star$$
+$$\arctan(\overline{z})=\overline{\arctan(z)}$$
 
 **Holds when** $z\in\C\land\imaginaryI z\notin\lparen-\infty, -1\rparen\cup\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
@@ -52597,7 +53861,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\ln(z^\star)=\ln(z)^\star$$
+$$\ln(\overline{z})=\overline{\ln(z)}$$
 
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for expansion.
@@ -52803,7 +54067,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{sinc}(z^\star)=\mathrm{sinc}(z)^\star$$
+$$\mathrm{sinc}(\overline{z})=\overline{\mathrm{sinc}(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -52943,7 +54207,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\frac{z(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0$$
+$$\frac{z\times(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+3)!}+\frac{(n^2+5n+6)z\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+2)!}+\frac{zz\mapsto\mathrm{sinc}(z)^{\prime}(z)}{(n+1)!}+\frac{1}{n!}(z\mapsto\mathrm{sinc}(z)^{\prime}(z))=0$$
 
 **Holds when** $z\in\C\land n\in\N$.
 Used by the Compute Engine for simplification.
@@ -53197,7 +54461,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sin(z^\star)=\sin(z)^\star$$
+$$\sin(\overline{z})=\overline{\sin(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -53569,7 +54833,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$\sqrt{z^\star}=\sqrt{z}^\star$$
+$$\sqrt{\overline{z}}=\overline{\sqrt{z}}$$
 
 **Holds when** $z\in\C\setminus\lparen-\infty, 0\rparen$.
 Used by the Compute Engine for expansion.
@@ -53782,7 +55046,7 @@ Used by the Compute Engine for expansion.
 
 ---
 
-$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
+$$2a(b^2-a^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)^2-a\mathrm{AGM}(a, b)^2+((3a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\prime}(a)+a\times(a^2-b^2)a\mapsto\mathrm{AGM}(a, b)^{\doubleprime}(a))\mathrm{AGM}(a, b)=0$$
 
 **Holds when** $a\in\C\land b\in\C\land b\ne0\land\frac{a}{b}\notin\lparen-\infty, 0\rbrack$.
 Used by the Compute Engine for simplification.
@@ -53950,7 +55214,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(-x, -y, z)=-(\imaginaryI\mathrm{CarlsonRD}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRD}(-x, -y, z)=-\overline{\imaginaryI\mathrm{CarlsonRD}(x, y, -z)}$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -54044,7 +55308,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRF}(-x, -y, z)=(\imaginaryI\mathrm{CarlsonRF}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRF}(-x, -y, z)=\overline{\imaginaryI\mathrm{CarlsonRF}(x, y, -z)}$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRF** — Carlson symmetric elliptic integral of the first kind.
@@ -54250,7 +55514,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRG}(-x, -y, z)=-(\imaginaryI\mathrm{CarlsonRG}(x, y, -z))^\star$$
+$$\mathrm{CarlsonRG}(-x, -y, z)=-\overline{\imaginaryI\mathrm{CarlsonRG}(x, y, -z)}$$
 
 **Holds when** $x\in\lbrack0, \infty\rparen\land y\in\lbrack0, \infty\rparen\land z\in\lbrack0, \infty\rparen$.
 **Symbols:** **CarlsonRG** — Carlson symmetric elliptic integral of the second kind.
@@ -54311,7 +55575,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRC}(-x, y)=(\imaginaryI\mathrm{CarlsonRC}(x, -y))^\star$$
+$$\mathrm{CarlsonRC}(-x, y)=\overline{\imaginaryI\mathrm{CarlsonRC}(x, -y)}$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind.
@@ -54378,7 +55642,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
+$$\mathrm{CarlsonRD}(0, y, z)=\frac{\begin{cases}\frac{3(\mathrm{EllipticE}(1-z/y)-(z\mathrm{EllipticK}(1-z/y))/y)}{(z\times(1-z/y))/y}&z\ne0\land z\ne y\\\frac{3\pi}{4}&z=y\\\tilde\infty&z=0\end{cases}}{\sqrt{y}^{3}}$$
 
 **Holds when** $y\in\C\setminus\lbrace0\rbrace\land z\in\C\land\vert\arg(y)-\arg(z)\vert\lt\pi$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -54387,7 +55651,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
+$$\mathrm{CarlsonRJ}(x+\mathrm{lamda}, y+\mathrm{lamda}, \mathrm{lamda}, w+\mathrm{lamda})+\mathrm{CarlsonRJ}(x+\frac{xy}{\mathrm{lamda}}, y+\frac{xy}{\mathrm{lamda}}, \frac{xy}{\mathrm{lamda}}, w+\frac{xy}{\mathrm{lamda}})=\mathrm{CarlsonRJ}(x, y, 0, w)-3\mathrm{CarlsonRC}(w^2(\mathrm{lamda}+\frac{xy}{\mathrm{lamda}}+x+y), w\times(w+\mathrm{lamda})(w+\frac{xy}{\mathrm{lamda}}))$$
 
 **Holds when** $x\in\lparen0, \infty\rparen\land y\in\lparen0, \infty\rparen\land w\in\lparen0, \infty\rparen\land\mathrm{lamda}\in\C\setminus\lparen-\infty, 0\rbrack$.
 **Symbols:** **CarlsonRC** — Degenerate Carlson symmetric elliptic integral of the first kind; **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -54524,7 +55788,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRD}(0, 1, z)=\begin{cases}\frac{3(\mathrm{EllipticE}(1-z)-z\mathrm{EllipticK}(1-z))}{z(1-z)}&z\ne0\land z\ne1\\\frac{3\pi}{4}&z=1\\\tilde\infty&z=0\end{cases}$$
+$$\mathrm{CarlsonRD}(0, 1, z)=\begin{cases}\frac{3(\mathrm{EllipticE}(1-z)-z\mathrm{EllipticK}(1-z))}{z\times(1-z)}&z\ne0\land z\ne1\\\frac{3\pi}{4}&z=1\\\tilde\infty&z=0\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -54756,7 +56020,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{CarlsonRJ}(-x, -y, -z, w)=-(\imaginaryI\mathrm{CarlsonRJ}(x, y, z, -w))^\star$$
+$$\mathrm{CarlsonRJ}(-x, -y, -z, w)=-\overline{\imaginaryI\mathrm{CarlsonRJ}(x, y, z, -w)}$$
 
 **Holds when** $x\in\lparen0, \infty\rbrack\land y\in\lparen0, \infty\rbrack\land z\in\lparen0, \infty\rbrack\land w\in\lparen0, \infty\rbrack$.
 **Symbols:** **CarlsonRJ** — Carlson symmetric elliptic integral of the third kind.
@@ -55649,7 +56913,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m)-(1-m)\mathrm{EllipticK}(m)=\frac{1}{3}(m(1-m)\mathrm{CarlsonRD}(0, 1, 1-m))$$
+$$\mathrm{EllipticE}(m)-(1-m)\mathrm{EllipticK}(m)=\frac{1}{3}(m\times(1-m)\mathrm{CarlsonRD}(0, 1, 1-m))$$
 
 **Holds when** $m\in\C$.
 **Symbols:** **CarlsonRD** — Degenerate Carlson symmetric elliptic integral of the third kind.
@@ -55714,7 +56978,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticK}(m^\star)=\mathrm{EllipticK}(m)^\star$$
+$$\mathrm{EllipticK}(\overline{m})=\overline{\mathrm{EllipticK}(m)}$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
@@ -55747,7 +57011,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{EllipticE}(m^\star)=\mathrm{EllipticE}(m)^\star$$
+$$\mathrm{EllipticE}(\overline{m})=\overline{\mathrm{EllipticE}(m)}$$
 
 **Holds when** $m\in\C\setminus\lparen1, \infty\rparen$.
 Used by the Compute Engine for expansion.
@@ -56226,7 +57490,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{BarnesG}(z^\star)=\mathrm{BarnesG}(z)^\star$$
+$$\mathrm{BarnesG}(\overline{z})=\overline{\mathrm{BarnesG}(z)}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **BarnesG** — Barnes G-function.
@@ -56300,7 +57564,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z^\star)=\begin{cases}\mathrm{LogBarnesG}(z)&z\in\lparen-\infty, 0\rbrack\\\mathrm{LogBarnesG}(z)^\star&\top\end{cases}$$
+$$\mathrm{LogBarnesG}(\overline{z})=\begin{cases}\mathrm{LogBarnesG}(z)&z\in\lparen-\infty, 0\rbrack\\\overline{\mathrm{LogBarnesG}(z)}&\top\end{cases}$$
 
 **Holds when** $z\in\C$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -56309,7 +57573,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z^2}{4}+z\mathrm{GammaLn}(z+1))-(\frac{z\times(z+1)}{2}+\frac{1}{12})\ln(z)-\ln(\mathrm{ConstGlaisher})+\sum_{n=1}^{N_{var}-1}\frac{\mathrm{BernoulliB}(2n+2)}{2n(2n+1)(2n+2)z^{2n}}+\mathrm{LogBarnesGRemainder}(N_{var}, z)$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, 0\rbrack\land N_{var}\in\N^*$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function; **LogBarnesGRemainder** — Remainder term in asymptotic expansion of logarithmic Barnes G-function.
@@ -56319,7 +57583,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
+$$\mathrm{LogBarnesG}(1-z)=\mathrm{LogBarnesG}(1+z)+\begin{cases}(\pi\imaginaryI(z^2-z+1/6))/2-z\times(\mathrm{GammaLn}(z)+\mathrm{GammaLn}(1-z))-\frac{\imaginaryI\operatorname{Li}_{2}(\exp(2\pi\imaginaryI z))}{2\pi}&0\lt\Re(z)\lt1\lor\Im(z)\gt0\lor\Im(z)=0\land\Re(z)\lt1\\-((\pi\imaginaryI((-z)^2-(-z)+1/6))/2-(-z\times(\mathrm{GammaLn}(-z)+\mathrm{GammaLn}(1-(-z))))-(\imaginaryI\operatorname{Li}_{2}(\exp(-2\pi\imaginaryI z)))/(2\pi))&-1\lt\Re(z)\lt0\lor\Im(z)\lt0\lor\Im(z)=0\land\Re(z)\gt-1\end{cases}$$
 
 **Holds when** $z\in\C\land z\notin\Z$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -56345,7 +57609,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=(\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=(\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+z\mathrm{GammaLn}(z))-\int_{0}^{z}\!\mathrm{GammaLn}(x)\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -56355,7 +57619,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LogBarnesG}(z+1)=\frac{z(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x$$
+$$\mathrm{LogBarnesG}(z+1)=\frac{z\times(1-z)}{2}+\frac{1}{2}(z\ln(2\pi))+\int_{0}^{z}\!x\mathrm{Digamma}(x)\, \mathrm{d}x$$
 
 **Holds when** $z\in\C\land z\notin\lparen-\infty, -1\rbrack$.
 **Symbols:** **LogBarnesG** — Logarithmic Barnes G-function.
@@ -56754,7 +58018,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{PolyGamma}(m, z^\star)=\mathrm{PolyGamma}(m, z)^\star$$
+$$\mathrm{PolyGamma}(m, \overline{z})=\overline{\mathrm{PolyGamma}(m, z)}$$
 
 **Holds when** $m\in\N\land z\in\C$.
 Used by the Compute Engine for expansion.
@@ -56903,7 +58167,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Digamma}(z^\star)=\mathrm{Digamma}(z)^\star$$
+$$\mathrm{Digamma}(\overline{z})=\overline{\mathrm{Digamma}(z)}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for expansion.
@@ -57125,7 +58389,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\binom{z}{2}=\frac{z(z-1)}{2}$$
+$$\binom{z}{2}=\frac{z\times(z-1)}{2}$$
 
 **Holds when** $z\in\C$.
 Used by the Compute Engine for simplification.
@@ -57201,7 +58465,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$n!=n(n-1)!$$
+$$n!=n\times(n-1)!$$
 
 **Holds when** $n\in\N^*$.
 Used by the Compute Engine for simplification.
@@ -57508,7 +58772,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Gamma(z^\star)=\Gamma(z)^\star$$
+$$\Gamma(\overline{z})=\overline{\Gamma(z)}$$
 
 **Holds when** $z\in\C\setminus\Z_{\le0}$.
 Used by the Compute Engine for expansion.
@@ -59179,7 +60443,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(j, z^\star, \tau)=\mathrm{JacobiTheta}(j, z, -\tau^\star)^\star$$
+$$\mathrm{JacobiTheta}(j, \overline{z}, \tau)=\overline{\mathrm{JacobiTheta}(j, z, -\overline{\tau})}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -59730,7 +60994,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{JacobiTheta}(j, z, -\tau^\star)=\mathrm{JacobiTheta}(j, z^\star, \tau)^\star$$
+$$\mathrm{JacobiTheta}(j, z, -\overline{\tau})=\overline{\mathrm{JacobiTheta}(j, \overline{z}, \tau)}$$
 
 **Holds when** $j\in\lbrace1, 2, 3, 4\rbrace\land z\in\C\land\Im(\tau)\gt0$.
 Used by the Compute Engine for simplification.
@@ -60178,7 +61442,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 $$\gcd(p, q)=1$$
 
-**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q$.
+**Holds when** $p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q$.
 Used by the Compute Engine for simplification.
 [`062423` · Fungrim entry ↗](https://fungrim.org/entry/062423)
 
@@ -60315,7 +61579,7 @@ Used by the Compute Engine for expansion.
 
 $$\gcd(p^{m}, q^{n})=1$$
 
-**Holds when** $p\in\mathrm{Primes}\land q\in\mathrm{Primes}\land p\ne q\land m\in\N\land n\in\N$.
+**Holds when** $p\in\mathbb{P}\land q\in\mathbb{P}\land p\ne q\land m\in\N\land n\in\N$.
 Used by the Compute Engine for simplification.
 [`499cfc` · Fungrim entry ↗](https://fungrim.org/entry/499cfc)
 
@@ -60393,7 +61657,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-2)=\frac{1}{2}(\vert a(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
+$$\lcm(a, a-2)=\frac{1}{2}(\vert a\times(a-2)\vert(1+\frac{1-(-1)^{a}}{2}))$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -60571,7 +61835,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\lcm(a, a-1)=a(a-1)$$
+$$\lcm(a, a-1)=a\times(a-1)$$
 
 **Holds when** $a\in\Z$.
 Used by the Compute Engine for simplification.
@@ -60630,7 +61894,7 @@ Used by the Compute Engine for simplification.
 
 ## Prime numbers
 
-$$\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathrm{Primes}, p\mapsto p\le x))$$
+$$\mathrm{PrimePi}(x)=\mathrm{Count}(\mathrm{Filter}(\mathbb{P}, p\mapsto p\le x))$$
 
 **Holds when** $x\in\R$.
 Used by the Compute Engine for simplification.
@@ -60674,7 +61938,7 @@ Used by the Compute Engine for expansion.
 
 $$\mathrm{Totient}(p^{k})=p^{k-1}(p-1)$$
 
-**Holds when** $p\in\mathrm{Primes}\land k\in\N^*$.
+**Holds when** $p\in\mathbb{P}\land k\in\N^*$.
 Used by the Compute Engine for simplification.
 [`1d731f` · Fungrim entry ↗](https://fungrim.org/entry/1d731f)
 
@@ -60714,7 +61978,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{Totient}(p)=p-1$$
 
-**Holds when** $p\in\mathrm{Primes}$.
+**Holds when** $p\in\mathbb{P}$.
 Used by the Compute Engine for simplification.
 [`cb410e` · Fungrim entry ↗](https://fungrim.org/entry/cb410e)
 
@@ -60766,7 +62030,7 @@ This page is generated from the compiled Fungrim artifact by `scripts/fungrim/ge
 
 ## Chebyshev polynomials
 
-$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}$$
+$$x\mapsto\mathrm{ChebyshevT}(n, x)^{\doubleprime}(x)=\frac{n\times(n\mathrm{ChebyshevT}(n, x)-x\mathrm{ChebyshevU}(n-1, x))}{x^2-1}$$
 
 **Holds when** $n\in\Z\land x\in\C\setminus\lbrace-1, 1\rbrace$.
 **Symbols:** **ChebyshevT** — Chebyshev polynomial of the first kind; **ChebyshevU** — Chebyshev polynomial of the second kind.
@@ -61263,7 +62527,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
+$$(1-z^2)z\mapsto\mathrm{LegendrePolynomial}(n, z)^{\doubleprime}(z)-2zz\mapsto\mathrm{LegendrePolynomial}(n, z)^{\prime}(z)+n\times(n+1)\mathrm{LegendrePolynomial}(n, z)=0$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for simplification.
@@ -61392,7 +62656,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{LegendrePolynomial}(n, z^\star)=\mathrm{LegendrePolynomial}(n, z)^\star$$
+$$\mathrm{LegendrePolynomial}(n, \overline{z})=\overline{\mathrm{LegendrePolynomial}(n, z)}$$
 
 **Holds when** $n\in\N\land z\in\C$.
 Used by the Compute Engine for expansion.
@@ -61792,7 +63056,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
+$$\mathrm{Fibonacci}(n)=(2(-\imaginaryI)^{n}\sinh(n\times(\ln(\varphi)+\frac{\pi\imaginaryI}{2})))/\sqrt{5}$$
 
 **Holds when** $n\in\Z$.
 Used by the Compute Engine for simplification.
@@ -62030,7 +63294,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{DirichletCharacter}(p^{e_{var}}, \ell, n)=\exp(\frac{2\pi\imaginaryI\mathrm{DiscreteLog}(\ell, \mathrm{ConreyGenerator}(p), p^{e_{var}})\mathrm{DiscreteLog}(n, \mathrm{ConreyGenerator}(p), p^{e_{var}})}{\mathrm{Totient}(p^{e_{var}})})$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
+**Holds when** $p\in\mathbb{P}\land p\ge3\land e_{var}\in\N^*\land\ell\in1..(p^{e_{var}}-1)\land n\in\Z\land\gcd(\ell, p^{e_{var}})=\gcd(n, p^{e_{var}})=1$.
 **Symbols:** **ConreyGenerator** — Conrey generator; **DirichletCharacter** — Dirichlet character; **DiscreteLog** — Discrete logarithm.
 Used by the Compute Engine for simplification.
 [`4cf4e4` · Fungrim entry ↗](https://fungrim.org/entry/4cf4e4)
@@ -62039,7 +63303,7 @@ Used by the Compute Engine for simplification.
 
 $$\mathrm{ConreyGenerator}(p)=\begin{cases}10&p=40\,487\\7&p=6\,692\,367\,337\\\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1))&\top\end{cases}$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3\land p\lt10^{12}$.
+**Holds when** $p\in\mathbb{P}\land p\ge3\land p\lt10^{12}$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`540931` · Fungrim entry ↗](https://fungrim.org/entry/540931)
@@ -62055,9 +63319,9 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p(p-1)))$$
+$$\mathrm{ConreyGenerator}(p)=\min(\mathrm{Filter}(\N^*, a\mapsto\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p, \N))=p-1\land\mathrm{Count}(\mathrm{Map}(k\mapsto a^{k}\bmod p^2, \N))=p\times(p-1)))$$
 
-**Holds when** $p\in\mathrm{Primes}\land p\ge3$.
+**Holds when** $p\in\mathbb{P}\land p\ge3$.
 **Symbols:** **ConreyGenerator** — Conrey generator.
 Used by the Compute Engine for simplification.
 [`75231e` · Fungrim entry ↗](https://fungrim.org/entry/75231e)
@@ -62585,7 +63849,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\mathrm{RiemannZetaZero}(-n)=\mathrm{RiemannZetaZero}(n)^\star$$
+$$\mathrm{RiemannZetaZero}(-n)=\overline{\mathrm{RiemannZetaZero}(n)}$$
 
 **Holds when** $n\in\Z\land n\ne0$.
 **Symbols:** **RiemannZetaZero** — Nontrivial zero of the Riemann zeta function.
@@ -62612,7 +63876,7 @@ Used by the Compute Engine for simplification.
 
 ---
 
-$$\Zeta(s^\star)=\Zeta(s)^\star$$
+$$\Zeta(\overline{s})=\overline{\Zeta(s)}$$
 
 **Holds when** $s\in\C\land s\ne1$.
 Used by the Compute Engine for expansion.
