@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.868c8a5e.js" defer="defer"></script>
-<script src="/assets/js/main.8b66a134.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.7d8c1380.js" defer="defer"></script>
+<script src="/assets/js/main.7a716e61.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -83,7 +83,9 @@
 <li class=""><code>abs</code> → <code>np.abs</code></li>
 <li class=""><code>floor</code> → <code>np.floor</code></li>
 <li class=""><code>ceiling</code> → <code>np.ceil</code></li>
-<li class=""><code>round</code> → <code>np.round</code></li>
+<li class=""><code>round</code> → <code>_ce_round(x, rule)</code>, a helper written before the code, which
+rounds a tie with the rule of <code>ce.roundingTies</code> at compile time; with the
+rule <code>&quot;to-even&quot;</code>, <code>round</code> → <code>np.round</code></li>
 </ul>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="statistics">Statistics<a href="#statistics" class="hash-link" aria-label="Direct link to Statistics" title="Direct link to Statistics" translate="no">​</a></h3>
 <ul>
