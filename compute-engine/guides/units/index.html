@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.7d8c1380.js" defer="defer"></script>
-<script src="/assets/js/main.7a716e61.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b9ba03a9.js" defer="defer"></script>
+<script src="/assets/js/main.700d6ab1.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -287,6 +287,29 @@ the engine&#x27;s <a href="#angular-units-and-trigonometry" class="">angular uni
 <code-playground><div slot="javascript">console.log(ce.parse(&quot;\\sin(1 \\pm 0.1)&quot;).N().toLatex());
 <!-- -->// ➔ 0.841 ± 0.054
 </div></code-playground>
+<p>The inverse trigonometric and hyperbolic functions, <code>Gamma</code>, <code>LogGamma</code>,
+<code>Erf</code>, <code>Erfc</code> and <code>Factorial</code> propagate the uncertainty the same way, with
+the derivative of the function: <code class="language-math math-inline">|f&#x27;(a)|\,\sigma</code>. So do <code>Mean</code>, <code>Median</code>,
+<code>Variance</code> and <code>StandardDeviation</code> over a list that contains a measurement:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\operatorname{mean}([0.7468 \\pm 0.001, 0.5, 0.9])&quot;).N().toLatex());
+<!-- -->// ➔ 0.71560 ± 0.00033
+</div></code-playground>
+<p>A comparison decides by the nominal value: <code>0.7468 \pm 0.001 &lt; 1</code> is <code>True</code>.
+The extremum operators (<code>Min</code>, <code>Max</code>, <code>Clamp</code>, <code>Sort</code>) also order a
+measurement by its nominal value, and return the chosen operand as it is,
+uncertainty included:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;\\min(0.1, 0.7468 \\pm 0.001)&quot;).N().toLatex());
+<!-- -->// ➔ 0.1
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;\\max(0.1, 0.7468 \\pm 0.001)&quot;).N().toLatex());
+<!-- -->// ➔ 0.7468 ± 0.0010
+</div></code-playground>
+<p>A step function (<code>Floor</code>, <code>Ceil</code>, <code>Round</code>, <code>Mod</code>, <code>Truncate</code>) returns the
+bare value of the nominal, because its slope is zero almost everywhere:
+<code>\lfloor 0.7468 \pm 0.001 \rfloor</code> is <code>0</code>. At a point where the derivative is
+not finite, such as <code>\arcsin(1 \pm 0.01)</code>, the bare nominal is returned and
+the error bar is dropped. An exact nominal stays exact under <code>evaluate()</code>:
+<code>(\sqrt2 \pm 1/10) + 1</code> evaluates to <code>1 + \sqrt2 \pm 1/10</code>.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="measured-quantities">Measured Quantities<a href="#measured-quantities" class="hash-link" aria-label="Direct link to Measured Quantities" title="Direct link to Measured Quantities" translate="no">​</a></h3>
 <p>A measurement can carry a unit. The parenthesized and bare forms are
 equivalent — a unit written on either operand of <code>\pm</code> scopes over the whole

@@ -2022,10 +2022,10 @@ seen
 // ➔ ["a", "b"]
 ```
 
-The default `iterationLimit` stops a loop after 1024 turns, so a loop that
-builds anything larger needs the engine's limit raised (see
-[Interruptibility](/evaluation/#interruptibility)). The measurement
-behind these figures is in the
+A loop has no iteration limit unless the host sets one (see
+[Interruptibility](/evaluation/#interruptibility)), so the cost of
+copying is what bounds a loop that builds a list. The measurement behind
+these figures is in the
 [performance note](#loop-accumulation-measured) at the end of this page.
 
 ## Indexing
@@ -2496,7 +2496,7 @@ not abort the rest of the work:
 
 ```epsil
 map(x => sqrt(x), [16, -4, "banana", 81])
-// ➔ [4, 2i, NaN, 9]
+// ➔ [4, 2i, Error(ErrorCode("incompatible-type", "complex | infinity", "string"), "banana"), 9]
 ```
 
 Note also `sqrt(-4)` → `2i` rather than a `ValueError`: the engine works over
@@ -4817,6 +4817,14 @@ A `->` whose left side is shaped like a parameter list — `(x, y) -> x + y`,
 (with a fixit) and recovered as the intended function: `->` builds a
 `key -> value` pair, and none of those shapes is a valid key.
 
+A bare name before `->` in a call argument is the key of a rule argument, in
+every argument position: `f(GridLines -> 1, Axes -> 2)` passes two
+`KeyValuePair` arguments, as `f(x, GridLines -> 1)` does. When the parameter
+at that position expects a function, the rule is reported as the same
+wrong-arrow typo, with a fixit to `=>`: `map(x -> x^2, xs)` passes a
+key-value pair where `map` expects a function. That call is not recovered as
+`map(x => x^2, xs)`; apply the fixit.
+
 ## Ranges: `..` {#ranges}
 
 The range operator is a compact spelling of a two-argument `Range`:
@@ -4875,15 +4883,18 @@ The splice happens at canonicalization: literal collections splice
 immediately, and a symbolic or lazy segment lowers to the equivalent
 `join` expression — a lone spread `[...xs]` is `join(xs)`, the list
 materialization of `xs`, and an infinite segment stays lazy
-(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). Set literals deduplicate as
-usual.
+(`[...(1..oo), 5] |> Take(3)` is `[1, 2, 3]`). A literal is a value, so
+when it is evaluated, every finite segment is listed, also a lazy one:
+`[...take(xs, 1), 9]` is a plain list, not a `join` recipe. An element
+that is a finite lazy collection is listed too (`[1..3, 4]` is
+`[[1, 2, 3], 4]`). Set literals deduplicate as usual.
 
 **Tuples do not spread here** — a tuple is a unit (a point, a pair), and
 splicing it would quietly discard that; spreading one is a `spread-tuple`
 error. To use a tuple's elements, convert explicitly:
-`[...ListFrom(t), 3]`. A scalar or string operand is an
-`incompatible-type` error (a string is a scalar, not a character
-collection). Note the mirror-image rule in calls: argument lists are
+`[...ListFrom(t), 3]`. A scalar operand is one element (`[...5]` is
+`[5]`), and a string operand contributes its characters (`[..."ab", 1]` is
+`["a", "b", 1]`). Note the mirror-image rule in calls: argument lists are
 tuple-shaped, so there exactly tuples spread.
 
 In a **dictionary literal**, `...` merges the entries of a dictionary.
@@ -5452,10 +5463,17 @@ xs
 // ➔ [1, 2]
 ```
 
-(A spread inside a literal, `[...xs, k]`, is the exception: it is the lazy
-`join` described next, not a snapshot — see the
-[Style Guide](/style/#building-a-list-one-element-at-a-time) before
-growing a list in a loop.)
+A spread inside a list literal, `[...xs, k]`, is a snapshot too: the literal
+holds the elements of each finite spread operand, also of a lazy one such as
+`take(xs, 2)`. Only an infinite spread (`[...1..oo]`) stays a lazy list. See
+the [Style Guide](/style/#building-a-list-one-element-at-a-time) before
+growing a list in a loop.
+
+```epsil
+let ys = [1, 2, 3, 4]
+[...take(ys, 1), 9, ...drop(ys, 2)]
+// ➔ [1, 9, 3, 4]
+```
 
 Lazy collection **operators** — `Range`, `map`, `filter`, `take`, `join` —
 are *generators*: their operands (bounds, sources, functions) are evaluated
@@ -5603,19 +5621,29 @@ The two kinds of limit end differently:
   continues past it. The statement that breached evaluates to the error value,
   and — because a loop is imperative — whatever it assigned before the breach
   stays assigned. A program that reads such a variable afterwards therefore
-  sees a *partial* result alongside the `evaluation-canceled` diagnostic:
+  sees a *partial* result alongside the `evaluation-canceled` diagnostic.
 
-  <!-- epsil-test: expect-diagnostics -->
+An Epsil program has **no iteration limit** by default: a loop runs until it
+ends, and a program that does not end is a valid program. The time budget is
+the bound a host should use. The engine's own default iteration limit (1024
+turns of a loop or of a lazy walk) is removed on an engine the first time it
+runs an Epsil program, and it stays removed for everything that engine
+evaluates afterwards, so that a lazy collection the program returns can be
+read in full.
 
-  ```epsil
-  total = 0
-  for i in 1..5000 { total = total + i * 2 }   // stops at iterationLimit (1024)
-  total                                        // ➔ 1051650, not 25005000
-  ```
+```epsil
+total = 0
+for i in 1..5000 { total = total + i * 2 }
+total
+// ➔ 25005000
+```
 
-  A host that displays `value` must also surface `diagnostics` (the loop's
-  breach is an `error`-severity `evaluation-canceled` there), or raise
-  `ce.iterationLimit` for programs expected to loop longer.
+A host that wants a count-based bound assigns `ce.iterationLimit` before it
+runs a program. An assigned limit is kept and applies to Epsil programs: a
+loop that exceeds it stops with `iteration-limit-exceeded`, and the host must
+then surface `diagnostics` with `value`, because the variables the loop
+assigned hold a partial result. The recursion limit (256 nested calls of user
+functions by default) always applies.
 
 These limits are cooperative. A browser that evaluates untrusted or potentially
 unbounded programs should run Epsil in a Web Worker it can terminate from the
@@ -7998,7 +8026,7 @@ To use a tuple's elements as list elements, convert explicitly: `ListFrom(t)` is
 
 A value's type does not match what its context requires — a typed declaration (`let x: string = …`) whose initializer has a different type, an argument outside a function's signature, or a value that fails a type ascription.
 
-The message reads "expected `T`, got `U`": T is what the context requires, U is what the value actually has. A site may follow — "for argument 2" points at a position in a call, "at `x`" quotes the offending subexpression. A type like `list<string^5>` is a list of exactly 5 strings; `integer` is a whole number, finite like every bare numeric type name.
+The message reads "expected `T`, got `U`": T is what the context requires, U is what the value actually has. A site may follow — "at `x`" quotes the offending subexpression. A type like `list<string^5>` is a list of exactly 5 strings; `integer` is a whole number, finite like every bare numeric type name.
 
 The check runs twice by design: once statically, when the program is canonicalized (reported before anything runs), and again during evaluation, where the mismatch becomes an error value that propagates outward (see `epsil doc runtime-error`).
 
@@ -8099,6 +8127,8 @@ The last element is `xs[-1]` — negative indices count from the end, which is u
 `->` and `=>` are different operators: `->` pairs a key with a value (the key must be a string, as in a dictionary entry) and also writes function TYPES in annotations (`(number) -> number`), while `=>` is the mapsto arrow that builds a function value.
 
 So `(x) -> x^2` reads as a key-value pair with a malformed key, not a lambda. Write `(x) => x^2` for the function; the fixit in the diagnostic applies exactly that rewrite.
+
+In a call, `name -> value` is a rule argument — a key-value pair whose key is the name, as in `f(GridLines -> 1, Axes -> 2)`. So `map(x -> x^2, xs)` passes a key-value pair where `map` expects a function, and the diagnostic names the argument. Write `map(x => x^2, xs)`; the fixit applies that rewrite too.
 
 ## `mapsto-arrow-legacy`
 
@@ -8327,9 +8357,9 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `Block` | `(unknown*) -> unknown` | Evaluate a sequence of expressions in a local scope, **sequentially**. |
 | — | `BuiltinFunction` | `(string \| symbol) -> symbol` | Return a built-in function symbol by name. |
 | `canonicalForm` | `CanonicalForm` | `(any, symbol*) -> any` | Return the canonical form of an expression |
-| `caseFold` | `CaseFold` | `(string) -> string` | CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. |
-| `characterFrom` | `CharacterFrom` | `(string) -> character` | CharacterFrom(s): the character `s` denotes. |
-| `characters` | `Characters` | `(string) -> list<character>` | Characters(s): split a string into a list of user-perceived characters (grapheme clusters). |
+| `caseFold` | `CaseFold` | `(character \| string) -> string` | CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. |
+| `characterFrom` | `CharacterFrom` | `(character \| string) -> character` | CharacterFrom(s): the character `s` denotes. |
+| `characters` | `Characters` | `(character \| string) -> list<character>` | Characters(s): split a string into a list of user-perceived characters (grapheme clusters). |
 | — | `Coalesce` | `(any+) -> unknown` | Return the first operand that is not ABSENT (`Missing`, `Undefined` or `NaN`), evaluated left-to-right. |
 | — | `Colon` | `(any, any) -> expression` | Type annotation (`a : b`) — opaque typed head. |
 | `conforms` | `Conforms` | `(subject: any, protocols: string+) -> boolean` | True iff the subject conforms to EVERY named protocol. |
@@ -8340,7 +8370,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `DeclareType` | `(string \| symbol, type: string \| symbol \| type, attributes: dictionary<any>?) scope -> nothing` | Declare a type. |
 | — | `DefineFunction` | `(symbol, function, dictionary<any>?) scope -> nothing` | Define one clause of a (possibly multi-clause) function: `DefineFunction(f, Function(body, params…))`. |
 | — | `Delimiter` | `(any, string?) -> any` | Group expressions with explicit delimiters. |
-| `digitsFrom` | `DigitsFrom` | `(string, (integer \| string)?) -> integer` | Return an integer representation of the string `s` in base `base`. |
+| `digitsFrom` | `DigitsFrom` | `(character \| string, (character \| integer \| string)?) -> integer` | Return an integer representation of the string `s` in base `base`. |
 | `error` | `Error` | `(expression<ErrorCode> \| string, expression?) -> nothing` | Represent an error expression. |
 | — | `ErrorCode` | `(string, any*) -> error` | Structured error code with optional arguments. |
 | `evaluate` | `Evaluate` | `(any) -> unknown` | Evaluate an expression. |
@@ -8348,7 +8378,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `findRoot` | `FindRoot` | `(any, any) -> dictionary` | FindRoot(equations, params): numerically find parameter values that |
 | — | `Function` | `(expression, (function \| symbol)*) -> function` | A function literal |
 | `geometricVector` | `GeometricVector` | `(any, any) -> expression` | Geometric vector (directed segment between two points) — opaque typed head. |
-| `graphemeClusters` | `GraphemeClusters` | `(string) -> list<character>` | A collection of grapheme clusters from a string. |
+| `graphemeClusters` | `GraphemeClusters` | `(character \| string) -> list<character>` | A collection of grapheme clusters from a string. |
 | `head` | `Head` | `(any) -> symbol` | Return the head of an expression, the name of the operator |
 | — | `Hold` | `(any) -> unknown` | Hold an expression, preventing it from being canonicalized or evaluated until `ReleaseHold` is applied to it |
 | — | `HoldValues` | `(any, any?) -> expression` | HoldValues(body): evaluate `body` with its assigned free symbols |
@@ -8367,12 +8397,12 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `N` | `(any, (integer \| list<number>)?) -> unknown` | N(expr): numerically evaluate an expression |
 | — | `NamedArgument` | `(string, any) -> nothing` | NamedArgument(name, value): one named argument of a call (Epsil |
 | `nothing` | `Nothing` | variable `nothing` | The absence of a value; the sole member of the unit type. |
-| `numberFrom` | `NumberFrom` | `(string, base: (integer \| string)?) -> number` | NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN", "Indeterminate". |
+| `numberFrom` | `NumberFrom` | `(character \| string, base: (character \| integer \| string)?) -> number` | NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN", "Indeterminate". |
 | `numericApproximation` | `NumericApproximation` | `(any) -> unknown` | Numerically evaluate an expression, as the `.N()` method does (engine-internal). |
 | — | `Object` | `(any, string?) -> unknown` | Provenance head for the snapshot of a mutable object: `["Object", <record>, "'TypeName'"]`. |
 | — | `OverParen` | `(any+) -> expression` | Over-paren accent (`\overparen{BC}`) — opaque typed head; not evaluated. |
-| `padEnd` | `PadEnd` | `(string, n: integer, pad: string?) -> string` | PadEnd(s, n, pad=" "): `s` padded at the END to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
-| `padStart` | `PadStart` | `(string, n: integer, pad: string?) -> string` | PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
+| `padEnd` | `PadEnd` | `(character \| string, n: integer, pad: (character \| string)?) -> string` | PadEnd(s, n, pad=" "): `s` padded at the END to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
+| `padStart` | `PadStart` | `(character \| string, n: integer, pad: (character \| string)?) -> string` | PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
 | `parallel` | `Parallel` | `(any, any) -> expression` | Parallelism relation (`AB \parallel CD`) — opaque typed head; not evaluated. |
 | `parse` | `Parse` | `(string) -> any` | Parse a LaTeX string and evaluate to a corresponding expression |
 | `perpendicular` | `Perpendicular` | `(any, any) -> expression` | Perpendicularity relation (`AB \perp CD`) — opaque typed head; not evaluated. |
@@ -8398,12 +8428,12 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `sphere` | `Sphere` | `(any+) -> expression` | Sphere primitive — opaque typed head. |
 | — | `Spread` | `(any) -> unknown` | Spread(t): splice the elements of the tuple `t` into the enclosing |
 | — | `String` | `(any*) -> string` | A string created by joining its arguments. |
-| `stringCompare` | `StringCompare` | `(string, string) -> integer` | StringCompare(a, b): -1 when `a` sorts before `b`, 0 when they are equal, 1 when `a` sorts after `b`. |
+| `stringCompare` | `StringCompare` | `(character \| string, character \| string) -> integer` | StringCompare(a, b): -1 when `a` sorts before `b`, 0 when they are equal, 1 when `a` sorts after `b`. |
 | `stringFrom` | `StringFrom` | `(any, format: string?) -> string` | StringFrom(value, format?): create a string from `value`. |
-| `stringJoin` | `StringJoin` | `(collection<character \| string>, separator: string?) -> string` | StringJoin(xs): join the elements of the finite collection `xs` (strings or characters) into a string. |
-| `stringRepeat` | `StringRepeat` | `(string, n: integer) -> string` | StringRepeat(s, n): `n` copies of the string `s`, concatenated. |
-| `stringReplace` | `StringReplace` | `((string, string, string, count: integer?) -> string) & ((string, regexp, string, count: integer?) -> string) & ((string, regexp, function, count: integer?) -> string)` | StringReplace(s, target, replacement): replace every non-overlapping occurrence of `target` in `s`, scanning left to right over whole characters. |
-| `stringSplit` | `StringSplit` | `((string, string?) -> list<string>) & ((string, regexp) -> list<string>)` | StringSplit(s): split a string on runs of whitespace (the Unicode White_Space code points), dropping empty parts. |
+| `stringJoin` | `StringJoin` | `(collection<character \| string>, separator: (character \| string)?) -> string` | StringJoin(xs): join the elements of the finite collection `xs` (strings or characters) into a string. |
+| `stringRepeat` | `StringRepeat` | `(character \| string, n: integer) -> string` | StringRepeat(s, n): `n` copies of the string `s`, concatenated. |
+| `stringReplace` | `StringReplace` | `((character \| string, character \| string, character \| string, count: integer?) -> string) & ((character \| string, regexp, character \| string, count: integer?) -> string) & ((character \| string, regexp, function, count: integer?) -> string)` | StringReplace(s, target, replacement): replace every non-overlapping occurrence of `target` in `s`, scanning left to right over whole characters. |
+| `stringSplit` | `StringSplit` | `((character \| string, (character \| string)?) -> list<string>) & ((character \| string, regexp) -> list<string>)` | StringSplit(s): split a string on runs of whitespace (the Unicode White_Space code points), dropping empty parts. |
 | — | `Subscript` | `(collection<any>, any) -> any` | Subscript notation for indexing or compound symbols. |
 | — | `Subtype` | `(subtype: string \| type, supertype: string \| type) -> boolean` | True iff the FIRST operand is a subtype of the second — `Subtype("integer", "number")` is `True`, `Subtype("number", "integer")` is `False`. |
 | `symbol` | `Symbol` | `function` | Construct a new symbol with a name formed by concatenating the arguments |
@@ -8411,19 +8441,19 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `Text` | `(any*) -> string` | A sequence of strings, annotated expressions and other Text expressions |
 | `timing` | `Timing` | `(value, repeat: integer?) -> tuple<number, value>` | `Timing(expr)` evaluates `expr` and returns a pair: the time the evaluation took, in microseconds, then the value; read them as `Timing(expr)[1]` and `Timing(expr)[2]`. |
 | `to` | `To` | `(any, any) -> nothing` | Action arrow / mapping (`a \to b`) — opaque typed head. |
-| `toLowerCase` | `ToLowerCase` | `(string) -> string` | ToLowerCase(s): the string `s` mapped to lower case using the Unicode default (locale-independent) mappings. |
-| `toUpperCase` | `ToUpperCase` | `(string) -> string` | ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (locale-independent) mappings. |
+| `toLowerCase` | `ToLowerCase` | `(character \| string) -> string` | ToLowerCase(s): the string `s` mapped to lower case using the Unicode default (locale-independent) mappings. |
+| `toUpperCase` | `ToUpperCase` | `(character \| string) -> string` | ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (locale-independent) mappings. |
 | `triangle` | `Triangle` | `(any+) -> expression` | Triangle primitive — opaque typed head. |
-| `trim` | `Trim` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | Trim(s): remove leading and trailing whitespace (the Unicode White_Space characters). |
-| `trimEnd` | `TrimEnd` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimEnd(s): remove trailing whitespace (the Unicode White_Space characters). |
-| `trimStart` | `TrimStart` | `(string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimStart(s): remove leading whitespace (the Unicode White_Space characters). |
+| `trim` | `Trim` | `(character \| string, chars: (character \| collection<character \| string> \| string)?) -> string` | Trim(s): remove leading and trailing whitespace (the Unicode White_Space characters). |
+| `trimEnd` | `TrimEnd` | `(character \| string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimEnd(s): remove trailing whitespace (the Unicode White_Space characters). |
+| `trimStart` | `TrimStart` | `(character \| string, chars: (character \| collection<character \| string> \| string)?) -> string` | TrimStart(s): remove leading whitespace (the Unicode White_Space characters). |
 | `type` | `Type` | `(any) -> type` | The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. |
 | `typeFrom` | `TypeFrom` | `(text: string) -> type` | A type expression as a first-class value, constructed from its text: `TypeFrom("list<integer>")`. |
 | — | `Typed` | `(any, string \| symbol) -> unknown` | Ascribe a type to an expression. |
 | — | `Unevaluated` | `(any) -> unknown` | Prevent an expression from being evaluated |
-| `unicodeScalars` | `UnicodeScalars` | `(string) -> list<integer>` | A collection of Unicode scalars from a string, same as UTF-32 |
-| `utf16` | `Utf16` | `(string) -> list<integer>` | A collection of UTF-16 code units from a string. |
-| `utf8` | `Utf8` | `(string) -> list<integer>` | A collection of UTF-8 code units from a string. |
+| `unicodeScalars` | `UnicodeScalars` | `(character \| string) -> list<integer>` | A collection of Unicode scalars from a string, same as UTF-32 |
+| `utf16` | `Utf16` | `(character \| string) -> list<integer>` | A collection of UTF-16 code units from a string. |
+| `utf8` | `Utf8` | `(character \| string) -> list<integer>` | A collection of UTF-8 code units from a string. |
 | — | `Wildcard` | `(symbol) -> symbol` | Single-expression pattern wildcard. |
 | — | `WildcardOptionalSequence` | `(symbol) -> symbol` | Pattern wildcard matching zero or more expressions. |
 | — | `WildcardSequence` | `(symbol) -> symbol` | Pattern wildcard matching one or more expressions. |
@@ -8495,7 +8525,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `append` | `Append` | `(collection<any>, (missing \| value)+) -> collection` | Add one or more elements to the end of a collection. |
 | `argMax` | `ArgMax` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that maximizes the given key function (or the element itself when no key is given). |
 | `argMin` | `ArgMin` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that minimizes the given key function (or the element itself when no key is given). |
-| — | `At` | `(value: any, index: (boolean \| indexed_collection<any> \| number \| string)+) -> unknown` | Access an element of an indexed collection. |
+| — | `At` | `(value: any, index: (boolean \| character \| indexed_collection<any> \| number \| string)+) -> unknown` | Access an element of an indexed collection. |
 | `chunk` | `Chunk` | `((S, integer) -> list<string> where S: string) & ((collection, integer) -> list<list>)` | Split the collection into `k` nearly equal-sized groups. |
 | `chunkBy` | `ChunkBy` | `((S, key: (character) any -> unknown) -> list<string> where S: string) & ((collection<T>, key: (T) any -> unknown) -> list<list<T>> where T)` | Split the collection into maximal runs of consecutive elements over which the key function yields the same value. |
 | `closed` | `Closed` | `(number) -> number` | Closed(x): the endpoint x of an Interval, marked as included. |
@@ -8649,10 +8679,10 @@ The [Regular expressions reference](/reference/regexp/) has the full description
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `isMatch` | `IsMatch` | `(subject: string, pattern: regexp) -> boolean` | Whether a string contains a match for a regular expression. |
+| `isMatch` | `IsMatch` | `(subject: character \| string, pattern: regexp) -> boolean` | Whether a string contains a match for a regular expression. |
 | `regExp` | `RegExp` | `(pattern: string, flags: string?) -> regexp` | A compiled regular expression, using the host JavaScript dialect. |
-| `stringMatch` | `StringMatch` | `(subject: string, pattern: regexp) -> nothing \| record` | The first match of a regular expression in a string, as a record. |
-| `stringMatchAll` | `StringMatchAll` | `(subject: string, pattern: regexp) -> list<record>` | Every non-overlapping match of a regular expression in a string, as a list of records. |
+| `stringMatch` | `StringMatch` | `(subject: character \| string, pattern: regexp) -> nothing \| record` | The first match of a regular expression in a string, as a record. |
+| `stringMatchAll` | `StringMatchAll` | `(subject: character \| string, pattern: regexp) -> list<record>` | Every non-overlapping match of a regular expression in a string, as a list of records. |
 
 ## Relations
 
@@ -8712,7 +8742,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `besselY` | `BesselY` | `(order: complex, complex \| infinity) -> number` | Bessel function of the second kind (Neumann function) |
 | `beta` | `Beta` | `(complex \| infinity, complex \| infinity) -> number` | Euler beta function |
 | `catalanConstant` | `CatalanConstant` | constant `real<0.915965594177219..0.9159655941772191>` = `0.915965594177219015055` | Catalan's constant G ≈ 0.9160. |
-| `ceil` | `Ceil` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number up to the next largest integer |
+| `ceil` | `Ceil` | `(x: real \| signed_infinity, step: real?) -> real \| signed_infinity` | Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number. |
 | `chop` | `Chop` | `(T) -> T where T: number` | Replace tiny numeric values with zero. |
 | `clamp` | `Clamp` | `(real \| signed_infinity, real \| signed_infinity, real \| signed_infinity) -> real \| signed_infinity` | Clamp a value to the range [lo, hi] = min(max(x, lo), hi). |
 | `complex` | `Complex` | `(real: number, imaginary: number) -> complex` | Construct a complex number from real and imaginary parts. |
@@ -8734,7 +8764,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `exponentialE` | `ExponentialE` | constant `real<2.718281828459045..2.718281828459046>` = `2.71828182845904523536` | Euler's number e ≈ 2.71828, the base of the natural logarithm. |
 | — | `Factorial` | `(complex \| infinity) -> number` | Factorial function: the product of all positive integers less than or equal to n |
 | `factorial2` | `Factorial2` | `(complex \| infinity) -> number` | Double Factorial Function |
-| `floor` | `Floor` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number down to the nearest integer. |
+| `floor` | `Floor` | `(x: real \| signed_infinity, step: real?) -> real \| signed_infinity` | Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number. |
 | `fract` | `Fract` | `(real \| signed_infinity) -> real<0..1>` | Fractional part of a number: x - floor(x) |
 | `gcd` | `GCD` | `(any*) -> number` | Greatest Common Divisor |
 | `gamma` | `Gamma` | `(complex \| infinity, (complex \| infinity)?) -> number` | Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt. |
@@ -8786,7 +8816,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `real` | `Real` | `(complex \| infinity) -> number` | Real part of a complex number. |
 | `remainder` | `Remainder` | `(T, T) -> T where T: number` | IEEE remainder: the signed remainder after dividing x by y, with the quotient rounded to the nearest integer (ties round toward +Infinity, matching JavaScript `Math.round`) |
 | `root` | `Root` | `(complex \| infinity, complex \| infinity) -> number` | n-th root of a value. |
-| `round` | `Round` | `(real \| signed_infinity, integer?) -> real \| signed_infinity` | Rounds a number to the nearest integer, or (with a precision argument) to `n` decimal places. |
+| `round` | `Round` | `(x: real \| signed_infinity, step: real?) -> real \| signed_infinity` | Rounds a number to the nearest integer, or with a step to the nearest multiple of the step. |
 | `sign` | `Sign` | `(complex \| signed_infinity) -> complex` | Sign of a number: -1, 0, or 1 for a real; `z/\|z\|`, the point of the unit circle in its direction, for a complex `z`. |
 | `sqrt` | `Sqrt` | `(complex \| infinity) -> complex \| infinity` | Square Root |
 | — | `Square` | `(number) -> number` | Square of a number: x^2. |
@@ -8794,8 +8824,8 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `sum` | `Sum` | `(any, tuple*) -> number` | `Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L` |
 | `supremum` | `Supremum` | `(value*) -> number` | Like Max, but defined for open sets |
 | `trigamma` | `Trigamma` | `(complex \| infinity) -> number` | Trigamma function, the derivative of the digamma function |
-| `truncate` | `Truncate` | `(real \| signed_infinity) -> integer \| signed_infinity` | Rounds a number towards zero (removes the fractional part) |
-| `zeta` | `Zeta` | `(complex \| infinity, (complex \| infinity)?) -> number` | Riemann zeta function; with two arguments, the Hurwitz zeta function ζ(s,a) = Σ_&#123;n=0&#125;^∞ (n+a)^&#123;-s&#125;. |
+| `truncate` | `Truncate` | `(x: real \| signed_infinity, step: real?) -> real \| signed_infinity` | Rounds a number towards zero (removes the fractional part), or with a step to the multiple of the step nearest to the number in the direction of zero. |
+| `zeta` | `Zeta` | `(complex \| infinity, (complex \| infinity)?) -> number` | Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ \|n+a\|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum. |
 | — | `e` | constant `real<2.718281828459045..2.718281828459046>` = `e` | Euler's number e ≈ 2.71828, the base of the natural logarithm. |
 | — | `i` | constant `imaginary` = `i` | The imaginary unit, whose square is −1. |
 
@@ -8866,7 +8896,7 @@ The [Calculus reference](/reference/calculus/) has the full description and the 
 | `bigO` | `BigO` | `(value) -> number` | Landau big-O remainder term. |
 | `circleContour` | `CircleContour` | `(center: complex, radius: real, orientation: integer?) -> expression` | Closed circle: center, positive radius, optional orientation (+1 or -1). |
 | `circularIntegrate` | `CircularIntegrate` | `(function, limits+) -> number` | Closed-path integral. |
-| `contourIntegrate` | `ContourIntegrate` | `(expression, variable: symbol, contour: expression) -> number` | Symbolic integral over an explicit closed contour, using the residue theorem. |
+| `contourIntegrate` | `ContourIntegrate` | `(expression, variable: symbol, contour: expression) -> number` | Symbolic integral over an explicit closed contour or the real line (`RealLineContour`), using the residue theorem. |
 | — | `D` | `(expression, variables: symbol*) -> expression` | Symbolic partial derivative with respect to one or more variables. |
 | `dSolve` | `DSolve` | `(expression, symbol, symbol) -> expression` | Symbolic differential equation solver. |
 | `derivative` | `Derivative` | `(function, order: number*) -> function` | Derivative operator that returns a derivative function. |
@@ -9426,6 +9456,16 @@ characters("naïve")
 // ➔ ["n", "a", "ï", "v", "e"]
 ```
 
+Indexing a string gives a character. A character and the one-character string
+with the same content are the same value, so every string operation accepts a
+character where it accepts a string, and a dictionary accepts a character as a
+key. The result is the result for the one-character string:
+
+```epsil
+toUpperCase("abc"[1])
+// ➔ "A"
+```
+
 A string literal can include the value of an expression with `\(…)`:
 
 ```epsil
@@ -9582,7 +9622,7 @@ canonicalForm(Hold(1 + x), "Order")
 
 ### caseFold
 
-MathJSON `CaseFold` · `(string) -> string`
+MathJSON `CaseFold` · `(character | string) -> string`
 
 CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. An approximation of Unicode full case folding.
 
@@ -9598,7 +9638,7 @@ caseFold("Hello") == caseFold("HELLO")
 
 ### characterFrom
 
-MathJSON `CharacterFrom` · `(string) -> character`
+MathJSON `CharacterFrom` · `(character | string) -> character`
 
 CharacterFrom(s): the character `s` denotes. `s` must be exactly one user-perceived character (one grapheme cluster) after NFC normalization; an empty or multi-character string is an error.
 
@@ -9609,7 +9649,7 @@ characterFrom("é")
 
 ### characters
 
-MathJSON `Characters` · `(string) -> list<character>`
+MathJSON `Characters` · `(character | string) -> list<character>`
 
 Characters(s): split a string into a list of user-perceived characters (grapheme clusters). Synonym: GraphemeClusters. For stable integer decompositions see UnicodeScalars, Utf8 and Utf16. A non-string argument leaves the expression unevaluated.
 
@@ -9736,7 +9776,7 @@ Delimiter(1 + 2)
 
 ### digitsFrom
 
-MathJSON `DigitsFrom` · `(string, (integer | string)?) -> integer`
+MathJSON `DigitsFrom` · `(character | string, (character | integer | string)?) -> integer`
 
 Return an integer representation of the string `s` in base `base`.
 
@@ -9839,7 +9879,7 @@ geometricVector(A, B)
 
 ### graphemeClusters
 
-MathJSON `GraphemeClusters` · `(string) -> list<character>`
+MathJSON `GraphemeClusters` · `(character | string) -> list<character>`
 
 A collection of grapheme clusters from a string. Synonym of Characters.
 
@@ -10093,7 +10133,7 @@ The absence of a value; the sole member of the unit type.
 
 ### numberFrom
 
-MathJSON `NumberFrom` · `(string, base: (integer | string)?) -> number`
+MathJSON `NumberFrom` · `(character | string, base: (character | integer | string)?) -> number`
 
 NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN", "Indeterminate". The integer part may be omitted before a fraction (".5" is 0.5); a trailing "." with no fraction digits ("5.") is not accepted. Any other text, including "", is an error value (never NaN).
 
@@ -10134,7 +10174,7 @@ OverParen(B, C)
 
 ### padEnd
 
-MathJSON `PadEnd` · `(string, n: integer, pad: string?) -> string`
+MathJSON `PadEnd` · `(character | string, n: integer, pad: (character | string)?) -> string`
 
 PadEnd(s, n, pad=" "): `s` padded at the END to `n` characters by repeating `pad` (its final copy truncated on a character boundary). Returned unchanged when `s` already has `n` or more characters. `n` must be a non-negative integer; an empty `pad` is an error; a non-string `pad` leaves the expression unevaluated.
 
@@ -10145,7 +10185,7 @@ padEnd("abc", 6, ".")
 
 ### padStart
 
-MathJSON `PadStart` · `(string, n: integer, pad: string?) -> string`
+MathJSON `PadStart` · `(character | string, n: integer, pad: (character | string)?) -> string`
 
 PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). Returned unchanged when `s` already has `n` or more characters. `n` must be a non-negative integer; an empty `pad` is an error; a non-string `pad` leaves the expression unevaluated.
 
@@ -10398,7 +10438,7 @@ Return the signature string of an operator.
 
 ```epsil
 Signature(stringRepeat)
-// ➔ "(string, n: integer) -> string"
+// ➔ "(character | string, n: integer) -> string"
 ```
 
 ### simplify
@@ -10496,7 +10536,7 @@ String("x", 2)
 
 ### stringCompare
 
-MathJSON `StringCompare` · `(string, string) -> integer`
+MathJSON `StringCompare` · `(character | string, character | string) -> integer`
 
 StringCompare(a, b): -1 when `a` sorts before `b`, 0 when they are equal, 1 when `a` sorts after `b`. The order compares Unicode scalar sequences code point by code point (NOT UTF-16 code units, which would sort astral characters below U+E000..U+FFFF).
 
@@ -10523,7 +10563,7 @@ stringFrom([72, 105])
 
 ### stringJoin
 
-MathJSON `StringJoin` · `(collection<character | string>, separator: string?) -> string`
+MathJSON `StringJoin` · `(collection<character | string>, separator: (character | string)?) -> string`
 
 StringJoin(xs): join the elements of the finite collection `xs` (strings or characters) into a string.
 
@@ -10536,7 +10576,7 @@ stringJoin(["a", "b", "c"], "-")
 
 ### stringRepeat
 
-MathJSON `StringRepeat` · `(string, n: integer) -> string`
+MathJSON `StringRepeat` · `(character | string, n: integer) -> string`
 
 StringRepeat(s, n): `n` copies of the string `s`, concatenated. StringRepeat(s, 0) is "". A negative or non-integer `n` is an error.
 
@@ -10547,7 +10587,7 @@ stringRepeat("ab", 3)
 
 ### stringReplace
 
-MathJSON `StringReplace` · `((string, string, string, count: integer?) -> string) & ((string, regexp, string, count: integer?) -> string) & ((string, regexp, function, count: integer?) -> string)`
+MathJSON `StringReplace` · `((character | string, character | string, character | string, count: integer?) -> string) & ((character | string, regexp, character | string, count: integer?) -> string) & ((character | string, regexp, function, count: integer?) -> string)`
 
 StringReplace(s, target, replacement): replace every non-overlapping occurrence of `target` in `s`, scanning left to right over whole characters.
 
@@ -10569,7 +10609,7 @@ stringReplace("banana", "a", "o", 1)
 
 ### stringSplit
 
-MathJSON `StringSplit` · `((string, string?) -> list<string>) & ((string, regexp) -> list<string>)`
+MathJSON `StringSplit` · `((character | string, (character | string)?) -> list<string>) & ((character | string, regexp) -> list<string>)`
 
 StringSplit(s): split a string on runs of whitespace (the Unicode White_Space code points), dropping empty parts.
 
@@ -10666,7 +10706,7 @@ replaceAll(x^2 + x, to(x, 3))
 
 ### toLowerCase
 
-MathJSON `ToLowerCase` · `(string) -> string`
+MathJSON `ToLowerCase` · `(character | string) -> string`
 
 ToLowerCase(s): the string `s` mapped to lower case using the Unicode default (locale-independent) mappings.
 
@@ -10677,7 +10717,7 @@ toLowerCase("Hello World")
 
 ### toUpperCase
 
-MathJSON `ToUpperCase` · `(string) -> string`
+MathJSON `ToUpperCase` · `(character | string) -> string`
 
 ToUpperCase(s): the string `s` mapped to upper case using the Unicode default (locale-independent) mappings. The character count can change ("ß" uppercases to "SS").
 
@@ -10699,7 +10739,7 @@ triangle(A, B, C)
 
 ### trim
 
-MathJSON `Trim` · `(string, chars: (character | collection<character | string> | string)?) -> string`
+MathJSON `Trim` · `(character | string, chars: (character | collection<character | string> | string)?) -> string`
 
 Trim(s): remove leading and trailing whitespace (the Unicode White_Space characters).
 
@@ -10717,7 +10757,7 @@ trim("--hi--", "-")
 
 ### trimEnd
 
-MathJSON `TrimEnd` · `(string, chars: (character | collection<character | string> | string)?) -> string`
+MathJSON `TrimEnd` · `(character | string, chars: (character | collection<character | string> | string)?) -> string`
 
 TrimEnd(s): remove trailing whitespace (the Unicode White_Space characters).
 
@@ -10730,7 +10770,7 @@ trimEnd("hi!!", "!")
 
 ### trimStart
 
-MathJSON `TrimStart` · `(string, chars: (character | collection<character | string> | string)?) -> string`
+MathJSON `TrimStart` · `(character | string, chars: (character | collection<character | string> | string)?) -> string`
 
 TrimStart(s): remove leading whitespace (the Unicode White_Space characters).
 
@@ -10772,7 +10812,7 @@ TypeFrom("integer | real") == TypeFrom("real")
 
 `(any, string | symbol) -> unknown`
 
-Ascribe a type to an expression. The type is asserted for the type system (ascription, not a check); evaluation is transparent. Used to annotate `Function` literal parameters and return types.
+Ascribe a type to an expression. The type is asserted for the type system. At evaluation, a concrete value that does not conform to the type is an `incompatible-type` error; any other value is returned unchanged. Used to annotate `Function` literal parameters and return types.
 
 ```epsil
 Typed(2 + 3, "integer")
@@ -10787,7 +10827,7 @@ Prevent an expression from being evaluated
 
 ### unicodeScalars
 
-MathJSON `UnicodeScalars` · `(string) -> list<integer>`
+MathJSON `UnicodeScalars` · `(character | string) -> list<integer>`
 
 A collection of Unicode scalars from a string, same as UTF-32
 
@@ -10798,7 +10838,7 @@ unicodeScalars("A😀")
 
 ### utf16
 
-MathJSON `Utf16` · `(string) -> list<integer>`
+MathJSON `Utf16` · `(character | string) -> list<integer>`
 
 A collection of UTF-16 code units from a string.
 
@@ -10809,7 +10849,7 @@ utf16("A😀")
 
 ### utf8
 
-MathJSON `Utf8` · `(string) -> list<integer>`
+MathJSON `Utf8` · `(character | string) -> list<integer>`
 
 A collection of UTF-8 code units from a string.
 
@@ -11508,7 +11548,7 @@ argMin([3, 9, 2])
 
 ### At
 
-`(value: any, index: (boolean | indexed_collection<any> | number | string)+) -> unknown`
+`(value: any, index: (boolean | character | indexed_collection<any> | number | string)+) -> unknown`
 
 Access an element of an indexed collection.
 
@@ -13160,7 +13200,7 @@ category.
 
 ### isMatch
 
-MathJSON `IsMatch` · `(subject: string, pattern: regexp) -> boolean`
+MathJSON `IsMatch` · `(subject: character | string, pattern: regexp) -> boolean`
 
 Whether a string contains a match for a regular expression.
 
@@ -13174,7 +13214,7 @@ The pattern is written most readably as a raw string literal: `RegExp(#"[0-9]+"#
 
 ### stringMatch
 
-MathJSON `StringMatch` · `(subject: string, pattern: regexp) -> nothing | record`
+MathJSON `StringMatch` · `(subject: character | string, pattern: regexp) -> nothing | record`
 
 The first match of a regular expression in a string, as a record.
 
@@ -13182,7 +13222,7 @@ The record holds `match`, `range`, `groups` and `names`; the result is `Nothing`
 
 ### stringMatchAll
 
-MathJSON `StringMatchAll` · `(subject: string, pattern: regexp) -> list<record>`
+MathJSON `StringMatchAll` · `(subject: character | string, pattern: regexp) -> list<record>`
 
 Every non-overlapping match of a regular expression in a string, as a list of records.
 
@@ -13591,6 +13631,17 @@ host can choose another rule with the engine setting `roundingTies`):
 // ➔ [-3, -2, -2, -3]
 ```
 
+With a second argument, `floor`, `ceil`, `truncate` and `round` round to a
+multiple of that step instead of an integer. `floor(x, step)` is the greatest
+multiple of the step that is at most `x`, whatever the sign of the step, and
+`round(x, step)` the nearest multiple. To round to `n` decimal places, the
+step is `10^-n`:
+
+```epsil
+[floor(226, 10), ceil(226, 10), truncate(-226, 10), round(226, 10), round(3.14159, 1/100)]
+// ➔ [220, 230, -220, 230, 157/50]
+```
+
 There are two remainders. `a % b` (`Mod`) takes the sign of the divisor `b`.
 `remainder(a, b)` rounds the quotient to the nearest integer, so its result
 can be negative when `b` is positive:
@@ -13843,13 +13894,13 @@ N(catalanConstant)
 
 ### ceil
 
-MathJSON `Ceil` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Ceil` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number up to the next largest integer
+Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number.
 
 ```epsil
-[ceil(2.3), ceil(-2.7)]
-// ➔ [3,-2]
+[ceil(2.3), ceil(-2.7), ceil(226, 10)]
+// ➔ [3,-2,230]
 ```
 
 ### chop
@@ -14090,13 +14141,13 @@ Double Factorial Function
 
 ### floor
 
-MathJSON `Floor` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Floor` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number down to the nearest integer.
+Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number.
 
 ```epsil
-[floor(2.7), floor(-2.3)]
-// ➔ [2,-3]
+[floor(2.7), floor(-2.3), floor(226, 10)]
+// ➔ [2,-3,220]
 ```
 
 ### fract
@@ -14687,13 +14738,13 @@ n-th root of a value.
 
 ### round
 
-MathJSON `Round` · `(real | signed_infinity, integer?) -> real | signed_infinity`
+MathJSON `Round` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number to the nearest integer, or (with a precision argument) to `n` decimal places.
+Rounds a number to the nearest integer, or with a step to the nearest multiple of the step.
 
 ```epsil
-[round(2.5), round(-2.5), round(3.14159, 2)]
-// ➔ [3,-3,157/50]
+[round(2.5), round(-2.5), round(226, 10), round(3.14159, 1/100)]
+// ➔ [3,-3,230,157/50]
 ```
 
 ### sign
@@ -14780,20 +14831,20 @@ N(trigamma(1))
 
 ### truncate
 
-MathJSON `Truncate` · `(real | signed_infinity) -> integer | signed_infinity`
+MathJSON `Truncate` · `(x: real | signed_infinity, step: real?) -> real | signed_infinity`
 
-Rounds a number towards zero (removes the fractional part)
+Rounds a number towards zero (removes the fractional part), or with a step to the multiple of the step nearest to the number in the direction of zero.
 
 ```epsil
-[truncate(2.7), truncate(-2.7)]
-// ➔ [2,-2]
+[truncate(2.7), truncate(-2.7), truncate(-226, 10)]
+// ➔ [2,-2,-220]
 ```
 
 ### zeta
 
 MathJSON `Zeta` · `(complex | infinity, (complex | infinity)?) -> number`
 
-Riemann zeta function; with two arguments, the Hurwitz zeta function ζ(s,a) = Σ_&#123;n=0&#125;^∞ (n+a)^&#123;-s&#125;.
+Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
 
 ```epsil
 [zeta(2), zeta(-1), N(zeta(3))]
@@ -15724,7 +15775,7 @@ Closed-path integral. Evaluates supported explicit contours by the residue theor
 
 MathJSON `ContourIntegrate` · `(expression, variable: symbol, contour: expression) -> number`
 
-Symbolic integral over an explicit closed contour, using the residue theorem.
+Symbolic integral over an explicit closed contour or the real line (`RealLineContour`), using the residue theorem.
 
 ### D
 
@@ -17343,7 +17394,7 @@ identityMatrix(3)
 
 ### inverse
 
-MathJSON `Inverse` · `(T) -> T where T: matrix`
+MathJSON `Inverse` · `(matrix) -> matrix`
 
 Multiplicative inverse of a square matrix.
 
@@ -19077,7 +19128,9 @@ search by concept with `epsil doc <keywords>`.
   membership. Also `StringReplace(s, target, replacement, count?)`,
   `trim`/`trimStart`/`trimEnd`, `stringRepeat`, `padStart`/`padEnd`,
   `toUpperCase`/`toLowerCase`/`caseFold`, `stringCompare(a, b)` (`-1/0/1`,
-  code-point order) and `NumberFrom(s, base?)`.
+  code-point order) and `NumberFrom(s, base?)`. `s[i]` is a character; every
+  string operation, and a dictionary lookup `d[c]`, accepts a character as the
+  one-character string (`toUpperCase(s[1])`, no `String(c)` needed).
 - **Dictionaries**: `keys`, `values`.
 - **Absence**: `missing` preserves a missing position; `nothing` is omitted
   from arguments and collections; `isMissing`, `Coalesce`.

@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.7d8c1380.js" defer="defer"></script>
-<script src="/assets/js/main.7a716e61.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b9ba03a9.js" defer="defer"></script>
+<script src="/assets/js/main.700d6ab1.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -48,7 +48,50 @@
       font-weight: 400
     }
   
-    </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes">Breaking Changes<a href="#breaking-changes" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
+    </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01111-2026-10-09">0.111.1 <em>2026-10-09</em><a href="#01111-2026-10-09" class="hash-link" aria-label="Direct link to 01111-2026-10-09" title="Direct link to 01111-2026-10-09" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories">Security Advisories<a href="#security-advisories" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><ul>
+<li class="">Fixed a cross-site scripting (XSS) vulnerability in the <code>shadow</code> option of
+the <code>\enclose</code> command. The value of the option was written into the markup
+of the SVG overlay as raw attribute text, outside of any quoted attribute. A
+value containing spaces could therefore add attributes, including event
+handlers, to the <code>&lt;svg&gt;</code> element, and run script when the markup was inserted
+in the document. The issue affected <code>convertLatexToMarkup()</code>, the editor and
+the <code>&lt;math-span&gt;</code> / <code>&lt;math-div&gt;</code> static elements. No HTML in the input was
+needed, so input-side HTML sanitizers did not catch it. The value is now
+validated against a strict grammar (two or three CSS lengths and an optional
+color) and emitted inside the quoted <code>style</code> attribute. Invalid values are
+ignored. As a side effect, the <code>shadow</code> option, which never had any visible
+effect, now works. This is the same class of issue as GHSA-qwj6-q94f-8425 and
+GHSA-fm7p-gw32-828p.</li>
+<li class="">Fixed a cross-site scripting (XSS) vulnerability in the handling of
+<code>\htmlData</code> and <code>\href</code> values. A value consisting of a single quote
+character was treated as an already quoted value and emitted as an
+unterminated quote. The text of the following attributes then became part of
+the value, and a crafted input could turn it into an event handler attribute.
+Attribute values are now always escaped and quoted by the renderer. As part
+of this change, <code>&amp;</code> is now escaped in attribute values, so a character
+reference such as <code>&amp;copy;</code> in a URL is preserved literally.</li>
+<li class="">Fixed a cross-site scripting (XSS) vulnerability in the MathML output of the
+<code>\enclose</code> command. The notation names were written unescaped into the
+<code>notation</code> attribute of the <code>&lt;menclose&gt;</code> element. A crafted first argument
+could close the attribute and add elements, which ran script when the MathML
+was inserted in the document by the <code>&lt;math-span&gt;</code> / <code>&lt;math-div&gt;</code> elements or
+by <code>renderMathInElement()</code> (which generates MathML by default). Unknown
+notation names are now dropped and the names are escaped.</li>
+<li class="">The speakable text generated for accessibility by <code>renderMathInElement()</code> is
+now inserted as text, not as HTML. In SSML mode, the text content is now XML
+escaped.</li>
+<li class="">Hardened the handling of CSS values that originate from the LaTeX input.
+Colors that are not recognized by the color map, the border of <code>\bbox</code>, the
+border and background options of <code>\enclose</code> and the argument of
+<code>\fontfamily</code> are now validated against a strict grammar before being used
+in a <code>style</code> attribute. Previously, a <code>;</code> in these values could add arbitrary
+CSS declarations. Invalid values are ignored.</li>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved">Issues Resolved<a href="#issues-resolved" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+<li class=""><code>\enclose{box}</code> now honors its border options instead of always rendering a
+<code>1px solid red</code> border.</li>
+<li class="">The <code>mathbackground</code> attribute of the MathML output of <code>\bbox</code> now contains
+the color instead of <code>[object Object]</code>.</li>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01110-2026-09-30">0.111.0 <em>2026-09-30</em><a href="#01110-2026-09-30" class="hash-link" aria-label="Direct link to 01110-2026-09-30" title="Direct link to 01110-2026-09-30" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="breaking-changes">Breaking Changes<a href="#breaking-changes" class="hash-link" aria-label="Direct link to Breaking Changes" title="Direct link to Breaking Changes" translate="no">​</a></h3><ul>
 <li class="">The <code>@cortex-js/compute-engine</code> package is no longer a dependency of
 MathLive. The Compute Engine was never bundled with MathLive; it was only
 used for its TypeScript types. If your application loads the Compute Engine
@@ -63,9 +106,87 @@ expression, and <code>mf.setValue(expr.latex)</code> (or <code>mf.setValue(expr)
 still accepts a MathJSON object) to set one.</li>
 <li class="">The <code>&quot;math-json&quot;</code> output format has been removed from <code>getValue()</code>. Use
 <code>MathfieldElement.computeEngine.parse(mf.getValue()).json</code> instead.</li>
+<li class="">The <code>convertMathJsonToLatex()</code> function has been removed. Use
+<code>MathfieldElement.computeEngine.box(json).latex</code> instead, or the <code>latex</code>
+property of a boxed expression from your own Compute Engine instance.
+<code>renderMathInElement()</code> still renders <code>&lt;script type=&quot;math/json&quot;&gt;</code> tags, and
+<code>&lt;math-span&gt;</code> and <code>&lt;math-div&gt;</code> still accept <code>format=&quot;math-json&quot;</code>, when the
+Compute Engine is loaded in the global scope.</li>
 <li class="">The <strong>Evaluate</strong>, <strong>Simplify</strong> and <strong>Solve</strong> items have been removed from the
 default context menu.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01100-2026-06-08">0.110.0 <em>2026-06-08</em><a href="#01100-2026-06-08" class="hash-link" aria-label="Direct link to 01100-2026-06-08" title="Direct link to 01100-2026-06-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories">Security Advisories<a href="#security-advisories" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><ul>
+<li class=""><strong>#3081</strong> <strong>Accessibility</strong> The <code>&lt;math-field&gt;</code> element now has the <code>group</code>
+role instead of <code>math</code>. The <code>math</code> role has presentational children, but a
+mathfield contains a focusable textbox and buttons, and axe reported
+<code>nested-interactive</code>. Code that finds a mathfield by its role, for example
+<code>getByRole(&#x27;math&#x27;)</code> in a test, must use <code>group</code>, or <code>textbox</code> for the
+focusable element. The <code>&lt;math-field&gt;</code> element also no longer has a default
+<code>aria-label</code> of &quot;math input field&quot;: that default is now on the focusable
+textbox, and the element takes its name from its <code>aria-label</code>,
+<code>aria-labelledby</code>, <code>&lt;label&gt;</code> or <code>title</code>. (contributed by @rztaylor)</li>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements">Improvements<a href="#improvements" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+<li class=""><strong>#3045</strong> Improved the Japanese localization: corrected several translations
+and added the missing strings for the cut and paste tooltips. (contributed by
+@314systems)</li>
+<li class=""><strong>#3046</strong> The alphabetic keys of the virtual keyboard now vibrate when they
+are pressed, like the other keys, on devices that support vibration. Set
+<code>MathfieldElement.keypressVibration</code> to <code>false</code> to turn this off.
+(contributed by @IsaacOscar)</li>
+<li class=""><strong>#3048</strong> Added support for the <code>\genfrac</code> command from the <code>amsmath</code>
+package:
+<code>\genfrac{left-delim}{right-delim}{thickness}{mathstyle}{numerator}{denominator}</code>.
+An empty delimiter is a null delimiter. An empty thickness uses the default
+thickness, and a thickness of <code>0pt</code> gives no fraction bar. The mathstyle is
+empty (use the current mathstyle) or one of <code>0</code> (display), <code>1</code> (text), <code>2</code>
+(script) or <code>3</code> (scriptscript). For example, <code>\genfrac{(}{)}{0pt}{}{n}{k}</code>
+is the same as <code>\binom{n}{k}</code>.</li>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+<li class=""><strong>#2966</strong> The keyboard navigation now visits the subscript before the
+superscript. After inserting <code>\int_{#?}^{#?}</code> or <code>\sum_{#?}^{#?}</code>, the lower
+bound is now selected first, and the <strong>Tab</strong> key moves from the lower bound to
+the upper bound. Previously the upper bound was selected first. This matches
+the order of the bounds in the MathJSON output. The change applies to all
+atoms with scripts: for example, in <code>x_i^2</code> the right arrow key now moves
+from <code>x</code> into the subscript <code>i</code> before the superscript <code>2</code>.</li>
+<li class=""><strong>#2973</strong> Fixed a <code>TypeError</code> (&quot;this.mathfield is undefined&quot;) when a
+mathfield was focused after another mathfield had been removed from the DOM
+while it had the focus. This happened in Firefox and Safari, which do not
+blur an element when it is removed. (contributed by @dor-sr)</li>
+<li class=""><strong>#3075</strong> Fixed the copy of a multiline mathfield: the row separators (<code>\\</code>)
+were dropped, so the rows <code>a=b</code> and <code>c=d</code> were copied as <code>a=bc=d</code>.
+<code>mf.getValue(0, -1)</code> had the same problem and is also fixed. This regression
+was introduced in 0.108.0. (contributed by @ubarkai)</li>
+<li class=""><strong>#3081</strong> <strong>Accessibility</strong> The focusable element of a mathfield (the
+keyboard sink, <code>role=&quot;textbox&quot;</code>) now has an accessible name. It is copied
+from the <code>&lt;math-field&gt;</code> element&#x27;s <code>aria-labelledby</code>, <code>aria-label</code>,
+associated <code>&lt;label&gt;</code> or <code>title</code>, and defaults to &quot;math input field&quot;.
+Previously the textbox had no name, or had only the spoken form of its
+content, and axe reported <code>aria-input-field-name</code>. (contributed by
+@rztaylor)</li>
+<li class=""><strong>Accessibility</strong> The <code>aria-readonly</code> state of a read-only mathfield is now
+set on the focusable element of the mathfield (the keyboard sink,
+<code>role=&quot;textbox&quot;</code>) and no longer on the <code>&lt;math-field&gt;</code> element, whose <code>group</code>
+role does not support it. The state is now set when the <code>readonly</code>
+attribute or the <code>readOnly</code> property is used: previously it was set only by
+the <code>readonly</code> property, and it was not removed when the mathfield became
+editable again. A read-only mathfield with editable prompts is not reported
+as read-only. Chromium does not report <code>aria-readonly</code> for this element,
+because the element is <code>contenteditable</code>.</li>
+<li class="">When a mathfield is removed from the DOM while it has the focus, the
+<code>change</code> (if the value was modified), <code>blur</code> and <code>focusout</code> events are now
+dispatched in all browsers. Previously, they were dispatched only in
+Chromium, so an application that saved the value in a <code>change</code> or <code>blur</code>
+listener lost the last edit in Firefox and Safari. In Firefox and Safari the
+element is already detached when these events are dispatched: only the
+listeners attached to the mathfield itself receive them.</li>
+<li class="">The hidden MathML content of the <code>&lt;math-span&gt;</code> and <code>&lt;math-div&gt;</code> elements is
+now wrapped in a <code>&lt;math&gt;</code> element. Without it, the browser did not parse the
+content as MathML.</li>
+<li class="">A mathfield no longer takes the focus back when the focus moves to another
+element in the 60 ms after the mathfield received it. For example,
+<code>mf.focus()</code> followed at once by <code>textarea.focus()</code> left the focus in the
+mathfield, and keystrokes typed in a second mathfield right after the first
+one was focused were inserted in the first one.</li>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01100-2026-06-08">0.110.0 <em>2026-06-08</em><a href="#01100-2026-06-08" class="hash-link" aria-label="Direct link to 01100-2026-06-08" title="Direct link to 01100-2026-06-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories-1">Security Advisories<a href="#security-advisories-1" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><ul>
 <li class=""><strong>#3028</strong> Fixed a cross-site scripting (XSS) vulnerability in the rendering of
 text-mode content. The body of <code>\text{}</code>, <code>\mbox{}</code> and similar commands
 accepts arbitrary characters, which were reflected <strong>unescaped</strong> into both the
@@ -76,7 +197,7 @@ HTML markup (<code>convertLatexToMarkup()</code>, the editor, and the <code>&lt;
 JavaScript when the output was inserted into the DOM. Text content and
 delimiters are now HTML-escaped in both output paths. Applications that render
 untrusted LaTeX should upgrade.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-1">Resolved Issues<a href="#resolved-issues-1" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2949</strong> Fixed the layout of fill-in-the-blank prompts that contain content.
 The prompt&#x27;s outline box now correctly encloses and aligns with its content,
@@ -107,7 +228,7 @@ imports (such as <code>import &#x27;../core/modes&#x27;</code>) that referenced 
 included in the package, which TypeScript 6 flags by default via
 <code>noUncheckedSideEffectImports</code>.</p>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements">Improvements<a href="#improvements" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-1">Improvements<a href="#improvements-1" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#3032</strong> <code>validateLatex()</code> now accepts an optional <code>options</code> argument with a
 <code>macros</code> dictionary, so custom macros are recognized during validation instead
@@ -118,7 +239,7 @@ of being reported as unknown commands. (contributed by @Wigny)</p>
 entry point (<code>math-static-elements</code>), making them available to TypeScript
 consumers. (contributed by @tsuji-riya)</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01092-2026-04-28">0.109.2 <em>2026-04-28</em><a href="#01092-2026-04-28" class="hash-link" aria-label="Direct link to 01092-2026-04-28" title="Direct link to 01092-2026-04-28" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-1">Resolved Issues<a href="#resolved-issues-1" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01092-2026-04-28">0.109.2 <em>2026-04-28</em><a href="#01092-2026-04-28" class="hash-link" aria-label="Direct link to 01092-2026-04-28" title="Direct link to 01092-2026-04-28" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-2">Resolved Issues<a href="#resolved-issues-2" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2931</strong> Fixed virtual keyboard recursion in sandboxed iframe mathfields. The
 message handling guard now checks the <code>source</code> window rather than only the
@@ -139,14 +260,14 @@ color swatches could paint over the border of the active swatch. The focused
 color now has an explicit <code>z-index</code> to keep it above its neighbors.
 (contributed by @Blibbo)</p>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-1">Improvements<a href="#improvements-1" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-2">Improvements<a href="#improvements-2" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">Added Catalan (<code>ca</code>) localization. (contributed by @aaronFortuno)</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01091-2026-04-01">0.109.1 <em>2026-04-01</em><a href="#01091-2026-04-01" class="hash-link" aria-label="Direct link to 01091-2026-04-01" title="Direct link to 01091-2026-04-01" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-2">Resolved Issues<a href="#resolved-issues-2" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01091-2026-04-01">0.109.1 <em>2026-04-01</em><a href="#01091-2026-04-01" class="hash-link" aria-label="Direct link to 01091-2026-04-01" title="Direct link to 01091-2026-04-01" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-3">Resolved Issues<a href="#resolved-issues-3" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2974</strong> Fixed empty/unresponsive mathfield after inserting a fraction
 following a parenthesized expression built via keyboard (e.g.
 <code>5 ) Home ( End /</code>). Also fixed a phantom duplicate caret that appeared after
 the same input sequence. (contributed by @zojize)</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01090-2026-03-11">0.109.0 <em>2026-03-11</em><a href="#01090-2026-03-11" class="hash-link" aria-label="Direct link to 01090-2026-03-11" title="Direct link to 01090-2026-03-11" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-3">Resolved Issues<a href="#resolved-issues-3" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01090-2026-03-11">0.109.0 <em>2026-03-11</em><a href="#01090-2026-03-11" class="hash-link" aria-label="Direct link to 01090-2026-03-11" title="Direct link to 01090-2026-03-11" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-4">Resolved Issues<a href="#resolved-issues-4" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2946</strong> Fixed virtual keyboard toggle focus issues. Clicking the
 <code>virtual-keyboard-toggle</code> button now correctly focuses the mathfield and
@@ -171,7 +292,7 @@ normally. (contributed by @repst)</p>
 with arrow keys. Pressing left or right arrow to move past the boundary of a
 <code>\command</code> now correctly accepts the command and exits LaTeX mode.</p>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-2">Improvements<a href="#improvements-2" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-3">Improvements<a href="#improvements-3" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2935</strong> Fixed Korean localization translation errors. (contributed by
 @onu032001)</p>
@@ -184,12 +305,12 @@ with arrow keys. Pressing left or right arrow to move past the boundary of a
 <p><strong>#2726</strong> Updated Italian localization with improved translations and
 capitalization normalization. (contributed by @GGilli)</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01083-2026-02-11">0.108.3 <em>2026-02-11</em><a href="#01083-2026-02-11" class="hash-link" aria-label="Direct link to 01083-2026-02-11" title="Direct link to 01083-2026-02-11" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-4">Resolved Issues<a href="#resolved-issues-4" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01083-2026-02-11">0.108.3 <em>2026-02-11</em><a href="#01083-2026-02-11" class="hash-link" aria-label="Direct link to 01083-2026-02-11" title="Direct link to 01083-2026-02-11" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-5">Resolved Issues<a href="#resolved-issues-5" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2906</strong> Fixed a runtime error
 (<code>undefined is not an object (evaluating &#x27;this.ariaLiveText.textContent=&quot;&quot;&#x27;)</code>)
 that occurred when the mathfield element could not be fully initialized (e.g.
 in Vue runtime-only builds) or after the mathfield was disposed.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01082-2025-11-13">0.108.2 <em>2025-11-13</em><a href="#01082-2025-11-13" class="hash-link" aria-label="Direct link to 01082-2025-11-13" title="Direct link to 01082-2025-11-13" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-5">Resolved Issues<a href="#resolved-issues-5" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01082-2025-11-13">0.108.2 <em>2025-11-13</em><a href="#01082-2025-11-13" class="hash-link" aria-label="Direct link to 01082-2025-11-13" title="Direct link to 01082-2025-11-13" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-6">Resolved Issues<a href="#resolved-issues-6" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2899</strong> Typing an inline shortcut immediately after inserting a structure
 (e.g. <code>sin/cos</code>) now expands the shortcut correctly and keeps the caret in the
 numerator placeholder. The inline shortcut buffer is flushed in place, so the
@@ -202,7 +323,7 @@ where the denominator was erroneously selected after <code>/</code>.</li>
 button now automatically switch from horizontal (side-by-side) to vertical
 (stacked) layout when the mathfield height is 100px or greater. This happens
 dynamically as you add content to the mathfield.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-6">Resolved Issues<a href="#resolved-issues-6" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-7">Resolved Issues<a href="#resolved-issues-7" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">Fixed virtual keyboard toggle requiring triple-click to activate.</li>
 <li class=""><strong>#2892</strong> Fixed vertical alignment issues when using <code>\colorbox</code> with
 expressions that have both subscripts and superscripts. Previously, applying a
@@ -259,7 +380,7 @@ is configured via the <code>scientificNotationTemplate</code> property (default:
 the exponent. For example, typing <code>3.14e2</code> followed by a space will
 automatically format to <code>3.14×10²</code>. The feature respects the
 <code>decimalSeparator</code> setting for internationalization.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-7">Resolved Issues<a href="#resolved-issues-7" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-8">Resolved Issues<a href="#resolved-issues-8" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">Fixed click positioning in multiline environments. When clicking in a
 multiline environment (such as <code>\displaylines</code>, <code>gather</code>, <code>align</code>, etc.), the
 caret is now correctly positioned on the line that is closest to the click
@@ -530,7 +651,7 @@ maintains editability via the background color menu. Selection highlighting no
 longer causes subscripts to shift, as vertical alignment is only applied to
 intentional background colors, not selection highlights.</li>
 <li class="">Fix empty-line selection highlighting in multiline mathfields</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01071-2025-09-30">0.107.1 <em>2025-09-30</em><a href="#01071-2025-09-30" class="hash-link" aria-label="Direct link to 01071-2025-09-30" title="Direct link to 01071-2025-09-30" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-8">Resolved Issues<a href="#resolved-issues-8" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01071-2025-09-30">0.107.1 <em>2025-09-30</em><a href="#01071-2025-09-30" class="hash-link" aria-label="Direct link to 01071-2025-09-30" title="Direct link to 01071-2025-09-30" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-9">Resolved Issues<a href="#resolved-issues-9" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2817</strong> Calling <code>setPromptValue()</code> no longer changes the focus to the
 mathfield.</li>
 <li class=""><strong>#2805</strong> On mobile, show the math virtual keyboard when using prompts</li>
@@ -540,18 +661,18 @@ mathfield.</li>
 </ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01070-2025-08-17">0.107.0 <em>2025-08-17</em><a href="#01070-2025-08-17" class="hash-link" aria-label="Direct link to 01070-2025-08-17" title="Direct link to 01070-2025-08-17" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features-2">New Features<a href="#new-features-2" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">Added <code>mountMathVirtualKeyboard()</code> to control in which browsing context the
 math virtual keyboard is mounted.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-9">Resolved Issues<a href="#resolved-issues-9" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-10">Resolved Issues<a href="#resolved-issues-10" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2800</strong>: New line on matrix causes duplicated input</li>
 </ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01060-2025-07-11">0.106.0 <em>2025-07-11</em><a href="#01060-2025-07-11" class="hash-link" aria-label="Direct link to 01060-2025-07-11" title="Direct link to 01060-2025-07-11" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features-3">New Features<a href="#new-features-3" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
 <li class="">Export to <strong>typst</strong> format. Use <code>mf.getValue(&quot;typst&quot;)</code> to get the value of the
 mathfield in typst format.</li>
 <li class=""><strong>#2731</strong> The keybinding <code>alt+shift+V</code> now inserts a n<sup>th</sup> root. The
 existing <code>alt+V</code> keybinding continues to insert a square root.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-10">Resolved Issues<a href="#resolved-issues-10" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-11">Resolved Issues<a href="#resolved-issues-11" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">The commands <code>\iff</code>, <code>\Coloneqq</code> and <code>\hArr</code> did not render correctly.</li>
 <li class="">Improved rendering in dark mode.</li>
 <li class=""><strong>#2727</strong> Improved rendering of annotations.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01053-2025-05-14">0.105.3 <em>2025-05-14</em><a href="#01053-2025-05-14" class="hash-link" aria-label="Direct link to 01053-2025-05-14" title="Direct link to 01053-2025-05-14" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-11">Resolved Issues<a href="#resolved-issues-11" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01053-2025-05-14">0.105.3 <em>2025-05-14</em><a href="#01053-2025-05-14" class="hash-link" aria-label="Direct link to 01053-2025-05-14" title="Direct link to 01053-2025-05-14" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-12">Resolved Issues<a href="#resolved-issues-12" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class="">
 <p>Using the kebab version of commands (for example <code>&quot;select-all&quot;</code> instead of
 <code>&quot;SelectAll&quot;</code>) would incorrectly result in a runtime error.</p>
@@ -561,7 +682,7 @@ existing <code>alt+V</code> keybinding continues to insert a square root.</li>
 correctly. To specify some padding, use
 <code>\enclose{updiagonalstrike downdiagonalstrike}[padding=&quot;10px&quot;, 6px solid rgba(205, 0, 11, .4)]{42}</code>.</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01051-2025-04-18">0.105.1 <em>2025-04-18</em><a href="#01051-2025-04-18" class="hash-link" aria-label="Direct link to 01051-2025-04-18" title="Direct link to 01051-2025-04-18" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-12">Resolved Issues<a href="#resolved-issues-12" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01051-2025-04-18">0.105.1 <em>2025-04-18</em><a href="#01051-2025-04-18" class="hash-link" aria-label="Direct link to 01051-2025-04-18" title="Direct link to 01051-2025-04-18" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues-13">Resolved Issues<a href="#resolved-issues-13" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
 <li class=""><strong>#2526</strong> In the virtual keyboard, the keycap text over CSS variables was not
 displayed correctly.</li>
 <li class=""><strong>#2567</strong> Avoid potential race condition when changing the focus of the
@@ -578,7 +699,7 @@ keyboard was not correctly calculated.</li>
 sync with the state of the mathfield.</li>
 <li class=""><strong>#2667</strong> The edit toolbar was not displayed in the alphabetic keyboard
 layout.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-3">Improvements<a href="#improvements-3" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-4">Improvements<a href="#improvements-4" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">Accessibility: Improved support for the high-contrast mode.</li>
 <li class="">There is a new CSS variable to control the z-index of the suggestion popover:
 <code>--suggestion-zindex</code>. This allows the suggestion popover to be displayed
@@ -596,7 +717,7 @@ popover, position the cursor inside the argument.</li>
 the <strong>npm</strong> package has changed. The files that were previously in the <code>./dist/</code>
 directory are now in the root of the package. This should not affect most users,
 but if you are importing the library or auxiliary files from the <code>dist</code>
-directory, you will need to update your paths.</p><p>To use <code>jsdelivr</code>, use:</p><div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> MathfieldElement </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;https://esm.run/mathlive&quot;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div><p>or:</p><div class="language-html codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-html codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token tag punctuation" style="color:var(--base-06)">&lt;</span><span class="token tag" style="color:var(--base-0e)">script</span><span class="token tag" style="color:var(--base-0e)"> </span><span class="token tag attr-name" style="color:var(--base-0c)">defer</span><span class="token tag" style="color:var(--base-0e)"> </span><span class="token tag attr-name" style="color:var(--base-0c)">src</span><span class="token tag attr-value punctuation attr-equals" style="color:var(--base-06)">=</span><span class="token tag attr-value punctuation" style="color:var(--base-06)">&quot;</span><span class="token tag attr-value" style="color:var(--base-0b)">https://cdn.jsdelivr.net/npm/mathlive</span><span class="token tag attr-value punctuation" style="color:var(--base-06)">&quot;</span><span class="token tag punctuation" style="color:var(--base-06)">&gt;</span><span class="token script"></span><span class="token tag punctuation" style="color:var(--base-06)">&lt;/</span><span class="token tag" style="color:var(--base-0e)">script</span><span class="token tag punctuation" style="color:var(--base-06)">&gt;</span><br></div></code></pre></div></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved">Issues Resolved<a href="#issues-resolved" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+directory, you will need to update your paths.</p><p>To use <code>jsdelivr</code>, use:</p><div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> MathfieldElement </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;https://esm.run/mathlive&quot;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div><p>or:</p><div class="language-html codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-html codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token tag punctuation" style="color:var(--base-06)">&lt;</span><span class="token tag" style="color:var(--base-0e)">script</span><span class="token tag" style="color:var(--base-0e)"> </span><span class="token tag attr-name" style="color:var(--base-0c)">defer</span><span class="token tag" style="color:var(--base-0e)"> </span><span class="token tag attr-name" style="color:var(--base-0c)">src</span><span class="token tag attr-value punctuation attr-equals" style="color:var(--base-06)">=</span><span class="token tag attr-value punctuation" style="color:var(--base-06)">&quot;</span><span class="token tag attr-value" style="color:var(--base-0b)">https://cdn.jsdelivr.net/npm/mathlive</span><span class="token tag attr-value punctuation" style="color:var(--base-06)">&quot;</span><span class="token tag punctuation" style="color:var(--base-06)">&gt;</span><span class="token script"></span><span class="token tag punctuation" style="color:var(--base-06)">&lt;/</span><span class="token tag" style="color:var(--base-0e)">script</span><span class="token tag punctuation" style="color:var(--base-06)">&gt;</span><br></div></code></pre></div></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-1">Issues Resolved<a href="#issues-resolved-1" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2647</strong>, <strong>#2634</strong>, <strong>#2562</strong> Some accents (<code>\hat{}</code>, <code>\vec{}</code>) where not
 rendered correctly in some cases.</p>
@@ -606,19 +727,19 @@ rendered correctly in some cases.</p>
 mathfield would not result in the focus getting into a zombie state and
 keyboard event no longer being dispatched.</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01042-2025-03-23">0.104.2 <em>2025-03-23</em><a href="#01042-2025-03-23" class="hash-link" aria-label="Direct link to 01042-2025-03-23" title="Direct link to 01042-2025-03-23" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-1">Issues Resolved<a href="#issues-resolved-1" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01042-2025-03-23">0.104.2 <em>2025-03-23</em><a href="#01042-2025-03-23" class="hash-link" aria-label="Direct link to 01042-2025-03-23" title="Direct link to 01042-2025-03-23" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-2">Issues Resolved<a href="#issues-resolved-2" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2588</strong> With Chrome 133+ input with the physical keyboard was disabled after
 showing the virtual keyboard.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01041-2025-03-18">0.104.1 <em>2025-03-18</em><a href="#01041-2025-03-18" class="hash-link" aria-label="Direct link to 01041-2025-03-18" title="Direct link to 01041-2025-03-18" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-4">Improvements<a href="#improvements-4" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01041-2025-03-18">0.104.1 <em>2025-03-18</em><a href="#01041-2025-03-18" class="hash-link" aria-label="Direct link to 01041-2025-03-18" title="Direct link to 01041-2025-03-18" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-5">Improvements<a href="#improvements-5" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">Improved support for the <code>jsdelivr</code> CDN. To use it, use:</li>
-</ul><div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> MathfieldElement </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;https://esm.run/mathlive&quot;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-2">Issues Resolved<a href="#issues-resolved-2" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token keyword" style="color:var(--base-0e)">import</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token plain"> MathfieldElement </span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token plain"> </span><span class="token keyword" style="color:var(--base-0e)">from</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&quot;https://esm.run/mathlive&quot;</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-3">Issues Resolved<a href="#issues-resolved-3" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2628</strong> Attempting to delete an empty line in a multiline environment would
 not delete the line.</li>
 <li class=""><strong>#2585</strong> In some cases, the arguments of a macro were not serialized
 correctly. This could happen when using a macro in conjunction with a inline
 shortcut.</li>
 <li class=""><strong>#2586</strong> The <code>\pdiff{}{}</code> command was not properly serialized to LaTeX.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01040-2025-02-08">0.104.0 <em>2025-02-08</em><a href="#01040-2025-02-08" class="hash-link" aria-label="Direct link to 01040-2025-02-08" title="Direct link to 01040-2025-02-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories-1">Security Advisories<a href="#security-advisories-1" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><p>As a reminder, if you are handling untrusted input, you should consider using
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01040-2025-02-08">0.104.0 <em>2025-02-08</em><a href="#01040-2025-02-08" class="hash-link" aria-label="Direct link to 01040-2025-02-08" title="Direct link to 01040-2025-02-08" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="security-advisories-2">Security Advisories<a href="#security-advisories-2" class="hash-link" aria-label="Direct link to Security Advisories" title="Direct link to Security Advisories" translate="no">​</a></h3><p>As a reminder, if you are handling untrusted input, you should consider using
 the <code>MathfieldElement.createHTML()</code> method to sanitize content. The
 <code>createHTML()</code> method follows the recommendations from the
 <a href="https://www.w3.org/TR/trusted-types/" target="_blank" rel="noopener noreferrer" class="">Trusted Type</a> specification.</p><p>For example, using the DOMPurify library (there are other HTML sanitizers
@@ -637,7 +758,7 @@ displayed instead in the mathfield if the content is unsafe. When using
 <p>The <code>\href{}{}</code> command now only allows URLs with the <code>http</code> or <code>https</code>
 protocol.</p>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-3">Issues Resolved<a href="#issues-resolved-3" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-4">Issues Resolved<a href="#issues-resolved-4" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class="">
 <p>Generate only standard trigonometric functions, i.e. those available in the
 <code>amsmath</code> package. Use <code>\operatorname{}</code> for the others. The standard commands
@@ -707,15 +828,15 @@ now mapped to the correct symbol (U+27C2)</p>
 <li class="">
 <p>Improved ASCIIMath serialization.</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01030-2024-12-10">0.103.0 <em>2024-12-10</em><a href="#01030-2024-12-10" class="hash-link" aria-label="Direct link to 01030-2024-12-10" title="Direct link to 01030-2024-12-10" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-4">Issues Resolved<a href="#issues-resolved-4" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01030-2024-12-10">0.103.0 <em>2024-12-10</em><a href="#01030-2024-12-10" class="hash-link" aria-label="Direct link to 01030-2024-12-10" title="Direct link to 01030-2024-12-10" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-5">Issues Resolved<a href="#issues-resolved-5" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2530</strong> The AsciiMath <code>1/2</code> is now parsed as <code>\frac{1}{2}</code></li>
 <li class="">The <code>\displaylines</code> command is now correctly parsed as a command with an
 argument, not as a group command.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01020-2024-11-29">0.102.0 <em>2024-11-29</em><a href="#01020-2024-11-29" class="hash-link" aria-label="Direct link to 01020-2024-11-29" title="Direct link to 01020-2024-11-29" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-5">Issues Resolved<a href="#issues-resolved-5" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01020-2024-11-29">0.102.0 <em>2024-11-29</em><a href="#01020-2024-11-29" class="hash-link" aria-label="Direct link to 01020-2024-11-29" title="Direct link to 01020-2024-11-29" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-6">Issues Resolved<a href="#issues-resolved-6" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2550</strong> The subpath exports in the main package.json have been updated to
 comply with Node.js&#x27;s subpath patterns, which utilize &quot;direct static matching
 and replacement.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-5">Improvements<a href="#improvements-5" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="improvements-6">Improvements<a href="#improvements-6" class="hash-link" aria-label="Direct link to Improvements" title="Direct link to Improvements" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2554</strong> <strong>Option for sticky virtual keyboard variant panel</strong></p>
 <p>When long pressing a key on the virtual keyboard, a variant panel is displayed
@@ -727,7 +848,7 @@ finger from the screen.</p>
 to make the variant panel sticky.</p>
 <p>See <code>./examples/sticky-variant-panel/</code> for an example.</p>
 </li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01012-2024-11-15">0.101.2 <em>2024-11-15</em><a href="#01012-2024-11-15" class="hash-link" aria-label="Direct link to 01012-2024-11-15" title="Direct link to 01012-2024-11-15" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-6">Issues Resolved<a href="#issues-resolved-6" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01012-2024-11-15">0.101.2 <em>2024-11-15</em><a href="#01012-2024-11-15" class="hash-link" aria-label="Direct link to 01012-2024-11-15" title="Direct link to 01012-2024-11-15" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-7">Issues Resolved<a href="#issues-resolved-7" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class="">Correctly display the caret following a <code>\mathop{}</code> command.</li>
 <li class=""><strong>#2540</strong> When using <code>renderMathInElement()</code> some white space was occasionally
 incorrectly removed.</li>
@@ -735,7 +856,7 @@ incorrectly removed.</li>
 <li class=""><strong>#2543</strong> The <code>MathfieldElement.fractionNavigationOrder</code> was not respected
 when navigating in a fraction with the arrow keys.</li>
 <li class=""><strong>#2251</strong> Fixed the serialization of <code>\displaylines{}</code></li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01011-2024-10-15">0.101.1 <em>2024-10-15</em><a href="#01011-2024-10-15" class="hash-link" aria-label="Direct link to 01011-2024-10-15" title="Direct link to 01011-2024-10-15" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-7">Issues Resolved<a href="#issues-resolved-7" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01011-2024-10-15">0.101.1 <em>2024-10-15</em><a href="#01011-2024-10-15" class="hash-link" aria-label="Direct link to 01011-2024-10-15" title="Direct link to 01011-2024-10-15" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-8">Issues Resolved<a href="#issues-resolved-8" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2533</strong> When using the virtual keyboard to insert a character with a
 blackboard style followed by a non-alphabetic symbol without a blackboard
 style, the second symbol would incorrectly be serialized with a blackboard
@@ -785,7 +906,7 @@ definition.</p>
 pressed use:</p>
 <div class="language-js codeBlockContainer_Ckt0 theme-code-block" style="--prism-color:var(--console-color);--prism-background-color:var(--console-background)"><div class="codeBlockContent_QJqH"><pre tabindex="0" class="prism-code language-js codeBlock_qGQc thin-scrollbar" style="color:var(--console-color);background-color:var(--console-background)"><code class="codeBlockLines_p187"><div class="token-line" style="color:var(--console-color)"><span class="token plain">mathVirtualKeyboard</span><span class="token punctuation" style="color:var(--base-06)">.</span><span class="token function" style="color:var(--base-0a)">setKeycap</span><span class="token punctuation" style="color:var(--base-06)">(</span><span class="token string" style="color:var(--base-0b)">&#x27;[*]&#x27;</span><span class="token punctuation" style="color:var(--base-06)">,</span><span class="token plain"> </span><span class="token punctuation" style="color:var(--base-06)">{</span><span class="token literal-property property" style="color:var(--base-0c)">latex</span><span class="token operator" style="color:var(--base-06)">:</span><span class="token plain"> </span><span class="token string" style="color:var(--base-0b)">&#x27;\\times&#x27;</span><span class="token punctuation" style="color:var(--base-06)">}</span><span class="token punctuation" style="color:var(--base-06)">)</span><span class="token punctuation" style="color:var(--base-06)">;</span><br></div></code></pre></div></div>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-8">Issues Resolved<a href="#issues-resolved-8" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-9">Issues Resolved<a href="#issues-resolved-9" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2455</strong> Serialization to ASCII Math of brackets and braces is now correct.</li>
 <li class="">When using Chrome in some locale (such as <code>es-419</code>), the context menu would
 not be displayed.</li>
@@ -820,7 +941,7 @@ keyboard (shift, enter, etc...):<!-- -->
 inserted when using the physical keyboard.</li>
 <li class=""><strong>#2398</strong> When a placeholder was the only element in a group, i.e.
 <code>{\placeholder{}}</code>, the placeholder was not automatically selected.</li>
-</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01000-2024-06-12">0.100.0 <em>2024-06-12</em><a href="#01000-2024-06-12" class="hash-link" aria-label="Direct link to 01000-2024-06-12" title="Direct link to 01000-2024-06-12" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-9">Issues Resolved<a href="#issues-resolved-9" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01000-2024-06-12">0.100.0 <em>2024-06-12</em><a href="#01000-2024-06-12" class="hash-link" aria-label="Direct link to 01000-2024-06-12" title="Direct link to 01000-2024-06-12" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-10">Issues Resolved<a href="#issues-resolved-10" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong>#2396</strong> Pressing the arrow keys in the virtual keyboard would not move the
 selection in the mathfield and display a runtime error in the console.</p>
@@ -948,7 +1069,7 @@ previous syntax was <code>command: [&quot;switchKeyboardLayer&quot;, &quot;alt-l
 syntax is <code>command: &#x27;switchKeyboardLayer(&quot;alt-layer&quot;)&#x27;</code>. This is more concise
 and easier to read.</p>
 </li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-10">Issues Resolved<a href="#issues-resolved-10" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-11">Issues Resolved<a href="#issues-resolved-11" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class=""><strong>#2387</strong> When using a macro, the spacing around the macro was incorrect in
 some cases.</li>
 <li class=""><strong>#2370</strong> The order of the <code>keydown</code> and <code>input</code> event is now consistent with
@@ -1010,7 +1131,7 @@ be used to specify the width of the keycap. (See <strong>#2028</strong>, <strong
 <li class=""><strong>#2255</strong> Support for <code>gather*</code> environment</li>
 <li class=""><strong>#2242</strong> A virtual keyboard keycap can now include a tooltip for its shifted
 variant.</li>
-</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-11">Issues Resolved<a href="#issues-resolved-11" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
+</ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="issues-resolved-12">Issues Resolved<a href="#issues-resolved-12" class="hash-link" aria-label="Direct link to Issues Resolved" title="Direct link to Issues Resolved" translate="no">​</a></h3><ul>
 <li class="">When using some APIs such as <code>renderToMarkup()</code> or <code>renderToMathML()</code> in a
 server-side environment, a runtime error would occur.</li>
 <li class="">When tabbing in a mathfield with multiple prompts, tab out of the mathfield
@@ -1036,7 +1157,7 @@ interpreted correctly.</li>
 <li class="">The command <code>\operatorname</code> is now spoken correctly</li>
 <li class=""><strong>#2152</strong> On Safari, fill-in-the-blank prompts containing a fraction were
 rendered incorrectly.</li>
-</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/mathfield/demo/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Demo</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/mathfield/virtual-keyboard/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Using the Virtual Keyboard</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#coming-soon" class="table-of-contents__link toc-highlight">Coming Soon</a></li><li><a href="#01100-2026-06-08" class="table-of-contents__link toc-highlight">0.110.0 <em>2026-06-08</em></a></li><li><a href="#01092-2026-04-28" class="table-of-contents__link toc-highlight">0.109.2 <em>2026-04-28</em></a></li><li><a href="#01091-2026-04-01" class="table-of-contents__link toc-highlight">0.109.1 <em>2026-04-01</em></a></li><li><a href="#01090-2026-03-11" class="table-of-contents__link toc-highlight">0.109.0 <em>2026-03-11</em></a></li><li><a href="#01083-2026-02-11" class="table-of-contents__link toc-highlight">0.108.3 <em>2026-02-11</em></a></li><li><a href="#01082-2025-11-13" class="table-of-contents__link toc-highlight">0.108.2 <em>2025-11-13</em></a></li><li><a href="#01081-2025-11-11" class="table-of-contents__link toc-highlight">0.108.1 <em>2025-11-11</em></a></li><li><a href="#01080-2025-11-09" class="table-of-contents__link toc-highlight">0.108.0 <em>2025-11-09</em></a></li><li><a href="#01071-2025-09-30" class="table-of-contents__link toc-highlight">0.107.1 <em>2025-09-30</em></a></li><li><a href="#01070-2025-08-17" class="table-of-contents__link toc-highlight">0.107.0 <em>2025-08-17</em></a></li><li><a href="#01060-2025-07-11" class="table-of-contents__link toc-highlight">0.106.0 <em>2025-07-11</em></a></li><li><a href="#01053-2025-05-14" class="table-of-contents__link toc-highlight">0.105.3 <em>2025-05-14</em></a></li><li><a href="#01051-2025-04-18" class="table-of-contents__link toc-highlight">0.105.1 <em>2025-04-18</em></a></li><li><a href="#01050-2025-03-27" class="table-of-contents__link toc-highlight">0.105.0 <em>2025-03-27</em></a></li><li><a href="#01042-2025-03-23" class="table-of-contents__link toc-highlight">0.104.2 <em>2025-03-23</em></a></li><li><a href="#01041-2025-03-18" class="table-of-contents__link toc-highlight">0.104.1 <em>2025-03-18</em></a></li><li><a href="#01040-2025-02-08" class="table-of-contents__link toc-highlight">0.104.0 <em>2025-02-08</em></a></li><li><a href="#01030-2024-12-10" class="table-of-contents__link toc-highlight">0.103.0 <em>2024-12-10</em></a></li><li><a href="#01020-2024-11-29" class="table-of-contents__link toc-highlight">0.102.0 <em>2024-11-29</em></a></li><li><a href="#01012-2024-11-15" class="table-of-contents__link toc-highlight">0.101.2 <em>2024-11-15</em></a></li><li><a href="#01011-2024-10-15" class="table-of-contents__link toc-highlight">0.101.1 <em>2024-10-15</em></a></li><li><a href="#01010-2024-07-17" class="table-of-contents__link toc-highlight">0.101.0 <em>2024-07-17</em></a></li><li><a href="#01000-2024-06-12" class="table-of-contents__link toc-highlight">0.100.0 <em>2024-06-12</em></a></li><li><a href="#0990-2024-06-10" class="table-of-contents__link toc-highlight">0.99.0 <em>2024-06-10</em></a></li><li><a href="#0986-2024-01-27" class="table-of-contents__link toc-highlight">0.98.6 <em>2024-01-27</em></a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li><li class="footer__item"><a href="https://epsil.dev" target="_blank" rel="noopener noreferrer" class="footer__link-item">Epsil<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
+</ul></div><footer class="theme-doc-footer docusaurus-mt-lg"><div class="theme-doc-footer-edit-meta-row row"><div class="col"></div><div class="col lastUpdated_VsjB"></div></div></footer></article><nav class="docusaurus-mt-lg pagination-nav" aria-label="Docs pages"><a class="pagination-nav__link pagination-nav__link--prev" href="/mathfield/demo/"><div class="pagination-nav__sublabel">Previous</div><div class="pagination-nav__label">Demo</div></a><a class="pagination-nav__link pagination-nav__link--next" href="/mathfield/virtual-keyboard/"><div class="pagination-nav__sublabel">Next</div><div class="pagination-nav__label">Using the Virtual Keyboard</div></a></nav></div></div><div class="col col--3"><div class="tableOfContents_bqdL thin-scrollbar theme-doc-toc-desktop"><ul class="table-of-contents table-of-contents__left-border"><li><a href="#01111-2026-10-09" class="table-of-contents__link toc-highlight">0.111.1 <em>2026-10-09</em></a></li><li><a href="#01110-2026-09-30" class="table-of-contents__link toc-highlight">0.111.0 <em>2026-09-30</em></a></li><li><a href="#01100-2026-06-08" class="table-of-contents__link toc-highlight">0.110.0 <em>2026-06-08</em></a></li><li><a href="#01092-2026-04-28" class="table-of-contents__link toc-highlight">0.109.2 <em>2026-04-28</em></a></li><li><a href="#01091-2026-04-01" class="table-of-contents__link toc-highlight">0.109.1 <em>2026-04-01</em></a></li><li><a href="#01090-2026-03-11" class="table-of-contents__link toc-highlight">0.109.0 <em>2026-03-11</em></a></li><li><a href="#01083-2026-02-11" class="table-of-contents__link toc-highlight">0.108.3 <em>2026-02-11</em></a></li><li><a href="#01082-2025-11-13" class="table-of-contents__link toc-highlight">0.108.2 <em>2025-11-13</em></a></li><li><a href="#01081-2025-11-11" class="table-of-contents__link toc-highlight">0.108.1 <em>2025-11-11</em></a></li><li><a href="#01080-2025-11-09" class="table-of-contents__link toc-highlight">0.108.0 <em>2025-11-09</em></a></li><li><a href="#01071-2025-09-30" class="table-of-contents__link toc-highlight">0.107.1 <em>2025-09-30</em></a></li><li><a href="#01070-2025-08-17" class="table-of-contents__link toc-highlight">0.107.0 <em>2025-08-17</em></a></li><li><a href="#01060-2025-07-11" class="table-of-contents__link toc-highlight">0.106.0 <em>2025-07-11</em></a></li><li><a href="#01053-2025-05-14" class="table-of-contents__link toc-highlight">0.105.3 <em>2025-05-14</em></a></li><li><a href="#01051-2025-04-18" class="table-of-contents__link toc-highlight">0.105.1 <em>2025-04-18</em></a></li><li><a href="#01050-2025-03-27" class="table-of-contents__link toc-highlight">0.105.0 <em>2025-03-27</em></a></li><li><a href="#01042-2025-03-23" class="table-of-contents__link toc-highlight">0.104.2 <em>2025-03-23</em></a></li><li><a href="#01041-2025-03-18" class="table-of-contents__link toc-highlight">0.104.1 <em>2025-03-18</em></a></li><li><a href="#01040-2025-02-08" class="table-of-contents__link toc-highlight">0.104.0 <em>2025-02-08</em></a></li><li><a href="#01030-2024-12-10" class="table-of-contents__link toc-highlight">0.103.0 <em>2024-12-10</em></a></li><li><a href="#01020-2024-11-29" class="table-of-contents__link toc-highlight">0.102.0 <em>2024-11-29</em></a></li><li><a href="#01012-2024-11-15" class="table-of-contents__link toc-highlight">0.101.2 <em>2024-11-15</em></a></li><li><a href="#01011-2024-10-15" class="table-of-contents__link toc-highlight">0.101.1 <em>2024-10-15</em></a></li><li><a href="#01010-2024-07-17" class="table-of-contents__link toc-highlight">0.101.0 <em>2024-07-17</em></a></li><li><a href="#01000-2024-06-12" class="table-of-contents__link toc-highlight">0.100.0 <em>2024-06-12</em></a></li><li><a href="#0990-2024-06-10" class="table-of-contents__link toc-highlight">0.99.0 <em>2024-06-10</em></a></li><li><a href="#0986-2024-01-27" class="table-of-contents__link toc-highlight">0.98.6 <em>2024-01-27</em></a></li></ul></div></div></div></div></main></div></div></div><div class="shared-footer"><footer class="theme-layout-footer footer footer--dark"><div class="container container-fluid"><div class="row footer__links"><div class="theme-layout-footer-column col footer__col"><div class="footer__title">SDKs</div><ul class="footer__items clean-list"><li class="footer__item"><a class="footer__link-item" href="/mathfield/">Mathfield</a></li><li class="footer__item"><a class="footer__link-item" href="/compute-engine/">Compute Engine</a></li><li class="footer__item"><a class="footer__link-item" href="/math-json/">MathJSON</a></li><li class="footer__item"><a href="https://epsil.dev" target="_blank" rel="noopener noreferrer" class="footer__link-item">Epsil<svg width="13.5" height="13.5" aria-label="(opens in new tab)" class="iconExternalLink_nPIU"><use href="#theme-svg-external-link"></use></svg></a></li></ul></div><div class="theme-layout-footer-column col footer__col"><div class="footer__title">Community</div><ul class="footer__items clean-list"><li class="footer__item"><a href="https://github.com/cortex-js" target="_blank" rel="noopener noreferrer" class="footer__link-item">
             <svg class="icon-one-rem"><use role="none" xlink:href="/icons.svg#github"></use></svg>
             GitHub
             <svg width="13.5" height="13.5" aria-hidden="true" viewBox="0 0 24 24" class="iconExternalLink_nPIU"><path fill="currentColor" d="M21 13v10h-21v-19h12v2h-10v15h17v-8h2zm3-12h-10.988l4.035 4-6.977 7.07 2.828 2.828 6.977-7.07 4.125 4.172v-11z"></path></svg>

@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.7d8c1380.js" defer="defer"></script>
-<script src="/assets/js/main.7a716e61.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b9ba03a9.js" defer="defer"></script>
+<script src="/assets/js/main.700d6ab1.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -102,6 +102,18 @@ are equal values), and it is what makes <code>c == &quot;a&quot;</code>, <code>&
 stay disjoint regardless. Ordering is by the code-point sequence of the
 cluster; it is deliberately <strong>not</strong> locale-aware, and never will be — engine
 identity, membership and hashing must be deterministic on every host.</p>
+<p><strong>A string operator accepts a character.</strong> Wherever a string operator takes a
+<code>string</code> — <code>ToUpperCase</code>, <code>ToLowerCase</code>, <code>CaseFold</code>, <code>StringRepeat</code>,
+<code>PadStart</code>, <code>PadEnd</code>, <code>Trim</code>, <code>TrimStart</code>, <code>TrimEnd</code>, <code>StringReplace</code>,
+<code>StringSplit</code>, <code>StringCompare</code>, <code>Characters</code>, <code>GraphemeClusters</code>,
+<code>UnicodeScalars</code>, <code>Utf8</code>, <code>Utf16</code>, <code>CharacterFrom</code>, <code>NumberFrom</code>,
+<code>DigitsFrom</code>, the separator of <code>StringJoin</code>, the subject of <code>IsMatch</code>,
+<code>StringMatch</code> and <code>StringMatchAll</code>, and the key of a dictionary lookup — it
+also accepts a <code>character</code>. The result is that of the one-character string:
+<code>[&quot;ToUpperCase&quot;, [&quot;At&quot;, &quot;&#x27;abc&#x27;&quot;, 1]]</code> is <code>&quot;A&quot;</code> and
+<code>[&quot;StringRepeat&quot;, [&quot;CharacterFrom&quot;, &quot;&#x27;a&#x27;&quot;], 3]</code> is <code>&quot;aaa&quot;</code>. The types stay
+distinct. A symbol with no declared type that is used at such a parameter is
+inferred <code>character | string</code>.</p>
 <p><strong>Serialization.</strong> MathJSON has string literals but no character literal, so
 a character&#x27;s wire form is the call form <code>[&quot;CharacterFrom&quot;, &quot;&#x27;x&#x27;&quot;]</code>, which
 canonicalizes back to the identical character:</p>
@@ -157,7 +169,9 @@ characters&quot; worth its complexity; rejoin explicitly with
 <p>Operators whose result is not a collection of the source&#x27;s kind — <code>Length</code>,
 <code>IsEmpty</code>, <code>Contains</code>, <code>Count</code>, <code>Any</code>, <code>All</code>, <code>IndexOf</code>, <code>At</code>, <code>First</code>,
 <code>Last</code>, <code>Position</code>, <code>Find</code>, <code>Reduce</code>, <code>Fold</code> — behave on a string exactly
-as they do on any other indexed collection.</p>
+as they do on any other indexed collection. In LaTeX, <code>|s|</code> of a string is
+its <code>Count</code>: <code>ce.parse(&#x27;|\\text{abc}|&#x27;).evaluate()</code> is <code>3</code>, and
+<code>Count</code> of a string serializes back as <code>|s|</code>.</p>
 </li>
 <li class="">
 <p>Set operators read a string operand as <em>its characters</em>:

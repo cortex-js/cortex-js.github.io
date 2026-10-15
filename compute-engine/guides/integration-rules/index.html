@@ -20,8 +20,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.7d8c1380.js" defer="defer"></script>
-<script src="/assets/js/main.7a716e61.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.b9ba03a9.js" defer="defer"></script>
+<script src="/assets/js/main.700d6ab1.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -78,7 +78,9 @@ integral: a step budget and a wall-clock limit.</p>
 Because it counts steps and not time, the same integral gives the same answer
 on a fast machine, a slow one and a loaded one: an integral that needs more
 steps stays unevaluated everywhere, and the built-in antiderivative is used
-instead.</p>
+instead. The built-in antiderivative has its own fixed budget of 100,000
+steps, which does not depend on <code>stepBudget</code>; when it is spent too, the
+result is the unevaluated <code>Integrate</code> expression.</p>
 <p>The <strong>wall-clock limit</strong> is only a guard against a hang in code that does not
 count steps. The default (120 s) is about 8 times what the step budget allows
 on an idle machine, so on a machine up to about 8 times slower the step budget,

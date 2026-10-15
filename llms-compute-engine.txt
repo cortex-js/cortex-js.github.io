@@ -1298,6 +1298,19 @@ try {
 The `expr.evaluateAsync()` method returns a `Promise` that resolves to the result
 of the evaluation. It accepts the same `numericApproximation` options as `expr.evaluate()`.
 
+Several `evaluateAsync()` calls can run at the same time on one engine. Each
+evaluation keeps the scopes it opens (the index of a `Sum`, the locals of a
+`Block`) to itself, so two sums over the same index name evaluated together do
+not see each other's index. One engine per concurrent evaluation is not
+necessary.
+
+```js
+const a = ce.parse('\\sum_{k=1}^{100000} k').evaluateAsync();
+const b = ce.parse('\\sum_{k=1}^{1000} k^2').evaluateAsync();
+await Promise.all([a, b]);
+// ➔ [5000050000, 333833500]
+```
+
 It is also possible to interrupt an evaluation, for example by providing the user
 with a pause/cancel button.
 
@@ -1454,6 +1467,18 @@ console.log(ce.box(['Sin', NaN]).evaluate().json);
 
 console.log(ce.parse('\\ln(2)').evaluate().json);
 // ➔ ["Ln", 2]      — an exact argument stays symbolic
+```
+
+A float operand makes the result a float, also when the value is a whole
+number: the exact `0` divided by a float is the float `0.0`, and a float
+exponent is kept.
+
+```ts
+console.log(ce.parse('0/2.5').evaluate().json);
+// ➔ {"num": "0.0"}
+
+console.log(ce.parse('3x^{2.0}').evaluate().json);
+// ➔ ["Multiply", 3, ["Power", "x", {"num": "2.0"}]]   — not 3x^2
 ```
 
 
@@ -2031,6 +2056,23 @@ the expression is automatically evaluated as a **numeric approximation**.
 console.log(parse('1/3 + 1/4 + 1.24').evaluate());
 ```
 
+An integer function of an exact integer argument gives the exact integer
+under `expr.N()` too, because an approximation of the argument would change
+the answer: `DigitSum`, `Binomial`, `Factorial`, `Fibonacci`, `Mod`, `GCD`,
+`LCM` and the integer predicates (`IsPrime`, `IsEven`, …) read an exact
+operand as written. Only an inexact (float) operand is read as a float.
+
+```js
+ce.box(['DigitSum', ['Power', 2, 1000]]).N();
+// ➔ 1366  (the same as evaluate())
+
+ce.box(['GCD', ['Power', 2, 100], ['Power', 6, 50]]).N();
+// ➔ 1125899906842624  (2^50)
+
+ce.box(['IsPrime', ['Subtract', ['Power', 2, 89], 1]]).N();
+// ➔ True
+```
+
 ### Infinity and NaN
 
 The two non-finite results fall on opposite sides of the exactness rule above,
@@ -2092,6 +2134,14 @@ Compiled functions honor the angular unit as well: with
 `ce.angularUnit = "deg"`, `ce.compile("\\sin(x)")` returns a function that
 interprets `x` in degrees, matching `evaluate()`.
 
+The symbolic integrator follows the angular unit as well. With
+`ce.angularUnit = "deg"`, `\int_0^{180} \sin x\,dx` evaluates to `360/\pi`
+and `\int \sin x\,dx` to `-(180/\pi)\cos x`. An integral with no
+trigonometric function, such as `\int_0^1 \frac{dx}{1 + x^2} = \pi/4`, has the
+same value in every unit. The same holds with the integration rules library
+loaded, and for the closed form the JavaScript target compiles for a definite
+integral.
+
 ## Rounding Ties
 
 `Round` rounds a number to the nearest integer. A value exactly halfway
@@ -2113,8 +2163,8 @@ console.log(ce.parse("\\operatorname{round}(2.5)").evaluate());
 ```
 
 The rule applies at every precision, to an exact rational (`Round(5/2)`), and
-to the form `Round(x, n)`, which rounds to `n` decimal places: with
-`"to-even"`, `Round(0.125, 2)` is `3/25`. A value that is not a tie is not
+to the step form `Round(x, step)`, which rounds to the nearest multiple of the
+step: with `"to-even"`, `Round(0.125, 1/100)` is `3/25`. A value that is not a tie is not
 affected.
 
 Compiled functions honor the rule as well: the code is made with the rule in
@@ -2195,10 +2245,14 @@ function with a precision argument: `["N", expr, digits]`.
 console.log(ce.box(['N', 'Pi', 50]).evaluate().toString());
 ```
 
-If the requested precision is greater than `ce.precision`, the working precision
-is raised to match and **kept** raised (display precision is global). If it is at
-or below `ce.precision`, the result is rounded to that many significant digits
-without changing the working precision.
+The value is computed with the requested digits plus a few guard digits, then
+rounded to the requested digits. The working precision of the engine
+(`ce.precision`) does not change: after `ce.box(['N', 'Pi', 30]).evaluate()`,
+`ce.precision` is still `21`. A later operation on the result is computed at the
+working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
+`4.14159265358979323846`. The reference page for
+[`N`](/compute-engine/reference/core/#N) describes the precision and accuracy
+goals `["N", expr, ["List", p, a]]`.
 
 
 ### Machine Precision
@@ -3283,10 +3337,12 @@ For example, use `double` instead of `\operatorname{double}`.
 :::
 
 The evaluate handler can be either a MathJSON expression as above or 
-a JavaScript function.
+a JavaScript function. A name is declared once per scope, so to change the
+definition above, pass the fields to change with `{ extend: true }` (see
+below).
 
 ```js
-ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
 
 The signature of the `evaluate` handler is `(args[], options)`, where:
@@ -3295,16 +3351,39 @@ The signature of the `evaluate` handler is `(args[], options)`, where:
   argument is a expression. The array may be empty if there are no
   arguments.
 - `options`: an object literal which includes an `engine` property that is the
-  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, and an `expression` property that is the expression being evaluated.
+  Compute Engine instance that is evaluating the expression, a `numericApproximation` property that is true if the result should be a numeric approximation, an `expression` property that is the expression being evaluated, and a `precision` property with the number of significant digits requested: inside `N(x, p)` it is `p`, also when `p` is lower than `ce.precision`; under `.N()` it is `ce.precision`; in an exact evaluation it is `undefined`.
 
 Since `args` is an array, you can use destructuring to get the arguments:
 
 ```js
-ce.declare("double", { evaluate: (args) => args[0].mul(2) });
+ce.declare("double", { evaluate: (args) => args[0].mul(2) }, { extend: true });
 
 // or
-ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
+
+**A name is declared once per scope.** Declaring it again throws
+`The symbol "double" is already declared in this scope`. This also applies
+when the first declaration had no `signature`: an `evaluate` handler alone, a
+flag such as `lazy`, or a description is enough to make the name taken. To
+change an existing definition, pass a patch with only the fields to change and
+the option `{ extend: true }`:
+
+```js
+// On a new engine, the first declaration of the name
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+
+// Throws: The symbol "double" is already declared in this scope
+ce.declare("double", { evaluate: ([x]) => x.mul(3) });
+
+// Changes the handler of the existing definition
+ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
+```
+
+A name first seen in use, such as `f` in `ce.parse("f(x)")`, is not declared
+yet and can be defined with `ce.declare("f", {...})`. See
+[Overloading Functions](#overloading-functions) for the fields a patch can
+carry.
 
 ### The `expression` option
 
@@ -3373,7 +3452,7 @@ ce.declare("double", {
   description: "Multiply a number by two",
   keywords: ["twice", "doubling"],
   evaluate: ([x]) => x.mul(2),
-});
+}, { extend: true });
 ```
 
 The optional `description` and `keywords` properties make a definition easier
@@ -3391,6 +3470,25 @@ ce.searchDefinitions("doubling", { limit: 5 });
 The optional `limit` setting limits the number of results and defaults to `10`.
 Pass a returned `id` to `ce.lookupDefinition(id)` to inspect the complete
 definition.
+
+A definition can give its own derivative with the `derivative` key. The value
+is an array with one function literal for each argument (each literal takes all
+the arguments as parameters), or a handler
+`(ops, { engine, argument }) => Expression | undefined` that returns the
+partial derivative with respect to argument number `argument` at `ops`. `D`
+applies the chain rule. A partial derivative that the key does not give stays
+symbolic.
+
+```js
+ce.declare("Sq", {
+  signature: "(number) -> number",
+  evaluate: ([x]) => (isNumber(x) ? x.mul(x) : undefined),
+  derivative: [["Function", ["Multiply", 2, "x"], "x"]],
+});
+
+ce.box(["D", ["Sq", "x"], "x"]).evaluate();                // ➔ 2x
+ce.box(["D", ["Sq", ["Power", "x", 2]], "x"]).evaluate();  // ➔ 4x^3
+```
 
 See `FunctionDefinition` for more details on the other handlers and
 properties that can be provided when defining a function.
@@ -3688,6 +3786,26 @@ handlers on: pass the `options` it received to `evaluateAsync()`. To change
 one option, copy the others — `op.evaluateAsync({ ...options,
 numericApproximation: true })` — and do not build the object from nothing.
 
+The `options` also carry the scopes of the evaluation, for example the scope
+of the index of an enclosing `Sum`. The engine installs them only while the
+evaluation's own synchronous code runs, because other code can run on the
+engine while a handler is suspended. Before the first `await` of an
+`evaluateAsync` handler they are in place. After it, synchronous work that
+reads the scope (canonicalizing a held operand with `x.canonical`,
+`ce.box()`, `ce.parse()`, `evaluate()`, `ce.assign()`) must run inside
+`ce.withEvaluationContext(options, fn)`:
+
+```js
+evaluateAsync: async ([x], options) => {
+  await somethingSlow();
+  return ce.withEvaluationContext(options, () => x.canonical).evaluateAsync(options);
+},
+```
+
+Outside it, an index of an enclosing `Sum` stays symbolic, and a global
+symbol with its name is declared. A nested `evaluateAsync(options)` call does
+not need it.
+
 **The `entropy` handler** is the unseeded source of randomness: an object with
 one method, `random()`, that returns a uniform number in `[0, 1)`
 (`Math.random` by default). `RandomExpression` draws from it, and so does every
@@ -3811,7 +3929,7 @@ the signature of the function as the second argument of `ce.declare()` or
 use the `"function"` type.
 
 ```js
-ce.declare("double", "function");
+ce.declare("triple", "function");
 ```
 
 
@@ -4125,6 +4243,10 @@ ce.clearSequenceCache('F');  // Clear cache for specific sequence
 ce.clearSequenceCache();     // Clear all sequence caches
 ```
 
+`getSequenceCache()` holds the exact terms only, with the index as the key.
+The terms that `.N()` computes are kept apart, one set for each precision;
+`clearSequenceCache()` clears both.
+
 ### Generating Sequence Terms
 
 Generate a list of sequence terms with `getSequenceTerms()`:
@@ -4234,21 +4356,74 @@ ce.declare('Sqrt', {
   ...originalSqrtDefinition,
   evaluate: (x, options) => {
     const y = originalSqrtDefinition.evaluate!(x, options);
-    return y?.isExtendedReal ? y : ce.NaN;
+    return y?.isExtendedReal === false ? ce.NaN : y;
   },
 });
+
+ce.parse('\\sqrt{-2.5}').evaluate();     // ➔ NaN
+ce.parse('\\sqrt{\\sin x}').evaluate();  // ➔ sqrt(sin(x))
 ```
 
 `isExtendedReal` is the test for "lies on the real line", and it accepts
 $\pm\infty$ along with the finite reals; only a value with a non-zero imaginary
-part, or `NaN`, fails it. Use `isFinite` instead when the guard must also
-exclude the infinities — but note that `isFinite` accepts a finite *complex*
-value, so it is not a substitute here.
+part, or `NaN`, fails it. For a symbolic result such as `sqrt(sin(x))` it is
+`undefined`, neither `true` nor `false`, so the guard compares with `false`:
+a plain truth test would turn every symbolic result into `NaN`. Use `isFinite`
+instead when the guard must also exclude the infinities — but note that
+`isFinite` accepts a finite *complex* value, so it is not a substitute here.
+An argument whose square root is reduced at canonicalization (`\sqrt{-4}` is
+`2i`) does not reach the `evaluate` handler.
 
-In general, re-declaring a function in the same scope is not allowed and 
-will throw an error. However, the standard functions are in a `system` scope
-so a new declaration in the `global` scope or a child scope will
-override the original declaration.
+A redeclaration that replaces a handler, as `evaluate` above, is a user
+definition. `compile()` cannot lower it as the library `Sqrt`: it reports
+`success: false` and `run()` uses the interpreter. `D` differentiates it as an
+unknown function. A copy that keeps the library handlers is still the library
+operator for differentiation and compilation: after
+`ce.declare('Sqrt', { ...ce.expr('Sqrt').operatorDefinition, description: '…' })`,
+`compile(ce.parse('\\sqrt{\\sin x}'))` succeeds and
+`D(sqrt(sin(x)), x)` is `cos(x) / (2sqrt(sin(x)))`. The rule: a definition of
+a library name is the library operator when its `evaluate`, `canonical`,
+`compile`, `derivative` and `evaluateAsync` handlers are the same function
+objects as the library's, and its `lazy` and `broadcastable` flags have the
+same values.
+
+A copy declared under another name keeps that name. After
+`const { name, ...sin } = ce.lookupDefinition('Sin').operator; ce.declare('MySin', sin)`,
+`ce.box(['MySin', 'x']).evaluate()` is `MySin(x)`, and `MySin(π)` is `0`.
+
+**To change part of a definition**, pass `{ extend: true }` as the third
+argument of `ce.declare()`. The engine builds a new definition from the visible
+one and the fields of the patch. A field the patch does not name keeps its
+value. A field the patch names replaces the old value. This works for a name
+declared in the same scope, where a plain `ce.declare()` throws, and for a
+standard operator.
+
+```js
+// Widen the signature and keep the evaluate handler
+ce.declare("SetMinus", { signature: "(value, value*) -> set" }, { extend: true });
+
+ce.box(["SetMinus", ["Set", 1, 2, 3], ["Set", 2]]).evaluate();  // ➔ {1, 3}
+ce.box(["SetMinus", 5, 2]);                                     // ➔ valid
+
+// Add a description and keep every handler: D still differentiates Sin
+ce.declare("Sin", { description: "The sine" }, { extend: true });
+ce.box(["D", ["Sin", "x"], "x"]).evaluate();                    // ➔ cos(x)
+```
+
+The patch can carry any field of the definition: `signature`, `evaluate`,
+`description`, `keywords`, `lazy`, … The field `addSignature` adds an overload
+instead of replacing the signature: the signature becomes `old & new`. The new
+signature must be a subtype of the old one, so that every call that was valid
+stays valid; otherwise the call throws. With
+`ce.declare("SetMinus", { addSignature: "(integer, integer) -> set" }, { extend: true })`,
+the signature is `((set<any>, value*) -> set) & ((integer, integer) -> set)`.
+It is an error to extend a name with no operator definition, a name declared as
+a value, or a function defined by clauses. An expression boxed before the
+extension keeps the old definition. The third argument can also be
+`{ scope, extend }`; a scope alone as the third argument works as before.
+
+The standard functions are in a `system` scope, so a new declaration in the
+`global` scope or a child scope replaces the original declaration.
 
 
 ## Multi-Clause Function Definitions
@@ -4366,6 +4541,49 @@ ce.assign({
   "f": ce.parse("x \\mapsto x^2 + x + 41"),
   "g": ce.parse("t \\mapsto t^3 + t^2 + 17"),
 });
+```
+
+## Loading a Library
+
+A set of definitions can be packaged as a **library**: an object with a `name`,
+a `definitions` dictionary (the same entries as `ce.declare()` takes), and an
+optional `requires` list with the names of the libraries it depends on.
+
+**To load a library when the engine is created**, give it in the `libraries`
+constructor option. **To load a library on a running engine**, call
+`ce.loadLibrary(library)`. The definitions go in the global scope, as with
+`ce.declare()`, and an expression boxed before the call uses them.
+
+```js
+ce.box(["Sq", 3]).evaluate();  // ➔ Sq(3)
+
+ce.loadLibrary({
+  name: "mine",
+  definitions: {
+    Sq: {
+      signature: "(number) -> number",
+      evaluate: ["Function", ["Square", "x"], "x"],
+    },
+  },
+});
+
+ce.box(["Sq", 3]).evaluate();  // ➔ 9
+```
+
+Each library in `requires` must already be loaded. The call throws, and
+declares nothing, for a library name that is already loaded, a missing required
+library, a standard library, or a definition that is invalid, repeated, or
+already declared in the global scope. A checkpoint taken before the call
+(`ce.checkpoint()`) undoes it.
+
+`ce.libraryOf(name)` returns the name of the library that defines `name`:
+`"trigonometry"` for `Sin`, the `name` of a loaded library for one of its
+definitions, and `undefined` for a name declared with `ce.declare()` or a name
+nothing defines.
+
+```js
+ce.libraryOf("Sq");   // ➔ "mine"
+ce.libraryOf("Sin");  // ➔ "trigonometry"
 ```
 
 ---
@@ -4509,6 +4727,19 @@ ce.declare('L', 'list<real>');
 
 ce.parse('f(x)').json;   // ["f", "x"]
 ce.parse('a(x+1)').json; // ["Multiply", "a", ["Add", "x", 1]]
+```
+
+A name written in parentheses is a factor, not the head of a function
+application: `(k)(x - 1)` is `k·(x - 1)`, `(a)(b)` is `a·b` and `(k)(x, y)` is
+`k·(x, y)`. Only a name that the library or a declaration defines as a function
+keeps the application reading: `(\sin)(x)` is `sin(x)`, and `(f)(3)` is `f(3)`
+when `f` is declared a function. A function type that the engine only inferred
+from an earlier `f(x)` does not count.
+
+```js
+ce.parse('(k)(x-1)').json;  // ["Multiply", "k", ["Add", "x", -1]]
+ce.parse('(\\sin)(x)').json; // ["Sin", "x"]
+ce.parse('(f)(3)^2').json;  // ["Power", ["f", 3], 2], with f declared as above
 ```
 
 Declarations also affect subscript parsing: a subscript can index a known
@@ -4938,10 +5169,12 @@ parsing as for serialization.
 
 | Key | Description |
 | :--- | :--- |
-| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)` and `sqrt(x)`, `*` multiplication, `**` powers, parenthesized superscripts/subscripts, and common infinity spellings. Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
+| `strict` | When `true`, parse conventional LaTeX syntax. When `false`, also accept the Compute Engine's loose input forms, including bare function names such as `sin(x)`, `sqrt(x)`, `mod(x, 2)`, `pow(x, 2)`, `trunc(x)`, `sgn(x)` and `Re(z)`; the operators `*`, `**`, `÷`, `=<` and `<>`; `+-` and `-+` for `\pm` and `\mp` when the two signs touch; the words `in` and `infinity`; parenthesized superscripts/subscripts; and an unbraced subscript or exponent read as one operand (`x_max` is `x_{max}`, `e^-x` is `e^{-x}`, `x^pi` is `x^{\pi}`). Loose mode is intended for interactive input similar to ASCIIMath or Typst; it is not a separate expression language. **Default:** `true`. |
 | `skipSpace` | If `true`, ignore space characters in a math zone. Default is `true`. |
 | `parseNumbers` | When parsing a decimal number, e.g. `3.1415`:<br/>- `"auto"` or `"decimal"`: if a decimal number, parse it as an approximate   decimal number with a whole part and a fractional part<br/> - `"rational"`: if a decimal number, parse it as an exact rational number with a numerator  and a denominator. If not a decimal number, parse it as a regular number.<br/>- `"never"`: do not parse numbers, instead return each token making up the number (minus sign, digits, decimal marker, etc...).<br/><br/> **Note**: a repeating-decimal literal (e.g. `1.33(333)` or `0.\overline{3}`) always boxes to the exact `Rational` it represents, regardless of this setting. **Default**: `"auto"`|
 | `preserveLatex` | If `true`, the expression will be decorated with the LaTeX fragments corresponding to each element of the expression. The top-level expression, that is the one returned by `parse()`, will include the verbatim LaTeX input that was parsed. The sub-expressions may contain a slightly different LaTeX, for example with consecutive spaces replaced by one, with comments removed, and with some low-level LaTeX commands replaced, for example `\egroup` and `\bgroup`. **Default:** `false` |
+| `diagnostics` | When `true` and `strict` is `false`, the result has a `parseDiagnostics` array. Each entry reports a reading choice that has a second common reading, with a code that starts with `ambiguous-`, the source span (`start`, `end`) and a `detail` object. The reading does not change. Codes include `ambiguous-digit-groups` (`2 3` is read as `23`), `ambiguous-letter-run` (`eps` is read as `e·p·s`), `ambiguous-denominator` (`1/2x` is read as `1/(2x)`), `ambiguous-exponent-end` (`x^2y` is read as `x^2·y`), `ambiguous-implicit-subscript` (`x2` is read as `x_2`), `ambiguous-function-argument` (`sin x y` is read as `sin(x·y)`), `ambiguous-constant-name` (`e = 1.6e-19`), `ambiguous-log-base` (`log(x, 2)`) and `ambiguous-sign` (`x = ±1`). For example, `ce.parse('y = 2 3', { strict: false, diagnostics: true }).parseDiagnostics` is `[{ code: "ambiguous-digit-groups", start: 4, end: 7, detail: { digits: "23" } }]`. In strict mode the array is empty. **Default:** `false` |
+| `onAmbiguity` | `"report"` keeps the reading and reports the diagnostic when `diagnostics` is `true`. `"error"` replaces the smallest expression that holds the source span of each `ambiguous-*` diagnostic by an `Error` node whose code is the diagnostic code and whose argument is the source text: `ce.parse('y = 2 3', { strict: false, onAmbiguity: 'error' }).json` is `["Equal", "y", ["Error", "'ambiguous-digit-groups'", ["LatexString", "'2 3'"]]]`. It works without `diagnostics: true`. In strict mode the option has no effect. **Default:** `"report"` |
 
 ```js
 ce.parse('x + 0.5', { parseNumbers: "rational" }).print();
@@ -5154,7 +5387,8 @@ must be surrounded by curly brackets.
 | :--- | :--- |
 | `positiveInfinity` | The LaTeX string used to represent positive infinity. Default is `"\infty"` $ \infty $. |
 | `negativeInfinity` | The LaTeX string used to represent negative infinity. Default is `"-\infty"` $ -\infty $. |
-| `imaginaryUnit` | The LaTeX string used to represent the imaginary unit symbol. Default is `"\imaginaryI"` $ \imaginaryI $ |
+| `imaginaryUnit` | The LaTeX string used to represent the imaginary unit symbol, in complex numbers too. Default is `"\imaginaryI"` $ \imaginaryI $ |
+| `exponentialE` | The LaTeX string used to represent `ExponentialE` and the base of `Exp`. With `exponentialE: "e"`, `["Exp", "x"]` is written `e^{x}`. Default is `"\exponentialE"` $ \exponentialE $ |
 | `notANumber` | The LaTeX string to represent the number NaN. Default value is `"\operatorname{NaN}"` $ \operatorname{NaN} $. |
 | `prettify` | If `true`, the output will be formatted to be more human-readable. Default is `false`. |
 | `invisibleMultiply` | A LaTeX string to use as an invisible multiply operator between expressions. Use `"\cdot"` to use a $ \cdot $. Default is `""`. |
@@ -6021,9 +6255,32 @@ ce.parse("\\gamma + 1").json;
 // ➔ ["Add", 1, "EulerGamma"]
 ```
 
-The four number symbols whose spelling is a serialization option
-(`positiveInfinity`, `negativeInfinity`, `notANumber` and `imaginaryUnit`) do
-not need the flag.
+The five number symbols whose spelling is a serialization option
+(`positiveInfinity`, `negativeInfinity`, `notANumber`, `imaginaryUnit` and
+`exponentialE`) do not need the flag.
+
+**To add entries to a running engine**, call `ce.latexSyntax.addEntries(entries)`.
+The next parse or serialization uses them. The default dictionary and the array
+given as the `dictionary` option are not modified. An engine created without the
+`latexSyntax` option has its own `LatexSyntax`, so the entries apply to that
+engine only; a `LatexSyntax` instance given to several engines is shared, and
+the entries apply to all of them.
+
+```js
+ce.declare("Sq", "(number) -> number");
+ce.box(["Sq", 3]).latex;
+// ➔ \mathrm{Sq}(3)
+
+ce.latexSyntax.addEntries([
+  { name: "Sq", kind: "function", latexTrigger: "\\operatorname{sq}" },
+]);
+
+ce.box(["Sq", 3]).latex;
+// ➔ \operatorname{sq}(3)
+
+ce.parse("\\operatorname{sq}(3)").json;
+// ➔ ["Sq", 3]
+```
 
 ## Using a New Function with a Mathfield
 
@@ -6222,7 +6479,14 @@ Two caveats bound the wildcard:
   types) are **not** compatible with `unknown`. Absence is opt-in: a slot 
   whose type has not yet been determined does not silently accept an absence 
   marker — admit it explicitly with a union such as `number | missing`, or 
-  use `any`.
+  use `any`. At an operator parameter, a value typed `T | missing` — a lookup
+  with a computed key, such as `xs[i]` — and a collection of such values
+  (`list<missing | string>`) are accepted where `T` or a collection of `T` is
+  expected; whether an element is absent is decided when the program runs.
+  With `xs := ["a", "b"]`, `StringJoin(Map(i ↦ xs[i], [1, 2]), "")` is
+  `"ab"`, and with the index `5` the result is an `incompatible-type` error
+  that names the absent element. A collection whose cells can only be absent
+  (`list<missing>`) is refused.
 - `unknown` is a placeholder, not a promise. Contrast it with `any`, which is 
   a **contract**: `(any) -> any` — the signature of the identity function — 
   promises a function that accepts every value, and a definition that cannot 
@@ -6426,6 +6690,14 @@ A ranged type can appear in four ways:
   `Pi` and `ExponentialE` declare a value bracket
   (`real<3.141592653589793..3.141592653589794>`), so their sign
   and magnitude are type facts.
+- **A binder declares it**: the index of a `Sum`, `Product`, `Loop` or
+  comprehension whose bounds are integer literals is declared `integer<a..b>`
+  at its binding site, on the parse route (`\sum_{k=1}^{16}`) and on the box
+  route (`["Limits", "k", 1, 16]`, `["Element", "k", ["Range", 1, 16]]`)
+  alike. The range is used inside the body — `√((k − 0.5)/16)` is real
+  there, so `[√((k − 0.5)/16) for k in 1..16]` is a `list<real>` — but a
+  comprehension's list keeps the element type without the range:
+  `[k for k in 1..16]` is a `list<integer>`.
 
 Ranges are deliberately **not** propagated through arithmetic: the sum of
 two values in `real<-1..>` is not itself in `real<-1..>`, so `x + y` falls
@@ -6617,6 +6889,17 @@ Similarly, a **`matrix`** is a list of lists.
 - `matrix<nxm>`: A matrix of `n` rows and `m` columns (e.g. `matrix<3x3>`)
 - `matrix<T^nxm>`: A matrix of `n` rows and `m` columns of elements of type `T`
   (e.g. `matrix<boolean^3x3>`)
+
+A nested list type with fixed lengths is the same type as its flat shape:
+`list<list<integer^2>^2>` is `matrix<integer^(2x2)>`, so a symbol declared
+with it matches a `matrix<T^(NxN)>` constraint, and `x^2` of such a symbol is
+the matrix power, as it is for a matrix literal.
+
+A dimension can be `0`: `list<integer^(2x0)>` is `matrix<integer^(2x0)>`, a
+matrix of two empty rows, and `list<integer^(0x2)>` is a matrix with no rows
+and two columns. In a dimension, `0x` always separates a zero-length axis
+from the next dimension; it is never a hexadecimal prefix. The empty list
+`[]` is a value of every list type whose first axis has length `0`.
 
 And finally, a **`tensor`** is a multi-dimensional array of any values, of any rank,
 and **`tensor<T>`** is a tensor of elements of type `T`.
@@ -7090,9 +7373,14 @@ When a call is made, the arm whose parameters accept the arguments is selected.
 If several arms accept them, the **most specific** one wins — above,
 `Interval(0,1)` is a `set<real>`, and since `set<real>` is a subtype of
 `collection` both arms accept it, so the first arm is chosen and the result type
-is `real` rather than `any`. Arms that are not comparable are tried in
-declaration order, so it is good practice to write the most specific arm first.
-If no arm accepts the arguments, the call is an error.
+is `real` rather than `any`. When the type of an argument does not decide
+which arm applies — the argument is `unknown`, or its type is wider than the
+parameter of one arm — the result type is the union of the results of every
+arm that can apply. Declaration order does not decide. With
+`f: ((integer) -> integer) & ((real) -> string)`, `ce.box(["f", "x"]).type` is
+`integer | string` for `x: real` and for an undeclared `x`, while
+`ce.box(["f", 3]).type` is `integer`. If no arm accepts the arguments, the call
+is an error.
 
 An overload set is a subtype of each of its arms:
 
@@ -7138,8 +7426,14 @@ The annotations are **authoritative** (an ascription, not a whole-body type
 check): the declared types define the literal's signature directly. In strict
 mode, the arguments of a typed literal are checked against the declared
 parameter types when the function is applied — a mismatch produces an
-`incompatible-type` error. Assigning a typed literal to a symbol gives that
-symbol the annotated signature, including the return type.
+`incompatible-type` error. The value the body returns is checked against the
+declared return type when it is concrete (a number, a string, a character, a
+boolean, or a list or tuple of these): with `g` declared
+`(integer) -> integer` and the body `n / 2`, `g(4)` is `2` and `g(5)` is an
+`incompatible-type` error. A symbolic value, `Missing`, `Nothing`, `NaN` and
+an error pass unchanged; a real float passes under `integer` or `rational`.
+Compiled code does not make this check. Assigning a typed literal to a symbol
+gives that symbol the annotated signature, including the return type.
 
 The return ascription may also be a **full signature carrying effects** — this
 is how a definition states its effect contract
@@ -7368,12 +7662,26 @@ ce.type("(U) -> T where T, U: list<T>");
 
 Several standard library operators are declared this way — `Identity` is
 `(T) -> T where T`, `Reverse` is
-`(T) -> T where T: indexed_collection`, `Inverse` is
-`(T) -> T where T: matrix` — so their results are typed from their
+`(T) -> T where T: indexed_collection` — so their results are typed from their
 arguments:
 
 ```js
 ce.box(["Reverse", ["List", 1, 2, 3]]).type; // ➔ "vector<integer^3>"
+```
+
+`Inverse` is not generic: its signature is `(matrix) -> matrix`, and its type
+handler keeps the shape of the argument but gives the entries the type
+`rational`, because the inverse of an integer matrix has rational entries.
+`MatrixPower` with a negative exponent is typed the same way; a positive
+exponent keeps the element type.
+
+```js
+ce.box(["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]).type;
+// ➔ "matrix<rational^(2x2)>"
+
+ce.declare("m", "matrix<integer^(2x2)>");
+ce.parse("m^2").type;      // ➔ "matrix<integer^(2x2)>"
+ce.parse("m^{-1}").type;   // ➔ "matrix<rational^(2x2)>"
 ```
 
 A **scalar** bound interacts with broadcasting. On an operator that
@@ -8299,12 +8607,31 @@ Inference writes happen at these moments:
    examples above). This includes *forwarding* through user functions: in
    `g(c) = pick(c)` where `pick`'s own body indexes its parameter, the
    collection evidence inferred for `pick` propagates to `c`, so `g` binds
-   a list argument whole instead of broadcasting over it.
+   a list argument whole instead of broadcasting over it. A self-call is
+   evidence too: when a function calls itself and passes a collection (a
+   list literal, a range, a set, a comprehension, a `filter` result) at a
+   parameter's position, that parameter takes a whole collection. With
+   `f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`
+   and the inferred signature is `(unknown, list<any>) -> unknown`. A
+   self-call that forwards a parameter unchanged, or passes a scalar, is no
+   evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
+   `[2, 4, 6]`. A type inferred as
+   a union by one use is narrowed again by a later use whose parameter admits
+   only some of its members: `ToUpperCase(s)` infers `s` as
+   `character | string`, and a later `Sort(s)` narrows it to `string` instead
+   of refusing the call. A *declared* union is checked, not narrowed.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
-   (`v[1]`) narrows it to a collection through `At`'s signature, arithmetic
+   (`v[1]`) narrows it to a collection, arithmetic
    infers numeric, boolean use infers `boolean`. The lambda's stored
-   signature carries what the body proved and nothing more.
+   signature carries what the body proved and nothing more. While every
+   read of the parameter uses a literal index, the parameter is a tuple
+   whose component at each index is what that read requires:
+   `p => !p[1] if p[2] % 2 == 0 else p[1]` types `p` as
+   `tuple<boolean, real>` and accepts `(true, 4)`. When some read uses a
+   non-literal index, the parameter is an `indexed_collection` whose element
+   type is the union of the read requirements. The inferred tuple is not
+   enforced at application.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type. `xs[1] + 1` makes an undeclared
    `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
@@ -8314,7 +8641,7 @@ Inference writes happen at these moments:
    collection (`m[1][2] + 1` makes `m` an
    `indexed_collection<indexed_collection<number>>`), and a lambda
    parameter shows the refinement on its arrow: `(v) => v[1] + 1` types
-   `(v: indexed_collection<number>) -> broadcastable<number>`. The element
+   `(v: tuple<number>) -> number` (a literal index, so a tuple; see item 3). The element
    written is the scalar reading — `number`, exactly as `x + 1` infers a
    bare `x` — and a boolean use commits `boolean` the same way, so a later
    numeric use of that element is an `incompatible-type` error, as it is
@@ -9438,6 +9765,36 @@ console.log(ce.parse("\\sin(1 \\pm 0.1)").N().toLatex());
 // ➔ 0.841 ± 0.054
 ```
 
+The inverse trigonometric and hyperbolic functions, `Gamma`, `LogGamma`,
+`Erf`, `Erfc` and `Factorial` propagate the uncertainty the same way, with
+the derivative of the function: $|f'(a)|\,\sigma$. So do `Mean`, `Median`,
+`Variance` and `StandardDeviation` over a list that contains a measurement:
+
+```live
+console.log(ce.parse("\\operatorname{mean}([0.7468 \\pm 0.001, 0.5, 0.9])").N().toLatex());
+// ➔ 0.71560 ± 0.00033
+```
+
+A comparison decides by the nominal value: `0.7468 \pm 0.001 < 1` is `True`.
+The extremum operators (`Min`, `Max`, `Clamp`, `Sort`) also order a
+measurement by its nominal value, and return the chosen operand as it is,
+uncertainty included:
+
+```live
+console.log(ce.parse("\\min(0.1, 0.7468 \\pm 0.001)").N().toLatex());
+// ➔ 0.1
+
+console.log(ce.parse("\\max(0.1, 0.7468 \\pm 0.001)").N().toLatex());
+// ➔ 0.7468 ± 0.0010
+```
+
+A step function (`Floor`, `Ceil`, `Round`, `Mod`, `Truncate`) returns the
+bare value of the nominal, because its slope is zero almost everywhere:
+`\lfloor 0.7468 \pm 0.001 \rfloor` is `0`. At a point where the derivative is
+not finite, such as `\arcsin(1 \pm 0.01)`, the bare nominal is returned and
+the error bar is dropped. An exact nominal stays exact under `evaluate()`:
+`(\sqrt2 \pm 1/10) + 1` evaluates to `1 + \sqrt2 \pm 1/10`.
+
 ### Measured Quantities
 
 A measurement can carry a unit. The parenthesized and bare forms are
@@ -9635,6 +9992,11 @@ from the cost gate entirely. If you write a rule that should apply regardless
 of cost, tag it the same way — see
 [Patterns and Rules](/compute-engine/guides/patterns-and-rules/).
 
+Powers with the same base are combined in a product as they are in a quotient,
+for a symbol with no assumptions: `ce.parse('x^a x^b').simplify()` is
+$x^{a+b}$ and `ce.parse('x^a x^{-a}').simplify()` is $1$. `evaluate()` leaves
+$x^a \cdot x^b$ as it is.
+
 ## Numeric Simplifications
 
 The `expr.simplify()` function will apply some numeric simplifications, such as
@@ -9787,6 +10149,27 @@ ce.parse('|y|').simplify().latex;
 // ➔ "-y"
 ```
 
+Logarithms are combined or split only when their arguments are known to be
+non-negative, because $\ln(x) + \ln(y)$ and $\ln(xy)$ differ for negative
+values. An argument counts as non-negative when it is a non-negative number, when
+its type or an assumption says so, or when it is an absolute value.
+
+```javascript
+// Without assumptions, the logarithms stay apart
+ce.parse('\\ln(x)+\\ln(y)').simplify().latex;
+// ➔ "\ln(x)+\ln(y)"
+
+// Numeric arguments combine
+ce.parse('\\ln(2)+\\ln(3)').simplify().latex;
+// ➔ "\ln(6)"
+
+// With positive assumptions
+ce.assume(ce.parse('x > 0'));
+ce.assume(ce.parse('y > 0'));
+ce.parse('\\ln(x)+\\ln(y)').simplify().latex;
+// ➔ "\ln(xy)"
+```
+
 <ReadMore path="/compute-engine/guides/assumptions/" > Read more about
 <strong>Assumptions</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
@@ -9822,9 +10205,18 @@ value's type.
 
 ### The method vs. the `Simplify` operator
 
-The `.simplify()` method applies rewrite rules only — it does not run an
-operator's evaluation. So a result that comes from a handler rather than a rule
-(a determinant, a derivative, an integral) is returned unchanged by the method:
+The `.simplify()` method applies rewrite rules and folds constants — it does
+not substitute the values assigned to symbols. A constant subexpression (one
+that is pure, has no unknowns and mentions no assigned variable) is folded to
+its value when that value is a number, whatever the `rules` option says: `3!`
+is `6`, `ln(e)` is `1`, and the determinant of a numeric matrix is a number.
+A relation whose sides fold to number literals simplifies to its truth value:
+`ce.parse('2 + 3 = 5').simplify()` is `True`, `ce.parse('3 < 4').simplify()`
+is `True`, and `ce.parse('2\\pi < 4\\pi').simplify()` is `True`. A relation
+with an unknown is unchanged: `x = x` stays as written.
+A result that comes from a handler rather than a rule and that has unknowns (a
+determinant of a symbolic matrix, a derivative, an integral) is returned
+unchanged by the method:
 
 ```javascript
 const m = ['List', ['List', 'a', 'b'], ['List', 'c', 'd']];
@@ -9893,6 +10285,27 @@ Each rule applies specific identities:
 - **Product-to-sum**: `sin(x)cos(y)` → `½[sin(x+y) + sin(x-y)]`
 - **Sum-to-product**: `sin(x) + sin(y)` → `2sin((x+y)/2)cos((x-y)/2)`
 - **Morrie's law**: `cos(x)cos(2x)cos(4x)` → `sin(8x)/(8sin(x))`
+
+**Odd and even functions.** When the argument is `-x` or a negative number,
+`simplify()` moves the sign out of an odd function (`Sin`, `Tan`, `Cot`,
+`Csc`, `Sinh`, `Tanh`, `Arcsin`, `Arctan`, `Arsinh`, `Erf`, `Erfi`,
+`SinIntegral`, `FresnelS`, `FresnelC`, …) and drops it for an even function
+(`Cos`, `Sec`, `Cosh`, `Sech`). Terms of a sum that differ only by this sign
+are then combined. `evaluate()` keeps `sin(-1)` as it is.
+
+```javascript
+ce.parse('\\sin(1) - \\sin(-1)').simplify();
+// ➔ 2sin(1)
+
+ce.parse('\\cos(-2) - \\cos(2)').simplify();
+// ➔ 0
+
+ce.parse('\\sinh(x) + \\sinh(-x)').simplify();
+// ➔ 0
+
+ce.parse('\\operatorname{erf}(-x) + \\operatorname{erf}(x)').simplify();
+// ➔ 0
+```
 
 ### Using the Fu Algorithm
 
@@ -10208,6 +10621,125 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+### The `run()` Contract: Shaped Inputs, Read-Only Results
+
+On the `javascript` target, `run()` requires inputs of the shape the compiled
+code reads, and treats its results as read-only. The runner does a constant
+amount of work per binding on each call, one `typeof`:
+
+- a `{re, im}` value bound to a real binding throws a `TypeError` that names
+  the binding (the unsigned pole `~oo` is projected to `Infinity` instead);
+- a plain number bound to a complex binding is lifted to `{re, im: 0}`;
+- a string or a typed array (`Float64Array`, …) bound to a binding the code
+  reads as an array is refused: the compiled code reads plain arrays only, so
+  convert a typed array once on your side with `Array.from(typed)`.
+
+The string refusal applies to a binding declared with a bare collection type
+(`indexed_collection`, `collection`, `list`), with a collection of non-text
+elements (`list<number>`), with `list<string>` or `list<character>`, or whose
+collection type the engine inferred from its uses. Compiled code would read
+the string as UTF-16 code units, not as characters, so the `TypeError` names
+the binding and says so. A binding whose type admits a string (`string`,
+`indexed_collection<character>`) is not refused. These entry checks are on by
+default; `compile(expr, { entryChecks: false })` turns them off, for a caller
+that validates its own inputs.
+
+```javascript
+ce.declare('S', 'indexed_collection');
+const f = compile(ce.box(['Length', ['Drop', 'S', 1]]));
+f.run({ S: 'abc' });
+// ➔ throws TypeError: "S" (type `indexed_collection`) is compiled as a
+//   JavaScript array, and compiled code does not accept a string for it: it
+//   would read the string as UTF-16 code units, not as characters. Pass an
+//   array, or declare the binding `string` to compile text.
+```
+
+A number bound to a binding declared as a list is not refused at entry, since
+some lowerings accept a scalar. When the compiled body then fails because it
+needed an array, the error names the binding and keeps the body's message as
+its `cause`:
+
+```javascript
+ce.declare('S', 'list<number>');
+compile(ce.box(['Sum', 'S'])).run({ S: 5 });
+// ➔ throws TypeError: "S" (type `list<number>`) received a number: compiled
+//   code reads such a binding as a JavaScript array, and the compiled body
+//   failed (_.S.reduce is not a function). Pass an array.
+```
+
+Nothing else is checked, converted, or copied:
+
+- the entries of a list input are never read. A `{re, im}` object, a string
+  or a typed array at an entry of a list the code reads on the real lane
+  computes with that value, as it would in plain JavaScript;
+- a returned collection or `{re, im}` object is the value the code built. It
+  may be a value the runner keeps for every later call (a hoisted constant
+  list, a bound symbol value), so do not write to a result: copy it first if
+  you need to change it.
+
+The result convention is kept: a value whose imaginary part is exactly zero
+comes back as a plain number, inside a collection too, and a collection is
+copied only when such a cell has to be rewritten. That check is one `typeof`
+per cell of a returned collection, with no allocation.
+
+The interpreter is the route that validates: evaluate the expression with
+`.evaluate()` or `.N()` to diagnose a wrong input shape.
+
+```typescript
+const fn = compile(expr, { to: 'javascript' }).run!;
+const T = Array.from(float64Board); // convert a typed array once
+const v = fn({ x, y, T });          // no per-call walk, copy or check of T
+```
+
+### Running Compiled Code Without the Engine
+
+The entry point `@cortex-js/compute-engine/runtime` exports
+`createJavaScriptRuntime(options)`: the helper bundle that `run()` uses, with
+no engine behind it. Store a `javascript` `CompilationResult` and run it on a
+page, in a worker or on a server with `runtime.load(result)`:
+
+```typescript
+import { compile } from '@cortex-js/compute-engine';
+import { createJavaScriptRuntime } from '@cortex-js/compute-engine/runtime';
+
+const result = compile(ce.parse('x^2 + 1'), { to: 'javascript' });
+
+const runtime = createJavaScriptRuntime({});
+const f = runtime.load(result);
+f({ x: 3 });
+// ➔ 10
+```
+
+`load()` reads the `code`, `entryPlan`, `reconstructionDigits` and
+`runtimeVersion` fields of the result, and the `preambleOnce`,
+`preamblePerCall` and `callCode` fields when the code has a preamble. It
+evaluates the definitions that read nothing per call (a constant list, a
+memo) once, and it applies the same input conversions as `run()`: a
+real given to a complex-declared symbol is lifted, and a `Float64Array` for a
+list symbol is copied. `load()` throws when `result.runtimeVersion` is not
+`runtime.runtimeVersion`, or when the stored code has none.
+
+The runtime exposes `load`, `frame`, `setFrame`, `iterationLimit`, `deadline`
+and `runtimeVersion`. The other helpers are internal and can change in any
+release. The options give the runtime the state it cannot read from an engine:
+
+- `random`: the source of random draws outside a `WithRandomSeed` frame, and
+  of the Monte-Carlo samples of the integrals. `null` denies draws; a draw
+  then throws an error whose `name` is `CapabilityDeniedError` (test `e.name`,
+  not `instanceof`: the class differs in each bundle).
+- `frame`, or `runtime.setFrame()`: the frame of an interpreted
+  `WithRandomSeed` that the code is called from (`{ seedLo, seedHi, next }` or
+  `{ seed, next }`). After the call, `runtime.frame.next` is the advanced
+  counter.
+- `iterationLimit`: the cap on the lazy-stream walks (default 1024; `0` or
+  less means no limit, as for `ce.iterationLimit`).
+- `deadline`: an optional time after which the shuffle and choice loops throw.
+
+A seeded program gives the same values interpreted, with `run()` and from the
+stored code. Functions passed in the `functions` or `imports` compile options
+are copied into the code as source, so a closure loses its enclosing scope,
+and a function given by name must exist where the code runs.
+
 ### Constant Folding
 
 A **pure** subexpression with no free variables is evaluated at compile time
@@ -10227,14 +10759,20 @@ becomes a literal list, which matters most when the collection is constant but
 its consumer is not:
 
 ```javascript
-compile(ce.box(['At', ['Map', ['Function', ['Square', 'y'], 'y'],
-                       ['Range', 1, 6]], 'k'])).code
-// ➔ "_SYS.at([1, 4, 9, 16, 25, 36], _.k)"
+const r = compile(ce.box(['At', ['Map', ['Function', ['Square', 'y'], 'y'],
+                                 ['Range', 1, 6]], 'k']));
+r.code         // ➔ "_SYS.at(_lit_1, _.k)"
+r.preambleOnce // ➔ "const _lit_1 = [1, 4, 9, 16, 25, 36];\n"
 ```
 
 The index `k` is a run-time input, so the expression as a whole cannot fold —
 but its base is baked once at compile time instead of being rebuilt and
-mapped over on every call. Collection folding is bounded: it applies to a
+mapped over on every call. The baked list is a preamble local that `run()`
+evaluates once per compiled function (it is in `preamble`, and in
+`preambleOnce` for a runtime that splits the two), so a caller that runs
+`code` itself must include the preamble, as for a bound symbol value
+(`_val_*`) or a user function (`_fn_*`). A written list literal of three or
+more numbers (`[1, 2, 3]`, a matrix of them) is hoisted the same way. Collection folding is bounded: it applies to a
 **finite, indexed** collection (a `Set` has no defined element order, so it
 never folds) of at most 50 **numeric** elements. A longer collection, or one
 holding strings, tuples or nested collections, compiles structurally.
@@ -10394,6 +10932,24 @@ span argument compiles and the emitted code throws
 `RangeError: Slice: the span argument is not an ascending index range at run
 time`.
 
+The integer operations `Mod`, `Remainder`, `GCD` and `LCM` use the same
+convention for magnitude. Compiled code works in doubles, so an operand beyond
+the safe integer range (±2^53) or an infinity throws a `RangeError` that names
+the operation and the value, instead of returning a different number. The
+Python target raises a `ValueError` with the same message. The `Mod(x, 1)`
+fractional-part forms are not checked. A plot kernel that samples
+`Mod(1/x, 2)` at `x = 0` throws at that sample. A constant operand is folded
+from the exact value, so `DigitSum(2^1000)` compiles to `1366`.
+
+```javascript
+ce.declare('x', 'integer');
+const m = compile(ce.box(['Mod', 'x', 10]));
+m.run({ x: 2 ** 60 + 1 });
+// ➔ throws RangeError: Mod: 1152921504606847000 is beyond the safe integer
+//   range of compiled code (±9007199254740991); evaluate with the interpreter
+//   for the exact result
+```
+
 The upper bound in those messages is not arbitrary. The interpreter reads these
 counts with `asSmallInteger`, which answers `null` — hence an error value —
 above **1 000 000**, so the compiled guard uses the same ceiling; without it
@@ -10477,6 +11033,28 @@ console.log(g.run(3, 4));
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
+
+**Declared parameter types are checked.** A compiled call of a user function
+whose parameters have declared types checks the argument at run time when its
+static type does not prove the declared type. The compiled value is `NaN`
+where the interpreter answers an `incompatible-type` error:
+
+```js
+ce.declare("h", { signature: "(x: integer) -> integer" });
+ce.assign("h", ce.parse("x \\mapsto 2x"));
+ce.declare("y", "real");
+
+const f = compile(ce.parse("h(y)"));
+f.run({ y: 3 });    // ➔ 6
+f.run({ y: 2.5 });  // ➔ NaN  (the interpreter gives an incompatible-type error)
+
+compile(ce.box(["Map", "h", ["List", 1, 2.5]])).run();
+// ➔ [2, NaN]  (a function value handed to Map is checked per element)
+```
+
+An argument whose static type is already below the declared type needs no
+test, and a parameter typed `number` or `complex` has none. The declared
+result type is not checked in compiled code.
 
 ### Tuple Expressions
 
@@ -10603,6 +11181,27 @@ the result whenever the branch draws from the random stream.
 `Loop` and `Block` are not hoisted either — they remain valid only as a whole
 function body, and fail closed when used as a sub-expression.
 
+A shader has no dynamic array, so a literal `List`, `Tuple`, `PointList` or
+`Range` is written into the shader as a constant array constructor. The `glsl`
+and `wgsl` targets accept at most **256** elements this way. A larger constant
+collection is a `capability` decline with the diagnostic code
+`inline-collection-too-large`; the message names the element count and the
+limit. Ship such a collection as a texture (a `storage: sampler2D` input read
+with `At`) instead. The `javascript` and `interval-js` targets have no such
+limit: a list of any length is one array constant there.
+
+```javascript
+const big = ce.box(['List', ...Array.from({ length: 300 }, (_, i) => i)]);
+const r = compile(ce.box(['At', big, 'k']), { to: 'glsl' });
+r.diagnostic.code;
+// ➔ "inline-collection-too-large"
+r.error;
+// ➔ "Could not compile `List`: a constant collection of 300 elements is above
+//    the 256 elements a shader array constructor takes on this target. Ship
+//    the collection as a texture (a `storage: sampler2D` input, read with
+//    `At`) instead."
+```
+
 #### `Block` and `where`
 
 `Block` expressions create scoped variable bindings. The `where` syntax provides
@@ -10667,11 +11266,14 @@ complex-valued. This happens when:
 - An operation is applied to a complex-valued operand
 
 The detection is **static** — based on the expression's structure, not on
-runtime values. So `\sqrt{x}` compiles to real `Math.sqrt` because `x` has no
-declared complex type, even though `Math.sqrt(-1)` returns `NaN` at runtime.
-
-To get complex results from `\sqrt{x}`, you'd need to make the expression
-explicitly complex, e.g., `\sqrt{x + 0i}`.
+runtime values. What happens to a radical of a real operand whose sign is not
+known depends on the compile [mode](#modes-auto-strict-complex). Under the
+default `auto` mode, `\sqrt{x}` is **promoted**: it is lowered through the
+complex kernel, so `compile("\\sqrt{x}").run({ x: -4 })` is `{ re: 0, im: 2 }`,
+as `evaluate()` gives, and `2` at `x = 4`. Under `mode: "strict"` the
+radical compiles to the real `Math.sqrt`, because `x` has no declared complex
+type, and the same call returns `NaN`. To get a complex result in every mode,
+make the expression explicitly complex, e.g. `\sqrt{x + 0i}`.
 
 ### Result Format
 
@@ -10872,6 +11474,19 @@ reaches one:
   "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
   `ln(x²)` — keep the real kernel and cost nothing.
 
+The special functions whose value is complex for some real operands —
+`HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
+`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `auto` and
+`complex` the same way. The complex kernel is used where the operand facts do
+not prove the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`,
+`m ≤ 1` for the elliptic integrals), so compiled `LambertW(x)` at `x = −1` is
+`{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled `LerchPhi(3, 2, 1)`
+is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The GLSL and WGSL
+targets have no complex lane for these heads and decline a provably complex
+value. `Arcsec` and `Arccsc` of a real operand of unknown magnitude are typed
+`complex | infinity | nan`, so with `x` declared `real` the compiled
+`Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }`.
+
 ```live
 // import { ComputeEngine, compile } from '@cortex-js/compute-engine';
 
@@ -10921,7 +11536,37 @@ you can.** A symbol declared `real` is never a wide binding — `2a + 1`,
 `b(a)`, `a < 3` stay on the real kernel in every setting (its unknown-sign
 radical still promotes under `auto`, because promotion is about sign, not
 wideness); a symbol declared `complex` is complex-shaped in every setting and
-never a mismatch. `mode` is per compilation, on `CompileTarget` (the target
+never a mismatch.
+
+A function's declared result is read the same way. A function declared
+`(real) -> real` whose body holds an unknown-sign radical or logarithm compiles
+its body on the real kernel in every mode, with `promoted: false`, and gives
+`NaN` outside the real domain. A body that is complex because of a
+complex-typed operand still declines.
+
+```javascript
+ce.declare('p', { signature: '(real) -> real' });
+ce.assign('p', ce.parse('k \\mapsto \\sin(2.4k)\\sqrt{(k-0.5)/16}'));
+ce.declare('k', 'real');
+const r = compile(ce.parse('p(k)'));
+r.preamble;
+// ➔ "const _fn_p = (k) => Math.sin(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5));"
+r.promoted;
+// ➔ false
+r.run({ k: 0.1 });
+// ➔ NaN
+```
+
+Under `auto` on the JavaScript target, a user function called from a `Sum`,
+`Product` or comprehension whose index has literal integer bounds is compiled
+once more for the range of that index when the range proves the sign of such a
+head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare `p(t)` promotes
+the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
+`_fn_p_integer_1___ = (k) => 1.45 * Math.cos(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5))`
+on the real kernel, with `promoted: false`. A copy is made only when it removes
+a promoted head, so a function with no such head keeps one definition.
+
+`mode` is per compilation, on `CompileTarget` (the target
 default) or on `compile()`'s options; a mode a target does not offer
 (`complex` on `glsl`) is a `capability` decline, never a silent coercion. The
 shader targets and `interval-js` offer `strict` only.
@@ -13844,9 +14489,11 @@ ce.parse('\\begin{vmatrix} a & b \\\\ c & d \\end{vmatrix}');
 ce.parse('\\det\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}');
 // → ["Determinant", ["List", ["List", 1, 2], ["List", 3, 4]]]
 
-// Inverse using superscript -1
+// Inverse using superscript -1, for a symbol declared as a matrix
+ce.declare('A', 'matrix');
 ce.parse('A^{-1}');
 // → ["Inverse", "A"]
+// (for an undeclared symbol, A^{-1} is ["Divide", 1, "A"], the reciprocal)
 
 ce.parse('\\begin{pmatrix} 1 & 2 \\\\ 3 & 4 \\end{pmatrix}^{-1}');
 // → ["Inverse", ["List", ["List", 1, 2], ["List", 3, 4]]]
@@ -14102,6 +14749,13 @@ ce.parse('\\det\\begin{pmatrix} a & b \\\\ c & d \\end{pmatrix}').evaluate();
 ce.parse('\\det(A)');  // → ["Determinant", "A"]
 ```
 
+A matrix with a float entry is a float matrix: the determinant, and each entry
+of a matrix result, is then a float, also where the value is an integer.
+`ce.expr(['Determinant', ['List', ['List', 1.5, 0], ['List', 0, 2]]]).evaluate()`
+is the float `3.0`, not the exact `3`, and
+`Transpose([[2.0, 1.5], [3, 4]])` is `[[2.0, 3.0], [1.5, 4.0]]`. A matrix of
+exact entries gives exact results.
+
 ### Trace
 
 The trace is the sum of diagonal elements:
@@ -14177,10 +14831,6 @@ ce.expr(['Norm', ['List', 3, 4], 3]).evaluate();
 // Frobenius norm (default): √(1² + 2² + 3² + 4²) = √30
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]]]).evaluate();
 // → √30 ≈ 5.477
-
-// Spectral norm (order 2): the largest singular value
-ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 2]).evaluate();
-// → √(15 + √221) ≈ 5.465
 
 // L1 norm: max column sum = max(4, 6) = 6
 ce.expr(['Norm', ['List', ['List', 1, 2], ['List', 3, 4]], 1]).evaluate();
@@ -14551,6 +15201,36 @@ ce.expr(['Power', ['List', ['List', 1, 2], ['List', 3, 4]], -1]).evaluate();
 `A^n` (an integer power) routes to `MatrixPower`. A non-square base returns an
 `expected-square-matrix` error. For an element-wise power of the entries, map
 `Power` over the matrix.
+
+The same reading applies to a symbol whose value is a square matrix of
+numbers, also when the power was built before the value was assigned: the
+`Power` evaluation reads an integer exponent over such a value as
+`MatrixPower`.
+
+```js example
+const e = ce.parse('B^2');
+ce.assign('B', ce.box(['List', ['List', 1, 2], ['List', 3, 4]]));
+e.evaluate();
+// → [[7,10],[15,22]]  (the matrix power, as for B^2 parsed after the assignment)
+```
+
+The exception is `B^{-1}` built before the assignment: with `B` undeclared,
+it canonicalizes to `Divide(1, B)`, so it evaluates to the element-wise
+reciprocal `[[1, 1/2], [1/3, 1/4]]`, not the inverse. Declare `B` as a
+`matrix` first, or parse `B^{-1}` after the assignment, to get `Inverse(B)`.
+
+A **non-integer** exponent is element-wise: `[[1, 2], [3, 4]]^{1/2}` is
+`[[1, √2], [√3, 2]]`, the square root of each entry, not the matrix square
+root. This is the reading Mathematica gives `M^(1/2)` too. There is no
+operator for the matrix square root or for a matrix function of a non-integer
+exponent.
+
+`simplify()` follows the same reading. For `A` declared a `matrix`,
+`ce.parse('A A').simplify()` is `MatrixPower(A, 2)`, and
+`\sqrt{A}\sqrt{A}` is `MatrixPower(\sqrt{A}, 2)`. The same-base rules for
+numbers do not apply to a matrix: `e^A e^B` is not combined into `e^{A+B}`
+(`Exp` of a matrix is element-wise, see below), and `A^a / A^b` is left as it
+is.
 
 :::warning[No matrix exponential]
 `Exp` applied to a matrix broadcasts **element-wise**: `["Exp", M]` computes
@@ -15914,6 +16594,43 @@ ce.angularUnit = 'deg';
 
 <MemberCard>
 
+### RoundingTies {#roundingties}
+
+```ts
+type RoundingTies = 
+  | "away-from-zero"
+  | "to-even"
+  | "toward-zero"
+  | "toward-positive-infinity"
+  | "toward-negative-infinity";
+```
+
+The rule that `Round` uses for a value that is exactly halfway between two
+integers (a tie). A value that is not a tie always rounds to the nearest
+integer.
+
+| Rule | `Round(2.5)` | `Round(3.5)` | `Round(-2.5)` | Description |
+|:-----|:------------:|:------------:|:-------------:|:------------|
+| `away-from-zero` | `3` | `4` | `-3` | the default |
+| `to-even` | `2` | `4` | `-2` | IEEE 754, Python, NumPy and Mathematica |
+| `toward-zero` | `2` | `3` | `-2` | |
+| `toward-positive-infinity` | `3` | `4` | `-2` | JavaScript `Math.round` |
+| `toward-negative-infinity` | `2` | `3` | `-3` | |
+
+The rule also applies to the step form `Round(x, step)`, which rounds to
+the nearest multiple of the step: the tie is at the half of the step
+(with the step `1/100`, `Round(0.125, 1/100)` is a tie).
+
+To change the rule used by the Compute Engine, use:
+
+```js
+ce.roundingTies = 'to-even';
+```
+
+</MemberCard>
+
+<MemberCard>
+
 ### AssignValue {#assignvalue}
 
 ```ts
@@ -16242,6 +16959,19 @@ tolerance: number;
 ```ts
 angularUnit: AngularUnit;
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~roundingTies~~ {#roundingties-2}
+
+```ts
+roundingTies: RoundingTies;
+```
+
+The rule that `Round` uses for a value halfway between two integers.
+ See [RoundingTies](#roundingties). Default: `'away-from-zero'`.
 
 </MemberCard>
 
@@ -16675,6 +17405,62 @@ calling `withEffects`, or use a separate engine.
 ####### overrides
 
 [`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~withEvaluationContext()~~ {#withevaluationcontext-1}
+
+```ts
+withEvaluationContext<T>(options, fn): T
+```
+
+Run the synchronous `fn` in the evaluation context that `options`
+carries, then put the previous context back, and return the result of
+`fn`.
+
+For an `evaluateAsync` handler. The handler receives `options`, which
+carry the evaluation context of the evaluation that called it: the host
+capability registry, and the lexical scopes of the scoped operators that
+the evaluation is inside (the scope of the index of a `Sum`, for
+example). While the handler is suspended at an `await`, other code can
+run on the same engine, so the engine does not keep that context
+installed for the handler. Before the first `await`, the context is in
+place. After it, synchronous work that reads the scope — canonicalizing
+a held operand (`x.canonical`), `ce.box()`, `ce.parse()`, `evaluate()`,
+`ce.assign()` — sees the global scope unless it runs inside `fn`. An
+index of an enclosing `Sum` then stays symbolic, and a new global
+symbol with its name is declared.
+
+```ts
+ce.declare('Late', {
+  signature: '(integer) -> integer',
+  lazy: true,
+  evaluateAsync: async ([x], options) => {
+    await delay(1);
+    return ce
+      .withEvaluationContext(options, () => x.canonical)
+      .evaluateAsync(options);
+  },
+});
+```
+
+A nested `evaluateAsync(options)` call does not need it: the options
+carry the context to that evaluation.
+
+If `fn` returns a promise, only the synchronous part of `fn`, up to its
+first `await`, runs in the context.
+
+• T
+
+####### options
+
+`Partial`\<`EvaluateOptions`\> \| `undefined`
 
 ####### fn
 
@@ -18788,7 +19574,7 @@ readonly isCollection: true;
 ##### CollectionInterface.count {#count-2}
 
 ```ts
-readonly count: number | undefined;
+readonly count: number | bigint | undefined;
 ```
 
 </MemberCard>
@@ -19447,9 +20233,11 @@ The number of significant digits the caller asked for, when
   it is `ce.precision`, the precision of the engine.
 
 A handler can use it to compute to the requested number of digits
-without reading `ce.precision`. Note that `N(x, p)` with a `p` greater
-than the precision of the engine also sets `ce.precision` to `p`, and
-leaves it there after the call.
+without reading `ce.precision`. `N(x, p)` with a `p` greater than the
+precision of the engine computes at `p` digits plus guard digits for the
+time of the call and restores the precision of the engine after it; on
+the asynchronous route the raised precision travels with the evaluation
+(`EvaluateOptions._precisionWindow`).
 
 #### EvaluateHandlerOptions.effects
 
@@ -20664,12 +21452,19 @@ different order.
 ##### BaseCollectionHandlers.count {#count}
 
 ```ts
-count: (collection) => number | undefined;
+count: (collection) => number | bigint | undefined;
 ```
 
 Return the number of elements in the collection.
 
-An empty collection has a count of 0.
+An empty collection has a count of 0. An infinite collection has a count
+of `Infinity`. Return `undefined` when the count cannot be determined.
+
+A finite count that is not a safe integer (larger than
+`Number.MAX_SAFE_INTEGER`) cannot be held exactly by a `number`: return
+it as a `bigint`. A handler can also return a `bigint` for a smaller
+count: `expr.count` always converts a count that is a safe integer to a
+`number`.
 
 </MemberCard>
 
@@ -21271,6 +22066,7 @@ type OperatorDefinitionFlags = {
   threadsConditionals: boolean | number[];
   inspectsErrors: boolean;
   selectsOperands: boolean;
+  evaluatesOperands: boolean;
   namedArgumentsRequired: boolean;
   missingBehavior: "reject" | "propagate" | "handle";
   missingStrip: "all" | number[];
@@ -24519,7 +25315,9 @@ Spans for `undeclared-symbol`, `juxtaposition-as-multiply` and every
 `ambiguous-*` code except `ambiguous-percent` are offsets into CE's
 **normalized** LaTeX (the
 re-serialized token stream), which matches the original input only when
-the input round-trips unchanged.
+the input round-trips unchanged. A Unicode superscript or subscript is the
+exception: it is measured as written, not as its expansion, so `x²! + 1`
+reports the span `x²!` (offsets 0 to 3), not `x^{2}!`.
 `comment-discarded` is the exception: because the comment is precisely what
 was stripped before tokenization, its span is in **original-input**
 coordinates. `recovered` spans are a best-effort original-input range (equal
@@ -24769,6 +25567,29 @@ abstract N(): NumericValue
 ```
 
 Return a non-exact representation of the numeric value
+
+</MemberCard>
+
+<MemberCard>
+
+##### NumericValue.roundToPrecision() {#roundtoprecision}
+
+```ts
+roundToPrecision(_digits): NumericValue
+```
+
+This value with each part rounded to `digits` significant digits. A
+value that is already within `digits` (an exact value, a machine float,
+a big decimal with no more digits) is returned as it is.
+
+The `add` and `mul` of a big decimal are exact, so a running sum or
+product of big floats grows a digit count of the size of the exponent
+span, or of the number of factors: the numeric folds of `Sum` and
+`Product` round each partial result with this method.
+
+####### \_digits
+
+`number`
 
 </MemberCard>
 
@@ -26073,6 +26894,15 @@ optional evaluateAsync?: (ops, options) => Promise<Expression | undefined>;
 
 An asynchronous version of `evaluate`.
 
+A handler that evaluates an operand with `evaluateAsync` passes its
+own `options` on (`x.evaluateAsync(options)`, or a copy that keeps the
+`_effects`, `_contextStack` and `_precisionWindow` fields): they carry
+the state of the evaluation across the handler's `await`s, among which
+the precision window of an enclosing `N(x, p)` call. An operand
+evaluation started with options of the handler's own inherits the
+window in force when it starts, but a handler that awaits BEFORE it
+evaluates its operand starts that evaluation outside the window.
+
 #### OperatorDefinition.evalDimension?
 
 ```ts
@@ -27048,6 +27878,19 @@ angularUnit: AngularUnit;
 
 <MemberCard>
 
+##### IComputeEngine.roundingTies {#roundingties-1}
+
+```ts
+roundingTies: RoundingTies;
+```
+
+The rule that `Round` uses for a value halfway between two integers.
+ See [RoundingTies](#roundingties). Default: `'away-from-zero'`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.costFunction {#costfunction-1}
 
 ```ts
@@ -27476,6 +28319,62 @@ calling `withEffects`, or use a separate engine.
 ####### overrides
 
 [`EffectHandlerOverrides`](#effecthandleroverrides)
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.withEvaluationContext() {#withevaluationcontext}
+
+```ts
+withEvaluationContext<T>(options, fn): T
+```
+
+Run the synchronous `fn` in the evaluation context that `options`
+carries, then put the previous context back, and return the result of
+`fn`.
+
+For an `evaluateAsync` handler. The handler receives `options`, which
+carry the evaluation context of the evaluation that called it: the host
+capability registry, and the lexical scopes of the scoped operators that
+the evaluation is inside (the scope of the index of a `Sum`, for
+example). While the handler is suspended at an `await`, other code can
+run on the same engine, so the engine does not keep that context
+installed for the handler. Before the first `await`, the context is in
+place. After it, synchronous work that reads the scope — canonicalizing
+a held operand (`x.canonical`), `ce.box()`, `ce.parse()`, `evaluate()`,
+`ce.assign()` — sees the global scope unless it runs inside `fn`. An
+index of an enclosing `Sum` then stays symbolic, and a new global
+symbol with its name is declared.
+
+```ts
+ce.declare('Late', {
+  signature: '(integer) -> integer',
+  lazy: true,
+  evaluateAsync: async ([x], options) => {
+    await delay(1);
+    return ce
+      .withEvaluationContext(options, () => x.canonical)
+      .evaluateAsync(options);
+  },
+});
+```
+
+A nested `evaluateAsync(options)` call does not need it: the options
+carry the context to that evaluation.
+
+If `fn` returns a promise, only the synchronous part of `fn`, up to its
+first `await`, runs in the context.
+
+• T
+
+####### options
+
+`Partial`\<`EvaluateOptions`\> \| `undefined`
 
 ####### fn
 
@@ -31535,6 +32434,14 @@ If the number of elements cannot be determined, return `undefined`, for
 example, if the collection is lazy and not finite and the size cannot
 be determined without iterating over the collection.
 
+The count is a `bigint` only when it is finite and is not a safe integer
+(larger than `Number.MAX_SAFE_INTEGER`), for example the count of
+`QuotientRing(Integers, 2^61 - 1)`. A count that is a safe integer is
+always a `number`, and an infinite count is `Infinity`. Do not mix the
+count with a `number` in arithmetic before you check its type:
+JavaScript throws a `TypeError` for `count + 1` when `count` is a
+`bigint`. A comparison (`count > 10`) is valid for both types.
+
 </MemberCard>
 
 <MemberCard>
@@ -35378,6 +36285,10 @@ ce.assign("double(x)", ["Multiply", "x", 2]);
 ce.assign("half(x)", ce.parse("\\frac{x}{2}"));
 ```
 
+A set of definitions can also be packaged as a **library** and given to the
+engine with the `libraries` constructor option or with `ce.loadLibrary()`;
+see [Loading a Library](/compute-engine/guides/augmenting/#loading-a-library).
+
 
 
 <ReadMore path="/compute-engine/guides/augmenting/" >
@@ -35502,7 +36413,8 @@ required to be finite reject an infinite argument outright — see
 <Signature name="Sum">_xs_: collection</Signature>
 
 Evaluate to a sum of all the elements in _collection_. If all the elements are
-numbers, the result is a number. Otherwise it is an `["Add"]` expression.
+numbers, the result is a number. If some elements are symbolic, the result is
+an `["Add"]` expression.
 
 <Latex flow="column" value="\sum x_{i}"/>
 
@@ -35512,6 +36424,22 @@ numbers, the result is a number. Otherwise it is an `["Add"]` expression.
 
 ["Sum", ["List", 5, 7, "x" , "y"]]
 // ➔ ["Add", 12, "x", "y"]
+```
+
+A list of points (tuples) sums to a point, and a list of rows sums to the row
+of the column sums. An element that is not a number, a point or a row (a
+boolean, a dictionary) is an `incompatible-type` error, also when it is the
+only element.
+
+```json example
+["Sum", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// ➔ ["Tuple", 4, 6]
+
+["Sum", ["List", ["List", 1, 2], ["List", 3, 4]]]
+// ➔ ["List", 4, 6]
+
+["Sum", ["List", "True"]]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'number'", "'boolean'"], "True"]
 ```
 
 Note this is equivalent to:
@@ -35543,6 +36471,25 @@ ce.parse('\\sum_{1 \\le i \\le 10} i^2').evaluate()
 
 // \sum_{i \le 10} i   (lower bound defaults to 1)
 ce.parse('\\sum_{i \\le 10} i').evaluate()
+// ➔ 55
+```
+
+Only the `\le`/`\ge` form implies a bound. A sum with one explicit bound in
+the `i=1`/superscript form, such as `\sum_{k=1} k` or `\sum_{k}^{10} k`,
+stays unevaluated: no default is chosen for the missing bound. The subscript
+`k=1` is the lower bound, `["Limits", "k", 1, "Nothing"]`. For an infinite
+sum, write the upper bound `\infty`.
+
+```js
+ce.parse('\\sum_{k=1} k').evaluate().json;
+// ➔ ["Sum", "k", ["Limits", "k", 1, "Nothing"]]  (unevaluated)
+```
+
+The bounds can also be written flat after the index, as for `Integrate`:
+the index, then the lower bound, then the upper bound.
+
+```json example
+["Sum", "k", "k", 1, 10]
 // ➔ 55
 ```
 
@@ -35672,10 +36619,26 @@ accelerated numerical approximation). The recognized families:
 | $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
 | $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
 
+The body is compared with each pattern as a rational function of the index, so
+an equivalent spelling is recognized: $\sum_{k=1}^{\infty} \frac{k}{k^3}$ is
+$\frac{\pi^2}{6}$, $\sum_{k=1}^{\infty} \frac{1}{(k+1)^2}$ is
+$\frac{\pi^2}{6} - 1$, and the telescoping sum
+$\sum_{k=1}^{\infty} \frac{1}{k^2+k}$ is $1$. The comparison runs only for a
+body whose denominator, as written, is zero at no integer index of the domain.
+A pole there keeps the sum symbolic.
+
 For a **symbolic** ratio $r$, the families with a convergence region return a
 `When`-guarded value recording it — for example
-$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$. Divergent numeric cases
-($\sum 1/k$, $\sum k \cdot 2^k$) stay symbolic.
+$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$.
+
+A series whose divergence the engine can certify evaluates to its infinity,
+under `evaluate()` and `.N()`: $\sum_{n=1}^{\infty} \frac{1}{n}$ and
+$\sum_{k=1}^{\infty} k \cdot 2^k$ give `PositiveInfinity`, and
+$\sum_{n=1}^{\infty} \frac{-3}{n}$ gives `NegativeInfinity`. The certificate is
+the limit comparison with the harmonic series. A series with no value
+($\sum (-1)^n$) and a series the test cannot decide ($\sum \frac{1}{n \ln n}$)
+stay symbolic. `isEqual()` against an infinity answers `true` for a certified
+divergent series and `undefined` for a series left symbolic.
 
 </FunctionDefinition>
 
@@ -35714,6 +36677,14 @@ Return the product of `body` for each value in `bounds`.
 ```json example
 ["Product", ["Add", "x", 1], ["Tuple", "x", 1, 10]]
 // ➔ 39916800
+```
+
+A product with only one bound (`\prod_{k=1} k`) stays unevaluated, as a sum
+does. The bounds can also be written flat after the index:
+
+```json example
+["Product", "k", "k", 1, 5]
+// ➔ 120
 ```
 
 <Signature name="Product" returns="number">_body_: function, ..._bounds_: Element</Signature>
@@ -35756,10 +36727,25 @@ Edge cases:
 - Empty range (upper < lower): returns `1`
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
+The Wallis-like product is also given its closed form by `evaluate()`, for any
+positive integer lower bound $a$: $\prod_{k=a}^{n} \left(1 - \frac{1}{k^2}\right)$
+evaluates to $\frac{(a-1)(n+1)}{a \cdot n}$, so $\prod_{k=2}^{n}$ is
+$\frac{n+1}{2n}$, $\prod_{k=3}^{n}$ is $\frac{2(n+1)}{3n}$, and
+$\prod_{k=1}^{n}$ is $0$. The body is compared as a rational function, so
+$\frac{k^2-1}{k^2}$ and $\frac{(k-1)(k+1)}{k^2}$ are recognized too.
+
 #### Infinite Products
 
-A `Product` over an **infinite** upper bound is evaluated exactly for these
-known convergent families (staying symbolic otherwise):
+A `Product` over an **infinite** upper bound is evaluated exactly when its body
+is one of these known convergent families, or the reciprocal of one. The body
+is compared with each pattern algebraically, so any spelling of the same
+rational function is recognized: $\prod_{n=1}^{\infty} \frac{4n^2}{4n^2-1}$ is
+$\frac{\pi}{2}$ (the reciprocal of the Wallis product),
+$2\prod_{n=1}^{\infty} \frac{4n^2}{4n^2-1}$ is $\pi$, and
+$\prod_{k=1}^{\infty} \frac{k^2}{k^2+1}$ is $\frac{\pi}{\sinh \pi}$. A body
+that matches no entry stays symbolic. A body with a float literal gives a
+float, and a body whose numerator and denominator share a factor stays
+symbolic.
 
 | Product | Value | Name |
 | :------ | :---- | :--- |
@@ -35847,9 +36833,30 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
 | `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
 | `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
-| `Round`  |              | Rounds a number to the nearest integer. `Round(x, n)` rounds to `n` decimal places |
+| `Round`  |              | Rounds a number to the nearest integer. `Round(x, step)` rounds to the nearest multiple of the step |
 
 </div>
+
+`Floor`, `Ceil`, `Truncate` and `Round` take an optional second argument, a
+step: the value is rounded to a multiple of the step instead of an integer.
+`Floor(x, step)` is the greatest multiple of the step that is at most `x`,
+whatever the sign of the step, `Round(x, step)` is the nearest multiple, and
+a zero step gives `Indeterminate`. To round to `n` decimal places, use the
+step `10^-n`: `Round(3.14159, 1/100)` is `157/50`.
+
+```json example
+["Floor", 226, 10]
+// ➔ 220
+
+["Ceil", 226, 10]
+// ➔ 230
+
+["Floor", 2.7, ["Rational", 1, 2]]
+// ➔ 5/2
+
+["Round", 3.14159, ["Rational", 1, 100]]
+// ➔ 157/50
+```
 
 A value exactly halfway between two integers (a tie) is rounded with the rule
 of `ce.roundingTies`. The default rule rounds a tie away from zero:
@@ -35922,6 +36929,11 @@ unknown — there is no ordering that could rule it out.
 Otherwise, simplify the expression by removing values that are smaller than or
 equal to the largest known number.
 
+A dictionary is not a collection of numbers. `Max`, `Min`, `Supremum` and
+`Infimum` of a dictionary that has an entry give the `incompatible-type` error
+that `Sum` gives, and the error names the first entry. An empty dictionary
+contributes no value, as an empty list does.
+
 ```json example
 ["Max", 5, 2, -1]
 // ➔ 5
@@ -35989,6 +37001,14 @@ The result is always the same sign as `b`, or 0.
 
 ["Mod", -7, -5]
 // ➔ -2
+```
+
+`Mod` of exact operands is exact. A radical dividend is reduced without
+rounding, and `N()` gives the float.
+
+```json example
+["Mod", ["Sqrt", 2], 1]
+// ➔ ["Add", -1, ["Sqrt", 2]]   (√2 − 1; N() gives 0.4142…)
 ```
 
 </FunctionDefinition>
@@ -36508,6 +37528,17 @@ Distribute multiplication over addition in `expr`.
 ```
 
 </FunctionDefinition>
+
+The polynomial operators below (`PolynomialDegree`, `CoefficientList`,
+`PolynomialQuotient`, `PolynomialRemainder`, `PolynomialGCD`, `Resultant`,
+`Cancel`, `PartialFraction`, `Apart`, `PolynomialRoots` and `Discriminant`)
+receive their operands unevaluated. A symbol that holds a polynomial is
+replaced by its value, as `Expand` and `Factor` do, and the default variable is
+read from that value: with `p := x^3 - 2x^2 - 4` and `q := x - 3`,
+`["PolynomialQuotient", "p", "q", "x"]` is `x^2 + x + 3` and
+`["PolynomialRemainder", "p", "q", "x"]` is `5`. The variable named in the call
+is never substituted, even when it has a value: with `x := 5`,
+`["PolynomialDegree", ["Add", ["Power", "x", 2], 1], "x"]` is `2`.
 
 <FunctionDefinition name="PolynomialDegree">
 
@@ -37122,6 +38153,9 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `FresnelS(x)` | `sin(πx²/2)` | Fresnel sine integral |
 | `FresnelC(x)` | `cos(πx²/2)` | Fresnel cosine integral |
 | `LambertW(x)` | `W(x)/(x·(1+W(x)))` | Lambert W function |
+| `PolyLog(s, z)` | `PolyLog(s-1, z)/z` | In `z`; `PolyLog(2, z)` gives `-ln(1-z)/z`. No closed form in `s` |
+| `Gamma(s, z)` | `-e^(-z)·z^(s-1)` | Upper incomplete gamma, in `z`. No closed form in `s` |
+| `Arctan2(y, x)` | `-y/(x²+y²)` in `x`, `x/(x²+y²)` in `y` | Divided by the unit factor in a non-radian angular unit |
 | **Bessel Functions** | | |
 | `BesselJ(n, x)` | `(J_{n-1}(x) - J_{n+1}(x))/2` | First kind |
 | `BesselY(n, x)` | `(Y_{n-1}(x) - Y_{n+1}(x))/2` | Second kind |
@@ -37131,7 +38165,7 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `Floor(x)` | `0` | Derivative is 0 almost everywhere |
 | `Ceil(x)` | `0` | Derivative is 0 almost everywhere |
 | `Round(x)` | `0` | Derivative is 0 almost everywhere |
-| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere |
+| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
 | `GCD(x, n)` | `0` | Discrete function |
 | `LCM(x, n)` | `0` | Discrete function |
 
@@ -37401,6 +38435,60 @@ Double integrals can be computed by specifying more than one limit.
 ]
 ```
 
+The bounds can also be written flat after the variable. After the variable,
+an operand that is not a variable name starts the bounds, and the next operand
+is the upper bound.
+
+```json example
+["Integrate", ["Power", "y", 2], "y", 0, "Pi"]
+// ➔ ["Integrate", ["Function", ["Power", "y", 2], "y"], ["Limits", "y", 0, "Pi"]]
+// evaluates to 1/3 * pi^3
+```
+
+An integral with only one bound, such as `\int^2 y^2\,dy` or
+`["Limits", "y", "Nothing", 2]`, is neither an indefinite nor a definite
+integral. No default is chosen for the missing bound, and the integral stays
+unevaluated under `evaluate()` and `N()`.
+
+A definite integral whose integrand has a pole inside the interval has no
+finite value. When the integrand changes sign across the pole, the result is
+`Indeterminate` (`NaN` under `.N()`): `\int_{-1}^1 \frac{1}{t}\,dt` is
+`Indeterminate`. When the integrand keeps one sign, the result is `+∞` or
+`−∞`, also for a pole at a bound: `\int_0^1 t^{-2}\,dt` is `+∞`. When the
+position of a pole depends on a free symbol, as in `\int_0^4 (y-a)^{-2}\,dy`,
+the integral stays unevaluated unless the declared type of the symbol or an
+assumption puts the pole outside the interval. With
+`ce.assume(ce.parse("a > 4"))`, the same integral evaluates to
+`-1/a - 1/(4 - a)`.
+
+When the exponent of a power is a symbol, the closed form is the value only
+under a condition, and the result carries that condition:
+
+```javascript
+ce.parse('\\int_0^1 t^n\\,dt').evaluate()
+// → 1/(n + 1) {0 < n + 1}      (the integral diverges for n ≤ -1)
+
+ce.parse('\\int_{-1}^{1} t^{-n}\\,dt').evaluate()
+// → 1/(1 - n) - (-1)^(1 - n)/(1 - n) {0 < 1 - n}
+
+ce.parse('\\int_1^2 t^{-n}\\,dt').evaluate()
+// → (2^(1 - n) - 1)/(1 - n) {n ≠ 1}      (the value at n = 1 is ln 2)
+```
+
+An assumption such as `ce.assume(ce.parse("n > 2"))` discharges the
+condition. A numeric exponent, or a constant exponent such as `t^\pi`,
+carries no condition. The indefinite integral `\int t^{-n}\,dt` is
+`t^{1 - n}/(1 - n)` with no condition.
+
+At a finite bound where the antiderivative has no value, the value is the
+one-sided limit of the antiderivative from inside the interval, as at an
+infinite bound:
+
+```javascript
+ce.parse('\\int_0^1 \\ln t\\,dt').evaluate()
+// → -1      (t·ln t - t has no value at 0; its limit from the right is 0)
+```
+
 Some functions do not have a closed form for their antiderivative, and the integral cannot be computed symbolically. In this case, the `Integrate` function returns a symbolic representation of the integral. Use `NIntegrate` to compute a numerical approximation of the integral.
 
 
@@ -37408,46 +38496,39 @@ Some functions do not have a closed form for their antiderivative, and the integ
 </FunctionDefinition> 
 
 <FunctionDefinition name="NIntegrate">
-<Signature name="NIntegrate" returns="number">_f_:function, ..._limits_:tuple</Signature>
+<Signature name="NIntegrate" returns="number">_f_:function, _lower_:number, _upper_:number</Signature>
 
-Calculate a **numerical approximation** of the definite integral of a function.
+Calculate a **numerical approximation** of the definite integral of a function
+of one variable between `lower` and `upper`.
 
 <Latex flow="column" value="\int_{0}^{2} x^2 dx"/>
 
 ```json example
-["NIntegrate", ["Power", "x", 2], ["Tuple", 0, 2]]
+["NIntegrate", ["Power", "x", 2], 0, 2]
 // -> 2.6666666666666665
 ```
 
-The `limits` tuples indicate the variable of integration and the limits of integration.
-
-The first element of the tuple is the variable of integration, and the second 
-and third elements are the lower and upper limits of integration, respectively.
-
-The variable of integration can be omitted if it is the same as the argument of 
-the function.
+The integrand `f` is a function literal, as for `Integrate`: an expression
+with one unknown, a `["Function"]` expression, or the name of a function.
 
 ```json example
-["NIntegrate", ["Power", "x", 2], ["Tuple", 0, 2]]
-// -> 2.6666666666666665
+["NIntegrate", "Sin", 0, 2]
+// -> 1.4161468365471424
 ```
 
+The bounds are two numbers. A `Tuple` of bounds is an `incompatible-type`
+error operand. For a multiple integral, use `Integrate` with one `Limits`
+per variable and call `.N()` on it.
 
-
-A double integral can be computed by specifying more than one limit.
-
-<Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
+The value is computed with the same methods as `Integrate(…).N()`: adaptive
+Gauss–Kronrod quadrature, with an oscillatory rule on a semi-infinite interval.
+Monte Carlo sampling is used only when the quadrature does not converge. A
+divergent integral is `+∞`, `−∞` or `NaN`:
 
 ```json example
-["NIntegrate", 
-  ["Add", ["Power", "x", 2], ["Power", "y", 2]], 
-  ["Tuple", 0, 2], 
-  ["Tuple", 1, 3]
-]
-// -> 20.666666666666668
+["NIntegrate", ["Function", ["Divide", 1, "x"], "x"], 0, 1]
+// -> +∞
 ```
-
-The numerical approximation is computed using a **Monte Carlo** method.
 
 
 </FunctionDefinition>
@@ -37512,6 +38593,129 @@ ce.parse('\\int e^x \\cos(2x) dx').evaluate()
 The general formulas used are:
 - $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
 - $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
+
+#### Piecewise Integrands
+
+A definite integral over a finite real interval of an integrand that contains
+`If`, `Which`, `Min`, `Max`, `Floor`, `Ceil` or `Fract` is cut at the points
+where the integrand changes branch, and each piece is integrated:
+
+```javascript
+ce.parse('\\int_{-1}^{1} \\max(x, 0)\\,dx').evaluate()
+// → 1/2
+
+ce.parse('\\int_0^3 \\lfloor x\\rfloor\\,dx').evaluate()
+// → 3
+
+ce.parse('\\int_0^2 \\lfloor x^2\\rfloor\\,dx').evaluate()
+// → 5 - sqrt(3) - sqrt(2)
+
+ce.parse('\\int_0^{2\\pi} \\max(\\sin x, \\cos x)\\,dx').evaluate()
+// → 2sqrt(2)
+```
+
+The cut points are exact. They come from linear conditions, from `Solve` over
+the interval (polynomial and periodic conditions), and from the poles and
+domain limits of $1/u$, $\sqrt{u}$, $\ln u$ and $\tan u$. When a cut point is
+not known exactly, when a condition is not supported, or when there are more
+than 128 cuts, the integral stays unevaluated.
+
+An absolute value or a sign of a non-affine argument is cut at the exact
+roots of the argument in the same way:
+
+```javascript
+ce.parse('\\int_0^{2\\pi} |\\sin x| dx').evaluate()
+// → 4
+
+ce.parse('\\int_{-2}^{2} |x^2 - 1| dx').evaluate()
+// → 4
+```
+
+#### Special-Function Primitives
+
+`Erf`, `Erfc`, `BesselJ(1, u)`, `BesselI(1, u)`, `Digamma`, `Trigamma` and
+`PolyGamma` of an affine argument $u$ have antiderivatives.
+
+```javascript
+ce.parse('\\int \\operatorname{erf}(x) dx').evaluate()
+// → x·Erf(x) + e^(-x^2)/sqrt(pi)
+
+ce.box(['Integrate', ['Digamma', 'x'], 'x']).evaluate()
+// → LogGamma(x)
+```
+
+#### Integrals by Residues
+
+`Integrate` gives an exact value by the residue theorem for these definite
+integrals:
+
+- over $(-\infty, \infty)$: a rational function, or a rational function times
+  $\cos(ax)$, $\sin(ax)$ or $e^{iax}$;
+- over $[0, \infty)$: such an integrand when it is even;
+- over $[0, 2\pi]$ or $[0, \pi]$: a rational function of $\sin x$ and $\cos x$.
+
+```javascript
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{\\sin x}{x} dx').evaluate()
+// → pi
+
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{1+x^2} dx').evaluate()
+// → pi
+
+ce.parse('\\int_{0}^{2\\pi} \\frac{1}{2+\\cos x} dx').evaluate()
+// → 2/3·sqrt(3)·pi
+```
+
+`.N()` uses the exact value. A pole on the path of the integral gives `+∞`,
+`−∞` or `Indeterminate`:
+
+```javascript
+ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{x^2} dx').evaluate()
+// → +oo
+```
+
+A Cauchy principal value is never assumed. To ask for one, integrate over the
+real line with `ContourIntegrate` and the path `RealLineContour(True)`:
+
+```javascript
+ce.box(['ContourIntegrate',
+  ['Divide', 'x', ['Add', ['Power', 'x', 2], 1]], 'x',
+  ['RealLineContour', 'True']]).evaluate()
+// → 0   (the principal value of ∫ x/(x²+1) dx over the real line)
+```
+
+**Contour integrals.** The notation $\oint_{|z-c|=r} f(z)\,dz$, the operator
+`ContourIntegrate(f, z, contour)` and the method
+`ce.contourIntegrate(f, z, contour)` integrate over a closed path in the
+complex plane by the residue theorem. The path is a `CircleContour(c, r)`, a
+`RectangleContour` or a simple `PolygonContour`.
+
+```javascript
+ce.parse('\\oint_{|z|=2} \\frac{1}{z} dz').evaluate()
+// → 2i·pi
+
+ce.box(['ContourIntegrate', ['Divide', 1, 'z'], 'z', ['CircleContour', 0, 2]]).evaluate()
+// → 2i·pi
+
+ce.parse('\\oint_{|z|=2} \\frac{1}{z^2+1} dz').evaluate()
+// → 0
+```
+
+The method returns a report: each pole with its location, order, residue and
+leading Laurent coefficient, the sum of the residues, and the value.
+
+```javascript
+const report = ce.contourIntegrate(
+  ce.parse('\\frac{1}{z^2+1}'), 'z', ce.box(['CircleContour', 0, 2]));
+report.method   // → "residue-theorem"
+report.poles    // → one entry for i and one for -i, each with order 1 and residue ∓i/2
+```
+
+The supported integrands are rational functions, entire numerators, products
+of $\sin$ or $\cos$ of a real affine argument in the denominator, and
+$P(z)·e^{c/(z-a)}$ with an essential singularity. An integrand whose poles
+cannot be certified exactly stays unevaluated, and a pole on the contour
+gives `Indeterminate`. Each call has a step budget, so the point where it
+gives up does not depend on the machine.
 
 
 ## Limit
@@ -37699,14 +38903,15 @@ ce.parse('\\operatorname{Series}(\\cot x, x)').evaluate()
 
 Special functions are expanded at their poles with exact coefficients (the
 Euler–Mascheroni constant $\gamma$ is `EulerGamma`, the Riemann zeta function is
-`Zeta`):
+`Zeta`, and the Stieltjes constants $\gamma_k$ of its Laurent series at $s = 1$
+are `StieltjesGamma(k)`):
 
 ```javascript
 ce.parse('\\operatorname{Series}(\\Gamma(x), x)').evaluate()
 // → 1/x - γ + (π²/12 + γ²/2)·x + … + O(x^6)
 
-ce.parse('\\operatorname{Series}(\\zeta(x), x, 1)').evaluate()
-// → 1/(x - 1) + γ + O(x - 1)
+ce.parse('\\operatorname{Series}(\\zeta(x), x, 1, 2)').evaluate()
+// → 1/(x - 1) + γ - γ₁·(x - 1) + γ₂/2·(x - 1)^2 + O((x - 1)^3)
 ```
 
 Poles at $\pm\infty$ are handled too:
@@ -38224,6 +39429,23 @@ list. A re-created instance draws fresh values. See the
 [`WithRandomSeed`](/compute-engine/reference/arithmetic/#withrandomseed)
 notes for making draws reproducible.
 
+**A list or tuple literal is a value.** When a `List` or `Tuple` literal is
+evaluated, each element that is a finite lazy collection is listed in place.
+An element stays lazy when it is not known to be finite (`["Range", 1,
+"PositiveInfinity"]`, a `Filter` over an infinite source), when it is a lazy
+dictionary view, or when its elements would exceed `ce.maxCollectionSize`.
+
+```json example
+["List", ["Range", 1, 3], 4]
+// ➔ ["List", ["List", 1, 2, 3], 4]
+
+["Tuple", ["Range", 1, 3], 4]
+// ➔ ["Tuple", ["List", 1, 2, 3], 4]
+
+["List", ["Range", 1, "PositiveInfinity"], 4]
+// ➔ ["List", ["Range", 1, "PositiveInfinity"], 4]
+```
+
 Materializing a lazy collection involves evaluating all its elements and storing 
 them in memory, resulting in an **eager collection**. This is also known as 
 **realizing** the collection.
@@ -38481,11 +39703,15 @@ The type of a list is `list<T>`, where `T` is the type of the elements in the li
 The type `list` is a shorthand for `list<any>`, meaning the list can contain elements of any type.
 
 A `["Spread", xs]` element splices the elements of the collection `xs` into
-the list (in Epsil, `[...xs, c]`). The splice happens at canonicalization
-with `Join`'s semantics: a literal list splices immediately, a symbolic or
-lazy operand lowers to the equivalent `Join` expression (a lone spread
-`["List", ["Spread", "xs"]]` is `["Join", "xs"]`), and an infinite operand
-stays lazy. A **tuple** does not spread — tuples are units; use `ListFrom`
+the list (in Epsil, `[...xs, c]`). The splice happens at canonicalization:
+a literal list splices immediately, and a symbolic or lazy operand lowers to
+the equivalent `ListJoin` expression (a lone spread
+`["List", ["Spread", "xs"]]` is `["ListJoin", "xs"]`). When the literal is
+evaluated, the `ListJoin` becomes a plain `List` as soon as every spread
+operand is a finite collection and the total number of elements is within
+`ce.maxCollectionSize`. An infinite operand stays lazy, and so does a literal
+whose spread operands together exceed the cap. An element that is not spread
+is kept as written. A **tuple** does not spread — tuples are units; use `ListFrom`
 to convert one explicitly — so a provably-tuple operand is a `spread-tuple`
 error, and a scalar operand is an `incompatible-type` error. A **string** is
 an indexed collection of characters, so it spreads into its characters
@@ -38497,6 +39723,19 @@ on key collisions.
 ```json example
 ["List", ["Spread", ["List", 1, 2]], 3]
 // ➔ ["List", 1, 2, 3]
+```
+
+With `xs` assigned the list `["List", 1, 2]`:
+
+```json example
+["List", ["Spread", ["Take", "xs", 1]], 9, ["Spread", ["Drop", "xs", 1]]]
+// ➔ ["List", 1, 9, 2]
+
+["List", ["Spread", "xs"], ["Range", 1, 3]]
+// ➔ ["List", 1, 2, ["List", 1, 2, 3]]
+
+["List", ["Spread", ["Range", 1, "PositiveInfinity"]]]
+// ➔ ["ListJoin", ["Range", 1, "PositiveInfinity"]]  (stays lazy)
 ```
 
 The visual presentation of a `List` expression can be customized using the
@@ -38650,11 +39889,11 @@ parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 <FunctionDefinition name="Range">
 
-<Signature name="Range" returns="range | indexed_collection<integer>">_upper_:number</Signature>
+<Signature name="Range" returns="range | list<integer>">_upper_:number</Signature>
 
-<Signature name="Range" returns="range | indexed_collection<integer>">_lower_:number, _upper_:number</Signature>
+<Signature name="Range" returns="range | list<integer>">_lower_:number, _upper_:number</Signature>
 
-<Signature name="Range" returns="range | indexed_collection<number>">_lower_:number, _upper_:number, _step_:number</Signature>
+<Signature name="Range" returns="range | list<real>">_lower_:number, _upper_:number, _step_:number</Signature>
 
 A sequence of numbers, starting with `lower`, ending with `upper`, and
 incrementing by `step`.
@@ -38686,30 +39925,43 @@ negative.
 ```
 
 **Element type narrows by step.** When the step is omitted or is an integer
-literal, the result is `indexed_collection<integer>`. When the step is
-non-integer (e.g. `0.1`) or a symbolic expression, the result widens to
-`indexed_collection<number>`.
+literal, the result is `list<integer>`. When the step is a non-integer number
+(e.g. `0.1`, `1/3`) or a constant expression (`π/4`), the result widens to
+`list<real>`. When the step is a symbol with no value, the result is
+`list<number>`.
 
 ```json example
 ["Range", 0, 1, 0.1]
-// type: indexed_collection<number>
+// type: list<real>
 // ➔ ["List", 0, 0.1, 0.2, 0.3, ..., 1.0]
+```
+
+**An exact rational bound or step gives exact elements.** A float bound or
+step, or a step that is a constant expression such as `π/4`, gives floats, and
+`.N()` of the range gives floats.
+
+```json example
+["Range", 0, 1, ["Rational", 1, 3]]
+// ➔ ["List", 0, ["Rational", 1, 3], ["Rational", 2, 3], 1]
+
+["Sum", ["Range", 0, 1, ["Rational", 1, 3]]]
+// ➔ 2
 ```
 
 **A range that describes collection indexes has the `range` type.** When the
 bounds are integers, at least 1, ascending, and one apart — that is, when the
 value is a contiguous run of valid 1-based indexes — the result takes the
 narrower [`range`](/compute-engine/guides/types/) type, an **index span**.
-Every other case keeps the `indexed_collection` types above.
+Every other case keeps the `list` types above.
 
 ```json example
 ["Range", 2, 5]      // type: range        (an index span)
 ["Range", 7]         // type: range        (the one-argument form means 1..7)
-["Range", 1, 10, 2]  // type: indexed_collection<integer>  (stepped: a gather, not a span)
-["Range", 5, 2]      // type: indexed_collection<integer>  (descending)
-["Range", 0, 5]      // type: indexed_collection<integer>  (0 is not an index)
+["Range", 1, 10, 2]  // type: list<integer>  (stepped: a gather, not a span)
+["Range", 5, 2]      // type: list<integer>  (descending)
+["Range", 0, 5]      // type: list<integer>  (0 is not an index)
 ["Range", 1, "PositiveInfinity"]
-                     // type: indexed_collection<integer>  (unbounded)
+                     // type: list<integer>  (unbounded)
 ```
 
 An **infinite upper bound** is allowed and produces a lazy, unbounded
@@ -38926,13 +40178,16 @@ spelling (the expression stays unevaluated).
 
 <FunctionDefinition name="Repeat">
 
-<Signature name="Repeat" returns="indexed_collection">_value_: any</Signature>
+<Signature name="Repeat" returns="list<T>">_value_: T</Signature>
 
 An infinite collection of the same element.
 
-<Signature name="Repeat" returns="indexed_collection">_value_: any, _count_: integer?</Signature>
+<Signature name="Repeat" returns="list<T>">_value_: T, _count_: integer?</Signature>
 
 A collection of the same element repeated `count` times.
+
+The result is typed `list<T>`, where `T` is the type of the value:
+`["Repeat", "False", 3]` is a `list<boolean>`.
 
 ```json example
 ["Repeat", 42, 5]
@@ -39892,6 +41147,25 @@ rows.
 // ➔ 4
 ```
 
+In LaTeX, `|S|`, `\#S`, `\operatorname{card}(S)` and `\operatorname{Card}(S)`
+of a set or a string parse to `Count(S)`, and `Count` of a set or a string
+serializes as `|S|`. For a list, `|L|` is the element-wise absolute value, and
+`\#` alone is the symbol `hash`.
+
+```js example
+ce.parse('|\\{1,2\\}|').evaluate();
+// ➔ 2
+
+ce.parse('|\\text{abc}|').evaluate();
+// ➔ 3
+
+ce.parse('\\#S');
+// ➔ ["Count", "S"]
+
+ce.box(['Count', ['Set', 1, 2]]).latex;
+// ➔ "\vert\lbrace1, 2\rbrace\vert"
+```
+
 <Signature name="Count" returns="integer">_xs_: collection, _value_: any</Signature>
 
 With a second argument that is not a function, returns how many elements of
@@ -40409,6 +41683,23 @@ callback, use a tuple-pattern parameter, `["Function", body, ["Tuple",
 // ➔ ["Error", ["ErrorCode", "'callback-arity'", ...]]
 ```
 
+An element that _f_ cannot accept is kept as an error cell. This holds for
+every spelling of the callback: a function literal, a named operator or a
+comprehension give the same cells. An absent element (`Missing`) under a
+numeric function gives `NaN`; under a text function such as `ToUpperCase` it
+gives the `incompatible-type` error.
+
+```json example
+["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, -4, "'banana'", 81]]
+// ➔ ["List", 4, ["Complex", 0, 2], ["Error", ["ErrorCode", "'incompatible-type'", ...], "'banana'"], 9]
+
+["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, "Missing", 81]]
+// ➔ ["List", 4, "NaN", 9]
+
+["Map", "ToUpperCase", ["List", "'a'", "Missing"]]
+// ➔ ["List", "'A'", ["Error", ["ErrorCode", "'incompatible-type'", ...], "Missing"]]
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -40533,6 +41824,19 @@ When an `initial` value is provided, the reducing function is applied to the
 initial value and the first element of the collection, then to the result of the
 previous application and the next element, etc...
 
+The initial value is evaluated once, at the first step or when the collection
+is empty, under the same options as the fold. The reducing function always
+receives the value of the initial value, never the expression as written.
+Without an initial value, an empty collection gives `Nothing`.
+
+```json example
+["Reduce", ["List"], "Add", ["Add", 1, ["Mod", 4, 3]]]
+// ➔ 2
+
+["Fold", "Add", ["Sqrt", 2], ["List"]]
+// ➔ ["Sqrt", 2]   (and 1.414… under `.N()`)
+```
+
 ```json example
 [
   "Reduce",
@@ -40644,13 +41948,18 @@ Evaluate to a tuple of two lists:
 
 <FunctionDefinition name="Zip">
 
-<Signature name="Zip" return="indexed_collection">..._xss_: indexed_collection</Signature>
+<Signature name="Zip" returns="list<tuple<T1, ..., Tn>>">..._xss_: indexed_collection</Signature>
 
 Returns a collection of tuples where the first element of each tuple is the
 first element of the first collection, the second element of each tuple is the
 second element of the second collection, etc.
 
 The length of the resulting collection is the length of the shortest collection.
+
+The result is typed `list<tuple<T1, ..., Tn>>`, where each `Ti` is the
+element type of the matching source collection (`unknown` for a source with
+no element type): `["Zip", ["List", 1, 2], ["List", "'a'", "'b'"]]` is a
+`list<tuple<integer, string>>`.
 
 ```json example
 ["Zip", ["List", 1, 2, 3], ["List", 4, 5, 6]]
@@ -42475,8 +43784,12 @@ entries present depend on what the operand is; keys include:
 - `clauses`: for a multi-clause function, the clause listing (a list of
   strings, one per clause, in declaration order, with overlap/coverage
   annotations)
-- `attributes`: algebraic attributes of a function
-  (e.g. `"commutative associative"`)
+- `attributes`: a list of strings with the algebraic attributes of a
+  function, followed by `"lazy"` when the operator receives its arguments
+  unevaluated (`["commutative", "associative", "idempotent", "lazy"]` for
+  `Add`, `["lazy"]` for `Hold`)
+- `examples`, `keywords`: the examples and the keywords of the definition,
+  each as a list of strings
 - `description`, `wikidata`, `url`: documentation metadata, when the
   definition carries any
 
@@ -42987,9 +44300,22 @@ the solutions as if it were the answer. For example,
 stay unevaluated, because the solver finds `1` and `2`, but not the other
 solutions.
 
+An equation that holds for every value of the unknown (`x = x`,
+`2(x + 1) = 2x + 2`) gives `[t]`: one solution for every value of the fresh
+parameter `t`, the same form as the parametric answers of the integer solver.
+An equation whose answer depends on another unknown (`Solve(a = 0, x)`) stays
+unevaluated.
+
 **Real or complex solutions.** When the unknown has no declared type and no
 domain is given, a polynomial equation gives all its roots, complex roots
-included: `Solve(x^2 + 1 = 0, x)` is `[i, -i]`. Every other equation gives
+included: `Solve(x^2 + 1 = 0, x)` is `[i, -i]`, and `Solve(x^3 = 8, x)` is
+`[2, -1 + √3i, -1 - √3i]`. A root is exact when the polynomial has a closed
+form that the engine knows: a rational root, a quadratic factor with
+rational coefficients, a pure power `x^n = c` (its `n` roots are
+`ⁿ√c·(cos(2kπ/n) + i·sin(2kπ/n))`), or a polynomial in `x^g`. The roots of a
+factor with no such closed form are floats: `x^5 + x + 1 = 0` is
+`(x^2 + x + 1)(x^3 - x^2 + 1) = 0`, and its roots are the exact
+`(-1 ± i√3)/2` and the three numeric roots of the cubic. Every other equation gives
 its real solutions only: `Solve(e^x = -1, x)` and `Solve(|x^2 + 1| = 0, x)`
 are `[]`, and `Solve(|x - 1| = 3, x)` is `[-2, 4]`. To solve such an equation
 over the complex numbers, declare the unknown complex
@@ -43426,14 +44752,25 @@ Ascribe a type to _expression_ for the benefit of the type system.
 The _type_ is a string such as `{"str": "integer"}`, or a type-name symbol
 such as `integer` (which is normalized to a string).
 
-`Typed` is an **ascription, not a runtime check**: it asserts the type without
-verifying the value, and it is transparent at evaluation — `Typed(x, type)`
-evaluates to the value of `x`.
+`Typed` sets the static type of the expression. At evaluation, a concrete
+value is checked against that type: `Typed(x, type)` evaluates to the value of
+`x` when the value conforms, and to an `incompatible-type` error when it does
+not.
 
 ```json example
 ["Typed", ["Add", 2, 3], "'integer'"]
 // The expression has type `integer`, and evaluates to 5
+
+["Typed", "'s'", "'integer'"]
+// ➔ ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'string'"], "'s'"]
 ```
+
+Only a concrete value is checked: a number, a string, a character, a boolean,
+or a list or tuple of these. A symbolic value, `Missing`, `Nothing`, `NaN` and
+an error value pass unchanged. A real float conforms to every type that admits
+a real number, so the value of `.N()` passes under `integer` or `rational`. A
+character conforms where a `string` is declared, because the two are the same
+value.
 
 The main use of `Typed` is to annotate the parameters and return type of a
 [function literal](/compute-engine/reference/functions/#Function).
@@ -43755,6 +45092,23 @@ The shorthand function literal `["Multiply", "x", 2]` which uses the unknown `x`
 is equivalent to the function literal `["Function", ["Multiply", "x", 2], "x"]`.
 When using this form, make sure that the symbol `x` is not defined in the current scope.
 
+An expression with no wildcard and no unknown is a constant function:
+`["Apply", 3, 5]` evaluates to `3`.
+
+The unknowns of an expression become its parameters only when the expression
+is known not to be a function. An expression whose type is `unknown` is kept
+as a **function value** instead, and is applied once its value is known. This
+is the case for a call of a function that has no definition yet: in
+`["Apply", ["g", "f"], "x"]` the callee `g(f)` is not read as the function
+`f ↦ g(f)`, because `g(f)` may itself be a function. The application stays
+`["Apply", ["g", "f"], "x"]`. Once `g` has a value, for example
+`["Function", ["Add", "a", "b"], "a", "b"]`, it evaluates to `f + x`: `g(f)` is
+then `g` applied to its first argument, a function of one argument.
+
+To apply a function with an unknown result type as a shorthand, use a
+wildcard: `["Map", ["f", "_"], "xs"]` maps `f` over `xs` whether or not `f`
+is defined.
+
 
 
 
@@ -43865,9 +45219,49 @@ ce.expr(['k', ['lst', 3]]).evaluate();  // lst(3) ➔ [3, -3]
 
 The static type of an application mirrors this: applied to a visible
 collection, the result types `list<R>`; applied to an argument that *may* be
-a collection (e.g. an unknown-return call), it types `broadcastable<R>` —
-where `R` is the function's return type. See the
+a collection (e.g. an unknown-return call), it types `broadcastable<R>`. For
+a function literal, `R` is the type of the body with each parameter typed as
+the element the call maps over, so a parameter that flows into the result
+unchanged does not read `unknown`:
+
+```js example
+ce.parse('f(x, y, z) := (-y, z, x)').evaluate();
+ce.box('f').type;
+// ➔ (unknown, unknown, unknown) -> tuple<number, unknown, unknown>
+
+ce.parse('f([1, 2], [3, 4], [5, 6])').type;
+// ➔ list<tuple<integer, integer, integer>>
+```
+
+For a function with a declared signature, `R` is the declared return type
+(`g: (number) -> integer` applied to `[1, 2]` types `vector<integer^2>`, a
+list of integers). See the
 [broadcastable type](/compute-engine/guides/types/) in the Types guide.
+
+#### Tuple Arguments
+
+A function whose parameter is declared with a **scalar** type (a number type
+or `boolean`) also maps over a tuple argument, as `Sin((a, b))` is
+`(sin(a), sin(b))`. The result is a tuple, typed `tuple<…>` with one component
+type per result. A component that does not match the declared type is an error
+in its own cell.
+
+```js example
+ce.assign('g', ce.parse('(u: \\mathrm{real}) \\mapsto 2u'));
+ce.parse('g((a, b))').evaluate();
+// ➔ ["Tuple", ["Multiply", 2, "a"], ["Multiply", 2, "b"]]
+
+ce.parse('g((a, b))').type;
+// ➔ tuple<real, real>
+
+// A list of tuples maps over the list, then over each tuple
+ce.expr(['g', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]]]).evaluate();
+// ➔ ["List", ["Tuple", 2, 4], ["Tuple", 6, 8]]
+```
+
+A parameter with no declared type, or declared `string`, binds the tuple
+whole: `Apply(u ↦ 7, (a, b))` is `7`. The compiled code gives the same tuple:
+an array on the `javascript` target, and a `vecN` on the GLSL and WGSL targets.
 
 #### Opting Out
 
@@ -43886,7 +45280,44 @@ ce.expr(['len', ['List', 1, 2, 3]]).evaluate();
 
 For lambdas defined with `\mapsto` without an explicit signature, the
 inferred parameter type is `unknown`, which is treated as scalar — so
-they broadcast by default.
+they broadcast by default, unless the body shows that the parameter is a
+collection.
+
+One such case needs no annotation. When the body hands the parameter to an
+operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
+`StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
+`GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
+argument binds whole. The parameter is followed through element-wise
+operators (`mean(v^2)`, `sin(v)`) and through a local of the body assigned
+from it.
+
+```js example
+ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));
+ce.expr(['h', ['List', 1, 2, 3]]).evaluate();
+// ➔ 14/3  (the mean of [1, 4, 9]; not [1, 4, 9])
+
+ce.assign('s', ce.box(['Function', ['Sum', ['Power', 'v', 2]], 'v']));
+ce.expr(['s', ['List', 1, 2, 3]]).evaluate();
+// ➔ 14
+
+ce.assign('mx', ce.parse('v \\mapsto \\max(v)'));
+ce.expr(['mx', ['List', 1, 2, 3]]).evaluate();
+// ➔ 3
+
+// A body with no such operator still broadcasts
+ce.assign('q', ce.parse('v \\mapsto v^2 + 1'));
+ce.expr(['q', ['List', 1, 2, 3]]).evaluate();
+// ➔ ["List", 2, 5, 10]
+```
+
+A scalar argument gives the scalar value (`h(2)` is `4`). Compiled JavaScript
+follows the same rule.
+
+A function that passes a collection to itself at a parameter's position
+also receives that parameter whole: with
+`f(n, s) = s if n == 0 else f(n - 1, [1, 2])`, `f(1, [0])` is `[1, 2]`, and
+the parameter `s` is inferred as `list<any>`. See "When Inference Triggers"
+in the [Types guide](/compute-engine/guides/types/).
 
 
 ## Closures
@@ -43984,7 +45415,14 @@ expression:
 ```
 
 The annotation is authoritative: it sets the result type of the signature
-directly. Canonicalization moves the ascription **inside** the body `Block`,
+directly. When the function is applied, a concrete returned value (a number, a
+string, a character, a boolean, or a list or tuple of these) is checked
+against the declared result type: with `g` declared `(integer) -> integer`
+and the body `n / 2`, `g(4)` is `2` and `g(5)` is an `incompatible-type`
+error. A symbolic value, `Missing`, `Nothing`, `NaN` and an error value pass
+unchanged, and a real float passes under `integer` or `rational`, so `.N()`
+of such a function gives the float. Compiled code does not make this check.
+Canonicalization moves the ascription **inside** the body `Block`,
 wrapping its last statement, so the canonical form of the example above is:
 
 ```json example
@@ -44052,7 +45490,8 @@ expression or the shorthand function literal.
 <Signature name="Apply">_function_, _expr-1_, ..._expr-n_</Signature>
 
 [Apply](https://en.wikipedia.org/wiki/Apply) a list of arguments to a function.
-The _function_ is a function literal, or a symbol whose value is a function literal.
+The _function_ is a function literal, a symbol whose value is a function
+literal, or an expression whose value is a function.
 
 The _expr-n_ arguments are the arguments of the function literal.
 
@@ -44064,6 +45503,28 @@ The _expr-n_ arguments are the arguments of the function literal.
 ["Apply", ["Function", ["Multiply", "x", "x"], "x"], 3]
 // ➔ 9
 ```
+
+An expression that is not a function literal is read as a
+[shorthand function literal](#shorthand-function-literals): `["Apply",
+["Add", "x", 1], 2]` is `3`. An expression whose type is `unknown` is not:
+it is kept as a function value, and the application evaluates once the value
+is known. With `g` undefined, `["Apply", ["g", "f"], "x"]` stays as written,
+and the same expression written with a compound head, `[["g", "f"], "x"]`,
+is the same application. Once `g` is a function of two arguments, `g(f)` is
+that function applied to its first argument, and `["Apply", ["g", "f"], "x"]`
+is `g(f, x)`: a function applied to fewer arguments than it declares is a
+function of the remaining ones.
+
+```json example
+["Apply", ["Function", ["Add", "x", "y"], "x", "y"], 1]
+// ➔ ["Function", ["Add", "_1", 1], "_1"]
+
+["Apply", ["Apply", ["Function", ["Add", "x", "y"], "x", "y"], 1], 2]
+// ➔ 3
+```
+
+A function literal applied to more arguments than it declares evaluates to an
+`unexpected-argument` error.
 
 With LaTeX, the `\lhd` and `\rhd` commands can be used to apply a function to a single
 argument on the left or right respectively.
@@ -44448,6 +45909,26 @@ For a scalar, `Shape` returns an empty tuple.
 // ➔ ["Tuple", 2, 4]
 ```
 
+An empty list keeps its axis: its shape is `(0)`, and a list of empty lists
+has the shape `(2, 0)`. A zero axis is never dropped.
+
+```json example
+["Shape", ["List"]]
+// ➔ ["Tuple", 0]
+
+["Shape", ["List", ["List"], ["List"]]]
+// ➔ ["Tuple", 2, 0]
+```
+
+A finite indexed collection such as `Range(1, 3)` gives the shape of the list
+with the same elements. A set, a dictionary, an infinite collection, or a
+symbol with a collection type and no value stays unevaluated.
+
+```json example
+["Shape", ["Range", 1, 3]]
+// ➔ ["Tuple", 3]
+```
+
 **Note:** The shape of a matrix is also sometimes called "dimensions".
 However, this terminology is ambiguous because the word "dimension" is also
 used to refer to the length of a matrix along a specific axis.
@@ -44480,6 +45961,22 @@ The rank is the length of the shape of the tensor.
 
 ["Rank", ["List", ["List", 5, 2, 10], ["List", 1, 2, 3]]]
 // ➔ 2
+```
+
+An empty list has rank 1, and a list of empty lists has rank 2: a zero axis
+counts. A finite indexed collection such as `Range(1, 3)` has the rank of the
+list with the same elements, `1`. A set, a dictionary, an infinite collection,
+or a symbol with a collection type and no value stays unevaluated.
+
+```json example
+["Rank", ["List"]]
+// ➔ 1
+
+["Rank", ["List", ["List"], ["List"]]]
+// ➔ 2
+
+["Rank", ["Range", 1, 3]]
+// ➔ 1
 ```
 
 </FunctionDefinition>
@@ -45030,6 +46527,10 @@ scalar itself.
 // ➔ 5
 ```
 
+The Wolfram Language name `Det` is an alias: its canonical form is
+`Determinant`. Only the one-operand form exists; a second operand is an
+`unexpected-argument` error.
+
 </FunctionDefinition>
 
 
@@ -45543,18 +47044,11 @@ For matrices, the default is the Frobenius norm: sqrt(sum of |aij|^2)
 // ➔ sqrt(30) ≈ 5.477
 ```
 
-- **Frobenius norm** (_p_ = `"Frobenius"`, the default): Square root of the sum of the squared moduli of the entries
+- **Frobenius norm** (_p_ = 2 or `"Frobenius"`): Square root of sum of squared elements
 
 ```json example
 ["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], "Frobenius"]
 // ➔ sqrt(30) ≈ 5.477
-```
-
-- **Spectral norm** (_p_ = 2): The largest singular value, sqrt(λmax(Aᴴ A)). The result is exact for a matrix with one or two rows or columns, or with at most one nonzero entry in each row and column. Any other exact matrix stays unevaluated under `evaluate()` and gives a number under `N()`. On a tensor of rank 3 or more, _p_ = 2 is the Frobenius norm.
-
-```json example
-["Norm", ["List", ["List", 1, 2], ["List", 3, 4]], 2]
-// ➔ sqrt(15 + sqrt(221)) ≈ 5.465
 ```
 
 - **L1 norm** (_p_ = 1): Maximum column sum of absolute values
@@ -45674,7 +47168,15 @@ The matrix must be square. For non-square matrices, an `expected-square-matrix` 
 - **Diagonal/triangular matrices**: Returns the diagonal elements (fast path)
 - **2×2 matrices**: Uses the quadratic formula on the characteristic polynomial
 - **3×3 matrices**: Uses Cardano's formula for the cubic characteristic polynomial
-- **Larger matrices**: Uses the QR algorithm for numerical computation
+- **Larger matrices**: Uses the QR algorithm. For a matrix of exact entries,
+  an eigenvalue close to a rational number that makes $A - \lambda I$ singular
+  is returned exact, and `Eigenvectors` then gives exact vectors. A matrix with
+  a float entry gives float results.
+
+```json example
+["Eigenvalues", ["List", ["List", 5, 4, 2, 1], ["List", 0, 1, -1, -1], ["List", -1, -1, 3, 0], ["List", 1, 1, -1, 2]]]
+// ➔ ["List", 4, 4, 2, 1]
+```
 
 **Symbolic matrices**: For symbolic matrices, the eigenvalue computation may be returned unevaluated if closed-form solutions cannot be determined.
 
@@ -46704,31 +48206,41 @@ ce.parse("42 \\in \\Z").evaluate().print();
 
 ## Constants
 
+The engine writes the number sets with `\mathbb{…}` (`\mathbb{Z}`,
+`\mathbb{R}_{>0}`). The short commands `\Z`, `\R`, `\Q`, `\C` and `\N`, which
+MathLive defines, are read as the same sets.
+
 <div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
 
 | Symbol     | Notation                                 | &nbsp; | Definition |
 | :--------- | :--------------------------------------- | :--------- | :--------- |
 | `EmptySet` | `\varnothing` or `\emptyset`| $$ \varnothing $$ or $$ \emptyset $$ | A set that has no elements           |
 | `Numbers`               | `\mathrm{Numbers}` | $$ \mathrm{Numbers} $$ | Any number — real, imaginary or complex — together with $$+\infty$$, $$-\infty$$, $$\tilde\infty$$ and $$\mathrm{NaN}$$. It corresponds to the type `number` |
-| `ComplexNumbers`        | `\C` | $$ \C $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
+| `ComplexNumbers`        | `\mathbb{C}` | $$ \mathbb{C} $$ | Real or imaginary numbers (does not include the infinities or $$\mathrm{NaN}$$) |
 | `ExtendedComplexNumbers`        | `\overline\C` | $$ \overline\C $$ | Real or imaginary numbers, including $$+\infty$$, $$-\infty$$ and $$\tilde\infty$$ |
 | `ImaginaryNumbers`           | `\imaginaryI\R` | $$ \imaginaryI\R $$ | Complex numbers with a non-zero imaginary part and no real part |
-| `RealNumbers`           | `\R` | $$ \R $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
+| `RealNumbers`           | `\mathbb{R}` | $$ \mathbb{R} $$ | Numbers that form the unique Dedekind-complete ordered field $$ \left( \mathbb{R} ; + ; \cdot ; \lt \right) $$, up to an isomorphism (does not include $\pm\infty$) |
 | `ExtendedRealNumbers`           | `\overline\R` | $$ \overline\R $$ | Real numbers extended to include $\pm\infty$ |
-| `Integers`              | `\Z` | $$ \Z$$  | Whole numbers and their additive inverse $$\lbrace \ldots -3, -2, -1,0, 1, 2, 3\ldots\rbrace$$                                       |
+| `Integers`              | `\mathbb{Z}` | $$ \mathbb{Z}$$  | Whole numbers and their additive inverse $$\lbrace \ldots -3, -2, -1,0, 1, 2, 3\ldots\rbrace$$                                       |
 | `ExtendedIntegers`              | `\overline\Z` | $$ \overline\Z$$  | Integers extended to include $\pm\infty$ |
-| `RationalNumbers`       | `\Q` | $$ \Q $$  | Numbers which can be expressed as the quotient $$ \nicefrac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.                                  |
+| `RationalNumbers`       | `\mathbb{Q}` | $$ \mathbb{Q} $$  | Numbers which can be expressed as the quotient $$ \nicefrac{p}{q}$$ of two integers $$p, q \in \mathbb{Z}$$.                                  |
 | `ExtendedRationalNumbers`              | `\overline\Q` | $$ \overline\Q$$  | Rational numbers extended to include $\pm\infty$ |
-| `NegativeNumbers`       | `\R_{<0}` | $$ \R_{<0} $$       | Real numbers $$ \lt 0 $$ |
-| `NonPositiveNumbers`    | `\R_{\leq0}` | $$ \R_{\leq0} $$    | Real numbers $$ \leq 0 $$ |
-| `NonNegativeNumbers`    | `\R_{\geq0}` | $$ \R_{\geq0} $$    | Real numbers $$ \geq 0 $$ |
-| `PositiveNumbers`       | `\R_{>0}` | $$ \R_{>0} $$     | Real numbers $$ \gt 0$$ |
-| `NegativeIntegers`      | `\Z_{<0}` | $$ \Z_{<0} $$       | Integers $$ \lt 0$$, $$\lbrace \ldots -3, -2, -1\rbrace$$                                                                          |
-| `NonPositiveIntegers`   | `\Z_{\le0}` | $$ \Z_{\le0} $$    | Integers $$ \leq 0 $$, $$\lbrace \ldots -3, -2, -1, 0\rbrace$$                                                                     |
-| `NonNegativeIntegers`   | `\N` | $$ \N $$    | Integers $$ \geq 0 $$, $$\lbrace 0, 1, 2, 3\ldots\rbrace$$                                                                         |
-| `PositiveIntegers`      | `\N^*` | $$ \N^* $$     | Integers $$ \gt 0 $$, $$\lbrace 1, 2, 3\ldots\rbrace$$                                                                             |
+| `NegativeNumbers`       | `\mathbb{R}_{<0}` | $$ \mathbb{R}_{<0} $$       | Real numbers $$ \lt 0 $$ |
+| `NonPositiveNumbers`    | `\mathbb{R}_{\le0}` | $$ \mathbb{R}_{\le0} $$    | Real numbers $$ \leq 0 $$ |
+| `NonNegativeNumbers`    | `\mathbb{R}_{\geq0}` | $$ \mathbb{R}_{\geq0} $$    | Real numbers $$ \geq 0 $$ |
+| `PositiveNumbers`       | `\mathbb{R}_{>0}` | $$ \mathbb{R}_{>0} $$     | Real numbers $$ \gt 0$$ |
+| `NegativeIntegers`      | `\mathbb{Z}_{<0}` | $$ \mathbb{Z}_{<0} $$       | Integers $$ \lt 0$$, $$\lbrace \ldots -3, -2, -1\rbrace$$                                                                          |
+| `NonPositiveIntegers`   | `\mathbb{Z}_{\le0}` | $$ \mathbb{Z}_{\le0} $$    | Integers $$ \leq 0 $$, $$\lbrace \ldots -3, -2, -1, 0\rbrace$$                                                                     |
+| `NonNegativeIntegers`   | `\mathbb{N}` | $$ \mathbb{N} $$    | Integers $$ \geq 0 $$, $$\lbrace 0, 1, 2, 3\ldots\rbrace$$                                                                         |
+| `PositiveIntegers`      | `\mathbb{N}^*` | $$ \mathbb{N}^* $$     | Integers $$ \gt 0 $$, $$\lbrace 1, 2, 3\ldots\rbrace$$                                                                             |
 
 </div>
+
+The terse commands `\N`, `\Z`, `\Q`, `\R` and `\C` are shorthands for
+`\mathbb{N}`, `\mathbb{Z}`, `\mathbb{Q}`, `\mathbb{R}` and `\mathbb{C}`, and
+the Unicode double-struck letters `ℕ`, `ℤ`, `ℚ`, `ℝ` and `ℂ` are read the same
+way. A sign superscript on any of these spellings names the signed set:
+`\mathbb{Z}^+` and `ℤ^-` are `PositiveIntegers` and `NegativeIntegers`.
 
 `Union` and `Intersection` accept any finite collections, including lists. The
 result is a `Set`, so duplicate elements are removed:
@@ -46759,6 +48271,13 @@ New sets can be defined using one of the following operators.
 | `SymmetricDifference` | $$ \operatorname{A} \triangle \operatorname{B} $$ | Disjunctive union = $$ (\operatorname{A} \setminus \operatorname{B}) \cup (\operatorname{B} \setminus \operatorname{A})$$ [Q1147242](https://www.wikidata.org/wiki/Q1147242)                                      |
 
 </div>
+
+The number of elements of a set is its
+[`Count`](/compute-engine/reference/collections/#Count). In LaTeX it is
+written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:
+`ce.parse('|\\{1,2\\}|').evaluate()` is `2`, `|\emptyset|` is `0` and
+`|\mathbb{Z}|` is `PositiveInfinity`. `Count` of a set serializes back as
+$$|\operatorname{A}|$$.
 
 ## Ring Constructions
 
@@ -46821,17 +48340,42 @@ A subscript that marks a **sign restriction** is not a quotient: $$\Z_+$$,
 $$\R_-$$ and $$\Z_{\geq 0}$$ still name `PositiveIntegers`, `NegativeNumbers`
 and `NonNegativeIntegers`, as before.
 
-Both operators are **inert**: they stay symbolic, and there is no membership
-test (`Element`), no enumeration of residues, and no arithmetic in the
-constructed ring. They do carry a type, formed by joining the base ring's
-element type with the types of the adjoined elements:
+`Adjoin` is **inert**: it stays symbolic, and there is no membership test
+(`Element`) and no arithmetic in the constructed ring. It does carry a type,
+formed by joining the base ring's element type with the types of the adjoined
+elements:
 
 ```js
 ce.parse("\\Z[\\sqrt{2}]").type;   // ➔ set<real>
 ce.parse("\\Z[i]").type;           // ➔ set<complex>
 ce.parse("\\Z[x]").type;           // ➔ set<unknown>
-ce.parse("\\Z_n").type;            // ➔ set<integer>
 ```
+
+`QuotientRing(Integers, n)` with a positive integer literal `n` is a finite
+collection of the `n` residue classes `ResidueClass(0, n)` …
+`ResidueClass(n−1, n)` (see
+[`ResidueClass`](/compute-engine/reference/number-theory/#ResidueClass) for
+the arithmetic of the classes). Its type is `set<value>`. An integer is not an
+element of the ring: the elements are the classes.
+
+```js
+ce.parse("\\operatorname{Count}(\\mathbb{Z}/5\\mathbb{Z})").evaluate();
+// ➔ 5
+
+ce.box(["Element", ["ResidueClass", 7, 5], ["QuotientRing", "Integers", 5]]).evaluate();
+// ➔ True
+
+ce.box(["Element", 7, ["QuotientRing", "Integers", 5]]).evaluate();
+// ➔ False
+
+ce.box(["ListFrom", ["QuotientRing", "Integers", 3]]).evaluate();
+// ➔ ["List", ["ResidueClass", 0, 3], ["ResidueClass", 1, 3], ["ResidueClass", 2, 3]]
+
+ce.parse("\\Z_n").type;            // ➔ set<value>
+```
+
+With a symbolic, zero or negative modulus, or a base other than `Integers`,
+the quotient ring stays symbolic, with no count and no membership test.
 
 ## Relations
 
@@ -47072,6 +48616,26 @@ It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 // -> 120
 ```
 
+For a non-integer `n`, $$ n! $$ is $$ \Gamma(n+1) $$. An exact non-integer
+argument stays symbolic under `evaluate()`, and `.N()` or a float argument
+gives the value to `ce.precision` digits:
+
+```json example
+["Factorial", ["Rational", 5, 2]]
+// -> (5/2)!
+
+["Factorial", 2.5]
+// -> 3.32335097044784255118
+```
+
+Above machine precision, a factorial too large for an exact integer is a big
+decimal under `.N()`:
+
+```json example
+["N", ["Factorial", ["Power", 10, 6]]]
+// -> 8.26393168833124006238e+5565708
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Factorial2">
@@ -47160,8 +48724,80 @@ and fractional orders. The two-argument form is evaluated numerically with
 
 <Latex value="\ln(\Gamma(z))"/>
 
-This function is called `gammaln` in MatLab and SciPy and `LogGamma` in
-Mathematica.
+`GammaLn(z)` is the principal logarithm of $$ \Gamma(z) $$, as `gammaln` in
+MATLAB and SciPy. It is not the `LogGamma` of Mathematica: that function is
+the analytic continuation of $$ \ln\Gamma $$, which the Compute Engine
+provides as `LogGamma`. The two agree for a positive real argument and differ
+by a multiple of $$ 2\pi i $$ elsewhere:
+
+```json example
+["N", ["GammaLn", -1.5]]
+// -> 0.860047015376481014511
+
+["N", ["LogGamma", -1.5]]
+// -> 0.8600470153764792 - 6.283185307179586i
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="LogGamma">
+
+<Signature name="LogGamma">_z_</Signature>
+
+The analytic continuation of $$ \ln\Gamma(z) $$, with its branch cut on
+$$ (-\infty, 0] $$. This is the `LogGamma` of Mathematica and the `loggamma`
+of mpmath. It is exact where $$ \Gamma $$ is exact, and the poles at the
+non-positive integers are $$ +\infty $$. A real argument is computed to
+`ce.precision` digits. A complex argument is computed in double precision.
+
+```json example
+["LogGamma", 5]
+// -> 3ln(2) + ln(3)
+
+["LogGamma", ["Rational", 1, 2]]
+// -> 1/2 * ln(pi)
+
+["N", ["LogGamma", ["Complex", -2.5, 1.5]]]
+// -> -3.7175134511917927 - 7.713065525834192i
+```
+
+`PolyGamma(-1, z)` is `LogGamma(z)`.
+
+</FunctionDefinition>
+
+<FunctionDefinition name="BarnesG">
+
+<Signature name="BarnesG">_z_</Signature>
+
+The Barnes G-function, with $$ G(z+1) = \Gamma(z)\,G(z) $$ and
+$$ G(1) = 1 $$. At a positive integer `n`, `BarnesG(n)` is the superfactorial
+$$ \prod_{k=0}^{n-2} k! $$, an exact integer. A real argument is computed to
+`ce.precision` digits. A complex argument is computed in double precision.
+
+```json example
+["BarnesG", 5]
+// -> 12
+
+["BarnesG", 10]
+// -> 5056584744960000
+
+["N", ["BarnesG", ["Rational", 1, 2]]]
+// -> 0.603244281209446206191
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="LogBarnesG">
+
+<Signature name="LogBarnesG">_z_</Signature>
+
+The logarithm of the Barnes G-function, continued with `LogGamma` as in
+Mathematica. `LogBarnesG(0)` is $$ -\infty $$.
+
+```json example
+["N", ["LogBarnesG", -2.5]]
+// -> -2.574748476853131 + 18.84955592153876i
+```
 
 </FunctionDefinition>
 
@@ -47186,8 +48822,196 @@ and extended to other values by analytic continuation.
 // ➔ π²/6
 ```
 
+<Signature name="Zeta">_s_, _a_</Signature>
+
+The two-argument form is the generalized zeta function, as Mathematica
+defines it:
+
+$$
+\zeta(s, a) = \sum_{n=0}^{\infty} \frac{1}{|n + a|^s}
+$$
+
+with the term where $n + a = 0$ omitted. For $a > 0$ it is equal to the
+Hurwitz zeta function `HurwitzZeta(s, a)`, which sums $(n + a)^{-s}$ with the
+principal power. For $a \le 0$ the two differ: `Zeta(2.976, -2.664)` is the
+real `29.9024`, while `HurwitzZeta(2.976, -2.664)` is `22.6003 - 0.2754i`.
+
 - Wikidata: [Q187235](https://www.wikidata.org/wiki/Q187235)
 - NIST: http://dlmf.nist.gov/25.2
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletEta">
+
+<Signature name="DirichletEta">_s_</Signature>
+
+<Latex value="\eta(s)"/>
+
+The Dirichlet eta function, the alternating form of $$ \zeta $$:
+
+$$
+\eta(s) = \sum_{n=1}^{\infty} \frac{(-1)^{n-1}}{n^s} = (1 - 2^{1-s})\,\zeta(s)
+$$
+
+It is entire. The values at the integers are exact. A real `s` is computed to
+`ce.precision` digits, also next to $$ s = 1 $$. A complex `s` is computed in
+double precision.
+
+```json example
+["DirichletEta", 2]
+// -> π²/12
+
+["DirichletEta", 1]
+// -> ln(2)
+
+["N", ["DirichletEta", ["Rational", 1, 2]]]
+// -> 0.604898643421630370247
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletBeta">
+
+<Signature name="DirichletBeta">_s_</Signature>
+
+<Latex value="\beta(s)"/>
+
+The Dirichlet beta function:
+
+$$
+\beta(s) = \sum_{n=0}^{\infty} \frac{(-1)^n}{(2n+1)^s}
+$$
+
+It is entire. The values at the integers are exact. A real `s` is computed to
+`ce.precision` digits. A complex `s` is computed in double precision.
+
+```json example
+["DirichletBeta", 1]
+// -> π/4
+
+["DirichletBeta", 2]
+// -> CatalanConstant
+
+["DirichletBeta", 5]
+// -> 5π⁵/1536
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="StieltjesGamma">
+
+<Signature name="StieltjesGamma">_n_</Signature>
+<Signature name="StieltjesGamma">_n_, _a_</Signature>
+
+<Latex value="\gamma_n(a)"/>
+
+The generalized Stieltjes constant $$ \gamma_n(a) $$, the coefficient of the
+Laurent series of the Hurwitz zeta function at its pole:
+
+$$
+\zeta(s, a) = \frac{1}{s - 1} + \sum_{n=0}^{\infty} \frac{(-1)^n}{n!}\,\gamma_n(a)\,(s - 1)^n
+$$
+
+`StieltjesGamma(n)` is $$ \gamma_n(1) $$, the Stieltjes constant of the
+Riemann zeta function. `StieltjesGamma(0)` is `EulerGamma`, and
+`StieltjesGamma(0, a)` is `-PolyGamma(0, a)`. A non-positive integer `a` is a
+pole. A real `a > 0` is computed to `ce.precision` digits. A complex `a` or a
+negative non-integer `a` is computed in double precision. An order above 30
+stays unevaluated.
+
+```json example
+["StieltjesGamma", 0]
+// -> EulerGamma
+
+["N", ["StieltjesGamma", 1]]
+// -> -0.0728158454836767248606
+
+["StieltjesGamma", 0, "a"]
+// -> -PolyGamma(0, a)
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="ClausenCl">
+
+<Signature name="ClausenCl">_n_, _θ_</Signature>
+
+<Latex value="\operatorname{Cl}_n(\theta)"/>
+
+The Clausen function of integer order $$ n \ge 1 $$ and real $$ \theta $$:
+
+$$
+\operatorname{Cl}_n(\theta) = \sum_{k=1}^{\infty} \frac{\sin(k\theta)}{k^n}
+\text{ for even } n, \qquad
+\operatorname{Cl}_n(\theta) = \sum_{k=1}^{\infty} \frac{\cos(k\theta)}{k^n}
+\text{ for odd } n
+$$
+
+These are the `clsin` and `clcos` functions of mpmath. The values at the
+special points are exact. A real $$ \theta $$ is computed to `ce.precision`
+digits for an order up to 40. A non-integer or non-positive order, and a
+symbolic $$ \theta $$, stay unevaluated.
+
+```json example
+["ClausenCl", 2, ["Divide", "Pi", 2]]
+// -> CatalanConstant
+
+["ClausenCl", 3, 0]
+// -> Zeta(3)
+
+["N", ["ClausenCl", 2, 1]]
+// -> 1.01395913236076850429
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletCharacter">
+
+<Signature name="DirichletCharacter">_k_, _j_, _n_</Signature>
+
+The Dirichlet character $$ \chi_{k,j}(n) $$ modulo `k`, in the indexing of
+the Wolfram Language: `j = 1` is the principal character, and `j` runs up to
+$$ \varphi(k) $$. The value is `0` when $$ \gcd(n, k) > 1 $$. The function
+threads over a list.
+
+```json example
+["DirichletCharacter", 5, 2, 2]
+// -> i
+
+["DirichletCharacter", 7, 3, 3]
+// -> e^(2/3i * pi)
+
+["DirichletCharacter", 5, 2, 5]
+// -> 0
+```
+
+</FunctionDefinition>
+
+<FunctionDefinition name="DirichletL">
+
+<Signature name="DirichletL">_k_, _j_, _s_</Signature>
+
+The Dirichlet L-function $$ L(s, \chi_{k,j}) $$ of the character
+`DirichletCharacter(k, j, ·)`. The value at a non-positive integer `s` is
+exact. For a real character, the value at $$ s = 1 $$ is exact (from the class
+number formula). The principal character has a pole at $$ s = 1 $$. A real `s`
+of a real character is computed to `ce.precision` digits. A character with
+complex values is computed in double precision. A modulus above 1000 stays
+unevaluated.
+
+```json example
+["DirichletL", 4, 2, 1]
+// -> π/4
+
+["DirichletL", 3, 2, 1]
+// -> sqrt(3)/9 * pi
+
+["DirichletL", 5, 1, 1]
+// -> ~oo
+
+["N", ["DirichletL", 3, 2, 1.5]]
+// -> 0.703968244868733261668
+```
 
 </FunctionDefinition>
 
@@ -47414,6 +49238,24 @@ $$
 
 They arise in problems with cylindrical or spherical symmetry.
 
+`BesselJ`, `BesselY`, `BesselI` and `BesselK` of an integer order evaluate
+numerically at a real or a complex argument under `.N()`, and under
+`evaluate()` when the argument is a float. On the negative real axis, their
+branch cut, `BesselY` and `BesselK` take the limit from above, as `Ln(-2)`
+does. A non-integer order stays symbolic. Compiled code computes these
+functions for a real argument only.
+
+```json example
+["N", ["BesselJ", 3, ["Complex", 0, 0.7]]]
+// ➔ -0.007367373607628006i
+
+["N", ["BesselY", 0, -2]]
+// ➔ 0.5103756726497453 + 0.44778155828247124i
+
+["N", ["BesselJ", ["Rational", 1, 2], 1]]
+// ➔ ["BesselJ", 0.5, 1]  (non-integer order: stays symbolic)
+```
+
 
 <FunctionDefinition name="BesselJ">
 
@@ -47524,6 +49366,12 @@ $$
 $$
 
 They arise in physics, particularly in quantum mechanics and optics.
+
+`AiryAi`, `AiryBi`, `AiryAiPrime` and `AiryBiPrime` evaluate numerically at a
+real or a complex argument under `.N()`, and under `evaluate()` when the
+argument is a float: `["N", ["AiryAi", ["Complex", 1, 1]]]` is
+`0.060458308371838146 - 0.15188956587718141i`. Compiled code computes them
+for a real argument only.
 
 
 <FunctionDefinition name="AiryAi">
@@ -48827,6 +50675,17 @@ See also: [Euler's totient function - Wikipedia](https://en.wikipedia.org/wiki/E
 // ➔ 6
 ```
 
+`Totient(0)` is `0`, and `Totient(-n)` is `Totient(n)`. The Wolfram Language
+name `EulerPhi` is an alias: its canonical form is `Totient`.
+
+```json
+["Totient", -12]
+// ➔ 4
+
+["EulerPhi", 12]
+// ➔ 4
+```
+
 </FunctionDefinition>
 
 
@@ -49220,6 +51079,55 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 ["PowerMod", 2, 10, 1000]
 // ➔ 24
 ```
+
+<Signature name="PowerMod" returns="integer">a: integer, e: rational, m: integer</Signature>
+With a rational exponent $e = s/r$, returns the least $x$ in $[0, m)$ such
+that $x^r ≡ a^s \pmod m$, as in the Wolfram Language. When there is no such
+$x$, the expression stays unevaluated.
+
+```json
+["PowerMod", 4, ["Rational", 1, 2], 7]
+// ➔ 2
+```
+
+The function works on big integers. It stays unevaluated, rather than answer
+wrongly, when the modulus cannot be factored or a discrete logarithm is out of
+reach.
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PowerModList
+</nav>
+
+<FunctionDefinition name="PowerModList">
+<Signature name="PowerModList" returns="list<integer>">a: integer, e: rational, m: integer</Signature>
+Lists, in increasing order, every $x$ in $[0, m)$ such that $x^r ≡ a^s \pmod m$,
+for $e = s/r$. Returns `[]` when there is no such $x$. Stays unevaluated when
+the modulus cannot be factored or the list would have more than 100000
+entries.
+
+```json
+["PowerModList", 3, ["Rational", 1, 2], 11]
+// ➔ [5, 6]
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### RationalReconstruction
+</nav>
+
+<FunctionDefinition name="RationalReconstruction">
+<Signature name="RationalReconstruction" returns="rational">a: integer, m: integer</Signature>
+Recovers the fraction $p/q$ such that $p ≡ a q \pmod m$ and
+$|p|, q ≤ \lfloor\sqrt{(m-1)/2}\rfloor$ (Wang's algorithm). Works on big
+integers.
+
+```json
+["RationalReconstruction", 6, 11]
+// ➔ 1/2
+```
 </FunctionDefinition>
 
 
@@ -49276,6 +51184,70 @@ See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/
 ["ChineseRemainder", [2, 3, 2], [3, 5, 7]]
 // ➔ 23
 ```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### ResidueClass
+</nav>
+
+<FunctionDefinition name="ResidueClass">
+<Signature name="ResidueClass" returns="value">k: integer, n: integer</Signature>
+The residue class $\overline{k}$ of $k$ modulo $n$: an element of the ring
+$\mathbb{Z}/n\mathbb{Z}$. The modulus $n$ must be an exact integer $≥ 1$.
+
+In LaTeX, a class is written `\overline{k}_{n}` with integer literals $k$ and
+$n$, and it serializes back the same way. A bare `\overline{7}` is
+`Conjugate(7)`, and `\overline{z}_1` is the conjugate of $z_1$.
+
+The canonical form reduces $k$ to $[0, n)$. A rational $k$ whose denominator
+is coprime to $n$ is read as $u·v^{-1}$ in the ring. A float or a symbolic $k$
+or $n$ stays symbolic.
+
+```json
+["ResidueClass", 7, 5]
+// ➔ ["ResidueClass", 2, 5]
+
+["ResidueClass", -1, 7]
+// ➔ ["ResidueClass", 6, 7]
+
+["ResidueClass", ["Rational", 1, 3], 7]
+// ➔ ["ResidueClass", 5, 7]
+```
+
+Two classes with the same modulus and the same reduced $k$ are equal:
+`["Equal", ["ResidueClass", 7, 5], ["ResidueClass", 2, 5]]` is `True`.
+Classes are not ordered.
+
+Sums, differences, products and integer powers of classes with one modulus
+are classes. An exact integer, or a rational whose denominator is coprime to
+the modulus, is read in the ring. An inverse, a quotient or a negative power
+needs $\gcd(k, n) = 1$; otherwise the expression stays symbolic.
+
+```json
+["Add", ["ResidueClass", 5, 7], ["ResidueClass", 4, 7]]
+// ➔ ["ResidueClass", 2, 7]
+
+["Add", ["ResidueClass", 5, 7], 3]
+// ➔ ["ResidueClass", 1, 7]
+
+["Divide", 1, ["ResidueClass", 3, 7]]
+// ➔ ["ResidueClass", 5, 7]
+
+["Divide", 1, ["ResidueClass", 2, 4]]
+// ➔ ["Divide", 1, ["ResidueClass", 2, 4]]  (2 has no inverse modulo 4)
+```
+
+Classes of two different moduli, a float and an infinity are never combined
+with a class: the expression stays symbolic. The rules of the numbers do not
+apply to a class: `c/c` is not cancelled to `1` when the class `c` has no
+inverse. `Solve`, `D` and `Integrate` stay symbolic for an expression that
+holds a class.
+
+The ring itself, `QuotientRing(Integers, n)` (written $\mathbb{Z}/n\mathbb{Z}$
+or $\mathbb{Z}_n$), is the finite collection of its $n$ classes; see
+[Quotient rings](/compute-engine/reference/sets/). `Mod(a, n)` is the integer
+remainder, not a class: `["Mod", 7, 3]` is `1`.
 </FunctionDefinition>
 
 
@@ -49535,6 +51507,19 @@ See also: [Multiplicative order - Wikipedia](https://en.wikipedia.org/wiki/Multi
 ["MultiplicativeOrder", 2, 7]
 // ➔ 3
 ```
+
+The sign of $n$ is ignored, because the unit group modulo $-n$ is the unit
+group modulo $n$: `["MultiplicativeOrder", 3, -7]` is `6`. `n = 0` stays
+unevaluated.
+
+<Signature name="MultiplicativeOrder" returns="integer">a: integer, n: integer, residues: list</Signature>
+Returns the least $k ≥ 1$ such that $a^k ≡ r \pmod n$ for some $r$ in
+`residues`. Stays unevaluated when no element of the list is a power of $a$.
+
+```json
+["MultiplicativeOrder", 5, 7, ["List", 3, 11]]
+// ➔ 2
+```
 </FunctionDefinition>
 
 
@@ -49544,13 +51529,40 @@ See also: [Multiplicative order - Wikipedia](https://en.wikipedia.org/wiki/Multi
 
 <FunctionDefinition name="PrimitiveRoot">
 <Signature name="PrimitiveRoot" returns="integer">n: integer</Signature>
-Returns the smallest primitive root modulo $n$ (a generator of the multiplicative group of integers mod $n$), or undefined if none exists — which happens unless $n$ is 1, 2, 4, $p^k$, or $2p^k$ for an odd prime $p$.
+Returns the smallest primitive root modulo $n$ (a generator of the multiplicative group of integers mod $n$), or undefined if none exists — which happens unless $|n|$ is 1, 2, 4, $p^k$, or $2p^k$ for an odd prime $p$.
+
+The sign of $n$ is ignored, because the unit group modulo $-n$ is the unit
+group modulo $n$. `PrimitiveRoot(1)` is `0`. `PrimitiveRoot(0)` stays
+unevaluated.
 
 See also: [Primitive root modulo n - Wikipedia](https://en.wikipedia.org/wiki/Primitive_root_modulo_n)
 
 ```json
 ["PrimitiveRoot", 7]
 // ➔ 3
+
+["PrimitiveRoot", -7]
+// ➔ 3
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PrimitiveRootList
+</nav>
+
+<FunctionDefinition name="PrimitiveRootList">
+<Signature name="PrimitiveRootList" returns="list<integer>">n: integer</Signature>
+Lists every primitive root modulo $n$, in increasing order. Returns `[]` when
+$n$ has none, and `[0]` for $n = 1$. The sign of $n$ is ignored.
+`PrimitiveRootList(0)` is `[]`.
+
+```json
+["PrimitiveRootList", 25]
+// ➔ [2, 3, 8, 12, 13, 17, 22, 23]
+
+["PrimitiveRootList", 8]
+// ➔ []
 ```
 </FunctionDefinition>
 
@@ -49570,6 +51582,15 @@ See also: [Eulerian number - Wikipedia](https://en.wikipedia.org/wiki/Eulerian_n
 ```json
 ["Eulerian", 4, 2]
 // ➔ 11
+```
+
+Outside the triangle, the value is `0`: `Eulerian(n, m)` is `0` for
+$m ≥ n > 0$. `Eulerian(0, 0)` is `1`. A negative or symbolic operand leaves
+the expression unevaluated.
+
+```json
+["Eulerian", 3, 5]
+// ➔ 0
 ```
 
 </FunctionDefinition>
@@ -49592,6 +51613,18 @@ See also: [Stirling number of the second kind - Wikipedia](https://en.wikipedia.
 // ➔ 15
 ```
 
+Outside the triangle ($m > n$), the value is `0`, as for `Binomial`:
+`["Stirling", 3, 5]` is `0`, and so is `["StirlingS1", 3, 5]`. A negative or
+symbolic operand leaves the expression unevaluated.
+
+The Wolfram Language name `StirlingS2` is an alias: its canonical form is
+`Stirling`.
+
+```json
+["StirlingS2", 6, 3]
+// ➔ 90
+```
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -49609,6 +51642,14 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 ```json
 ["NPartition", 5]
 // ➔ 7
+```
+
+`NPartition(n)` is `0` for a negative $n$. The Wolfram Language name
+`PartitionsP` is an alias: its canonical form is `NPartition`.
+
+```json
+["NPartition", -3]
+// ➔ 0
 ```
 </FunctionDefinition>
 
@@ -49895,6 +51936,19 @@ stay disjoint regardless. Ordering is by the code-point sequence of the
 cluster; it is deliberately **not** locale-aware, and never will be — engine
 identity, membership and hashing must be deterministic on every host.
 
+**A string operator accepts a character.** Wherever a string operator takes a
+`string` — `ToUpperCase`, `ToLowerCase`, `CaseFold`, `StringRepeat`,
+`PadStart`, `PadEnd`, `Trim`, `TrimStart`, `TrimEnd`, `StringReplace`,
+`StringSplit`, `StringCompare`, `Characters`, `GraphemeClusters`,
+`UnicodeScalars`, `Utf8`, `Utf16`, `CharacterFrom`, `NumberFrom`,
+`DigitsFrom`, the separator of `StringJoin`, the subject of `IsMatch`,
+`StringMatch` and `StringMatchAll`, and the key of a dictionary lookup — it
+also accepts a `character`. The result is that of the one-character string:
+`["ToUpperCase", ["At", "'abc'", 1]]` is `"A"` and
+`["StringRepeat", ["CharacterFrom", "'a'"], 3]` is `"aaa"`. The types stay
+distinct. A symbol with no declared type that is used at such a parameter is
+inferred `character | string`.
+
 **Serialization.** MathJSON has string literals but no character literal, so
 a character's wire form is the call form `["CharacterFrom", "'x'"]`, which
 canonicalizes back to the identical character:
@@ -49986,7 +52040,9 @@ what the operator does, not from a list of exceptions:
 - Operators whose result is not a collection of the source's kind — `Length`,
   `IsEmpty`, `Contains`, `Count`, `Any`, `All`, `IndexOf`, `At`, `First`,
   `Last`, `Position`, `Find`, `Reduce`, `Fold` — behave on a string exactly
-  as they do on any other indexed collection.
+  as they do on any other indexed collection. In LaTeX, `|s|` of a string is
+  its `Count`: `ce.parse('|\\text{abc}|').evaluate()` is `3`, and
+  `Count` of a string serializes back as `|s|`.
 
 - Set operators read a string operand as *its characters*:
   `["Union", ["Set", 1], {str: "ab"}]` is `Set(1, "a", "b")`. `SetMinus` is
@@ -52430,7 +54486,9 @@ The **step budget** decides when the rule driver gives up on an integrand.
 Because it counts steps and not time, the same integral gives the same answer
 on a fast machine, a slow one and a loaded one: an integral that needs more
 steps stays unevaluated everywhere, and the built-in antiderivative is used
-instead.
+instead. The built-in antiderivative has its own fixed budget of 100,000
+steps, which does not depend on `stepBudget`; when it is spent too, the
+result is the unevaluated `Integrate` expression.
 
 The **wall-clock limit** is only a guard against a hang in code that does not
 count steps. The default (120 s) is about 8 times what the step budget allows
@@ -52603,6 +54661,47 @@ ce.parse('F_k').evaluate();
 // ➔ F_k (unevaluated)
 ```
 
+A term is returned also when it is not a single number: an exact expression,
+or a term with a free symbol. `.N()` gives a float.
+
+```javascript
+ce.declareSequence('B', {
+  base: { 0: 1 },
+  recurrence: '\\pi B_{n-1} / n',
+});
+ce.parse('B_{10}').evaluate();
+// ➔ 1/3628800 · π^10
+ce.parse('B_{10}').N();
+// ➔ 0.0258068913900140600126
+
+ce.declareSequence('a', {
+  base: { 0: 1 },
+  recurrence: 'a_{n-1} + \\sqrt{2}',
+});
+ce.parse('a_{10}').evaluate();
+// ➔ 1 + 10√2
+
+ce.declareSequence('c', {
+  base: { 0: 1 },
+  recurrence: 'x c_{n-1} + 1',
+});
+ce.parse('c_{3}').evaluate();
+// ➔ x(x(x + 1) + 1) + 1
+```
+
+A term with more than 250 nodes, or whose type is not a number, stays
+unevaluated. A memoized term is computed again when a symbol that the
+recurrence or a base case reads changes: after `ce.assign('x', 2)`, `c_3` is
+`15`, and after `ce.assign('x', 3)` it is `40`.
+
+A large index is computed without a deep recursion: the lower terms are
+computed on demand, so `F_{2000}` of the Fibonacci recurrence gives its 418
+digits on a new engine. A read that needs more than 100,000 new terms is
+declined and the subscript stays unevaluated. The terms that earlier reads
+computed are kept, so a read of a lower index first makes a later read of a
+higher index possible. An index that is not a safe integer (`F_{10^{20}}`)
+stays unevaluated.
+
 ### Sum and Product
 
 Sequences work with `Sum` and `Product`:
@@ -52632,6 +54731,20 @@ ce.getSequenceTerms('F', 0, 10);
 // With step parameter (every other term)
 ce.getSequenceTerms('F', 0, 10, 2);
 // ➔ [0, 1, 3, 8, 21, 55]
+```
+
+`getSequenceTerms()` returns the exact terms, also when they are not single
+numbers. It returns `undefined` when a term in the range has no value, or when
+a term is not a number.
+
+```javascript
+ce.declareSequence('a', {
+  base: { 0: 1 },
+  recurrence: 'a_{n-1} + \\sqrt{2}',
+});
+
+ce.getSequenceTerms('a', 0, 3);
+// ➔ [1, 1 + √2, 1 + 2√2, 1 + 3√2]
 ```
 
 ## Custom Evaluation with subscriptEvaluate
@@ -52764,6 +54877,11 @@ ce.clearSequenceCache('F');
 // Clear all sequence caches
 ce.clearSequenceCache();
 ```
+
+`getSequenceCache()` returns the exact terms only, with the index as the key.
+The terms that `.N()` computes are kept apart, one set for each precision, and
+`clearSequenceCache()` clears them too. On a new engine, `F_6.N()` leaves the
+exact cache empty, and `F_6.evaluate()` fills it with the terms `F_2` … `F_6`.
 
 ## Interpreting Elliptical Notation
 
