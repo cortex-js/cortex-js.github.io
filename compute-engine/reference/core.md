@@ -510,7 +510,7 @@ evaluate to `False`.
 To compare two expressions for mathematical equality, use `Equal`.
 
 To compare two expressions structurally, but ignoring the order of the arguments
-of commutative functions, use [`CanonicalForm`](#CanonicalForm).
+of commutative functions, use [`CanonicalForm`](#canonicalform).
 
 
 See [Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions) for other options to compare two expressions, such 
@@ -589,7 +589,7 @@ a list of booleans.
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
 `True` — matching the Epsil spelling `a === b === c`.
 
-**`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
+**`Same` vs `IsSame`.** [`IsSame`](#issame) compares its operands exactly as
 written, while `Same` compares their canonical forms. So
 `["IsSame", ["Add", 1, 1], 2]` is `False`, but `["Same", ["Add", 1, 1], 2]` is
 `True`, since canonicalization folds `1 + 1` to `2`.
@@ -636,7 +636,7 @@ merely *disagree* at the sampled points are undetermined, not `False`:
 
 The LaTeX notation is `\equiv` (or the `≡` character). A `\equiv` followed by
 `\pmod{n}` is a congruence and parses as
-[`Congruent`](/compute-engine/reference/arithmetic/#Congruent) instead.
+[`Congruent`](/compute-engine/reference/arithmetic/#congruent) instead.
 
 </FunctionDefinition>
 
@@ -858,7 +858,9 @@ Assumptions on the unknown (such as `assume(n > 0)`) filter the solutions the
 same way, conjunctively with any explicit domain.
 
 `Solve` is the operator form of the `expr.solve()` method, and uses the same
-solver for the two-argument symbolic case.
+solver for the two-argument symbolic case. For a periodic equation, the two
+differ: `Solve` gives the families of solutions, and `expr.solve()` gives the
+principal solutions.
 
 The result is a `List` that holds all the solutions in the domain. An empty
 `List` means that the engine has shown that there is no solution. When the
@@ -898,11 +900,20 @@ correct only for a real parameter is not given, and `Solve` stays
 unevaluated.
 
 A trigonometric equation has infinitely many solutions. With no domain, or
-over the real or the complex numbers, the result holds its principal
-solutions, one for each family of solutions: `Solve(sin(x) = 1/2, x)` is
-`[π/6, 5π/6]`, and each solution of the equation is one of them plus a
-multiple of `2π`. Over a bounded domain, such as an `Interval` or a `Range`,
-the result holds every solution in the domain.
+over the real or the complex numbers, the result is a list of families of
+solutions with the fresh integer parameter `t` (the names of the integer
+solver: `t`, `t_1`, …): `Solve(sin(x) = 1/2, x)` is
+`[π/6 + 2πt, 5π/6 + 2πt]`, and each solution is a member of one family.
+Families with the same solutions become one family (`Solve(sin(x) = 0, x)` is
+`[πt]`), and the solution of each family is in `(−T/2, T/2]`, where `T` is its
+spacing. Each factor of a product gives its families with the period of that
+factor: `Solve(sin(2x)·cos(3x) = 0, x)` is `[πt/2, π/6 + πt/3]`. A polynomial
+factor gives its solutions as they are: `Solve((x − 1)·sin(x) = 0, x)` is
+`[1, πt]`. A condition on the unknown (`sin(x) = 0 ∧ x > 0`, an assumption, or
+a type narrower than `real`) cannot remove members of a family, and `Solve`
+then stays unevaluated. Over a bounded domain, such as an `Interval` or a
+`Range`, the result holds every solution in the domain. `expr.solve()` returns
+the principal solutions: one for each family, in one period.
 
 A root template that you add to `ce.solveRules` is your claim of a solution:
 its solutions are returned as they are, also for a function that the solver
@@ -1241,9 +1252,9 @@ collection.
 ```
 
 To inspect an error rather than merely detect it, use
-[`Type`](#Type) (which returns `"error"`), or destructure it with an
+[`Type`](#type) (which returns `"error"`), or destructure it with an
 `["Error", ...]` case in a
-[`Match`](/compute-engine/reference/control-structures/#Match) expression.
+[`Match`](/compute-engine/reference/control-structures/#match) expression.
 
 </FunctionDefinition>
 
@@ -1342,7 +1353,7 @@ character conforms where a `string` is declared, because the two are the same
 value.
 
 The main use of `Typed` is to annotate the parameters and return type of a
-[function literal](/compute-engine/reference/functions/#Function).
+[function literal](/compute-engine/reference/functions/#function).
 
 </FunctionDefinition>
 

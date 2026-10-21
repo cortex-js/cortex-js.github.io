@@ -9,6 +9,7 @@
 <script>!function(){var e,t;window.moduleMap||(window.moduleMap={}),window.moduleMap={...window.moduleMap,mathlive:"https://esm.run/mathlive","compute-engine":"https://esm.run/@cortex-js/compute-engine","@cortex-js/compute-engine":"https://esm.run/@cortex-js/compute-engine"},(e=["https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js","https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/xml/xml.min.js","https://unpkg.com/@cortex-js/compute-engine","https://cdn.jsdelivr.net/npm/mathlive","https://cdn.jsdelivr.net/npm/@ui-js/code-playground@1.13.2/dist/code-playground.min.js@module"]).forEach((o,n)=>{const m=o.endsWith("@module"),c="script"+function(e,t=0){let o=3735928559^t,n=1103547991^t;for(let t=0;t<e.length;t++){const m=e.charCodeAt(t);o=Math.imul(o^m,2654435761),n=Math.imul(n^m,1597334677)}return o=Math.imul(o^o>>>16,2246822507),o^=Math.imul(n^n>>>13,3266489909),n=Math.imul(n^n>>>16,2246822507),n^=Math.imul(o^o>>>13,3266489909),4294967296*(2097151&n)+(o>>>0)}(o=o.replace("@module","")).toString(36);if(document.getElementById(c))return;const d=document.createElement("script");m&&(d.type="module"),d.id=c,d.src=o,d.async=!1,t&&n===e.length-1&&(d.onload=t),document.head.appendChild(d)})}()</script>
 
 
+
 <link rel="preconnect" href="https://rsms.me/">
 <link rel="stylesheet" href="https://rsms.me/inter/inter.css" media="print" onload="this.media=&#39;all&#39;">
 <link rel="preload" as="font" type="font/woff2" href="/fonts/berkeley-mono/BerkeleyMono-Regular.woff2" crossorigin="anonymous">
@@ -19,9 +20,9 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.f0919c7c.css">
-<script src="/assets/js/runtime~main.b9ba03a9.js" defer="defer"></script>
-<script src="/assets/js/main.700d6ab1.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.5e2c4708.css">
+<script src="/assets/js/runtime~main.972b1414.js" defer="defer"></script>
+<script src="/assets/js/main.c39903c0.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -37,6 +38,9 @@ transformation passes — an expansion fixpoint, a classifier tuned on parse
 shape, an incremental editor — and need to know exactly what survives each
 pass and what the engine may change underneath them.</p>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="the-three-tiers">The Three Tiers<a href="#the-three-tiers" class="hash-link" aria-label="Direct link to The Three Tiers" title="Direct link to The Three Tiers" translate="no">​</a></h2>
+<!-- -->
+<p>Nothing leads back from <code>canonical</code> to a parse shape: a tree that must stay
+in parse vocabulary has to be raw or structural from the parse onward.</p>
 <div class="symbols-table first-column-header" style="--first-col-width:22ch"><table><thead><tr><th style="text-align:left"></th><th style="text-align:center">raw <br><code>{ form: &#x27;raw&#x27; }</code></th><th style="text-align:center"><strong>structural</strong> <br><code>{ form: &#x27;structural&#x27; }</code></th><th style="text-align:center">canonical <br>(default)</th></tr></thead><tbody><tr><td style="text-align:left">Parse vocabulary preserved</td><td style="text-align:center">yes</td><td style="text-align:center"><strong>yes</strong></td><td style="text-align:center">no (rewritten)</td></tr><tr><td style="text-align:left">Operator definitions resolved (bound)</td><td style="text-align:center">no</td><td style="text-align:center"><strong>yes</strong></td><td style="text-align:center">yes</td></tr><tr><td style="text-align:left"><code>expr.type</code> answers</td><td style="text-align:center"><code>unknown</code></td><td style="text-align:center"><strong>yes</strong></td><td style="text-align:center">yes</td></tr><tr><td style="text-align:left">Usable in <code>.add()</code>, <code>.mul()</code>, …</td><td style="text-align:center">no</td><td style="text-align:center"><strong>yes</strong></td><td style="text-align:center">yes</td></tr><tr><td style="text-align:left"><code>.subs()</code> / <code>.map()</code> shape-preserving</td><td style="text-align:center">yes</td><td style="text-align:center"><strong>yes</strong></td><td style="text-align:center">no (result re-canonicalizes)</td></tr><tr><td style="text-align:left">Arity and type errors checked</td><td style="text-align:center">no</td><td style="text-align:center"><strong>no</strong></td><td style="text-align:center">yes</td></tr><tr><td style="text-align:left">Scope processing, binder shadowing</td><td style="text-align:center">no</td><td style="text-align:center"><strong>no</strong></td><td style="text-align:center">yes</td></tr></tbody></table></div>
 <p><strong>To create a structural expression</strong> use <code>ce.parse(s, { form: &#x27;structural&#x27; })</code>,
 <code>ce.expr(json, { form: &#x27;structural&#x27; })</code> or

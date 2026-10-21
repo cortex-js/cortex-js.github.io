@@ -1,4 +1,4 @@
-/* 0.111.1 */import type { Keys } from './types-utils';
+/* 0.111.0 */import type { Keys } from './types-utils';
 import type { InsertOptions, ParseMode, Style, TabularEnvironment } from './core-types';
 import type { Mathfield, Model } from './mathfield';
 /**
@@ -331,7 +331,7 @@ export interface Commands {
 }
 /**  @category Editing Commands */
 export type Selector = Keys<Commands>;
-/* 0.111.1 *//** @category Styles */
+/* 0.111.0 *//** @category Styles */
 export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
 /** @internal  */
 export type ArgumentType = ParseMode | ('bbox' | 'colspec' | 'delim' | 'value' | 'rest' | 'string' | 'balanced-string' | 'expression' | 'auto');
@@ -745,7 +745,7 @@ export type Selection = {
     ranges: Range[];
     direction?: 'forward' | 'backward' | 'none';
 };
-/* 0.111.1 */import type { KeyboardLayoutName } from './options';
+/* 0.111.0 */import type { KeyboardLayoutName } from './options';
 /**
  * Change the current physical keyboard layout.
  *
@@ -758,7 +758,7 @@ export declare function setKeyboardLayout(name: KeyboardLayoutName | 'auto'): vo
  * @category Localization
  */
 export declare function setKeyboardLayoutLocale(locale: string): void;
-/* 0.111.1 *//**
+/* 0.111.0 *//**
  * Static rendering web components for MathLive.
  *
  * These components provide lightweight rendering of mathematical expressions
@@ -893,7 +893,7 @@ declare global {
     }
 }
 export {};
-/* 0.111.1 */import type { Selector } from './commands';
+/* 0.111.0 */import type { Selector } from './commands';
 import type { LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
 import type { InsertStyleHook, Mathfield } from './mathfield';
 import type { InlineShortcutDefinitions, Keybinding, MathfieldOptions } from './options';
@@ -2326,7 +2326,7 @@ declare global {
         MathfieldElement: typeof MathfieldElement;
     }
 }
-/* 0.111.1 */import type { Selector } from './commands';
+/* 0.111.0 */import type { Selector } from './commands';
 import type { ApplyStyleOptions, InsertOptions, Offset, OutputFormat, Style, Range, Selection } from './core-types';
 /** @category Styles */
 export type InsertStyleHook = (sender: Mathfield, at: Offset, info: {
@@ -2361,7 +2361,7 @@ export interface Mathfield {
 export interface Model {
     readonly mathfield: Mathfield;
 }
-/* 0.111.1 *//**
+/* 0.111.0 *//**
  * Server-side rendering exports.
  *
  * These functions do not require a DOM environment and can
@@ -2470,7 +2470,7 @@ export declare function convertLatexToAsciiMath(latex: string, parseMode?: Parse
  * @category Conversion
  */
 export declare function convertAsciiMathToLatex(ascii: string): string;
-/* 0.111.1 *//**
+/* 0.111.0 *//**
  *
  * Importing this package in a web page will make the `<math-field>` custom
  * element available. Use it as a drop-in replacement for `<textarea>` or
@@ -2499,7 +2499,7 @@ export declare function convertAsciiMathToLatex(ascii: string): string;
  *
  *
  * @packageDocumentation Mathfield API Reference
- * @version 0.111.1
+ * @version 0.111.0
  *
  */
 import type { VirtualKeyboardInterface } from './virtual-keyboard';
@@ -2524,7 +2524,7 @@ declare global {
         mathVirtualKeyboard: VirtualKeyboardInterface & EventTarget;
     }
 }
-/* 0.111.1 */import type { Mathfield, InsertStyleHook } from './mathfield';
+/* 0.111.0 */import type { Mathfield, InsertStyleHook } from './mathfield';
 import type { Selector } from './commands';
 import type { ParseMode, MacroDictionary, Registers, Range } from './core-types';
 /**
@@ -2908,7 +2908,7 @@ export type StaticRenderOptions = Partial<LayoutOptions> & {
         };
     };
 };
-/* 0.111.1 *//**
+/* 0.111.0 *//**
  * @internal
  */
 type Filter<T, Cond, U extends keyof T = keyof T> = {
@@ -2919,13 +2919,13 @@ type Filter<T, Cond, U extends keyof T = keyof T> = {
  */
 export type Keys<T> = Filter<T, (...args: any[]) => any> & string;
 export {};
-/* 0.111.1 */export type KeyboardModifiers = {
+/* 0.111.0 */export type KeyboardModifiers = {
     alt: boolean;
     control: boolean;
     shift: boolean;
     meta: boolean;
 };
-/* 0.111.1 */import type { KeyboardModifiers } from './ui-events-types';
+/* 0.111.0 */import type { KeyboardModifiers } from './ui-events-types';
 /**
  * The type of a menu item:
  * - `command`: a command that can be selected and executed
@@ -3049,7 +3049,7 @@ export declare function isHeading(item: MenuItem): item is MenuItemHeading;
  * @category Menu
  */
 export type MenuItem<T = unknown> = MenuItemDivider | MenuItemHeading | MenuItemSubmenu | MenuItemCommand<T>;
-/* 0.111.1 */import type { Selector } from './commands';
+/* 0.111.0 */import type { Selector } from './commands';
 import type { ParseMode, Style } from './core-types';
 import type { OriginValidator } from './options';
 /**

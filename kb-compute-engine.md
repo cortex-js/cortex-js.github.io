@@ -1136,6 +1136,7 @@ property.
 | `unexpected-argument`          | too many arguments provided                                                                                      |
 | `expected-argument`            | not enough arguments provided                                                                                    |
 | `expected-expression`          | an expression was expected inside an enclosure (parentheses)                                                     |
+| `expected-set-builder-separator` | a set builder `\{x \| …\}` uses a bar as the separator; write `\mid` or `:` instead                            |
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |
 | `incompatible-type`          | the type of the provided argument does not match the expected type                                                         |
@@ -1415,7 +1416,7 @@ taken so far, with a correspondingly larger error bound.
 
 ## Errors
 
-An [`["Error"]`](/compute-engine/reference/core/#Error) is a **value**, and it
+An [`["Error"]`](/compute-engine/reference/core/#error) is a **value**, and it
 propagates along the ordinary value path. If an operand that a function
 evaluates strictly turns out to be an error, the whole expression evaluates to
 that error — not to a frozen expression wrapped around it. The propagated
@@ -1447,9 +1448,9 @@ The diagnostic is not lost, only unevaluated: the boxed expression still holds
 walks the expression still reports it.
 
 Errors do not spread past the tools that inspect them. `Type` reports
-`"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
+`"error"`, [`IsError`](/compute-engine/reference/core/#iserror) answers
 `True`/`False`, and
-[`Match`](/compute-engine/reference/control-structures/#Match) decides on an
+[`Match`](/compute-engine/reference/control-structures/#match) decides on an
 error subject — an `["Error", ...]` case destructures it, which is how a
 failure is rescued.
 
@@ -1525,6 +1526,19 @@ scope is searched, and so on until a definition is found.
 If no definition is found, the symbol is declared with a type of
 `unknown`, or a more specific type if the context allows it.
 
+```mermaid
+flowchart TD
+  sym["symbol to bind"] --> cur["current scope"]
+  cur -- "not found" --> parent["enclosing scopes,<br/>innermost first"]
+  parent -- "not found" --> global["global scope<br/>(user definitions)"]
+  global -- "not found" --> system["system scope<br/>(the standard library)"]
+  system -- "not found" --> auto["declared with type unknown,<br/>or a more specific type<br/>if the context allows it"]
+  cur -- found --> def["definition record"]
+  parent -- found --> def
+  global -- found --> def
+  system -- found --> def
+```
+
 If the symbol is found, the definition record is used to evaluate the
 expression. 
 
@@ -1568,6 +1582,62 @@ the free `a` resolves, the bound `x` does not.
 
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
+
+### Function Calls Are Bound Lexically
+
+A function call resolves its head (`f` in `f(3)`) through the binding the name
+had where the call was created, in the same way a symbol is bound to its
+definition during canonicalization. Declaring another function of the same
+name in a scope that is current when the call is evaluated does not redirect
+the call. Assigning a new function to the **original** binding does: a call
+reads the function that its binding holds when it runs.
+
+```js
+ce.assign('f', ce.parse('x \\mapsto 2x'));
+const call = ce.parse('f(3)');
+
+ce.pushScope();
+ce.declare('f', 'function');
+ce.assign('f', ce.parse('x \\mapsto 100x'));
+call.evaluate().print();
+// ➔ 6      (the call keeps the binding it was created with)
+ce.popScope();
+
+ce.assign('f', ce.parse('x \\mapsto 3x'));
+call.evaluate().print();
+// ➔ 9      (the original binding now holds another function)
+```
+
+A call written before its function is defined is a **forward reference**. It
+waits for a definition of the name in its own scope chain: evaluated while
+the name has no value, it stays symbolic; evaluated after the definition, it
+applies the function.
+
+Within one evaluation, the symbolic result of such a call is a value: it is
+not resolved again when the name is assigned later in the same evaluation.
+So `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
+term `h(1)` was computed while `h` had no value, and the assignment at
+`k = 2` does not reach it. A later evaluation resolves the stored result
+again:
+
+```js
+const call = ce.parse('g(3)');
+const result = call.evaluate();
+// ➔ g(3)   ("g" has no definition yet)
+
+ce.assign('g', ce.parse('x \\mapsto x^2'));
+call.evaluate().print();
+// ➔ 9
+result.evaluate().print();
+// ➔ 9      (a later evaluation resolves the stored result)
+```
+
+In a `Block`, a `DefineFunction` statement (the Epsil `function g(k) { … }`)
+defines its name for the whole block, including the statements written before
+it. An `Assign` of a function literal takes effect when it runs. A `Block`
+evaluated directly by the host is a program: each of its statements is an
+evaluation of its own, so a result stored by one statement is resolved again
+when a later statement reads it.
 
 ### Default Scopes
 
@@ -1621,6 +1691,20 @@ or if accessing the `.canonical` property of a
 non-canonical expression.
 
 When a function is evaluated, the following steps are followed:
+
+```mermaid
+flowchart TD
+  start["evaluate f(a, b, …)"] --> canon{"canonical?"}
+  canon -- no --> err["error: canonicalize first"]
+  canon -- yes --> lazy{"f is lazy?"}
+  lazy -- yes --> assoc
+  lazy -- no --> args["evaluate each argument, left to right<br/>a held argument, or a Hold, stays symbolic<br/>a Sequence result is spliced in; an empty one is dropped"]
+  args --> assoc{"f is associative?"}
+  assoc -- yes --> flat["flatten: f(f(a, b), c) → f(a, b, c)"]
+  assoc -- no --> apply
+  flat --> apply["apply f to the arguments"]
+  apply --> result["return the result in canonical form"]
+```
 
 1. If the expression is not canonical, it cannot be evaluated and an error is
    thrown. The expression must be canonicalized first.
@@ -1822,10 +1906,39 @@ The comparison is deliberately **cheap and predictable**:
 
 1. Both operands are evaluated (so assigned symbol values are substituted).
 2. If the results are structurally identical, they are equal.
-3. Otherwise, if the difference between them has no unknowns, it is evaluated
+3. Otherwise, if both results are exact numbers (integers, rationals, or
+   rational multiples of a square root), they are compared exactly.
+4. Otherwise, if the difference between them has no unknowns, it is evaluated
    numerically: they are equal if the absolute value of the difference is less
    than `ce.tolerance`.
-4. Otherwise the answer is `undefined`.
+5. Otherwise the answer is `undefined`.
+
+```mermaid
+flowchart TD
+  s["lhs.isEqual(rhs)"] --> ev["evaluate both operands"]
+  ev --> same{"structurally identical?"}
+  same -- yes --> t["true"]
+  same -- no --> exact{"both exact numbers?<br/>(integer, rational, or a rational<br/>multiple of a square root)"}
+  exact -- yes --> cmp["compared exactly:<br/>true or false"]
+  exact -- no --> unk{"the difference has<br/>no unknowns?"}
+  unk -- yes --> tol["the difference evaluated numerically:<br/>true if its magnitude is below ce.tolerance,<br/>false otherwise"]
+  unk -- no --> u["undefined"]
+```
+
+The tolerance is used only when a floating point number is involved. Two exact
+numbers are equal only if they have the same value, however close they are:
+
+```live
+console.log(ce.parse('\\frac{1}{3} = \\frac{3333333333333}{10^{13}}').evaluate());
+// ➔ False
+
+console.log(ce.parse('\\frac{1}{10} = 0.1').evaluate());
+// ➔ True
+```
+
+The order comparisons (`isLess()`, `isGreater()`, …, and the `<`, `>`, `\le`,
+`\ge` operators) follow the same rule, so for two exact numbers exactly one of
+$a < b$, $a = b$ and $a > b$ is true.
 
 No expansion, no simplification and no sampling is attempted. In particular,
 `isEqual()` does **not** attempt to prove a symbolic identity: the expressions
@@ -1854,7 +1967,13 @@ console.log(ce.parse('x = y').evaluate());
 Following IEEE 754, `NaN` is not equal to anything, including itself: `NaN =
 NaN` is `False`, and so is the comparison of two collections that contain it,
 `["Equal", ["List", "NaN"], ["List", "NaN"]]`. Only the syntactic tier reports
-those as identical (`["Same", "NaN", "NaN"]` is `True`).
+those as identical (`["Same", "NaN", "NaN"]` is `True`). A pole has no value
+either: `1/0 = 1/0` is `False`. A value with no order decides an ordered
+comparison as `False`: `0 < \frac{1}{0}`, `0 < i` and `0 < \ln(-1)` are
+`False`, so a piecewise on such a comparison takes its next branch
+(`\{1/0 > 0: 1, 0\}` is `0`), as it does for `NaN`. Equality of complex
+numbers keeps its meaning (`i = i` is `True`), `\ne` is unchanged
+(`1/0 \ne 0` is `True`), and a free symbol leaves the comparison unevaluated.
 
 ### Identity: `isIdenticallyEqual()`
 
@@ -1922,7 +2041,7 @@ that require evaluation, such as `\sin(\pi)`.
 | `lhs === rhs`                            | If true, same box expression instances |
 | `lhs.isSame(rhs)`                        | Syntactic equality (fast, exact, no evaluation). Accepts primitives. |
 | `lhs.is(rhs)`                            | Smart check: structural first, then numeric evaluation fallback for constant expressions (within `engine.tolerance`). For literal numbers, same as `isSame()`. |
-| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation and tolerance compare). May return `undefined`. |
+| `lhs.isEqual(rhs)`                       | Arithmetic equality (evaluation, then an exact compare of exact numbers or a tolerance compare). May return `undefined`. |
 | `lhs.isIdenticallyEqual(rhs)`            | Identity in all free variables (expansion, simplification, sampling). May return `undefined`. |
 | `lhs.match(rhs) !== null`                | Pattern match                          |
 | `ce.expr(["Equal", lhs, rhs]).evaluate()` | Synonym for `lhs.isEqual(rhs)`                |
@@ -2030,6 +2149,12 @@ Exact values are:
 | Constants                    | $e$ (`ExponentialE`), $\pi$ (`Pi`)            |
 
 </div>
+
+A number literal is exact or a float by the way it is written. A literal with
+no fraction part and no negative exponent is an exact integer: `1e3` is the
+exact `1000`. A literal with a fraction part is a float, also when the fraction
+is zero (`1.0`, `1.5e3`), and so is a literal with a negative exponent
+(`1e-3`).
 
 ```live
 console.log(parse('1/3 + 1/4').evaluate());
@@ -2251,7 +2376,7 @@ rounded to the requested digits. The working precision of the engine
 `ce.precision` is still `21`. A later operation on the result is computed at the
 working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
 `4.14159265358979323846`. The reference page for
-[`N`](/compute-engine/reference/core/#N) describes the precision and accuracy
+[`N`](/compute-engine/reference/core/#n) describes the precision and accuracy
 goals `["N", expr, ["List", p, a]]`.
 
 
@@ -2331,6 +2456,12 @@ expr.toMathJson({ fractionalDigits: 'auto' }); // rounded to ce.precision
 expr.toMathJson({ fractionalDigits: 'max' });  // all digits (default)
 expr.toMathJson({ fractionalDigits: 5 });      // 5 fractional digits
 ```
+
+A float keeps its digits in MathJSON, also when they repeat: the float
+`1.0/3` serializes as `"0.333333333333333333333"`. A number string with a
+repetend in parentheses (`"0.(3)"`) is an exact rational, so writing a float
+that way would make `ce.box()` read it back as the exact `1/3`. To mark the
+repeating digits of a float, use `expr.toMathJson({ repeatingDecimal: true })`.
 
 When the precision is greater than 15, the return value of `expr.N().json` may
 be a MathJSON number with a `num` string containing all available digits:
@@ -2469,6 +2600,30 @@ replace a number of a small magnitude with the exact integer 0.
 It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.
 
+Two numbers whose difference is smaller than the tolerance are considered
+equal. This applies only when a floating point number is involved: two exact
+numbers (integers, rationals, or rational multiples of a square root) are
+compared exactly, so $\frac{1}{3}$ and $\frac{3333333333333}{10^{13}}$ are not
+equal, while $\frac{1}{10}$ and $0.1$ are.
+
+The tolerance is an absolute value, and it does not change with the precision:
+at 40 digits, two values that differ by $10^{-12}$ still compare as equal. A
+tolerance you set is kept when the precision changes.
+
+**To make the tolerance follow the precision**, set it to `"auto"`. The
+tolerance is then $10^{-(\text{precision} - 2)}$, two digits short of the
+working precision, and it is recomputed at each precision change: $10^{-19}$ at
+the default 21 digits, $10^{-38}$ at 40 digits. This mode is meant for
+big-decimal work: a value computed in machine floats (about 16 digits) then
+compares as different from its exact value.
+
+```js
+const ce = new ComputeEngine({ precision: 40, tolerance: "auto" });
+ce.tolerance; // 1e-38
+ce.precision = 50;
+ce.tolerance; // 1e-48
+```
+
 ## Numeric Functions
 
 The topics below from the
@@ -2487,6 +2642,241 @@ evaluations for their numeric functions:
 | [Trigonometry](/compute-engine/reference/trigonometry/)           | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>
+
+---
+
+# Execution Constraints
+
+Source: https://mathlive.io/compute-engine/guides/execution-constraints/
+
+# Execution Constraints
+
+Some innocuous-looking expressions can take a very long time — or forever —
+to evaluate: a sum over a huge range, a number-theory function applied to a
+large integer, a limit that fails to converge, or a loop that never
+terminates.
+
+To keep evaluation responsive, the Compute Engine offers two kinds of
+bounds: a **time budget**, expressed as a span, and **iteration/recursion
+budgets**, expressed as counts.
+
+## Time Budgets: Spans
+
+A time budget is a **span**: a region of code you run with an explicit
+deadline. Everything evaluated inside the span shares one deadline; when it is
+exceeded, the evaluation in progress throws a `CancellationError` with
+`cause: "timeout"`.
+
+```js
+import { ComputeEngine, CancellationError } from "@cortex-js/compute-engine";
+
+const ce = new ComputeEngine();
+
+try {
+  ce.withTimeLimit({ ms: 500, label: "my-app:eval" }, () =>
+    ce.parse("\\sum_{i=1}^{100000000} \\sqrt{i}").evaluate()
+  );
+} catch (err) {
+  if (err instanceof CancellationError && err.cause === "timeout")
+    console.log("Evaluation exceeded its time budget");
+}
+```
+
+`withTimeLimit(limit, fn)` runs `fn` and returns its value. The `limit` is
+either a number of milliseconds, or an object `{ ms, label }`. The object form
+is preferred for new code: the `label` reads before the callback, and it is
+what lets you attribute a timeout later (see below).
+
+The contract is **at most** `ms` milliseconds:
+
+> Runs `fn` with **at most** `ms` milliseconds. A tighter deadline may already
+> be in effect from an enclosing span, in which case that one preempts this
+> limit. Use the `label` and the `attribution` field on `CancellationError` to
+> determine which limit fired.
+
+Work performed **outside** any span is not time-bounded. A consumer that wants
+a blanket bound wraps its entry point in a single span — one line at the
+boundary — rather than relying on an implicit global limit.
+
+### Nesting: the tighter deadline wins
+
+Spans nest. When you enter a span inside another, the effective deadline is the
+**minimum** of the two — a span can only shorten the budget, never extend it.
+This means an inner span can never defeat a bound its caller set:
+
+```js
+ce.withTimeLimit({ ms: 100, label: "outer" }, () =>
+  // Even though this asks for 5000ms, the enclosing 100ms deadline preempts it.
+  ce.withTimeLimit({ ms: 5000, label: "inner" }, () =>
+    ce.parse("\\sum_{i=1}^{100000000} \\sqrt{i}").evaluate()
+  )
+);
+```
+
+Labels are for **attribution only**, never for control: a label cannot buy a
+span more time than its enclosing budget allows.
+
+### Attribution: whose budget expired?
+
+When several spans are active, a `CancellationError` tells you which one owned
+the deadline that fired:
+
+<div className="symbols-table">
+
+| Property | Description |
+| :--- | :--- |
+| `err.cause` | `"timeout"` for a time-budget breach |
+| `err.attribution` | The `label` of the span whose deadline fired (`undefined` for an unlabelled span) |
+| `err.spans` | All active span labels, outermost first |
+
+</div>
+
+`attribution` answers the practical question "was this **my** budget or my
+**caller's**?" — compare it directly against the label you passed. Because
+nesting takes the tighter deadline, the span that fires is the tighter one:
+
+```js
+try {
+  ce.withTimeLimit({ ms: 100, label: "outer" }, () =>
+    ce.withTimeLimit({ ms: 5000, label: "inner" }, () =>
+      ce.parse("\\sum_{i=1}^{100000000} \\sqrt{i}").evaluate()
+    )
+  );
+} catch (err) {
+  if (err instanceof CancellationError) {
+    console.log(err.attribution); // ➔ "outer"  (the tighter, enclosing budget)
+    console.log(err.spans);       // ➔ ["outer", "inner"]
+  }
+}
+```
+
+Here the outer 100ms budget preempts the inner 5000ms request, so
+`attribution` is `"outer"`. Had the inner span been the tighter one,
+`attribution` would be `"inner"`. Code catching the error inside the `inner`
+span can therefore tell "my own sub-budget expired — degrade gracefully" from
+"my caller's budget expired — propagate".
+
+The numeric form `withTimeLimit(500, fn)` stays valid and produces an
+**unlabelled** span: any timeout it owns has `attribution: undefined` and does
+not appear in `spans`. Supply a label only when you can act on it.
+
+### `ce.timeLimit` has been removed
+
+Earlier versions armed a global, implicit deadline around every
+`evaluate()`/`simplify()` through the `ce.timeLimit` property (default 2000ms).
+Its scope was never well-defined — "the current evaluation" is not a region you
+can point at — and a span silently overrode it with no indication in the API.
+
+`ce.timeLimit` was deprecated in the previous minor release and is now
+**removed**. There is no implicit deadline anymore: an `evaluate()` outside a
+span runs unbounded, and `withTimeLimit()` spans are the only way to arm one.
+If you relied on the old 2000ms ambient default, wrap the work you want
+bounded in a span:
+
+```js
+// Before (no longer compiles)
+ce.timeLimit = 500;
+const r = expr.evaluate();
+
+// After
+const r = ce.withTimeLimit({ ms: 500, label: "my-app:eval" }, () =>
+  expr.evaluate()
+);
+```
+
+For a blanket bound, this is a single wrap at your application's entry point.
+
+**Numerical integration is special.** Monte Carlo integration (`NIntegrate`,
+or `N()` on an `Integrate` expression) does not throw when it runs out of time.
+Instead it returns the estimate computed from the samples taken so far, with a
+correspondingly larger error bound: a partial estimate is more useful than no
+answer.
+
+## Iteration and Recursion Budgets
+
+Time is not the only way a computation can run away. Two count-based budgets
+bound structural growth independently of the clock:
+
+<div className="symbols-table">
+
+| Property | Default | Description |
+| :--- | :--- | :--- |
+| `ce.iterationLimit` | 1 024 | Maximum iterations of a looping control structure (`Loop`, `Comprehension`, `While`, `FixedPoint`) and of collection iteration |
+| `ce.recursionLimit` | 1 024 | Maximum depth of user-function recursion |
+
+</div>
+
+When the iteration limit is exceeded, a `CancellationError` with cause
+`"iteration-limit-exceeded"` is thrown:
+
+```js
+ce.iterationLimit = 10_000;
+
+// A loop over a billion elements: aborts after 10,000 iterations
+ce.box(["Loop", ["Add", "i", 1], ["Element", "i", ["Range", 1, 1e9]]]).evaluate();
+// ➔ throws CancellationError, cause: "iteration-limit-exceeded"
+```
+
+When user-function recursion exceeds `ce.recursionLimit`, a `CancellationError`
+with cause `"recursion-depth-exceeded"` is thrown instead.
+
+Setting `ce.iterationLimit` to `0` or a negative value disables the iteration
+limit; a span (if any) still applies.
+
+The built-in symbolic integrator and the variation-of-parameters step of
+`DSolve` each have a fixed budget of 100,000 steps. The budget counts each
+step of the search, the simplification rules tried included, so the result is
+the same on every machine. When the budget is spent, the result is the
+unevaluated `Integrate` or `DSolve` expression; no error is thrown. A
+`withTimeLimit()` span of the caller still applies, and its expiry reaches the
+caller.
+
+An Epsil program has no iteration limit. The first time an engine runs a
+program (`executeEpsil`, or the `epsil` command), the default limit is removed,
+and it stays removed for every later evaluation on that engine, Epsil or not,
+so that a lazy collection a program returns can be read in full. A limit you
+assign to `ce.iterationLimit` yourself is kept, and it applies to Epsil
+programs too. A host that shares one engine between Epsil and other evaluation,
+and wants the cap for the latter, assigns `ce.iterationLimit` after the program
+has run.
+
+## Asynchronous Evaluation
+
+For long-running computations, `evaluateAsync()` evaluates without blocking the
+event loop and accepts an `AbortSignal` so a caller can request cancellation:
+
+```js
+const controller = new AbortController();
+
+// Request cancellation if the evaluation is still running after one second
+setTimeout(() => controller.abort("user-canceled"), 1000);
+
+try {
+  const result = await expr.evaluateAsync({ signal: controller.signal });
+  console.log(result.toString());
+} catch (err) {
+  if (err instanceof CancellationError) console.log("Canceled:", err.cause);
+}
+```
+
+Be aware of what async cancellation can and cannot do today:
+
+- **Cooperative, not preemptive.** An `abort()` is honored only at the points
+  where the engine checks the signal. Today those checks are reached by
+  `Loop`, `Factorial`, `Sum` and `Product`; other operators run their
+  synchronous evaluation to completion and cannot be interrupted by a signal.
+- **A synchronous tight loop blocks delivery.** JavaScript is
+  single-threaded. If an uninterruptible operator is spinning, the
+  `abort()` callback cannot even run until it yields, so cancellation may be
+  delayed indefinitely or never observed for that call.
+- **Not a runaway guard.** For untrusted or genuinely unbounded work, an
+  `AbortSignal` is not sufficient protection. Bounding such work reliably
+  requires isolating it in a Web Worker or a separate process that you can
+  terminate from the outside.
+
+For most work, a time span (`withTimeLimit`) and the iteration/recursion
+budgets are the appropriate bounds; reach for async cancellation when you need
+a user-facing "cancel" affordance on the interruptible operators above.
 
 ---
 
@@ -2556,8 +2946,8 @@ default, which is the desirable behavior in most cases.
 of `ce.parse(s, {form: 'raw'})` or `ce.expr(expr, {form: 'raw'})`.
 
 You can further customize the canonical form of an expression by using the
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
-or by specifying the form you want to use. See [below](#custom-canonical-form) for more details.
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) function 
+or by specifying the form you want to use. See [below](#custom-canonical-forms) for more details.
 
 The non-canonical version will be closer to the literal LaTeX input, which may
 be desirable to compare a "raw" user input with an expected answer.
@@ -2731,7 +3121,7 @@ console.log(ce.parse("2(0+x\\times x-1)").json);
 ```
 
 **To get a custom canonical form of an expression**, use the
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) function 
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) function 
 or specify the form you want to use with the `form` option of `ce.expr()`
 and `ce.parse()`.
 
@@ -2750,7 +3140,7 @@ the case in the full canonical form.
 
 There are other forms that can be used to customize the canonical form of an
 expression. See the documentation of
-[`["CanonicalForm"]`](/compute-engine/reference/core/#CanonicalForm) for more details.
+[`["CanonicalForm"]`](/compute-engine/reference/core/#canonicalform) for more details.
 
 For example:
 
@@ -3379,6 +3769,15 @@ ce.declare("double", { evaluate: ([x]) => x.mul(3) });
 // Changes the handler of the existing definition
 ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
 ```
+
+A patch that changes a flag of a library operator keeps the library handlers
+that do not depend on that flag. Removing `commutative` from `Add` or
+`Multiply` (`ce.declare("Add", { commutative: false }, { extend: true })`)
+removes the library ordering handler, so the canonical form keeps the operand
+order (`b + a` stays `b + a`). But the library `evaluate` handler of `Add` and
+`Multiply` collects like terms, and it still reorders a symbolic sum: supply
+your own `evaluate` handler in the same patch if the order must also be kept
+when the expression is evaluated.
 
 A name first seen in use, such as `f` in `ce.parse("f(x)")`, is not declared
 yet and can be defined with `ce.declare("f", {...})`. See
@@ -4821,7 +5220,7 @@ ce.parse("P \\implies Q").json;
 ### Based Numerals
 
 A numeral with an **integer-literal subscript base**, e.g. `10111_2` or
-`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#BaseForm),
+`2748_{16}`, parses to a numeric [`BaseForm`](/compute-engine/reference/strings/#baseform),
 so arithmetic on based numerals works:
 
 ```javascript
@@ -4836,7 +5235,7 @@ The guard is strict: every digit must be valid for the base (`19_2` stays an
 inert `Subscript`), and a subscripted symbol (`x_2`) is unchanged. A **symbol**
 subscript base (e.g. `161_b`) parses to `BaseForm` of the digit polynomial in
 that base, so base equations solve symbolically. See
-[`BaseForm`](/compute-engine/reference/strings/#BaseForm) for details.
+[`BaseForm`](/compute-engine/reference/strings/#baseform) for details.
 
 ### Repeating Decimals
 
@@ -4873,9 +5272,9 @@ ce.parse("2 \\cdot 4 \\cdot \\dots \\cdot 2n").json;
 Subtraction-spelled ellipses (`1 - 2 + 4 - \dots + x`) stay inert too, and such
 products round-trip through LaTeX (an explicit `\times` is emitted around the
 ellipsis). To turn elliptical notation into a formal `Sum` or `Product`, use the
-[`Interpret`](/compute-engine/reference/arithmetic/#Interpret) operator. A
+[`Interpret`](/compute-engine/reference/arithmetic/#interpret) operator. A
 sequence written with braces, `\{a_n\}_{n=1}^{\infty}`, parses to the inert
-[`IndexedSequence`](/compute-engine/reference/collections/#IndexedSequence) head.
+[`IndexedSequence`](/compute-engine/reference/collections/#indexedsequence) head.
 
 ### Notation Recoveries
 
@@ -4896,7 +5295,7 @@ otherwise error:
 | `\sin a'` | `["Sin", ["Prime", "a"]]` | Primed variables type-check as arguments |
 
 A bare `\equiv` (or the `≡` character) parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual); it is a
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal); it is a
 congruence, `Congruent`, only when followed by `\pmod n`. `\not\equiv`
 (optionally with a trailing `\pmod n`) negates a congruence, and a
 chain of congruence steps such as
@@ -6417,43 +6816,68 @@ better error checking and type inference.
 Type A is a **subtype** of type B if all values of type A are also values of type B.
 It is also said that type A **matches** type B.
 
+The following diagram shows selected relationships in the current
+implementation, in three parts. Each child is a subtype of its parent. The
+dashed arrows show a sample of the edges into `never`, which every type has.
+It is an overview, not a complete lattice of parameterized types, unions,
+and intersections.
 
-```plaintext
-any
-├── error
-├── nothing
-├── missing
-├── never
-├── unknown
-└── expression
-    ├── symbol
-    ├── function
-    └── value
-        ├── scalar
-        │   ├── boolean
-        │   ├── character
-        │   └── number
-        │     └── complex
-        │         ├── imaginary
-        │         └── real
-        │             └── rational
-        │                 └─ integer
-        └── collection
-            ├── set
-            ├── dictionary
-            |   └─ record
-            └── indexed_collection
-                ├── tuple
-                ├── range
-                ├── string
-                └── list
-                    ├─ vector
-                    ├─ matrix
-                    └─ tensor
+```mermaid
+flowchart TD
+  any --> error & nothing & missing & unknown
+  unknown --> expression
+  expression --> symbol & function & value
+  value --> color & regexp & type & object & scalar & collection
+  error & nothing & missing & symbol & function -.-> never["never<br/>(below every type)"]
 ```
 
-**Note:** this diagram is simplified and does not accurately reflect the finite vs
-non-finite distinction for the numeric types.
+The `scalar` branch:
+
+```mermaid
+flowchart TD
+  scalar --> boolean & character & number
+  number --> infinity & nan & complex
+  complex --> imaginary & real
+  real --> rational --> integer
+```
+
+The `collection` branch:
+
+```mermaid
+flowchart TD
+  collection --> set & dictionary & indexed_collection
+  dictionary --> record
+  indexed_collection --> tuple & string & list
+  list --> range & vector & matrix
+```
+
+**`never` is the bottom type**, not a sibling of the other types under
+`any`. It has no values and is a subtype of every type, including `unknown`,
+`missing`, `nothing`, and `error`.
+
+**`unknown` currently has two roles.** It marks information that inference
+can refine, and it is a supertype of ordinary expression types:
+`integer <: value <: expression <: unknown <: any`.
+The reverse relationships do not hold. In particular, an unresolved
+`unknown` does not establish that an expression is a number or even that it
+satisfies the explicit `expression` contract. Inference and deferred
+argument checking are separate from these subtype relationships.
+
+The agreed design direction is to make `unknown` solely an inference
+marker, with no required position in the content-type lattice. That change
+is not implemented yet; the diagram and subtype examples here describe the
+current behavior. `value`, `expression`, and `any` are the explicit content
+contracts.
+
+**Numeric types distinguish finite values from markers and infinities.**
+`complex` and its subtypes contain finite numbers. `infinity` and `nan`
+are separate subtypes of `number`.
+
+**`vector`, `matrix`, and `tensor` are list spellings**, not separate
+primitive types. Bare `vector` and `matrix` specify numeric elements and
+rank one or two, respectively. Bare `tensor` normalizes to `list<number>`
+without a rank constraint, so it is not shown as a separate branch.
+`range` is a subtype of `list<integer>`.
 
 **Note:** a `string` is an indexed collection of `character` — it sits beside
 `list`, `tuple` and `range`, not under `scalar`. A `character` (exactly one
@@ -6473,13 +6897,14 @@ not constrain a later definition: the definition's inferred type refines the
 placeholder, so declaring `(unknown) -> unknown` behaves like declaring no 
 signature at all.
 
-Two caveats bound the wildcard:
+The following distinctions matter:
 
-- The absence types `nothing` and `missing` (and the `error` and `never` 
-  types) are **not** compatible with `unknown`. Absence is opt-in: a slot 
-  whose type has not yet been determined does not silently accept an absence 
-  marker — admit it explicitly with a union such as `number | missing`, or 
-  use `any`. At an operator parameter, a value typed `T | missing` — a lookup
+- The absence types `nothing` and `missing`, and the `error` type, are
+  **not subtypes** of `unknown`; neither is `any`. `never` **is** a subtype
+  of `unknown`, as it is of every type. To include absence in a type, write
+  it explicitly with a union such as `number | missing`, or use `any`.
+  Call admission is a different question: at an operator parameter, a value
+  typed `T | missing` — a lookup
   with a computed key, such as `xs[i]` — and a collection of such values
   (`list<missing | string>`) are accepted where `T` or a collection of `T` is
   expected; whether an element is absent is decided when the program runs.
@@ -6493,11 +6918,23 @@ Two caveats bound the wildcard:
   honor that promise is rejected. Use `unknown` when the type is simply not 
   known yet; use `any` when you mean to accept everything.
 
-<div style={{visibility:"hidden"}}>
-<a href="#naming-constraints-for-elements-and-arguments" id="naming-constraints-for-elements-and-arguments"></a>
-</div>
+Do not confuse the ordinary word “value” with the narrower type `value`.
+The current collection contracts distinguish:
 
-:::info **Naming Constraints for Elements and Arguments**
+| Element annotation | What it accepts |
+| --- | --- |
+| `list<value>` | Data values, including scalars, collections, objects, and opaque values such as regular expressions; excludes functions and symbolic expressions typed as `symbol` or `expression` |
+| `list<expression>` | Data values, functions, and symbolic expressions |
+| `list<unknown>` | Elements whose types may still be unresolved; currently also a supertype of `list<expression>` and the normalized meaning of bare `list` |
+| `list<any>` | Unrestricted element types, including absence markers and errors |
+
+The first three exclude immediate `missing`, `nothing`, and `error`
+elements in subtype checks. These are not recursive absence restrictions:
+a list containing a missing datum is itself a collection value.
+
+### Naming Constraints for Elements and Arguments
+
+:::info
 
 Element names (used in tuples, records, dictionaries) and function argument names should:
 
@@ -6541,11 +6978,11 @@ The Compute Engine supports the following primitive types:
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
 | `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
-| `unknown`       | The type of an expression whose type is not known. An expression whose type is `unknown` can have its type modified (narrowed or broadened) at any time. Every other type matches `unknown`, except the absence types `nothing` and `missing` (and `error`): absence is opt-in and must be admitted explicitly (e.g. `number \| missing`) |
+| `unknown`       | An unresolved type that inference can refine. In the current subtype relation it is also above `expression`, `function`, `symbol`, and `value`; it excludes `any`, `nothing`, `missing`, and `error`. The bottom type `never` is below it. |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
 | `symbol`        | The type of a named object, for example a constant or variable in an expression such as `x` or `alpha` |
 | `function`        | The type of a function literal: an expression that applies some arguments to a body to produce a result, such as `["Function", ["Add", "x", 1], "x"]` |
-| `value`        | The type of a constant value, such as `1`, `True`, `"hello"` or `Pi`: a `scalar` or a `collection` |
+| `value`        | A data value: a scalar, collection, object, color, regular expression, or reified type. Excludes functions and symbolic expressions typed as `symbol` or `expression`. |
 | `collection`    | The type of a collection of values: a `list`, a `set`, a `tuple`, a `string`, a `dictionary` or a `record` |
 | `indexed_collection`    | The type of a collection of values that can be accessed by an index: a `tuple`, a `range`, a `string`, a `list`, a `vector`, a `matrix` or a `tensor` |
 | `range`        | The type of an **index span**: a contiguous, ascending run of 1-based collection indexes, such as `["Range", 2, 5]`. A `Range` has this type only when its bounds are integers, at least 1, ascending and one apart — so `["Range", 1, 10, 2]` (stepped) and `["Range", 5, 2]` (descending) are `indexed_collection<integer>` instead. Not a mathematical interval (see `Interval`) |
@@ -6994,8 +7431,8 @@ strings. To exclude them, intersect with a negation:
 ### Broadcastable
 
 The type `broadcastable<T>` represents a value that is either a scalar `T` or
-an indexed collection of `T` applied element-wise — the static type of an
-expression that may **broadcast** at evaluation.
+a list of `T` applied element-wise — the static type of an expression that
+may **broadcast** at evaluation. It is the union `T | list<T>`.
 
 Arithmetic in the Compute Engine broadcasts over collections at run time:
 `2 \cdot [1, 2, 3]` evaluates to `[2, 4, 6]`. When an operand is a visible
@@ -7011,17 +7448,25 @@ ce.parse('2h(x) - 1').type;
 // ➔ broadcastable<number>
 ```
 
-The subtyping rules follow from the meaning "a `T`, or an indexed collection
-of `T`":
+The subtyping rules follow from the meaning "a `T`, or a list of `T`":
 
 - `T <: broadcastable<T>` — a scalar is a valid broadcastable value
-- `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>` — any
-  indexed collection of `T` is too (`set` is not indexed, and `tuple`s and
-  `string`s bind atomically, so none of them qualifies — a broadcasting
-  operator applied to a string receives the whole string, not its characters)
+- `list<T> <: broadcastable<T>`, `vector<n> <: broadcastable<number>`,
+  `matrix<integer> <: broadcastable<integer>`, `range <: broadcastable<integer>`
+  — every list of `T` is too, and so is everything that is a list: a vector, a
+  matrix, a range
+- A `tuple`, a `string`, a `set` and a value typed only `indexed_collection<T>`
+  are **not** subtypes of `broadcastable<T>`. A tuple and a string bind
+  atomically (a broadcasting operator applied to a string receives the whole
+  string, not its characters), a set is not indexed, and the type
+  `indexed_collection<T>` also holds tuples, so it does not say that the value
+  is a list
+- The relation is transitive: whatever is a subtype of `list<T>` is a subtype
+  of `broadcastable<T>`
 - `broadcastable<S> <: broadcastable<T>` when `S <: T` (covariant)
 - `broadcastable<T>` is **not** a subtype of `T` or of `list<T>` — it may be
-  either one, so it is neither
+  either one, so it is neither. It is a subtype of `T | list<T>` and of
+  `T | indexed_collection<T>`
 
 A `broadcastable<T>` expression can be used anywhere the runtime can resolve
 the ambiguity: further arithmetic propagates the type, indexing with `At`
@@ -8653,15 +9098,25 @@ Inference writes happen at these moments:
    a body to `f: (unknown) -> unknown` replaces each `unknown` slot with the
    slot the body's inference produced, and the refined signature is what is
    stored. (An explicit `any` slot is the opposite: a contract the body must
-   honor.)
+   honor.) The refined result is the body's type with the parameters read as
+   the literal declares them: a bare parameter is read as `unknown` (item 3)
+   when the declared signature types it `any` or `broadcastable<T>`, which are
+   declaration-level contracts, not parameter types that are stamped on the
+   body. So `f: (any, any) -> unknown` assigned `(a, b) \mapsto a + 10b` reads
+   `(any, any) -> number`, the scalar reading of the body, while `f((1, 2),
+   (3, 4))` still evaluates to the point `(31, 42)` and the call itself types
+   `any`. A declared scalar or collection parameter type IS stamped on the
+   parameter before the body is read: `(real | nan) -> unknown` assigned
+   `t \mapsto t + 1` reads `-> nan | real`, not `-> number`.
 
 ### `unknown` vs `any`, and What a Bare Type Means
 
 The two "loose" types divide the work (see also the primitive-types table):
 
-- **`unknown`** — "some *value*, not stated which". It is the top of the
-  value types: every value type is a subtype of it, but the absence markers
-  (`nothing`, `missing`) are **not** — absence is opt-in. An `unknown` in a
+- **`unknown`** — an unresolved type. In the current subtype relation it
+  also sits above `expression`, including functions and symbols as well as
+  data values. It excludes `any`, `error`, and the absence markers
+  (`nothing`, `missing`); `never` remains below it. An `unknown` in a
   signature slot or an unbounded `where T` is a **placeholder** that later
   evidence refines. A *value* typed `unknown` is a placeholder too: because
   it claims nothing, no declaration can refute it, so assigning it to a
@@ -10621,6 +11076,19 @@ early:
 By default, `compile()` falls back to interpretation (`success: false` with a
 `run` function). To disable fallback and fail fast, set `fallback: false`.
 
+```mermaid
+flowchart TD
+  call["compile(expr, options)"] --> ok{"every operator lowers<br/>for this target?"}
+  ok -- yes --> success["success: true<br/>run() executes the generated code"]
+  ok -- no --> fb{"options.fallback"}
+  fb -- "false" --> throw["throws, with the reason"]
+  fb -- "default" --> fail["success: false<br/>error says why<br/>run() uses the interpreter"]
+  fail --> why["operand shape not supported,<br/>a target gap for a known operator,<br/>or an unknown operator"]
+```
+
+The three reasons are described under
+[Why a compilation declined](#why-a-compilation-declined).
+
 ### The `run()` Contract: Shaped Inputs, Read-Only Results
 
 On the `javascript` target, `run()` requires inputs of the shape the compiled
@@ -10739,6 +11207,193 @@ A seeded program gives the same values interpreted, with `run()` and from the
 stored code. Functions passed in the `functions` or `imports` compile options
 are copied into the code as source, so a closure loses its enclosing scope,
 and a function given by name must exist where the code runs.
+
+### Evaluating Many Points at Once: `broadcast()`
+
+A plotter samples a function once per pixel column, or once per cell of an
+implicit plot, and `run()` converts its argument object and wraps its result
+on every call. `broadcast(inputs, options)` takes the inputs of every cell at
+once and writes every result into one `Float64Array`: the conversions run once
+per batch, the compiled body once per cell. Measured 2026-10-20: 20 % faster
+than `run()` per cell on the main thread, and the batch is what a worker
+thread receives (below). It is present on a `javascript` result compiled from
+an expression (`calling: 'expression'`) and on an `interval-js` result.
+
+```javascript
+const f = compile(ce.parse('\\sin(x)\\cos(y) + a'));
+
+const xs = new Float64Array([0, 0.5, 1]);
+const ys = new Float64Array([0, 1]);
+
+// Six cells: the two arrays are the axes of a grid, `x` varying fastest.
+f.broadcast({ x: xs, y: ys, a: 0.5 }, { layout: 'grid' });
+// ➔ Float64Array [0.5, 0.979…, 1.341…, 0.5, 0.759…, 0.954…]
+
+// Three cells: every array holds one value per cell.
+f.broadcast({ x: xs, y: new Float64Array([1, 1, 1]), a: 0.5 });
+```
+
+**Inputs.** `inputs` maps each free variable to a `Float64Array` or to a
+number. A number is the same value for every cell (a document variable). With
+the default layout, `'cells'`, every array holds one value per cell (for
+`interval-js`, a `lo, hi` pair per cell) and all have the same cell count.
+With `layout: 'grid'` the arrays are the axes of a regular grid, in key order
+of `inputs`, the first varying fastest; the cell count is the product of their
+lengths and nothing is expanded on the caller's side. `options.out` is a
+caller-owned output array, filled and returned instead of a new one; it must
+hold at least `outputs` values per cell (below).
+
+**Shared inputs** (`javascript` only). An input can also be bound once for the
+whole batch and read by index in the expression, for example the field values
+of a grid that each cell reads around its own index:
+
+```javascript
+ce.declare('F', 'list<number>');
+ce.declare('i', 'integer');
+const f = compile(ce.parse('F_{i+1}'));
+
+f.broadcast({ i: new Float64Array([0, 1, 2]), F: [1, 2, 3, 4] });
+// ➔ Float64Array [1, 2, 3]
+```
+
+A variable is shared when the compiled code reads it as a list (its declared
+type is a list type), or when `options.shared` names it: `{ shared: ['G'] }`
+is the way to share a variable that has no declared type. Each name in
+`shared` must be a key of `inputs`. A shared input is a plain array of numbers
+or a `Float64Array`; the compiled code reads plain arrays only, so a
+`Float64Array` is copied into one, once per batch, before the cell loop. A
+shared input is not a column of the `cells` layout and not an axis of the
+`grid` layout: it does not count toward the cells. A plain array for any other
+variable throws.
+
+**Output of a `javascript` result.** One value per cell by default. A boolean
+is `1` or `0`; a complex value with a zero imaginary part is its real part; a
+cell whose evaluation throws, or gives any other non-number (a complex value
+with a non-zero imaginary part, a list), is `NaN`. Cell for cell, the value is
+the one `run()` gives: the same compiled body runs with the same conversions.
+A missing variable, a length mismatch or a wrong element type throws before
+the loop.
+
+**Several outputs per cell.** An expression whose type is a tuple of two or
+more elements that can be numbers writes that many values per cell into the
+same output array. An element typed `unknown` counts: `(x, y)` with undeclared
+`x` and `y` writes two values per cell. An element that cannot be a number,
+such as a string, gives one value per cell. With
+`m` values per cell, cell `c` is at `[m·c, m·c + m)`. The result reports the
+inferred `m` as `broadcastOutputs` (absent when it is 1), and
+`options.outputs` (a positive integer) overrides it.
+
+```javascript
+const g = compile(ce.parse('(i, 2i)'));
+g.broadcastOutputs;                                 // ➔ 2
+g.broadcast({ i: new Float64Array([1, 2, 3]) });
+// ➔ Float64Array [1, 2,  2, 4,  3, 6]
+```
+
+With more than one value per cell, the elements of an array answer go through
+the conversions above one by one; an element past the end of the array is
+`NaN`, and an answer that is not an array, or a cell that throws, is `NaN` in
+every slot. With one value per cell (`outputs: 1`), an array answer is `NaN`,
+as before. `shared` and `outputs` are `javascript` options: an `interval-js`
+result throws a `TypeError` for either.
+
+**Output of an `interval-js` result.** A `lo, hi, kind` triple per cell, at
+offsets `3·i`, `3·i + 1` and `3·i + 2`. The kinds are the `INTERVAL_KIND`
+codes, exported from the main entry and from
+`@cortex-js/compute-engine/interval`:
+
+| Code | Meaning | `lo`, `hi` |
+|------|---------|------------|
+| `interval` | an ordinary enclosure; a half-infinite bound is ordinary | the enclosure |
+| `empty` | no value on the input (`sqrt([-2, -1])`) | NaN |
+| `entire` | every real; nothing can be said | NaN |
+| `singularPole` | the input crosses a pole (`1/x` on `[-1, 1]`) | NaN |
+| `singularJump` | the input crosses a jump (`floor`) | the values on both sides |
+| `partial` | part of the input is outside the domain (`sqrt([-1, 4])`) | the values inside |
+| `boolTrue`, `boolFalse`, `boolMaybe` | a compiled comparison or logical expression | NaN |
+| `error` | this cell threw, or gave bounds that are not numbers or are reversed | NaN |
+
+A cell never rejects the batch. The `domainClipped` side of a `partial`
+result and the `at` and `continuity` of a `singular` result are not reported.
+
+```javascript
+const g = compile(ce.parse('\\sqrt{x}'), { to: 'interval-js' });
+g.broadcast({ x: new Float64Array([1, 4, -2, -1, -1, 4]) });
+// ➔ [1, 2, INTERVAL_KIND.interval,  NaN, NaN, INTERVAL_KIND.empty,  0, 2, INTERVAL_KIND.partial]
+```
+
+### Worker Threads: `broadcastAsync()` and the Kernel Pool
+
+`broadcastAsync(inputs, options)` takes the same inputs and `out` as
+`broadcast()`, plus a `signal` (an `AbortSignal`), a `deadline` (milliseconds
+of wall clock for the whole batch) and a `chunk` (cells per task). It resolves
+to `{ out, done }`, where `done` is the number of leading cells that are
+valid: every cell, or fewer when the deadline or the signal stopped the batch;
+the cells after `done` are untouched.
+
+`broadcastAsync()` takes `shared` and `outputs` as `broadcast()` does; `done`
+is still a count of cells, not of values. On a pool, the shared inputs go to
+each worker once per call, with the first slice of the call that the worker
+receives, and the worker keeps them until the call ends; each later slice
+carries only its own cells. A `Float64Array` shared input is copied for each
+worker and transferred, a plain array is cloned. The default stride travels
+with the stored result (`broadcastOutputs`), so a worker and
+`createJavaScriptRuntime().loadBroadcast(result)` lay out the cells the same
+way, and the runtime reads the shared inputs from the stored entry plan.
+
+Without a worker pool it runs the batch inline, in slices between yields to
+the event loop, so a deadline still applies and a long batch does not block a
+frame. With a pool it splits the cells into one slice per worker (or `chunk`
+cells per slice), ships them, and writes each returned slice into `out` as it
+arrives. A batch under a threshold runs inline in any case: the pool measures
+the cells per millisecond of each compiled function from its inline batches,
+and ships a batch only when its serial time would exceed about 10 ms (before
+the first measurement, 20 000 cells). Measured 2026-10-20 on an 18-core
+machine: an implicit plot of 512×512 interval cells takes 175 ms inline and 34
+ms on 8 workers; a 2000-column 1D plot takes under 2 ms and never ships.
+
+The engine creates no worker on its own. The host builds the pool and gives it
+to one or more engines:
+
+```javascript
+import { ComputeEngine, createKernelPool } from '@cortex-js/compute-engine';
+
+const pool = createKernelPool({
+  // The worker file ships as one self-contained ES module,
+  // `dist/esm-min/kernel-worker.js` (`@cortex-js/compute-engine/kernel-worker`).
+  // Copy it next to your own files when your bundler does not resolve the
+  // package at run time, and start it from its URL.
+  create: () => new Worker(new URL('./kernel-worker.js', import.meta.url), { type: 'module' }),
+  size: 4,        // default: one less than the hardware concurrency, at most 8
+  prewarm: true,  // create the workers on idle time now, not on the first batch
+});
+
+const ce = new ComputeEngine();
+ce.workers = pool;
+
+const f = compile(ce.parse('\\sin(x)\\cos(y) + x^2 - y^2 - 0.3'), { to: 'interval-js' });
+const { out, done } = await f.broadcastAsync(
+  { x: xAxis, y: yAxis },
+  { layout: 'grid', deadline: 30 }
+);
+```
+
+In Node the factory returns a `worker_threads` `Worker` on the same file. A
+worker reports the versions of the runtimes it holds; a stored result compiled
+by another release is refused by the worker, and its slices then run inline.
+`pool.dispose()` terminates the workers; a later batch creates them again. A
+Content Security Policy must allow the worker script (`worker-src`) and
+`new Function` in it (`'unsafe-eval'`): the worker rebuilds each function from
+its text, as `createJavaScriptRuntime().load()` does. `SharedArrayBuffer` is
+not needed; the arrays are transferred.
+
+The two standalone runtimes have the same batch forms:
+`createJavaScriptRuntime().loadBroadcast(result)` and
+`createIntervalRuntime().loadBroadcast(result)` (from
+`@cortex-js/compute-engine/interval`) rebuild a stored result as a
+`broadcast()` function, with no engine behind it. An `interval-js` result
+carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
+`javascript` result does.
 
 ### Constant Folding
 
@@ -11422,6 +12077,13 @@ console.log(f.run({ x: 0 }));    // ➔ Infinity
 console.log(f.run({ x: -0 }));   // ➔ -Infinity
 ```
 
+This projection reaches a comparison in a branch. In the interpreter a pole
+has no order, so `1/x > 0` at `x = 0` is `False` and `\{1/x > 0: 1, 0\}` is
+`0` (user decision of 2026-10-21); the compiled unit compares `Infinity > 0`,
+which is `true`, and gives `1`. The two answers differ at the pole only. A
+closed form with no variable (`\{1/0 > 0: 1, 0\}`) is folded at compile time to
+the interpreter's answer, `0`.
+
 Absence markers project the same way. `Missing` — what an unmatched `Which`,
 an else-less `If` and a false restriction `e\{c\}` return — is not a
 number, so the chained ternary ends in a literal `NaN` (see
@@ -11473,6 +12135,15 @@ reaches one:
   escalates. Radicals whose operand is non-negative under the compiler's own
   "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
   `ln(x²)` — keep the real kernel and cost nothing.
+
+```mermaid
+flowchart TD
+  c["compile(expr), mode 'auto'"] --> s["compile with strict shapes, plus promotion:<br/>an unknown-sign sqrt, ln, log or non-integer power<br/>lowers through the complex kernels"]
+  s --> reach{"a promoted or complex-typed value<br/>reaches a wide binding?"}
+  reach -- no --> done["result.mode = 'strict'<br/>result.promoted says whether a head was promoted"]
+  reach -- yes --> again["recompile once in complex mode:<br/>wide bindings are complex, lifted at their use"]
+  again --> done2["result.mode = 'complex'<br/>result.escalation holds the LaneMismatch<br/>diagnostic of the strict attempt"]
+```
 
 The special functions whose value is complex for some real operands —
 `HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
@@ -11527,8 +12198,11 @@ radical — compile under `auto` and `complex` with a **runtime rule**: the
 operand is bound once, and the comparison is `false` / the head `NaN` when the
 value's imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`,
 `false` at `z = i`; `y > √x` compiles and is `false` where `x < 0`). A
-**statically** non-real operand (`i < 2`, `Floor(2i)`) has no compiled value
-and is a compile-time decline in every mode; `strict` declines every complex
+**statically** non-real operand of a real-only head (`Floor(2i)`) has no
+compiled value and is a compile-time decline in every mode; a statically
+non-real operand of an ordering comparison (`i < 2`) folds to `false`, the
+interpreter's answer (a value with no order decides false, user decision of
+2026-10-21), while `i < x` with `x` free declines; `strict` declines every complex
 operand of such a head, as before.
 
 The single most effective lever is not a mode: **declare the narrowest type
@@ -11771,7 +12445,7 @@ console.log(`SELECT * FROM table WHERE ${sql}`);
 // → SELECT * FROM table WHERE AND("x" > 10, "y" <= 20)
 ```
 
-For more examples of custom targets, see [`examples/compile-custom-target.js`](../examples/compile-custom-target.js).
+For more examples of custom targets, see [`examples/compile-custom-target.js`](https://github.com/cortex-js/compute-engine/blob/main/examples/compile-custom-target.js).
 
 ## Plugin Architecture: Registering Custom Targets
 
@@ -11962,6 +12636,13 @@ fnResult.run({ x: { lo: 1, hi: 2 }, y: { lo: 0, hi: 0.5 } });
 // → { kind: 'interval', value: { lo: 1, hi: 4.5 } }
 ```
 
+#### Many Cells at Once
+
+`result.broadcast()` evaluates an `interval-js` function over an array of
+cells in one call and encodes each result as a `lo, hi, kind` triple, and
+`result.broadcastAsync()` runs the batch on a worker pool. See *Evaluating
+Many Points at Once* and *Worker Threads* above.
+
 #### GLSL Interval Target (`interval-glsl`)
 
 :::warning[Deprecated]
@@ -12135,7 +12816,7 @@ interface LanguageTarget {
 }
 ```
 
-For complete examples of custom targets including RPN (Reverse Polish Notation), Python, and more, see [`examples/compile-plugin-architecture.js`](../examples/compile-plugin-architecture.js).
+For complete examples of custom targets including RPN (Reverse Polish Notation), Python, and more, see [`examples/compile-plugin-architecture.js`](https://github.com/cortex-js/compute-engine/blob/main/examples/compile-plugin-architecture.js).
 
 ## Performance Benchmarks
 
@@ -12748,7 +13429,7 @@ The `ce.assume()` method returns a status indicating the result of the assumptio
 Every outcome is reported as a return value; an expression that cannot be
 assumed does not throw. The `["Assume"]` operator reports the same outcomes as
 a string — see the
-[`Assume` reference](/compute-engine/reference/core/#Assume).
+[`Assume` reference](/compute-engine/reference/core/#assume).
 
 ```js
 ce.assume(ce.parse("x > 4"));
@@ -13783,7 +14464,7 @@ ce.parse('p \\leftrightarrow q'); // → ["Equivalent", "p", "q"]
 and parses as `To`, not `Implies`.
 
 **Note:** `\equiv` is *not* a spelling of `Equivalent`: it parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal), the
 mathematical identity operator. Use `\iff` or `\Leftrightarrow` for a
 biconditional. (Over boolean operands the two agree, since two propositions are
 identically equal exactly when they are equivalent.)
@@ -16944,16 +17625,6 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
-
-```ts
-tolerance: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ExpressionComputeEngine.~~angularUnit~~ {#angularunit-2}
 
 ```ts
@@ -17060,6 +17731,21 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
+##### ExpressionComputeEngine.~~workers~~ {#workers-1}
+
+```ts
+workers: KernelPool | undefined;
+```
+
+The worker pool that `broadcastAsync()` of a compiled result uses, built
+by the host with `createKernelPool()`. The engine creates no worker on
+its own: with no pool every batch runs on the calling thread. One pool
+can serve several engines, and it is read at each call.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ExpressionComputeEngine.~~trace~~ {#trace-1}
 
 ```ts
@@ -17113,6 +17799,21 @@ For a change that must last for one block of code only, use
 get precision(): number
 set precision(p: number | "auto" | "machine"): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~tolerance~~ {#tolerance-2}
+
+```ts
+get tolerance(): number
+set tolerance(v: number | "auto"): void
+```
+
+The absolute tolerance of the comparisons that involve a float, and of
+`chop()`. A number is kept as set; `'auto'` is `10^(-precision + 2)`,
+recomputed at each precision change.
 
 </MemberCard>
 
@@ -17795,9 +18496,9 @@ as `ce.number(2)` is the exact `2`: a part is an integer when it is a
 exponent is at most `10^6` (also at machine precision, and also outside
 the double range). When a part has a fraction, is a `number` past the
 safe integers, or is a `BigDecimal` with a larger exponent (`1e2000000`),
-the result is a float. The same rule applies to a `Complex` given to
-`ce.number()` or `ce.box()`: `ce.number(new Complex(2, 3))` is the exact
-`2+3i`, `ce.number(new Complex(2.5, 3))` is a float.
+the result is a float. A `Complex` given to `ce.number()` or `ce.box()`
+does not follow this rule: it holds two doubles, so it is always a
+float (`ce.number(new Complex(2, 3))` is the float `2.0 + 3.0i`).
 
 ```js
 ce.precision = 30;
@@ -18483,7 +19184,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
@@ -18558,7 +19264,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
@@ -18704,6 +19415,9 @@ listSequences(): string[]
 List all defined sequences.
 Returns an array of sequence names.
 
+A name is listed when the definition it has in the current scope is a
+sequence, as for `isSequence()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -18715,6 +19429,12 @@ isSequence(name): boolean
 ```
 
 Check if a symbol is a defined sequence.
+
+The answer is for the definition that the name has in the current
+scope. A sequence declared in an enclosing scope is a sequence. A
+sequence is no longer one after the scope that declared it is popped,
+after `undeclare()`, or after a checkpoint restore that removes its
+declaration.
 
 ####### name
 
@@ -18932,6 +19652,78 @@ forget(symbol?): void
 ####### symbol?
 
 `string` \| `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### ExpressionComputeEngine.~~undeclare()~~ {#undeclare-1}
+
+```ts
+undeclare(names): void
+```
+
+Remove the binding of one or more names from the current scope.
+
+The binding goes whatever it holds: a value, a function given with
+`ce.assign()` or `ce.declare()`, or a function defined by one or more
+clauses (`f(x) := …`, `DefineFunction`). This is different from
+`forget()`, which removes assumptions and keeps the declaration.
+
+After the call, the name is not declared in the current scope:
+
+- When an enclosing scope declares the name, that declaration applies
+  again. `undeclare()` does not change an enclosing scope.
+- Otherwise, the name is a free symbol: `f(2)` stays unevaluated as
+  `["f", 2]`, and `x + 1` stays symbolic.
+- A later `ce.declare()`, `ce.assign()`, `f(x) := …` or `DefineFunction`
+  of the name is a new declaration, and is accepted.
+
+An expression boxed before the call does not use the removed binding
+either. A symbol reads the value that the scope chain holds when the
+expression is evaluated. A call such as `f(2)` boxed before the call
+evaluates to `["f", 2]`, and after a new definition of `f` in the same
+scope it uses the new definition, as for a function given again with
+`ce.assign()`.
+
+Assumptions about the name are not removed: an assumption applies to
+the name, and so to a new declaration of it. Use `forget()` to remove
+them.
+
+A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
+
+####### names
+
+`string` \| readonly `string`[]
+
+###### Throws
+
+if a name is not declared in the current scope. A name declared
+only in an enclosing scope is not declared in the current scope. To
+remove a name only when it is declared, test
+`ce.context.lexicalScope.bindings.has(name)` first.
+
+###### Throws
+
+if a name is defined by a library: a standard library, a library
+given to the constructor, or a library loaded with `ce.loadLibrary()`.
+Also throws for any name of the system scope, which holds the standard
+library.
+
+###### Throws
+
+if a name is the variable of an operator such as `Sum`, or a
+parameter of a function, while that expression is evaluated.
+
+When one name of a list is refused, no binding is removed.
+
+```ts
+ce.pushScope();
+ce.parse('f(n) := n + 1').evaluate();
+ce.parse('f(2)').evaluate();   // 3
+ce.undeclare('f');
+ce.parse('f(2)').evaluate();   // f(2)
+```
 
 </MemberCard>
 
@@ -19442,8 +20234,9 @@ _isLiteralData(): boolean
 
 Internal. Is this node written-out DATA: a canonical `List` or `Tuple`
 bound to the standard library whose every element is a number literal,
-or such a `List` or `Tuple` in turn? Such a node holds no symbol and
-evaluates to itself. The answer is computed once per node.
+a failed cell, or such a `List` or `Tuple` in turn? A failed cell is an
+`Error` node with no symbol in it, and is data too. Such a node holds no
+symbol and evaluates to itself. The answer is computed once per node.
 
 </MemberCard>
 
@@ -21601,6 +22394,29 @@ Return `undefined` if the membership cannot be determined.
 
 <MemberCard>
 
+##### BaseCollectionHandlers.countOf? {#countof}
+
+```ts
+optional countOf?: (collection, target) => number | bigint | undefined;
+```
+
+Return the number of elements of the collection that are structurally
+the same as `target` (the `isSame()` comparison), without a walk of the
+collection. `Count(xs, v)` reads it.
+
+Give this handler when the collection can have more elements than a
+walk can visit (a combinatorial generator such as `Permutations` has
+`n!` elements): without it, `Count(xs, v)` walks every element. A count
+that is not a safe integer is returned as a `bigint`.
+
+Return `undefined` when the count cannot be computed without a walk.
+The answer must be the one a walk that compares each element with
+`isSame()` gives.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BaseCollectionHandlers.subsetOf? {#subsetof}
 
 ```ts
@@ -21687,6 +22503,48 @@ indexWhere: (collection, predicate) => number | undefined;
 Return the index of the first element that matches the predicate.
 
 If no element matches the predicate, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionHandlers.atBigint? {#atbigint}
+
+```ts
+optional atBigint?: (collection, index) => Expression | undefined;
+```
+
+Return the element at a 1-based position given as a `bigint`.
+
+The position is positive. A negative position is converted before the
+call: it counts from the end, so it is `count + index + 1`.
+
+`at()` takes a `number`, which cannot hold a position larger than
+`Number.MAX_SAFE_INTEGER` exactly. Give this handler when the collection
+can have more elements than that (its `count` can be a `bigint`): it is
+used for such a position, and for a negative position when the count is
+a `bigint`. Without it, these positions have no element.
+
+If the position is outside the collection, return `undefined`.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IndexedCollectionHandlers.indexOf? {#indexof}
+
+```ts
+optional indexOf?: (collection, target) => number | bigint | undefined;
+```
+
+Return the 1-based position of the first element that is structurally
+the same as `target` (the `isSame()` comparison), without a walk of the
+collection. `IndexOf(xs, v)` reads it.
+
+Return `0` when no element is the same as `target`, and `undefined` when
+the position cannot be computed without a walk. A position that is not a
+safe integer is returned as a `bigint`. The answer must be the one a walk
+that compares each element with `isSame()` gives.
 
 </MemberCard>
 
@@ -22043,12 +22901,13 @@ type BroadcastExemption =
   | "collection-result"
   | "evaluated-operands"
   | "whole-collection-compare"
-  | "single-collection-join";
+  | "single-collection-join"
+  | "surplus-operands";
 ```
 
 A shape of operand (or result) whose broadcast handling an operator's own
 handlers provide, exempting it from the generic broadcast machinery. See
-[OperatorDefinitionFlags.broadcastExemptions](#broadcastexemptions) for the meaning of
+[OperatorDefinitionFlags.broadcastExemptions](#operatordefinitionflags) for the meaning of
 each label.
 
 </MemberCard>
@@ -22388,7 +23247,12 @@ The eager producer's element count — see the `elementCount` contract on
 
 ```ts
 optional inferOperandTypes?: (ops, requirement) => 
-  | readonly (Type | undefined)[]
+  | readonly (
+  | Type
+  | {
+  replace: Type;
+ }
+  | undefined)[]
   | undefined;
 ```
 
@@ -24831,9 +25695,11 @@ type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions,
   | "numericSetStyle"
   | "indexStyle"
   | "readsAsPointList"
-  | "readsAsCardinality"> & {
+  | "readsAsCardinality"
+  | "readsAsMatrixPowerBase"> & {
   readsAsPointList: ((operands) => boolean | undefined) | undefined;
   readsAsCardinality: ((operand) => boolean | undefined) | undefined;
+  readsAsMatrixPowerBase: ((base) => boolean | undefined) | undefined;
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => RootStyle;
@@ -24894,6 +25760,21 @@ This allows the serialized LaTeX to vary depending on the depth of the
 expression.
 
 For example use `\Bigl(` for the top level, and `\bigl(` or `(` for others.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Serializer.depth {#depth}
+
+```ts
+readonly depth: number;
+```
+
+How deeply the expression being written is nested: 0 for the expression
+`serialize()` was called on, 1 for one of its operands, and so on. Unlike
+`level`, no serializer adjusts it, so it tells whether the expression is
+an operand of another one.
 
 </MemberCard>
 
@@ -25008,6 +25889,30 @@ numericSetStyle: (expr, level) => "compact" | "regular" | "interval" | "set-buil
 ```ts
 indexStyle: (expr, level) => "subscript" | "bracket";
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### Serializer.serializeAtDepth() {#serializeatdepth}
+
+```ts
+serializeAtDepth(expr, depth): string
+```
+
+Serialize `expr` as if it stood at nesting `depth` (0 for the root), for
+a serializer that writes the same expression again in another form, or
+for an operand whose parent already writes the parentheses it would add.
+
+####### expr
+
+  \| [`MathJsonExpression`](#mathjsonexpression)
+  \| `null`
+  \| `undefined`
+
+####### depth
+
+`number`
 
 </MemberCard>
 
@@ -26426,7 +27331,7 @@ type SymbolTable = {
 function newSymbolIds(): {}
 ```
 
-A prototype-free [SymbolTable.ids](#ids) map — see the note there.
+A prototype-free [SymbolTable.ids](#symboltable) map — see the note there.
 
 </MemberCard>
 
@@ -26670,7 +27575,12 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
   inferOperandTypes: (ops, requirement) => 
-     | ReadonlyArray<Type | undefined>
+     | ReadonlyArray<
+     | Type
+     | {
+     replace: Type;
+    }
+     | undefined>
      | undefined;
 };
 ```
@@ -27125,7 +28035,12 @@ a declared `count` owns the answer, including its `undefined`.
 
 ```ts
 optional inferOperandTypes?: (ops, requirement) => 
-  | ReadonlyArray<Type | undefined>
+  | ReadonlyArray<
+  | Type
+  | {
+  replace: Type;
+ }
+  | undefined>
   | undefined;
 ```
 
@@ -27149,11 +28064,19 @@ Only a VALUE requirement reaches the handler: never `any`, `unknown`,
 `value`, `nothing`, an absence marker alone, or a function type. An
 absence arm (`real | missing`) is stripped before the call.
 
+An entry can also be `{ replace: t }`: the handler has combined the
+operand's current inferred type with this requirement itself, and `t`
+replaces that type instead of being intersected with it. This is for a
+combination that is not an intersection, such as a tuple that gets one
+more component. The same guards apply: a declared type never moves.
+
 `At` answers `dictionary<r> | indexed_collection<r>` for its base and
 `First`/`Second`/`Third`/`Last` answer `indexed_collection<r>`. The
 scalar reading is written on purpose: `xs[1] + 1` requires `number`
 of the element, exactly as `x + 1` infers a bare `x` as `number`.
-Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
+For a base that is a bare function parameter, `At` answers a
+`replace` entry that records each index read separately (a tuple for
+literal indices). Design and rulings: `docs/INFERENCE_ROADMAP.md` §5.
 
 </MemberCard>
 
@@ -27171,6 +28094,41 @@ type SymbolDefinitions = Readonly<{}>;
 
 Minimal interface for a LaTeX parser/serializer.
  Structurally compatible with `LatexSyntax` without importing it.
+
+<MemberCard>
+
+##### ILatexSyntax.dictionary? {#dictionary-2}
+
+```ts
+readonly optional dictionary?: readonly Partial<OnlyFirst<
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | SymbolEntry
+  | FunctionEntry
+  | EnvironmentEntry
+  | DefaultEntry, {} & 
+  | ExpressionEntry
+  | MatchfixEntry
+  | InfixEntry
+  | PostfixEntry
+  | PrefixEntry
+  | SymbolEntry
+  | FunctionEntry
+  | EnvironmentEntry
+  | DefaultEntry>>[];
+```
+
+The dictionary entries, including the entries added with
+ `addEntries()`. A call to `addEntries()` gives a new array, so a
+ different array means a different dictionary. Rule strings are parsed
+ with these entries plus the rule entries. Optional: a minimal injected
+ syntax may not have it, and then rule strings are parsed with the
+ default dictionary. See `LatexSyntax.dictionary`.
+
+</MemberCard>
 
 <MemberCard>
 
@@ -27858,16 +28816,6 @@ complex: (a, b?) => Complex;
 
 <MemberCard>
 
-##### IComputeEngine.tolerance {#tolerance-1}
-
-```ts
-tolerance: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
 ##### IComputeEngine.angularUnit {#angularunit-1}
 
 ```ts
@@ -27974,6 +28922,21 @@ compilation and latches to `'off'` engine-wide on the first CSP
 
 <MemberCard>
 
+##### IComputeEngine.workers {#workers}
+
+```ts
+workers: KernelPool | undefined;
+```
+
+The worker pool that `broadcastAsync()` of a compiled result uses, built
+by the host with `createKernelPool()`. The engine creates no worker on
+its own: with no pool every batch runs on the calling thread. One pool
+can serve several engines, and it is read at each call.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.trace {#trace}
 
 ```ts
@@ -28027,6 +28990,21 @@ For a change that must last for one block of code only, use
 get precision(): number
 set precision(p: number | "auto" | "machine"): void
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.tolerance {#tolerance-1}
+
+```ts
+get tolerance(): number
+set tolerance(v: number | "auto"): void
+```
+
+The absolute tolerance of the comparisons that involve a float, and of
+`chop()`. A number is kept as set; `'auto'` is `10^(-precision + 2)`,
+recomputed at each precision change.
 
 </MemberCard>
 
@@ -28709,9 +29687,9 @@ as `ce.number(2)` is the exact `2`: a part is an integer when it is a
 exponent is at most `10^6` (also at machine precision, and also outside
 the double range). When a part has a fraction, is a `number` past the
 safe integers, or is a `BigDecimal` with a larger exponent (`1e2000000`),
-the result is a float. The same rule applies to a `Complex` given to
-`ce.number()` or `ce.box()`: `ce.number(new Complex(2, 3))` is the exact
-`2+3i`, `ce.number(new Complex(2.5, 3))` is a float.
+the result is a float. A `Complex` given to `ce.number()` or `ce.box()`
+does not follow this rule: it holds two doubles, so it is always a
+float (`ce.number(new Complex(2, 3))` is the float `2.0 + 3.0i`).
 
 ```js
 ce.precision = 30;
@@ -29397,7 +30375,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
@@ -29472,7 +30455,12 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
-     \| readonly ([`Type`](#type-3) \| `undefined`)[]
+     \| readonly (
+     \| [`Type`](#type-3)
+     \| \{
+     `replace`: ...;
+    \}
+     \| `undefined`)[]
      \| `undefined`;
  \}\>\>
   \| [`BoxedOperatorDefinition`](#boxedoperatordefinition)
@@ -29618,6 +30606,9 @@ listSequences(): string[]
 List all defined sequences.
 Returns an array of sequence names.
 
+A name is listed when the definition it has in the current scope is a
+sequence, as for `isSequence()`.
+
 </MemberCard>
 
 <MemberCard>
@@ -29629,6 +30620,12 @@ isSequence(name): boolean
 ```
 
 Check if a symbol is a defined sequence.
+
+The answer is for the definition that the name has in the current
+scope. A sequence declared in an enclosing scope is a sequence. A
+sequence is no longer one after the scope that declared it is popped,
+after `undeclare()`, or after a checkpoint restore that removes its
+declaration.
 
 ####### name
 
@@ -29846,6 +30843,78 @@ forget(symbol?): void
 ####### symbol?
 
 `string` \| `string`[]
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.undeclare() {#undeclare}
+
+```ts
+undeclare(names): void
+```
+
+Remove the binding of one or more names from the current scope.
+
+The binding goes whatever it holds: a value, a function given with
+`ce.assign()` or `ce.declare()`, or a function defined by one or more
+clauses (`f(x) := …`, `DefineFunction`). This is different from
+`forget()`, which removes assumptions and keeps the declaration.
+
+After the call, the name is not declared in the current scope:
+
+- When an enclosing scope declares the name, that declaration applies
+  again. `undeclare()` does not change an enclosing scope.
+- Otherwise, the name is a free symbol: `f(2)` stays unevaluated as
+  `["f", 2]`, and `x + 1` stays symbolic.
+- A later `ce.declare()`, `ce.assign()`, `f(x) := …` or `DefineFunction`
+  of the name is a new declaration, and is accepted.
+
+An expression boxed before the call does not use the removed binding
+either. A symbol reads the value that the scope chain holds when the
+expression is evaluated. A call such as `f(2)` boxed before the call
+evaluates to `["f", 2]`, and after a new definition of `f` in the same
+scope it uses the new definition, as for a function given again with
+`ce.assign()`.
+
+Assumptions about the name are not removed: an assumption applies to
+the name, and so to a new declaration of it. Use `forget()` to remove
+them.
+
+A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
+
+####### names
+
+`string` \| readonly `string`[]
+
+###### Throws
+
+if a name is not declared in the current scope. A name declared
+only in an enclosing scope is not declared in the current scope. To
+remove a name only when it is declared, test
+`ce.context.lexicalScope.bindings.has(name)` first.
+
+###### Throws
+
+if a name is defined by a library: a standard library, a library
+given to the constructor, or a library loaded with `ce.loadLibrary()`.
+Also throws for any name of the system scope, which holds the standard
+library.
+
+###### Throws
+
+if a name is the variable of an operator such as `Sum`, or a
+parameter of a function, while that expression is evaluated.
+
+When one name of a list is refused, no binding is removed.
+
+```ts
+ce.pushScope();
+ce.parse('f(n) := n + 1').evaluate();
+ce.parse('f(2)').evaluate();   // 3
+ce.undeclare('f');
+ce.parse('f(2)').evaluate();   // f(2)
+```
 
 </MemberCard>
 
@@ -32069,8 +33138,12 @@ If this is an equation, solve the equation for the variables in vars.
 Otherwise, solve the equation `this = 0` for the variables in vars.
 
 For univariate equations, returns an array of solutions (roots). For a
-trigonometric equation, the array holds the principal roots, which
-represent the periodic families of roots. Returns `null` when the solver
+trigonometric equation, the array holds the principal roots: one root of
+each family of roots in one period, with no free parameter
+(`sin(x) = 1/2` gives `[π/6, 5π/6]`). This is different from the `Solve`
+operator, which gives the families themselves with a fresh integer
+parameter `t` (`[π/6 + 2πt, 5π/6 + 2πt]`), so that its list holds every
+root. Returns `null` when the solver
 cannot solve the equation, and also when it can find only a part of the
 roots: when the unknown is in a function that the solver cannot invert
 and that is not periodic (`(x - 1)·BesselJ(0, x) = 0`), or in a factor of
@@ -32738,8 +33811,14 @@ isSame(rhs): boolean
 Fast exact structural/symbolic equality check.
 
 Returns `true` if the expression is structurally identical to `rhs`.
-For symbols with value bindings, follows the binding (e.g., if `one = 1`,
-then `ce.symbol('one').isSame(1)` is `true`).
+The value of a symbol is never followed: if `one` is assigned `1`,
+`ce.symbol('one').isSame(1)` is `false`.
+
+The elements of a set literal are not ordered, so two sets with the same
+elements in a different order are the same:
+`ce.box(['Set', 2, 1]).isSame(ce.box(['Set', 1, 2]))` is `true`. A
+set-builder (`Set(body, Element(k, S))`) compares its two operands by
+position.
 
 Accepts JavaScript primitives: `number`, `bigint`, `boolean`, `string`.
 
@@ -33429,6 +34508,25 @@ optional rank?: number;
 ```ts
 data: DataTypeMap[DT][];
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### TensorData.holdsFloat? {#holdsfloat}
+
+```ts
+optional holdsFloat?: boolean;
+```
+
+Is the tensor a float tensor? `true` when an entry of the matrix the
+tensor was packed from is a float (a number literal that is not exact,
+such as `1.5` or `2.0`), or when the tensor was computed from a float
+tensor. Every cell of a float tensor is read back as a float, even when
+its value is an integer: the determinant of `[[1.5, 0], [0, 2]]` is the
+float `3`, not the exact `3`. Only the numeric dtypes (`float64`,
+`complex128`, …) use it: a cell of the `expression` dtype keeps its own
+exactness.
 
 </MemberCard>
 
@@ -36759,6 +37857,10 @@ symbolic.
 
 ### Interpreting Elliptical Notation
 
+<nav className="hidden">
+### Interpret
+</nav>
+
 <FunctionDefinition name="Interpret">
 
 <Signature name="Interpret">_expr_</Signature>
@@ -36864,6 +37966,10 @@ of `ce.roundingTies`. The default rule rounds a tie away from zero:
 [Rounding Ties](/compute-engine/guides/numeric-evaluation/#rounding-ties).
 
 ### Other Relational Operators
+
+<nav className="hidden">
+### Congruent
+</nav>
 
 <FunctionDefinition name="Congruent">
 
@@ -37134,6 +38240,10 @@ inside it reproducible.
 draw, "with" and "without" replacement coincide. The wrapper is the only
 difference — `RandomChoice` returns a list.
 
+<nav className="hidden">
+### WithRandomSeed
+</nav>
+
 <FunctionDefinition name="WithRandomSeed">
 
 <Signature name="WithRandomSeed">_seed_: real | string, _body_: any</Signature>
@@ -37274,6 +38384,10 @@ empty collection are all errors.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### RandomChoice
+</nav>
+
 <FunctionDefinition name="RandomChoice">
 
 <Signature name="RandomChoice">_domain_: collection, _k_: number</Signature>
@@ -37369,7 +38483,7 @@ of producing an empty one.
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known. `NaN` and a pole (`1/0`) are equal to nothing, including themselves |
 | `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 | `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
@@ -37380,6 +38494,14 @@ of producing an empty one.
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+An ordered comparison (`Less`, `LessEqual`, `Greater`, `GreaterEqual`) with an
+operand that has no order answers `False`: `NaN`, a pole (`1/0`, which
+evaluates to $\tilde\infty$) and a non-real complex number (`i`, `\ln(-1)`).
+So a piecewise whose condition compares such a value takes its next branch:
+`\{1/0 > 0: 1, 0\}` is `0`. `NotEqual` is not affected (`1/0 \ne 0` is
+`True`), and a comparison with a free symbol stays unevaluated. Signed
+infinities are ordered as usual (`0 < \infty` is `True`).
 
 The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
 `IdenticallyEqual` (same value for every value of the free variables) — are
@@ -39292,10 +40414,10 @@ The most common types of collection are:
 |:-------------|:-------------------------------------------------------|--------------------------|
 | `list`       | Collection of elements accessible by their index, duplicates allowed    | [**List**](#list)        |
 | `set`        | Collection of unique elements                           | [**Set**](#set)          |
-| `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](#tuple)      |
+| `tuple`      | Collection with a fixed size and optional names        | [**Tuple**](/compute-engine/guides/types/#tuple)      |
 | `range`      | An **index span**: a contiguous, ascending run of 1-based indexes | [**Range**](#range)      |
 | `string`     | An indexed collection of `character` — the string's grapheme clusters | [**Strings**](/compute-engine/reference/strings/) |
-| `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](#dictionary) |
+| `dictionary` | Collection of key-value pairs with string keys        | [**Dictionary**](/compute-engine/guides/types/#dictionary-and-record) |
 | `record`     | Structured data with a fixed set of known string keys  |                          |
 
 Collections are **immutable**: they cannot be modified in place.  
@@ -39561,12 +40683,12 @@ Some of the eager collections include:
   
   **Type:** `set<T>` where `T` is the type of the elements.
 
-- [**Tuple**](#tuple): indexed collections of elements, but with a fixed number
+- [**Tuple**](/compute-engine/guides/types/#tuple): indexed collections of elements, but with a fixed number
   of elements that have a specific type and an optional name. 
   
   **Type:** `tuple<T1, T2, ..., Tn>` where `T1`, `T2`, ..., `Tn` are the types of the elements.
 
-- [**Dictionary**](#dictionary): non-indexed collections of key-value pairs, 
+- [**Dictionary**](/compute-engine/guides/types/#dictionary-and-record): non-indexed collections of key-value pairs, 
     where each key is unique. 
     
     **Type:** either `dictionary<V>` where `V` is the 
@@ -39874,7 +40996,7 @@ bound:
 `simplify()`, and round-trips through LaTeX (it does not yet carry collection
 semantics).
 
-Note that the bare braces $\{a_n\}$ remain a [`Set`](#Set), and the
+Note that the bare braces $\{a_n\}$ remain a [`Set`](#set), and the
 parenthesized form $(a_n)_{n\in\mathbb{N}}$ is unchanged.
 
 </FunctionDefinition>
@@ -41170,7 +42292,7 @@ ce.box(['Count', ['Set', 1, 2]]).latex;
 
 With a second argument that is not a function, returns how many elements of
 _xs_ are equal to _value_. The value is compared using structural identity,
-like the [`Same`](/compute-engine/reference/core/#Same) operator — the same
+like the [`Same`](/compute-engine/reference/core/#same) operator — the same
 comparison [`Contains`](#contains) uses. Number leaves compare by exact value,
 so `0.5` counts as an occurrence of `1/2`.
 
@@ -41232,6 +42354,10 @@ Returns the symbol `True` if the collection has no elements.
 ```
 
 </FunctionDefinition>
+
+<nav className="hidden">
+### Contains
+</nav>
 
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
@@ -41377,6 +42503,9 @@ has to reject an empty needle because it must return a span.
 
 <nav className="hidden">
 ### StartsWith
+</nav>
+<nav className="hidden">
+### EndsWith
 </nav>
 
 <FunctionDefinition name="StartsWith">
@@ -42003,6 +43132,10 @@ three forms.
 ```
 </FunctionDefinition>
 
+<nav className="hidden">
+### Chunk
+</nav>
+
 <FunctionDefinition name="Chunk">
 <Signature name="Chunk">_collection_, _count_:integer</Signature>
 
@@ -42023,6 +43156,10 @@ For a **string** source each group is itself a string, so the result is a
 // ➔ ["abc", "def"]
 ```
 </FunctionDefinition>
+
+<nav className="hidden">
+### GroupBy
+</nav>
 
 <FunctionDefinition name="GroupBy">
 <Signature name="GroupBy">_collection_, _function_:function</Signature>
@@ -42990,6 +44127,10 @@ masking.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### Match
+</nav>
+
 <FunctionDefinition name="Match">
 
 <Signature name="Match">_subject_, _case-1_, ..._case-n_</Signature>
@@ -43108,7 +44249,7 @@ In Epsil, a range pattern is written `lo..hi`:
 `match n { 0..9 => "digit"; _ => "more" }`.
 
 **Error subjects**. `["Match"]` also decides when the subject is an
-[error](/compute-engine/reference/core/#Error) — it is the construct for
+[error](/compute-engine/reference/core/#error) — it is the construct for
 rescuing a failed computation. Matching stays total, but an error is never
 handed to a pattern that would pretend the failure has a shape: literal,
 range, pin, and structural cases all fail against an error subject, and it
@@ -43135,8 +44276,8 @@ error, binding its payload. This is the idiomatic rescue:
 ```
 
 A guard can inspect the subject with
-[`IsError`](/compute-engine/reference/core/#IsError) or
-[`Type`](/compute-engine/reference/core/#Type):
+[`IsError`](/compute-engine/reference/core/#iserror) or
+[`Type`](/compute-engine/reference/core/#type):
 
 ```json example
 ["Match", ["Ln", "'a'"],
@@ -43941,7 +45082,7 @@ evaluate to `False`.
 To compare two expressions for mathematical equality, use `Equal`.
 
 To compare two expressions structurally, but ignoring the order of the arguments
-of commutative functions, use [`CanonicalForm`](#CanonicalForm).
+of commutative functions, use [`CanonicalForm`](#canonicalform).
 
 
 See [Comparing Expressions](/compute-engine/guides/symbolic-computing/#comparing-expressions) for other options to compare two expressions, such 
@@ -44020,7 +45161,7 @@ a list of booleans.
 With more than two operands, `Same` is a chain — `["Same", 1, 1, 1]` is
 `True` — matching the Epsil spelling `a === b === c`.
 
-**`Same` vs `IsSame`.** [`IsSame`](#IsSame) compares its operands exactly as
+**`Same` vs `IsSame`.** [`IsSame`](#issame) compares its operands exactly as
 written, while `Same` compares their canonical forms. So
 `["IsSame", ["Add", 1, 1], 2]` is `False`, but `["Same", ["Add", 1, 1], 2]` is
 `True`, since canonicalization folds `1 + 1` to `2`.
@@ -44067,7 +45208,7 @@ merely *disagree* at the sampled points are undetermined, not `False`:
 
 The LaTeX notation is `\equiv` (or the `≡` character). A `\equiv` followed by
 `\pmod{n}` is a congruence and parses as
-[`Congruent`](/compute-engine/reference/arithmetic/#Congruent) instead.
+[`Congruent`](/compute-engine/reference/arithmetic/#congruent) instead.
 
 </FunctionDefinition>
 
@@ -44289,7 +45430,9 @@ Assumptions on the unknown (such as `assume(n > 0)`) filter the solutions the
 same way, conjunctively with any explicit domain.
 
 `Solve` is the operator form of the `expr.solve()` method, and uses the same
-solver for the two-argument symbolic case.
+solver for the two-argument symbolic case. For a periodic equation, the two
+differ: `Solve` gives the families of solutions, and `expr.solve()` gives the
+principal solutions.
 
 The result is a `List` that holds all the solutions in the domain. An empty
 `List` means that the engine has shown that there is no solution. When the
@@ -44329,11 +45472,20 @@ correct only for a real parameter is not given, and `Solve` stays
 unevaluated.
 
 A trigonometric equation has infinitely many solutions. With no domain, or
-over the real or the complex numbers, the result holds its principal
-solutions, one for each family of solutions: `Solve(sin(x) = 1/2, x)` is
-`[π/6, 5π/6]`, and each solution of the equation is one of them plus a
-multiple of `2π`. Over a bounded domain, such as an `Interval` or a `Range`,
-the result holds every solution in the domain.
+over the real or the complex numbers, the result is a list of families of
+solutions with the fresh integer parameter `t` (the names of the integer
+solver: `t`, `t_1`, …): `Solve(sin(x) = 1/2, x)` is
+`[π/6 + 2πt, 5π/6 + 2πt]`, and each solution is a member of one family.
+Families with the same solutions become one family (`Solve(sin(x) = 0, x)` is
+`[πt]`), and the solution of each family is in `(−T/2, T/2]`, where `T` is its
+spacing. Each factor of a product gives its families with the period of that
+factor: `Solve(sin(2x)·cos(3x) = 0, x)` is `[πt/2, π/6 + πt/3]`. A polynomial
+factor gives its solutions as they are: `Solve((x − 1)·sin(x) = 0, x)` is
+`[1, πt]`. A condition on the unknown (`sin(x) = 0 ∧ x > 0`, an assumption, or
+a type narrower than `real`) cannot remove members of a family, and `Solve`
+then stays unevaluated. Over a bounded domain, such as an `Interval` or a
+`Range`, the result holds every solution in the domain. `expr.solve()` returns
+the principal solutions: one for each family, in one period.
 
 A root template that you add to `ce.solveRules` is your claim of a solution:
 its solutions are returned as they are, also for a function that the solver
@@ -44672,9 +45824,9 @@ collection.
 ```
 
 To inspect an error rather than merely detect it, use
-[`Type`](#Type) (which returns `"error"`), or destructure it with an
+[`Type`](#type) (which returns `"error"`), or destructure it with an
 `["Error", ...]` case in a
-[`Match`](/compute-engine/reference/control-structures/#Match) expression.
+[`Match`](/compute-engine/reference/control-structures/#match) expression.
 
 </FunctionDefinition>
 
@@ -44773,7 +45925,7 @@ character conforms where a `string` is declared, because the two are the same
 value.
 
 The main use of `Typed` is to annotate the parameters and return type of a
-[function literal](/compute-engine/reference/functions/#Function).
+[function literal](/compute-engine/reference/functions/#function).
 
 </FunctionDefinition>
 
@@ -44995,7 +46147,7 @@ Read more about adding new definitions to the Compute Engine.
 | **Function Signature**      | A type describing the function's inputs and outputs, e.g. `(real, integer) -> boolean` |
 | **Function Literal**        | A first-class function value, defined using a construct like `["Function", body, params...]`, which may or may not capture variables from its lexical scope. |
 | **Shorthand Function Literal** | A compact way to write a function literal using placeholders (e.g. `_` or `_2`) instead of explicitly listing parameters, e.g. `["Add", "_", 1]` desugared to `["Function", ["Add", "_", 1], "_"]`. |
-| **Closure**                 | A function literal that **captures** one or more free variables from its defining lexical scope, preserving their values at the time of definition. The capture happens by simply referencing the variables in the function body. |
+| **Closure**                 | A function literal that **captures** one or more free variables from its defining lexical scope: the function reads the binding of the variable where it was defined, with the value that binding holds when the function is called. The capture happens by simply referencing the variables in the function body. |
 | **Anonymous Function**      | A function that is not bound to a symbol, often used as an argument to other functions. |
 
 </div>
@@ -45323,17 +46475,32 @@ in the [Types guide](/compute-engine/guides/types/).
 ## Closures
 
 A **closure** is a function literal that **captures** one or more free variables
-from its defining lexical scope, preserving their values at the time of definition.
-The capture happens by simply referencing the variables in the function body.
-For example, the following function literal captures the variable `a` from its
-lexical scope:
+from its defining lexical scope. The capture happens by simply referencing the
+variables in the function body. For example, the following function literal
+captures the variable `a` from its lexical scope:
 
 ```json example
 ["Function", ["Add", "a", "_"], "_"]
 ```
 
-This function literal captures the value of `a` at the time of definition, and
-when the function is applied, it will use that value of `a` in the computation.
+The function captures the **binding** of `a` where it is defined, not the
+value of `a` at that time. When the function is applied, it reads the value
+that this binding holds then, so an assignment to the same `a` made after the
+definition is visible to the function:
+
+```json example
+["Block",
+  ["Declare", "a", "integer"],
+  ["Assign", "a", 10],
+  ["Assign", "f", ["Function", ["Add", "a", "_"], "_"]],
+  ["Assign", "a", 20],
+  ["f", 1]
+]
+// ➔ 21
+```
+
+A variable of the same name declared in **another** scope is a different
+binding, which the function does not read:
 
 ```json example
 ["Block"
@@ -45351,14 +46518,18 @@ when the function is applied, it will use that value of `a` in the computation.
 // ➔ 1 + 10
 ```
 
-Note that the value of `a` is `10` when the function is defined, and it
-is `100` when the function is applied. The function will always use the value of
-`a` that was in scope when the function was defined, not the value of `a` at the
-time the function is applied. In fact, the outer `a` is a different variable
-which is unrelated to the `a` in the scope of the function, but with the same
-name.
+The inner `a`, assigned `10`, is the binding the function captured. The
+outer `a`, assigned `100`, is a different variable with the same name, so the
+function does not read it. The same rule applies to a function **called** in
+the body: a call reads the function that its name denotes where the body is
+written, and a same-named function defined in another scope does not redirect
+it (see the [Evaluation guide](/compute-engine/guides/evaluate/#function-calls-are-bound-lexically)).
 
 ## Operating on Functions
+
+<nav className="hidden">
+### Function
+</nav>
 
 <FunctionDefinition name="Function">
 
@@ -45405,7 +46576,7 @@ is normalized to a string).
 
 The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
-against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#Typed)).
+against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
 
 **Return type**. To ascribe a return type, wrap the body in a `Typed`
 expression:
@@ -47499,7 +48670,7 @@ Source: https://mathlive.io/compute-engine/reference/logic/
 
 `Equivalent` serializes as `\iff`. Note that `\equiv` is not one of its
 notations: it parses as
-[`IdenticallyEqual`](/compute-engine/reference/core/#IdenticallyEqual), the
+[`IdenticallyEqual`](/compute-engine/reference/core/#identicallyequal), the
 mathematical identity operator.
 
 `And`, `Or`, `Nand`, `Nor` and `Implies` are **short-circuit** operators:
@@ -48273,7 +49444,7 @@ New sets can be defined using one of the following operators.
 </div>
 
 The number of elements of a set is its
-[`Count`](/compute-engine/reference/collections/#Count). In LaTeX it is
+[`Count`](/compute-engine/reference/collections/#count). In LaTeX it is
 written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:
 `ce.parse('|\\{1,2\\}|').evaluate()` is `2`, `|\emptyset|` is `0` and
 `|\mathbb{Z}|` is `PositiveInfinity`. `Count` of a set serializes back as
@@ -48354,7 +49525,7 @@ ce.parse("\\Z[x]").type;           // ➔ set<unknown>
 `QuotientRing(Integers, n)` with a positive integer literal `n` is a finite
 collection of the `n` residue classes `ResidueClass(0, n)` …
 `ResidueClass(n−1, n)` (see
-[`ResidueClass`](/compute-engine/reference/number-theory/#ResidueClass) for
+[`ResidueClass`](/compute-engine/reference/number-theory/#residueclass) for
 the arithmetic of the classes). Its type is `set<value>`. An integer is not an
 element of the ring: the elements are the classes.
 
@@ -49721,6 +50892,11 @@ $$x_i$$ is the $$i$$-th number in the list.
 // 21.02
 ```
 
+If the collection contains complex infinity (for example
+`["Multiply", "PositiveInfinity", "ImaginaryUnit"]`), the mean is `NaN`: a
+value with no direction has no mean, although `Sum` of the same collection is
+`ComplexInfinity`.
+
 <Signature name="Mean">_distribution_</Signature>
 
 When the argument is a [probability distribution](#probability-distributions),
@@ -50867,7 +52043,7 @@ Modular **congruence** is written $a \equiv b \pmod{n}$, which parses to `Congru
 // ➔ "True"
 ```
 
-Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#Congruent).
+Note that `\bmod` is the binary modulo operator ($a \bmod n$ parses to `Mod(a, n)`), distinct from the `\pmod{n}` congruence annotation. The `Congruent` operator is described in the [Arithmetic reference](/compute-engine/reference/arithmetic/#congruent).
 
 ### Reduction of Large Integers
 
@@ -50912,7 +52088,7 @@ const sol = ce.box(['And',
 // ➔ { x: 105t + 23 }
 ```
 
-For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#ChineseRemainder).
+For a direct CRT computation from lists of residues and moduli, see [`ChineseRemainder`](#chineseremainder).
 
 
 <nav className="hidden">
@@ -55048,6 +56224,25 @@ shape, an incremental editor — and need to know exactly what survives each
 pass and what the engine may change underneath them.
 
 ## The Three Tiers
+
+```mermaid
+flowchart TD
+  src["source / MathJSON"]
+  src -- "form: 'raw'" --> raw
+  src -- "form: 'structural'" --> structural
+  src -- "default" --> canonical
+  raw -- "box with form: 'structural'" --> structural
+  raw -- ".canonical" --> canonical
+  structural -- ".canonical" --> canonical
+  structural -- ".subs(), .map()<br/>shape preserved" --> structural
+  canonical -- ".subs(), .map()<br/>re-canonicalized" --> canonical
+  canonical -- ".evaluate(), .N()" --> value["canonical value"]
+  structural -. ".evaluate(), .N()<br/>via the canonical form" .-> value
+  raw -. ".evaluate(), .N()<br/>via the canonical form" .-> value
+```
+
+Nothing leads back from `canonical` to a parse shape: a tree that must stay
+in parse vocabulary has to be raw or structural from the parse onward.
 
 <div className="symbols-table first-column-header" style={{"--first-col-width":"22ch"}}>
 

@@ -452,6 +452,10 @@ symbolic.
 
 ### Interpreting Elliptical Notation
 
+<nav className="hidden">
+### Interpret
+</nav>
+
 <FunctionDefinition name="Interpret">
 
 <Signature name="Interpret">_expr_</Signature>
@@ -557,6 +561,10 @@ of `ce.roundingTies`. The default rule rounds a tie away from zero:
 [Rounding Ties](/compute-engine/guides/numeric-evaluation/#rounding-ties).
 
 ### Other Relational Operators
+
+<nav className="hidden">
+### Congruent
+</nav>
 
 <FunctionDefinition name="Congruent">
 
@@ -827,6 +835,10 @@ inside it reproducible.
 draw, "with" and "without" replacement coincide. The wrapper is the only
 difference — `RandomChoice` returns a list.
 
+<nav className="hidden">
+### WithRandomSeed
+</nav>
+
 <FunctionDefinition name="WithRandomSeed">
 
 <Signature name="WithRandomSeed">_seed_: real | string, _body_: any</Signature>
@@ -967,6 +979,10 @@ empty collection are all errors.
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### RandomChoice
+</nav>
+
 <FunctionDefinition name="RandomChoice">
 
 <Signature name="RandomChoice">_domain_: collection, _k_: number</Signature>
@@ -1062,7 +1078,7 @@ of producing an empty one.
 
 | Function       | Notation         |                                                                       |
 | :------------- | :--------------- | :------------------------------------------------------------------------------ |
-| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known |
+| `Equal`        | $$ x = y $$    | Mathematical relationship asserting that two quantities have the same value. Stays unevaluated when the answer is not known. `NaN` and a pole (`1/0`) are equal to nothing, including themselves |
 | `NotEqual`     | $$ x \ne y $$  |                                                                                 |
 | `Greater`      | $$ x \gt y $$  | |
 | `GreaterEqual` | $$ x \geq y $$ |                                                                                 |
@@ -1073,6 +1089,14 @@ of producing an empty one.
 See below for additonal relational operators: `Congruent`, etc...
 
 </div>
+
+An ordered comparison (`Less`, `LessEqual`, `Greater`, `GreaterEqual`) with an
+operand that has no order answers `False`: `NaN`, a pole (`1/0`, which
+evaluates to $\tilde\infty$) and a non-real complex number (`i`, `\ln(-1)`).
+So a piecewise whose condition compares such a value takes its next branch:
+`\{1/0 > 0: 1, 0\}` is `0`. `NotEqual` is not affected (`1/0 \ne 0` is
+`True`), and a comparison with a free symbol stays unevaluated. Signed
+infinities are ordered as usual (`0 < \infty` is `True`).
 
 The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
 `IdenticallyEqual` (same value for every value of the free variables) — are

@@ -207,7 +207,7 @@ taken so far, with a correspondingly larger error bound.
 
 ## Errors
 
-An [`["Error"]`](/compute-engine/reference/core/#Error) is a **value**, and it
+An [`["Error"]`](/compute-engine/reference/core/#error) is a **value**, and it
 propagates along the ordinary value path. If an operand that a function
 evaluates strictly turns out to be an error, the whole expression evaluates to
 that error — not to a frozen expression wrapped around it. The propagated
@@ -239,9 +239,9 @@ The diagnostic is not lost, only unevaluated: the boxed expression still holds
 walks the expression still reports it.
 
 Errors do not spread past the tools that inspect them. `Type` reports
-`"error"`, [`IsError`](/compute-engine/reference/core/#IsError) answers
+`"error"`, [`IsError`](/compute-engine/reference/core/#iserror) answers
 `True`/`False`, and
-[`Match`](/compute-engine/reference/control-structures/#Match) decides on an
+[`Match`](/compute-engine/reference/control-structures/#match) decides on an
 error subject — an `["Error", ...]` case destructures it, which is how a
 failure is rescued.
 
@@ -317,6 +317,19 @@ scope is searched, and so on until a definition is found.
 If no definition is found, the symbol is declared with a type of
 `unknown`, or a more specific type if the context allows it.
 
+```mermaid
+flowchart TD
+  sym["symbol to bind"] --> cur["current scope"]
+  cur -- "not found" --> parent["enclosing scopes,<br/>innermost first"]
+  parent -- "not found" --> global["global scope<br/>(user definitions)"]
+  global -- "not found" --> system["system scope<br/>(the standard library)"]
+  system -- "not found" --> auto["declared with type unknown,<br/>or a more specific type<br/>if the context allows it"]
+  cur -- found --> def["definition record"]
+  parent -- found --> def
+  global -- found --> def
+  system -- found --> def
+```
+
 If the symbol is found, the definition record is used to evaluate the
 expression. 
 
@@ -360,6 +373,62 @@ the free `a` resolves, the bound `x` does not.
 
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
+
+### Function Calls Are Bound Lexically
+
+A function call resolves its head (`f` in `f(3)`) through the binding the name
+had where the call was created, in the same way a symbol is bound to its
+definition during canonicalization. Declaring another function of the same
+name in a scope that is current when the call is evaluated does not redirect
+the call. Assigning a new function to the **original** binding does: a call
+reads the function that its binding holds when it runs.
+
+```js
+ce.assign('f', ce.parse('x \\mapsto 2x'));
+const call = ce.parse('f(3)');
+
+ce.pushScope();
+ce.declare('f', 'function');
+ce.assign('f', ce.parse('x \\mapsto 100x'));
+call.evaluate().print();
+// ➔ 6      (the call keeps the binding it was created with)
+ce.popScope();
+
+ce.assign('f', ce.parse('x \\mapsto 3x'));
+call.evaluate().print();
+// ➔ 9      (the original binding now holds another function)
+```
+
+A call written before its function is defined is a **forward reference**. It
+waits for a definition of the name in its own scope chain: evaluated while
+the name has no value, it stays symbolic; evaluated after the definition, it
+applies the function.
+
+Within one evaluation, the symbolic result of such a call is a value: it is
+not resolved again when the name is assigned later in the same evaluation.
+So `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
+term `h(1)` was computed while `h` had no value, and the assignment at
+`k = 2` does not reach it. A later evaluation resolves the stored result
+again:
+
+```js
+const call = ce.parse('g(3)');
+const result = call.evaluate();
+// ➔ g(3)   ("g" has no definition yet)
+
+ce.assign('g', ce.parse('x \\mapsto x^2'));
+call.evaluate().print();
+// ➔ 9
+result.evaluate().print();
+// ➔ 9      (a later evaluation resolves the stored result)
+```
+
+In a `Block`, a `DefineFunction` statement (the Epsil `function g(k) { … }`)
+defines its name for the whole block, including the statements written before
+it. An `Assign` of a function literal takes effect when it runs. A `Block`
+evaluated directly by the host is a program: each of its statements is an
+evaluation of its own, so a result stored by one statement is resolved again
+when a later statement reads it.
 
 ### Default Scopes
 
@@ -413,6 +482,20 @@ or if accessing the `.canonical` property of a
 non-canonical expression.
 
 When a function is evaluated, the following steps are followed:
+
+```mermaid
+flowchart TD
+  start["evaluate f(a, b, …)"] --> canon{"canonical?"}
+  canon -- no --> err["error: canonicalize first"]
+  canon -- yes --> lazy{"f is lazy?"}
+  lazy -- yes --> assoc
+  lazy -- no --> args["evaluate each argument, left to right<br/>a held argument, or a Hold, stays symbolic<br/>a Sequence result is spliced in; an empty one is dropped"]
+  args --> assoc{"f is associative?"}
+  assoc -- yes --> flat["flatten: f(f(a, b), c) → f(a, b, c)"]
+  assoc -- no --> apply
+  flat --> apply["apply f to the arguments"]
+  apply --> result["return the result in canonical form"]
+```
 
 1. If the expression is not canonical, it cannot be evaluated and an error is
    thrown. The expression must be canonicalized first.

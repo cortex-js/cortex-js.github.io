@@ -4947,7 +4947,7 @@ In this section we'll discuss other options for adding a mathfield to a web page
 ## Using JavaScript Modules
 
 In addition to `MathfieldElement`, the Mathfield library provide some functions
-such as [`renderMathInDocument()`](/api/#rendermathindocument).
+such as [`renderMathInDocument()`](/mathfield/api/#rendermathindocument).
 
 **To access those functions**, import them from the MathLive module.
 
@@ -5180,7 +5180,7 @@ In JavaScript, the `\` in a string must be escaped and the escape character
 is also `\`. So, in JavaScript strings LaTeX commands start with a `\\`.
 :::
 
-<ReadMore path="/docs/mathfield/#(%22mathfield-element%22%3Amodule)">
+<ReadMore path="/mathfield/api/#mathfieldelement">
 Learn more about the attributes, properties, methods and events <kbd>ENTER</kbd> supported in the **`MathfieldElement`** documentation.
 </ReadMore>
 
@@ -5511,7 +5511,7 @@ which means that the backslashes will need to be escaped as well.
 
 With the  `current` property of the ref, you can access and manipulate all the 
 properties and methods that are specific to the mathfield (`value`, `selection`, `insert()`,
-etc...). See [MathfieldElement](/docs/mathfield/#(MathfieldElement%3Aclass)).
+etc...). See [MathfieldElement](/mathfield/api/#mathfieldelement).
 
 ```jsx
 import "./App.css";
@@ -5741,11 +5741,13 @@ document.getElementById('formula').addEventListener('input',(ev) => {
 Reading the `value` property is equivalent to calling the `getValue()` method with 
 no argument. 
 
-**To control the format of the result**, pass options to [`getValue()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(getValue%3Ainstance)).
-For example to get the content as a MathJSON expression, use `mf.getValue('math-json')`.
+**To control the format of the result**, pass options to [`getValue()`](/mathfield/api/#getvalue).
+For example to get the content as ASCIIMath, use `mf.getValue('ascii-math')`.
+To get the content as MathJSON, read the `expression` property, described
+below: the `math-json` output format has been removed.
 
 
-**Try:** [Other formats](/docs/mathfield/#(%22mathfield%22%3Amodule).(OutputFormat%3Atype)) are available: change `"math-json"` to `"spoken-text"`.
+**Try:** [Other formats](/mathfield/api/#outputformat) are available: change `"ascii-math"` to `"spoken-text"`.
 
 ```live
 :::html
@@ -5759,7 +5761,7 @@ const mf = document.getElementById('formula');
 
 // `ev.target` is an instance of `MathfieldElement`
 mf.addEventListener('input',
-  (ev) => console.log(ev.target.getValue('math-json'))
+  (ev) => console.log(ev.target.getValue('ascii-math'))
 );
 ```
 
@@ -5801,7 +5803,7 @@ of the Compute Engine.
 
 **To read the content of a `<math-field>` element as a boxed MathJSON expression** use the mathfield `expression` property.
 
-Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.parse(mf.value)` or `MathfieldElement.computeEngine.box(mf.getValue("math-json"))`.
+Using `mf.expression` is equivalent to calling `MathfieldElement.computeEngine.parse(mf.value)`.
 
 Once you have a boxed expression, you can perform operations on it using the
 Compute Engine.
@@ -5872,17 +5874,16 @@ to be dispatched.
 | `insertText` | Some content was added. It could be math content, plain text or raw latex. It could also be a row or column in matrix that was added. |
 | `insertLineBreak` | The <kbd>RETURN</kbd> or <kbd>ENTER</kbd> key was pressed. Note that the actual content of the mathfield may not have changed. |
 | `insertFromPaste`| The content of the mathfield was changed because of a paste operation |
-| `deleteWordBackward`|  |
-| `deleteWordForward`|  |
-| `deleteWordForward`|  |
-| `deleteSoftLineBackward`|  |
-| `deleteSoftLineForward`|  |
-| `deleteHardLineBackward`|  |
-| `deleteHardLineForward`|  |
+| `deleteWordBackward`| The word before the caret was deleted |
+| `deleteWordForward`| The word after the caret was deleted |
+| `deleteSoftLineBackward`| The content from the caret to the start of the line was deleted |
+| `deleteSoftLineForward`| The content from the caret to the end of the line was deleted |
+| `deleteHardLineBackward`| The content from the caret to the start of the expression was deleted |
+| `deleteHardLineForward`| The content from the caret to the end of the expression was deleted |
 | `deleteByCut`| The content was changed because of a cut operation |
 | `deleteContent`| Some content was deleted, but no particular direction applied |
-| `deleteContentBackward`|  |
-| `deleteContentForward`|  |
+| `deleteContentBackward`| The content before the caret was deleted, for example with the <kbd>BACKSPACE</kbd> key |
+| `deleteContentForward`| The content after the caret was deleted, for example with the <kbd>DELETE</kbd> key |
 | `historyUndo`| The content was changed because of an undo command |
 | `historyRedo`| The content was changed because of a redo command |
 
@@ -5900,7 +5901,25 @@ have been done. This event is cancelable. Calling `preventDefault()` on the
 event will cause the modification to be prevented.
 
 If the `beforeinput` event is not canceled, the mathfield content is modified 
-and a `input` event is dispatched. The `input` event is not cancelable.
+and an `input` event is dispatched. The `input` event is not cancelable.
+
+```mermaid
+sequenceDiagram
+  actor User
+  participant MF as math-field
+  participant App as your listeners
+  User->>MF: types, pastes, deletes…
+  MF->>App: beforeinput (cancelable)
+  alt preventDefault() called
+    App-->>MF: canceled
+    Note over MF: content unchanged
+  else not canceled
+    Note over MF: content modified
+    MF->>App: input (not cancelable)
+  end
+  User->>MF: presses Return/Enter, or focus leaves
+  MF->>App: change (not in LaTeX editing mode)
+```
 
 ## Detecting When the User has Finished Editing a Mathfield
 
@@ -6538,7 +6557,7 @@ prevent the input of superscript and subscripts
 when typing "if x > 0"
 * [`smartSuperscript`](/mathfield/api/#smartsuperscript): automatically move out of a superscript when a digit is typed
 
-These properties can also be passed as an argument to [`new MathfieldElement()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).MathfieldElement%3Aconstructor) when programmatically creating mathfield elements.
+These properties can also be passed as an argument to [`new MathfieldElement()`](/mathfield/api/#constructor) when programmatically creating mathfield elements.
 
 In the interactive code playground below, try some of these options. For example, 
 in line 1 add the attribute `smart-mode=false`, then type some parentheses 
@@ -7829,6 +7848,16 @@ may occasionally result in surprising results.
 This section details how keyboard events are used to determine which
 keyboard shortcut to activate.
 
+```mermaid
+flowchart TD
+  ev["keydown event<br/>code: the physical key<br/>key: depends on the layout and the modifiers"] --> cur["current layout: set by the application,<br/>or guessed from the user locale<br/>(a French locale gives AZERTY)"]
+  cur --> ok{"code and key consistent<br/>with the current layout?"}
+  ok -- no --> better["look for a better matching known layout,<br/>and switch to it if confident enough"]
+  ok -- yes --> map
+  better --> map["map key to the key-cap label<br/>with the layout's table"]
+  map --> match["label plus modifiers, matched<br/>against the keybindings"]
+```
+
 
 Let's consider the keyboard shortcut <kbd>CONTROL/⌘</kbd>+<kbd>ALT/OPTION</kbd>+<kbd>A</kbd>
 
@@ -8215,7 +8244,7 @@ For example, to insert a fraction when the user clicks a button.
 You can do this by dispatching **commands** to the mathfield, such as 
 `"select-all"`, `"move-to-next-char"`, `"delete-backward"`, etc...
 
-**To dispatch commands** use the [`mf.executeCommand()`](/docs/mathfield/#(%22mathfield-element%22%3Amodule).(MathfieldElement%3Aclass).(executeCommand%3Ainstance)) method.
+**To dispatch commands** use the [`mf.executeCommand()`](/mathfield/api/#executecommand) method.
 
 ```js
 mf.executeCommand("delete-backward");
@@ -8673,7 +8702,7 @@ import * from 'mathlive/ssr';
 ```
 
 **To convert LaTeX to HTML**, use the
-[`convertLatexToMarkup()`](/mathfield/api/#q=convertLatexToMarkup) function.
+[`convertLatexToMarkup()`](/mathfield/api/#convertlatextomarkup) function.
 
 ```javascript
 import { convertLatexToMarkup } from 'mathlive';
@@ -8681,7 +8710,7 @@ console.log(convertLatexToMarkup('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to MathML**, use the
-[`latexToMathML()`](/mathfield/api/#q=latexToMathML) function.
+[`convertLatexToMathMl()`](/mathfield/api/#convertlatextomathml) function.
 
 ```javascript
 import { convertLatexToMathMl } from 'mathlive';
@@ -8689,7 +8718,7 @@ console.log(convertLatexToMathMl('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to spoken text**, use the
-[`convertLatexToSpeakableText()`](/mathfield/api/#q=convertLatexToSpeakableText)
+[`convertLatexToSpeakableText()`](/mathfield/api/#convertlatextospeakabletext)
 function.
 
 ```javascript
@@ -8698,7 +8727,7 @@ console.log(convertLatexToSpeakableText('x^2 + y^2 = z^2'));
 ```
 
 **To convert LaTeX to AsciiMath**, use the
-[`convertLatexToAsciiMath()`](/mathfield/api/#q=convertLatexToAsciiMath)
+[`convertLatexToAsciiMath()`](/mathfield/api/#convertlatextoasciimath)
 function.
 
 ```javascript
@@ -8708,16 +8737,17 @@ console.log(convertLatexToAsciiMath('x^2 + y^2 = z^2'));
 
 ## Converting From Various Formats to LaTeX
 
-**To convert MathJson to LaTeX**, use the
-[`convertMathJsonToLatex()`](/mathfield/api/#convertmathjsontolatex) function.
+**To convert MathJSON to LaTeX**, box the expression with the Compute Engine
+and read its `latex` property. The `convertMathJsonToLatex()` function has
+been removed.
 
 ```javascript
-import { convertMathJsonToLatex } from 'mathlive';
-console.log(convertMathJsonToLatex(["Add", "x", "y"]));
+import { MathfieldElement } from 'mathlive';
+console.log(MathfieldElement.computeEngine.box(["Add", "x", "y"]).latex);
 ```
 
 **To convert AsciiMath to LaTeX**, use the
-[`convertAsciiMathToLatex()`](/mathfield/api/#q=convertAsciiMathToLatex)
+[`convertAsciiMathToLatex()`](/mathfield/api/#convertasciimathtolatex)
 function.
 
 ```javascript
@@ -8841,7 +8871,7 @@ The components are designed with accessibility in mind:
 ### Auto-rendering with renderMathInDocument()
 
 **To render math contained in a document as a static (non-editable) formula**,
-call [`renderMathInDocument()`](/mathfield/api/#q=renderMathInDocument) at the
+call [`renderMathInDocument()`](/mathfield/api/#rendermathindocument) at the
 end of your document, or in a `DOMContentLoaded` event handler.
 
 ```html
@@ -8898,7 +8928,7 @@ The following DOM elements are ignored for conversion: `<noscript>`, `<style>`,
 `<textarea>`, `<pre>`, `<code>`, `<annotation>` and `<annotation-xml>`.
 
 If you dynamically generate content, call
-[`renderMathInElement(element)`](/mathfield/api/#q=renderMathInElement) to
+[`renderMathInElement(element)`](/mathfield/api/#rendermathinelement) to
 render your element after the page has been loaded. This is a recursive call
 that will be applied to `element` and all its children.
 
@@ -9014,10 +9044,10 @@ Understanding these stages can help you write more robust code.
 In most cases, this is something you don't have to pay much attention to. Just 
 remember these guidelines:
 * Once a component is attached to the DOM, attributes (key/value pairs 
-attached to the `<math-field>` tag and properties (key/value pairs attached
+attached to the `<math-field>` tag) and properties (key/value pairs attached
 to a `MathfieldElement` object) are kept in sync, or _reflected_, except for 
-the `value` attribute which only reflect the inital value, not the current one.
-You can also call the functions of `MathfieldElement` without limitations. 
+the `value` attribute which only reflects the initial value, not the current one.
+You can also call the functions of `MathfieldElement` without limitations.
 * To be notified when the component is attached to the DOM, listen for a `mount`
  event on the element.
 * Before the component is attached to the DOM or even before the `MathfieldElement`
@@ -9026,6 +9056,24 @@ some limitations. The `value`, `selection`, `options`, `disabled` properties
 and the properties matching an attribute (`readOnly` for `read-only`, etc...)
 and related attributes are safe to set, but the values you read back may be 
 different once the component is mounted.
+
+```mermaid
+stateDiagram-v2
+  s1: ① Before Initialization
+  s2: ② Initialization
+  s3: ③ Constructed
+  s4: ④ Attached / Mounted
+  s5: ⑤ Detached / Unmounted
+  [*] --> s1: page loaded, markup only
+  s1 --> s2: scripts loaded
+  s2 --> s3: MathfieldElement registered (customElements.whenDefined)
+  [*] --> s3: new MathfieldElement()
+  s3 --> s4: attached to the DOM (appendChild), "mount" event
+  s4 --> s5: removed from the DOM (remove), "unmount" event
+  s5 --> s4: re-attached
+  s5 --> [*]: disposed
+  s4 --> [*]: page closed
+```
 
 ## ① Before Initialization
 
@@ -9091,20 +9139,20 @@ If all goes well, the element will be constructed next.
 This stage occurs either after the previous one (i.e. an element created
 from markup) or when an element is created programmatically with `new MathfieldElement()`.
 
-The `HTMLElement` object exist, but it is not yet attached to the DOM. You can 
+The `HTMLElement` object exists, but it is not yet attached to the DOM. You can 
 interact with the element, but its operations are still limited.
 
 At this stage:
 * you can read and change the properties as before. However, doing so will
 be reflected on attributes as well. That is calling `mf.mathVirtualKeyboardPolicy = "manual"`
-will result in `mf.getAttribute('math-virtual-keyboard-policy')` to return `"manual"`.
+makes `mf.getAttribute('math-virtual-keyboard-policy')` return `"manual"`.
 * you can read and change the attributes as before, however they will now 
 be reflected on properties as well, that is calling `mf.setAttribute('math-virtual-keyboard-policy', 'manual')`
-will result in the value of `mf.mathVirtualKeyboardPolicy` to be `"manual"`.
+makes the value of `mf.mathVirtualKeyboardPolicy` `"manual"`.
 * you can change/add/remove attributes on the element
 * you can invoke all methods specific to `MathfieldElement`, however some may
 have some limitations. For example `setValue()` will ignore any options provided
-including formats other than LaTeX, `executeCommand()` will do anything, etc... 
+including formats other than LaTeX, and `executeCommand()` does nothing. 
 These commands require the element to be attached to the DOM to function properly.
 But no worries, that's what happens next.
 
@@ -9117,7 +9165,7 @@ The transition to this stage happens automatically for elements created from
 markup after the `MathfieldElement` class has been registered to handle the 
 `<math-field>` tag. 
 
-If the element was created programatically, this stage is reached when the 
+If the element was created programmatically, this stage is reached when the 
 element is explicitly attached to the DOM, for example using `appendChild()`.
 
 At this stage:
@@ -9129,7 +9177,7 @@ vice versa).
 **To be notified when this stage is reached**, listen for the `mount` event on 
 the element:
 ```javascript
-md.addEventListener('mount', (ev) => {
+mf.addEventListener('mount', (ev) => {
   console.log('mf is mounted');
   // You can now read default options value for example, or 
   // call `setValue()` with format options other than LaTeX.
@@ -9148,13 +9196,13 @@ is immediately disposed of.
 Once this stage is reached, the same limitations as in the Constructed stage
 apply.
 
-Note that the next stage could be either for element to be disposed of 
+Note that the next stage could be either for the element to be disposed of
 or to be re-attached.
 
 **To be notified when this stage is reached**, listen for the `unmount` event on 
 the element:
 ```javascript
-md.addEventListener('unmount')((ev) => {
+mf.addEventListener('unmount', (ev) => {
   console.log('mf is about to be unmounted');
   // Last chance to interact with the mathfield
   console.log(ev.target.getValue('ascii-math'));
@@ -9165,7 +9213,7 @@ md.addEventListener('unmount')((ev) => {
 
 # Security
 
-Source: https://mathlive.io/compute-engine/guides/security/
+Source: https://mathlive.io/mathfield/guides/security/
 
 ## Content Security Policy
 
@@ -10878,7 +10926,7 @@ Consider using this option if you are displaying untrusted content. Read more ab
 ##### MathfieldElement.version {#version}
 
 ```ts
-static version: string = '0.111.1';
+static version: string = '0.111.0';
 ```
 
 </MemberCard>
@@ -16099,7 +16147,7 @@ const version: {
 };
 ```
 
-Current version: `0.111.1`
+Current version: `0.111.0`
 
 The version string of the SDK using the [semver](https://semver.org/) convention:
 

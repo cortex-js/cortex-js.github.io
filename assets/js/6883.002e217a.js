@@ -1,0 +1,1 @@
+"use strict";(globalThis.webpackChunkcortexjs_io||=[]).push([[6883],{36883(e,s,c){c.d(s,{createInfoServices:()=>r.v});var r=c(66744);c(80184)}}]);

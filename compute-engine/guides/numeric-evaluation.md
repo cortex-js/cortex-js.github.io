@@ -38,6 +38,12 @@ Exact values are:
 
 </div>
 
+A number literal is exact or a float by the way it is written. A literal with
+no fraction part and no negative exponent is an exact integer: `1e3` is the
+exact `1000`. A literal with a fraction part is a float, also when the fraction
+is zero (`1.0`, `1.5e3`), and so is a literal with a negative exponent
+(`1e-3`).
+
 ```live
 console.log(parse('1/3 + 1/4').evaluate());
 
@@ -258,7 +264,7 @@ rounded to the requested digits. The working precision of the engine
 `ce.precision` is still `21`. A later operation on the result is computed at the
 working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
 `4.14159265358979323846`. The reference page for
-[`N`](/compute-engine/reference/core/#N) describes the precision and accuracy
+[`N`](/compute-engine/reference/core/#n) describes the precision and accuracy
 goals `["N", expr, ["List", p, a]]`.
 
 
@@ -338,6 +344,12 @@ expr.toMathJson({ fractionalDigits: 'auto' }); // rounded to ce.precision
 expr.toMathJson({ fractionalDigits: 'max' });  // all digits (default)
 expr.toMathJson({ fractionalDigits: 5 });      // 5 fractional digits
 ```
+
+A float keeps its digits in MathJSON, also when they repeat: the float
+`1.0/3` serializes as `"0.333333333333333333333"`. A number string with a
+repetend in parentheses (`"0.(3)"`) is an exact rational, so writing a float
+that way would make `ce.box()` read it back as the exact `1/3`. To mark the
+repeating digits of a float, use `expr.toMathJson({ repeatingDecimal: true })`.
 
 When the precision is greater than 15, the return value of `expr.N().json` may
 be a MathJSON number with a `num` string containing all available digits:
@@ -475,6 +487,30 @@ replace a number of a small magnitude with the exact integer 0.
 
 It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.
+
+Two numbers whose difference is smaller than the tolerance are considered
+equal. This applies only when a floating point number is involved: two exact
+numbers (integers, rationals, or rational multiples of a square root) are
+compared exactly, so $\frac{1}{3}$ and $\frac{3333333333333}{10^{13}}$ are not
+equal, while $\frac{1}{10}$ and $0.1$ are.
+
+The tolerance is an absolute value, and it does not change with the precision:
+at 40 digits, two values that differ by $10^{-12}$ still compare as equal. A
+tolerance you set is kept when the precision changes.
+
+**To make the tolerance follow the precision**, set it to `"auto"`. The
+tolerance is then $10^{-(\text{precision} - 2)}$, two digits short of the
+working precision, and it is recomputed at each precision change: $10^{-19}$ at
+the default 21 digits, $10^{-38}$ at 40 digits. This mode is meant for
+big-decimal work: a value computed in machine floats (about 16 digits) then
+compares as different from its exact value.
+
+```js
+const ce = new ComputeEngine({ precision: 40, tolerance: "auto" });
+ce.tolerance; // 1e-38
+ce.precision = 50;
+ce.tolerance; // 1e-48
+```
 
 ## Numeric Functions
 

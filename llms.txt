@@ -29,7 +29,7 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Speech](https://mathlive.io/mathfield/guides/speech.md): Speech output for mathfields: keyboard shortcuts to speak a formula or the selection, the speak command, and how to configure the speech engine.
 - [Static Math Formulas](https://mathlive.io/mathfield/guides/static.md): Converting LaTeX to Various Formats
 - [Web Component Lifecycle](https://mathlive.io/mathfield/lifecycle.md): A mathfield web component goes through various stages during its lifecycle.
-- [Security](https://mathlive.io/compute-engine/guides/security.md): Deploy mathfields safely: the Content Security Policy directives MathLive needs, Trusted Types support, and disabling commands that can modify the DOM.
+- [Security](https://mathlive.io/mathfield/guides/security.md): Deploy mathfields safely: the Content Security Policy directives MathLive needs, Trusted Types support, and disabling commands that can modify the DOM.
 - [Mathfield API Reference](https://mathlive.io/mathfield/api.md): Complete API reference for MathLive: the MathfieldElement class, its properties, methods and events, and the options that configure a mathfield.
 
 ## Compute Engine
@@ -42,6 +42,7 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Evaluation of Expressions](https://mathlive.io/compute-engine/guides/evaluate.md): Evaluating an expression is the process of determining the value of the
 - [Symbolic Computing](https://mathlive.io/compute-engine/guides/symbolic-computing.md): The Compute Engine essentially performs computation by applying
 - [Numeric Evaluation](https://mathlive.io/compute-engine/guides/numeric-evaluation.md): To obtain an exact numeric evaluation of an expression use expr.evaluate().
+- [Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints.md): Some innocuous-looking expressions can take a very long time — or forever —
 - [Canonical Form](https://mathlive.io/compute-engine/guides/canonical-form.md): Many mathematical objects can be represented by several equivalent expressions.
 - [Symbols](https://mathlive.io/compute-engine/guides/symbols.md): A symbol is a named object in the Compute Engine. It has a type and may
 - [Custom Functions and Symbols](https://mathlive.io/compute-engine/guides/augmenting.md): The MathJSON Standard Library is a
