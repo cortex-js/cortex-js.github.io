@@ -120,7 +120,7 @@ console.log(expr.match(["Add", ["Multiply", "_a", ["Power", "x", 2]],
 // ➔ { _a: 3, _b: 2, _c: 5 }
 ```
 
-**BoxedExpression** — Used directly.
+**Expression** — Used directly.
 
 ```live example
 const expr = ce.parse('3x^2+2x+5');
@@ -178,7 +178,7 @@ console.log(expr.match(
 // ➔ { _a: 3, _b: 0, _c: 5 }
 ```
 
-For MathJSON and BoxedExpression patterns, set `matchMissingTerms: true`
+For MathJSON and Expression patterns, set `matchMissingTerms: true`
 explicitly to enable this behavior.
 
 
