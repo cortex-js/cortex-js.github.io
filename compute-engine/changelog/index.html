@@ -21,8 +21,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.5e2c4708.css">
-<script src="/assets/js/runtime~main.dc863a2b.js" defer="defer"></script>
-<script src="/assets/js/main.ae4ac3c2.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.6308bb28.js" defer="defer"></script>
+<script src="/assets/js/main.14a11181.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -50,119 +50,352 @@
     }
   
     </style><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="coming-soon">Coming Soon<a href="#coming-soon" class="hash-link" aria-label="Direct link to Coming Soon" title="Direct link to Coming Soon" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="new-features">New Features<a href="#new-features" class="hash-link" aria-label="Direct link to New Features" title="Direct link to New Features" translate="no">​</a></h3><ul>
-<li class=""><strong>Permutation groups, an optional entry:
+<li class="">
+<p><strong><code>ce.timeRemaining</code> and <code>ce.stepBudgetSpent</code>: the state of the current
+span.</strong> <code>ce.timeRemaining</code> is the number of milliseconds left before the
+earliest deadline of the active <code>withTimeLimit</code> spans (<code>Infinity</code> when no
+span has a time limit, <code>0</code> or less once the deadline has passed).
+<code>ce.stepBudgetSpent</code> is <code>true</code> when a step budget of the current span or of
+an enclosing one is spent. A host loop that does its own work inside a span
+reads the first to stop on time; a cache reads the second before it stores
+a value, so that it does not keep a value computed after a caught
+cancellation. Both describe the span of the current synchronous code: after
+an <code>await</code> they read <code>Infinity</code> and <code>false</code>.</p>
+</li>
+<li class="">
+<p><strong>The global slot <code>Symbol.for(&#x27;io.cortexjs.compute-engine&#x27;)</code> is documented
+and typed (<code>ComputeEngineGlobal</code>).</strong> A component that must work with a copy
+of the Compute Engine loaded by the page finds the <code>ComputeEngine</code> class,
+<code>version</code>, <code>LatexSyntax</code>, <code>LATEX_DICTIONARY</code>, <code>compile</code>, the type guards,
+<code>numericValue</code> and <code>sym</code> there. Its contents are an additive contract: a
+later version can add a member, but does not remove or change one. The main
+entry point and <code>/epsil</code> store it; <code>/core</code> does not.</p>
+</li>
+<li class="">
+<p><strong>Two runtime helpers of compiled JavaScript are a stable contract for a
+<code>compile</code> handler:</strong> <code>_SYS.atNoWrap(base, index)</code> (1-based position, no
+wrap-around) and <code>_SYS.atMask(base, mask)</code> (the elements where a list of
+booleans is <code>true</code>). Every other <code>_SYS</code> member stays internal.</p>
+</li>
+<li class="">
+<p><strong>WGSL field functions for compute shaders:
+<code>WGSLTarget.compileFieldFunction(expr, { name, coordinates })</code></strong> (Tycho ledger
+row 461, ROADMAP CE-571). It returns a function
+<code>fn &lt;name&gt;(x: f32, y: f32, z: f32) -&gt; f32</code> that a compute shader of the host
+calls at each grid point, the helper functions it needs by name, and the
+layout of one uniform struct that holds its parameters. Every free symbol that
+is not a coordinate (and every symbol with a value that is not a constant or a
+function) is a parameter, read as <code>ce_params.&lt;name&gt;</code>: a real or integer scalar
+is an <code>f32</code>, and a numeric list of known length (at most 1024 elements) is
+<code>array&lt;vec4f, ⌈n/4⌉&gt;</code>, read by position with the index rules of <code>At</code>. The
+result gives the struct declaration (<code>paramsStructSource</code>), each field with
+its byte offset and size (<code>params</code>), and the buffer size (<code>paramsSize</code>, a
+multiple of 16); the host declares the one <code>var&lt;uniform&gt;</code>. A change of a
+parameter value is a buffer write: the compiled text does not change, and
+neither the value nor a fact that it gives (its sign) is read. A list with a
+<code>&#x27;storage-buffer&#x27;</code> hint is read from its storage buffer, also in the
+user-defined functions that the field calls: its struct and its
+<code>var&lt;storage, read&gt;</code> declaration are in the helpers, and its layout in
+<code>storageBuffers</code>. A helper name always has the same source text, so the
+helpers of several field functions merge by name; the one exception is the
+declaration of a storage buffer, which has one text only for one hint and
+element type, so a buffer that several fields read must have the same hint in
+each. The user-defined functions are named after the field
+(<code>_fn_&lt;k&gt;_&lt;name&gt;_h</code>, with k the length of the field name). An expression that
+<code>compile(expr, { to: &#x27;wgsl&#x27; })</code> declines is declined with the same diagnostic;
+a boolean, text, complex or longer-list parameter, a <code>Return</code> or a result that
+is not a real scalar, a body that assigns an input, and a user-defined
+function that reads a coordinate it does not take, also decline. A parameter
+declared <code>real</code> is read as a finite value, so <code>sin</code> and <code>cos</code> of an operand
+that reads it are the built-ins, with no <code>NaN</code> test. Checked on WebGPU (Apple
+GPU, headless Chromium) against the <code>javascript</code> target.</p>
+</li>
+<li class="">
+<p><strong>A list in a <code>wgsl</code> storage buffer, with a length that changes at run time.</strong>
+The hint <code>storage: { S: { kind: &#x27;storage-buffer&#x27;, group, binding } }</code> on
+<code>compile(…, { to: &#x27;wgsl&#x27; })</code> makes the preamble declare
+<code>struct CE_List_f32 { len: u32, data: array&lt;f32&gt; }</code> and
+<code>@group(G) @binding(B) var&lt;storage, read&gt; S: CE_List_f32;</code>. The struct is
+named by its element type (<code>CE_List_f32</code>, <code>CE_List_vec2f</code>, …), so a host that
+merges preambles keeps one copy of each struct and one <code>var</code> line per buffer.
+The host writes the logical length <code>len</code> at byte 0 and the elements from
+<code>dataOffset</code> (4 for numbers, 8 for 2-D points, 16 for 3-D and 4-D points,
+which have a stride of 16 bytes); a change of length is one 4-byte write, with
+no new compilation. <code>CompilationResult.storageBuffers</code> gives the layout of
+each buffer the code reads. <code>At(S, i)</code> (the index rules of <code>At</code>, against
+<code>len</code>), <code>Length(S)</code>, <code>Sum</code>, <code>Product</code>, <code>Max</code>, <code>Min</code> and <code>Mean</code> of <code>S</code>, and a
+<code>Sum</code> or <code>Product</code> whose bound is <code>Length(S)</code> read the buffer, with no copy;
+on the empty list they give the values of the <code>javascript</code> target (0, 1,
+<code>NaN</code>, <code>NaN</code>, <code>NaN</code>). A <code>len</code> above the elements the buffer holds gives <code>NaN</code>,
+and <code>Length(S)</code> is then the number of elements the buffer holds, so that a
+loop bounded by it stops. An expression that uses the whole list otherwise
+(<code>S + 1</code>, <code>Map</code>) declines, and so do lists of complex numbers, booleans,
+strings or lists. The <code>glsl</code> target declines the kind: WebGL2 has no storage
+buffers. Requested by Tycho (row 462, CE-572).</p>
+</li>
+<li class="">
+<p><strong>Permutation groups, an optional entry:
 <code>@cortex-js/compute-engine/group-theory</code>.</strong> <code>loadGroupTheory(ce)</code> adds 26
 operators to an engine: permutations and their products, inverses, powers,
-conjugates (b⁻¹ab) and commutators (a⁻¹b⁻¹ab); groups given by generators
-on an explicit action <code>PermutationAction(n)</code>; orbits and transversals; the
-exact order, membership, point stabilizers, and the subgroup, index,
-equality, normality and abelian queries. The order and membership queries
-use an incremental Schreier–Sims algorithm: the order of S₁₀₀, generated
-by a transposition and a 100-cycle, takes about 30 ms. The loader options
-set resource limits, and a query can lower them with a named <code>options</code>
-dictionary. A query that reaches a limit returns an error such as
-<code>Error(&quot;permutation-chain-orbit-edge-limit&quot;)</code>, never a partial list or a
-false answer. An engine that does not load the entry does not have these
-operators. Contributed by @KingArth0r (#482).</li>
+conjugates (b⁻¹ab) and commutators (a⁻¹b⁻¹ab); groups given by generators on
+an explicit action <code>PermutationAction(n)</code>; orbits and transversals; the exact
+order, membership, point stabilizers, and the subgroup, index, equality,
+normality and abelian queries. The order and membership queries use an
+incremental Schreier–Sims algorithm: the order of S₁₀₀, generated by a
+transposition and a 100-cycle, takes about 30 ms. The loader options set
+resource limits, and a query can lower them with a named <code>options</code> dictionary.
+A query that reaches a limit returns an error such as
+<code>Error(&quot;permutation-chain-orbit-edge-limit&quot;)</code>, never a partial list or a false
+answer. An engine that does not load the entry does not have these operators.
+Contributed by @KingArth0r (#482).</p>
+</li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="behavior-changes">Behavior Changes<a href="#behavior-changes" class="hash-link" aria-label="Direct link to Behavior Changes" title="Direct link to Behavior Changes" translate="no">​</a></h3><ul>
-<li class=""><strong>The join of types does not depend on the order of its operands.</strong>
+<li class="">
+<p><strong><code>compileShader()</code> refuses a body that reads an undeclared name.</strong> On the
+GLSL and WGSL targets, a body statement that reads a symbol which is not an
+input, a uniform or (in GLSL) an output of the shader now throws an error that
+names each such symbol, for example
+<code>the body reads &quot;x&quot;, &quot;y&quot;, which no input or uniform of the shader declares</code>.
+Before, the shader was emitted with the bare names and failed only when the
+GPU compiled it. Library constants such as <code>Pi</code>, symbols with a value in the
+engine, <code>Sum</code> and <code>Product</code> indexes, function-literal parameters, <code>Block</code>
+locals and user functions are not affected, and a GLSL built-in variable such
+as <code>gl_FragCoord</code> is still accepted. On WGSL, the input struct of a fragment
+shader is now <code>FragmentInput</code> and that of a compute shader <code>ComputeInput</code> (the
+vertex stage keeps <code>VertexInput</code>), and a compute shader with <code>outputs</code> or with
+an input that has no <code>builtin</code> is refused: WGSL accepts neither. Also on WGSL:
+a uniform, input or output with no <code>location</code> or <code>binding</code> now takes the next
+free one (all of them took 0 before, which WGSL refuses when there are two);
+two declarations given the same location or binding, and a boolean uniform,
+input or output, are refused; and the GLSL type names <code>ivec2</code>…<code>ivec4</code> and
+<code>uvec2</code>…<code>uvec4</code> now become <code>vec2i</code>… and <code>vec2u</code>… (they were written
+unchanged). (CE-575)</p>
+</li>
+<li class="">
+<p><strong><code>run()</code> refuses an array for a symbol declared with a number type.</strong> On the
+<code>javascript</code> target, with <code>x</code> declared <code>real</code>, <code>x + 1</code> called with
+<code>{ x: [1, 2] }</code> returned the string <code>&quot;1,21&quot;</code>: JavaScript converted the array
+to a string. It now throws a <code>TypeError</code> that names <code>x</code>. A symbol declared as
+a list, a union with a list member (<code>real | list&lt;real&gt;</code>), and an undeclared
+symbol over which the code broadcasts a call still accept an array. (CE-581)</p>
+</li>
+<li class="">
+<p><strong><code>Factor</code>, <code>Together</code> and <code>Cancel</code> collect like terms in their result</strong>
+(ROADMAP CE-577), as evaluating the sum does. Before, they returned the sum
+unchanged when they found nothing to rewrite.</p>
+<ul>
+<li class=""><code>Together(a+a)</code> and <code>Cancel(a+a)</code> are <code>2a</code> (they were <code>a+a</code>), and
+<code>Factor(\sin(t)+\sin(t))</code> is <code>2\sin(t)</code>. With <code>g(t) := \sin(t)</code>,
+<code>Factor(g(t)+g(t))</code> is <code>2\sin(t)</code>.</li>
+<li class="">Without a variable, <code>Factor</code> takes out a factor common to every term of a
+sum: <code>Factor(ax+ay)</code> is <code>a(x+y)</code>. It treats a term that is not a polynomial
+as a variable of its own: <code>Factor(x\sin(t)+y\sin(t))</code> is <code>(x+y)\sin(t)</code>.</li>
+<li class=""><code>Cancel</code> with no variable and no single free variable collects the like
+terms of its operand: <code>Cancel((a+b)(c+d)+(a+b)(c+d))</code> is <code>2(a+b)(c+d)</code>. It
+stayed unevaluated.</li>
+<li class="">A sum with an absent term gives <code>NaN</code>, as evaluating it does:
+<code>Factor(Missing+1)</code> was <code>1+NaN</code>.</li>
+<li class="">Terms with a random or other impure value are not collected:
+<code>Together(Random()+Random())</code> keeps two draws.</li>
+</ul>
+</li>
+<li class="">
+<p><strong>The join of types does not depend on the order of its operands.</strong>
 <code>widen(nan, real, missing)</code> gave <code>missing | number</code> and
 <code>widen(missing, nan, real)</code> gave <code>missing | nan | real</code>. Both now give
-<code>missing | nan | real</code>: <code>nan</code> beside another number type is kept as its
-own arm (<code>widen(real, nan)</code> is <code>nan | real</code>, not <code>number</code>, which also admits
-the complex numbers). A finite type joined with an infinity is still
-<code>number</code>. The join of <code>+oo</code> and <code>-oo</code> is <code>signed_infinity</code>, not <code>infinity</code>
-(which also admits <code>~oo</code>), and a union of <code>+oo</code> and <code>-oo</code> no longer drops
-<code>-oo</code>. <code>[NaN, 1]</code> has the element type <code>integer | nan</code> whether it is built
-with <code>ce.box()</code> or <code>ce.list()</code>.</li>
-<li class=""><strong>A shader compile refuses a <code>vars</code> entry that names a variable of the
+<code>missing | nan | real</code>: <code>nan</code> beside another number type is kept as its own
+arm (<code>widen(real, nan)</code> is <code>nan | real</code>, not <code>number</code>, which also admits the
+complex numbers). A finite type joined with an infinity is still <code>number</code>. The
+join of <code>+oo</code> and <code>-oo</code> is <code>signed_infinity</code>, not <code>infinity</code> (which also
+admits <code>~oo</code>), and a union of <code>+oo</code> and <code>-oo</code> no longer drops <code>-oo</code>.
+<code>[NaN, 1]</code> has the element type <code>integer | nan</code> whether it is built with
+<code>ce.box()</code> or <code>ce.list()</code>.</p>
+</li>
+<li class="">
+<p><strong>A shader compile refuses a <code>vars</code> entry that names a variable of the
 compiled code.</strong> On <code>glsl</code> and <code>wgsl</code>, <code>vars: { a: &#x27;k&#x27; }</code> beside a <code>Block</code>
 that declares <code>k</code> (or a <code>Sum</code> index, a loop variable, a function parameter
 named <code>k</code>) compiled to code that read the local <code>k</code> instead of the uniform.
-The compile now fails with a message that names the entry and the symbol.
-A self-mapped entry (<code>vars: { T: &#x27;T&#x27; }</code>) is not affected.</li>
-<li class=""><strong>A list argument at a declared point parameter is refused by the compiled
+The compile now fails with a message that names the entry and the symbol. A
+self-mapped entry (<code>vars: { T: &#x27;T&#x27; }</code>) is not affected.</p>
+</li>
+<li class="">
+<p><strong>A list argument at a declared point parameter is refused by the compiled
 code, as by the interpreter.</strong> With <code>h(p: tuple&lt;real, real&gt;) := p[1] + p[2]</code>
 and <code>g(p) := h(p) + 1</code>, <code>g([x, y])</code> is an <code>incompatible-type</code> error in the
-interpreter, and compiled to code that gave a value. It now declines on
-every target.</li>
-<li class=""><strong>A recursive function declared <code>function</code> is typed as the same function
-assigned without the declaration.</strong> With <code>G</code>, <code>S</code> and <code>R</code> declared
-<code>function</code> and then assigned <code>G(a,b,c) = |\sin a| - 0.1</code>,
+interpreter, and compiled to code that gave a value. It now declines on every
+target.</p>
+</li>
+<li class="">
+<p><strong>A recursive function declared <code>function</code> is typed as the same function
+assigned without the declaration.</strong> With <code>G</code>, <code>S</code> and <code>R</code> declared <code>function</code>
+and then assigned <code>G(a,b,c) = |\sin a| - 0.1</code>,
 <code>S(a,b,c) = \max(G(a,b,c), c - 3)</code> and
-<code>R(i) = \{i = 0: 0, R(i-1) + S(1, 2, R(i-1))\}</code>, <code>R(3)</code> and <code>R(x)</code> were
-typed <code>any</code> (with a simpler <code>S</code>, a union of numbers, tuples and lists).
-They are now typed <code>number</code>. A recursive list builder declared <code>function</code>
-is typed <code>list&lt;number&gt;</code>, not <code>collection&lt;number&gt;</code>. The signature of such a
-function is derived as for a declaration <code>(unknown) -&gt; unknown</code>, which
-checks the recursion.</li>
+<code>R(i) = \{i = 0: 0, R(i-1) + S(1, 2, R(i-1))\}</code>, <code>R(3)</code> and <code>R(x)</code> were typed
+<code>any</code> (with a simpler <code>S</code>, a union of numbers, tuples and lists). They are now
+typed <code>number</code>. A recursive list builder declared <code>function</code> is typed
+<code>list&lt;number&gt;</code>, not <code>collection&lt;number&gt;</code>. The signature of such a function is
+derived as for a declaration <code>(unknown) -&gt; unknown</code>, which checks the
+recursion.</p>
+</li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="performance">Performance<a href="#performance" class="hash-link" aria-label="Direct link to Performance" title="Direct link to Performance" translate="no">​</a></h3><ul>
-<li class=""><strong>On the shader targets, a call that several user functions repeat is
-computed once in more cases.</strong> A large expansion was kept by reference: in
-Tycho&#x27;s <code>voronoi-diagram</code> document, <code>B</code>, <code>H</code>, <code>u</code>, <code>v</code> and <code>Z</code> each called
-<code>F(x, y)</code> and the same sixteen weight terms again, so WebGPU drew the row
-about 2.1 times slower than WebGL. The function bodies are now written into
-the main body, where each shared call is computed once per pixel. The
-shader is also smaller (10.8 KB of WGSL instead of 12.3 KB). The size check
-that counts the code written is unchanged.</li>
+<li class=""><strong>On the shader targets, the body of a user function uses the built-in <code>sin</code>,
+<code>cos</code>, <code>min</code>, <code>max</code>, <code>clamp</code> and <code>sign</code> for a parameter that every call passes
+a finite value</strong> (ROADMAP CE-565.4, CE-565.1). With <code>x</code>, <code>y</code> declared <code>real</code>
+and <code>F(a, b) := \sin(a) + \cos(b) + \min(a, b)</code>, compiling
+<code>F(x, y) + F(2x, y)</code> to GLSL gives
+<code>float _fn_F(float a, float b) { return sin(a) + cos(b) + min(a, b); }</code>; it
+called the NaN-safe helpers (<code>_gpu_sin(a)</code>, …), which cost 2 % to 14 % of a
+frame in Tycho&#x27;s shaders on WebGL. The proof reads the arguments at the call
+sites, not a declared parameter type: <code>F(\exp(x), y)</code> keeps the helper for
+<code>a</code>, because <code>\exp(x)</code> can overflow to <code>+\infty</code> in f32 before the call.</li>
+<li class=""><strong>On the shader targets, a call that several user functions repeat is computed
+once in more cases.</strong> A large expansion was kept by reference: in Tycho&#x27;s
+<code>voronoi-diagram</code> document, <code>B</code>, <code>H</code>, <code>u</code>, <code>v</code> and <code>Z</code> each called <code>F(x, y)</code>
+and the same sixteen weight terms again, so WebGPU drew the row about 2.1
+times slower than WebGL. The function bodies are now written into the main
+body, where each shared call is computed once per pixel. The shader is also
+smaller (10.8 KB of WGSL instead of 12.3 KB). The size check that counts the
+code written is unchanged.</li>
 <li class=""><strong>A common subexpression of a restriction&#x27;s condition is shared with its
-value.</strong> <code>T_3(t)\{-0.8 &lt; \cos(T_3(t))\}</code> (<code>When(T_3(t), …)</code>) computed
-<code>T_3(t)</code> twice on every target; it is now computed once. On the shader
-targets, a call that reads a uniform passed with a renamed <code>vars</code> entry
-(<code>vars: { s: &#x27;u_s&#x27; }</code>) can now be shared too.</li>
-<li class=""><strong>More shader operands use the built-in <code>sin</code>, <code>cos</code>, <code>sign</code>, <code>max</code>, <code>min</code>
-and <code>clamp</code> instead of the NaN-safe helpers</strong>: a product whose factors have
+value.</strong> <code>T_3(t)\{-0.8 &lt; \cos(T_3(t))\}</code> (<code>When(T_3(t), …)</code>) computed <code>T_3(t)</code>
+twice on every target; it is now computed once. On the shader targets, a call
+that reads a uniform passed with a renamed <code>vars</code> entry (<code>vars: { s: &#x27;u_s&#x27; }</code>)
+can now be shared too.</li>
+<li class=""><strong>More shader operands use the built-in <code>sin</code>, <code>cos</code>, <code>sign</code>, <code>max</code>, <code>min</code> and
+<code>clamp</code> instead of the NaN-safe helpers</strong>: a product whose factors have
 declared ranges (<code>sin(k t)</code> with <code>k: real&lt;0..10&gt;</code>, <code>t: real&lt;-7..7&gt;</code>), a
-product with a <code>sin</code>, <code>cos</code> or <code>tanh</code> factor, a symbol with an assigned
-value that is compiled as that value, and a <code>vec2</code> to <code>vec4</code> operand whose
-components are all finite for certain (<code>sin([t, k, 1])</code> with <code>t</code>, <code>k</code>
-declared <code>real</code>). A shader that calls only <code>gcd</code> no longer carries the
-<code>lcm</code> helper.</li>
-<li class=""><strong>A function that reads a symbol holding a long symbolic expression is
-faster to call</strong> (ROADMAP CE-566). With <code>X(l) := C_0[l]</code> and <code>C_0</code> assigned
-a <code>Sum</code> over a chain of lazy <code>Map</code> and <code>Unique</code> collections, each call of <code>X</code>
-derived the type of that chain again, although nothing it reads had changed.
-The type is now remembered until a binding it reads changes: 1 495 calls
-took 350 ms instead of 1 746 ms.</li>
+product with a <code>sin</code>, <code>cos</code> or <code>tanh</code> factor, a symbol with an assigned value
+that is compiled as that value, and a <code>vec2</code> to <code>vec4</code> operand whose
+components are all finite for certain (<code>sin([t, k, 1])</code> with <code>t</code>, <code>k</code> declared
+<code>real</code>). A shader that calls only <code>gcd</code> no longer carries the <code>lcm</code> helper.</li>
+<li class=""><strong>A function that reads a symbol holding a long symbolic expression is faster
+to call</strong> (ROADMAP CE-566). With <code>X(l) := C_0[l]</code> and <code>C_0</code> assigned a <code>Sum</code>
+over a chain of lazy <code>Map</code> and <code>Unique</code> collections, each call of <code>X</code> derived
+the type of that chain again, although nothing it reads had changed. The type
+is now remembered until a binding it reads changes: 1 495 calls took 350 ms
+instead of 1 746 ms.</li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="resolved-issues">Resolved Issues<a href="#resolved-issues" class="hash-link" aria-label="Direct link to Resolved Issues" title="Direct link to Resolved Issues" translate="no">​</a></h3><ul>
-<li class=""><strong>A shader compile no longer writes out a chain of user functions whose
+<li class="">
+<p><strong>Assigning a call of a recursive function while an assumption is in force
+no longer overflows the stack.</strong> With <code>F</code> declared <code>function</code>,
+<code>F := n ↦ \{n = 0: x &gt; 0, F(n - 1)\}</code> and any assumption (<code>x &gt; 0</code>),
+<code>ce.assign(&#x27;y&#x27;, F(m))</code> threw &quot;Maximum call stack size exceeded&quot;: the
+assignment reads the type of <code>F(m)</code> with the assumptions hidden, and the
+recursive call typed the body again at each level. It now gives <code>boolean</code>,
+the type an engine with no assumptions gives.</p>
+</li>
+<li class="">
+<p><strong>A <code>wgsl</code> read of a long list no longer copies the list.</strong> <code>At(S, i)</code> with
+<code>S</code> a free list symbol called a helper that copied the whole list into a local
+variable before it read one element, and a <code>Sum</code> over <code>S_k</code> copied it again on
+each pass of its loop. WGSL guarantees only 8192 bytes of local variables per
+function, so a list of more than 2048 numbers could fail to compile: a 150 ×
+150 board of 22 500 numbers needs 90 KB. When the copy would need more than
+8192 bytes (more than 2048 numbers, 1024 points of 2 coordinates, or 512
+points of 3 or 4), the read now indexes the list where the host declares it:
+<code>At(S, i)</code> compiles to <code>_gpu_at_S_22500(i)</code>, a helper whose body reads <code>S</code>
+directly, and a proven index compiles to <code>S[k - 1]</code>. Above that size the
+symbol, or the identifier that <code>vars</code> maps it to, must be a <code>var&lt;storage&gt;</code>
+declaration (a <code>var&lt;private&gt;</code> has the same 8192-byte guarantee as a local
+variable, and a <code>const</code> array constructor is guaranteed only 2047 elements);
+the storage kind <code>&#x27;storage-buffer&#x27;</code> is the recommended form. A read of that
+size that cannot index in place (a <code>vars</code> mapping to a struct field such as
+<code>u.S</code>), a body that writes such an input (which needs a local copy of it), and
+a <code>Block</code> local list of more than 8192 bytes now decline, with a message that
+names <code>&#x27;storage-buffer&#x27;</code>. A shorter list keeps the copying helper, which is
+also valid when the host declares the list as a parameter or a local of its
+own function. A written input read with a proven index reads its local copy
+directly instead of copying it again. The index rules do not change (1-based,
+a negative index counts from the end, and any other index gives <code>NaN</code>). The
+<code>glsl</code> output does not change.</p>
+</li>
+<li class="">
+<p><strong>The type of <code>run()</code> accepts a list argument.</strong> <code>run({ S: [1, 2, 3] })</code> for
+<code>S: list&lt;real&gt;</code> worked on the <code>javascript</code> target, but did not type-check: the
+value type of the runner was <code>number | ComplexResult</code>. It is now
+<code>number | ComplexResult | RunnerListInput</code>, where <code>RunnerListInput</code> is an
+array of numbers, complex values or such arrays. A typed array
+(<code>Float64Array</code>) is still refused at run time, with a message. (CE-581)</p>
+</li>
+<li class="">
+<p><strong>A shader compile no longer writes out a chain of user functions whose
 branches all call the function below.</strong> With
 <code>h_k(x) = \{x &gt; c_k: 2h_{k-1}(x), 3h_{k-1}(x)\}</code> (or a <code>Which</code> whose later
-conditions call it), the <code>glsl</code> and <code>wgsl</code> targets wrote the function
-bodies into the main body, where a call shared by two branches is written
-once in each, so the shader doubled at each level: 2.5 MB of GLSL and
-388 s of compilation at depth 14. Such a chain now stays a set of shader
-functions that call each other.</li>
-<li class=""><strong>Compiled code gave wrong values for a user function called with a list
-argument at a parameter that the interpreter binds whole.</strong> With <code>R</code>
-declared <code>function</code> and assigned <code>(V, θ) ↦ [Σ V·[cos θ, -sin θ], …]</code>,
-<code>R([x, y] + [-0.57, 2.8], φ)</code> gave <code>NaN</code> on <code>javascript</code> and an empty
-interval on <code>interval-js</code>; the interpreter gives the value. The compiler read
-the parameter type that the body&#x27;s use had narrowed (<code>number</code>), not the
-function&#x27;s own signature. <code>javascript</code> now gives the interpreter&#x27;s value,
-<code>glsl</code> and <code>wgsl</code> compile a copy of <code>R</code> with a <code>vec2</code> parameter, and
-<code>interval-js</code> declines instead of giving a wrong interval.</li>
-<li class=""><strong>A recursive function inside <code>Mod</code> declined on <code>interval-js</code>.</strong>
+conditions call it), the <code>glsl</code> and <code>wgsl</code> targets wrote the function bodies
+into the main body, where a call shared by two branches is written once in
+each, so the shader doubled at each level: 2.5 MB of GLSL and 388 s of
+compilation at depth 14. Such a chain now stays a set of shader functions that
+call each other.</p>
+</li>
+<li class="">
+<p><strong>Compiled code gave wrong values for a user function called with a list
+argument at a parameter that the interpreter binds whole.</strong> With <code>R</code> declared
+<code>function</code> and assigned <code>(V, θ) ↦ [Σ V·[cos θ, -sin θ], …]</code>,
+<code>R([x, y] + [-0.57, 2.8], φ)</code> gave <code>NaN</code> on <code>javascript</code> and an empty interval
+on <code>interval-js</code>; the interpreter gives the value. The compiler read the
+parameter type that the body&#x27;s use had narrowed (<code>number</code>), not the function&#x27;s
+own signature. <code>javascript</code> now gives the interpreter&#x27;s value, <code>glsl</code> and
+<code>wgsl</code> compile a copy of <code>R</code> with a <code>vec2</code> parameter, and <code>interval-js</code>
+compiles a copy of <code>R</code> for the list argument, whose interval contains the
+interpreter&#x27;s value.</p>
+</li>
+<li class="">
+<p><strong>A recursive function inside <code>Mod</code> declined on <code>interval-js</code>.</strong>
 <code>f(x, n) := 1/\operatorname{mod}(f(x, n-1), 1)</code> with <code>f(x, 0) = x</code> declined
-with &quot;an object-domain absent (&#x27;missing&#x27;) position&quot;. It compiles again.</li>
-<li class=""><strong>A call through a parameter typed only by index reads compiles.</strong> In
+with &quot;an object-domain absent (&#x27;missing&#x27;) position&quot;. It compiles again.</p>
+</li>
+<li class="">
+<p><strong>A call through a parameter typed only by index reads compiles.</strong> In
 <code>r(p) := (T + \lfloor p[1] \rfloor) \max(0, 0.5 - l(f(p)))</code> with
 <code>f(q) := \operatorname{mod}(q, 1) - 0.5</code>, the reads <code>p[1]</code> typed <code>p</code> as a
 point, and the compiler passed it to <code>f</code> as a point, which <code>Mod</code> minus a
 number refuses. Such a type does not prove a point: the call is now compiled
 for the argument&#x27;s own type (a list), as the interpreter evaluates it.
 <code>d(B(A(P(x, y))))</code> in the Tycho document <code>ra1p9naofs</code> compiles on
-<code>javascript</code> and gives the interpreter&#x27;s value.</li>
-<li class=""><strong>On <code>interval-js</code>, a user function whose invariant part is subtracted
+<code>javascript</code>, <code>interval-js</code> and <code>glsl</code>, and gives the interpreter&#x27;s value.</p>
+</li>
+<li class="">
+<p><strong>On <code>interval-js</code>, a user function called with a list argument compiles.</strong>
+<code>interval-js</code> now compiles a copy of the function for the argument&#x27;s type, as
+<code>javascript</code> does. Before, a call such as <code>d(B(A(P(x, y))))</code>, where <code>B</code>
+returns a list of two numbers, declined. A parameter declared as a point still
+refuses a list, as the interpreter does.</p>
+</li>
+<li class="">
+<p><strong>On <code>glsl</code> and <code>wgsl</code>, a function of a number called with a list of 2 to 4
+numbers compiles.</strong> With <code>f(p) := \operatorname{mod}(p, 1) - 0.5</code>, the call
+<code>f([x, y])</code> declined with &quot;lowers to vec2 but parameter is declared float&quot;;
+the interpreter applies <code>f</code> to each element. The shader now calls a wrapper
+that applies <code>f</code> to each component. A point argument still declines.</p>
+</li>
+<li class="">
+<p><strong>A recursive function compiled after an evaluation kept a wide type in its
+body.</strong> With <code>R(i, x, y)</code> declared <code>function</code> and defined by recursion, the
+sequence evaluate, compile, evaluate, compile (the order of a plotting host)
+declined on <code>interval-js</code>: &quot;may be a collection at run time&quot;, because the
+recursive call inside the body kept the type it had while the signature was
+derived. It compiles again (Tycho document <code>ndqj7hupta</code>).</p>
+</li>
+<li class="">
+<p><strong>A recursive function&#x27;s type follows a change to a value its body reads.</strong>
+With <code>a := 5</code> and <code>R(i) := \{i \le 0: 0, R(i-1) + a\}</code>, the assignment
+<code>a := [1, 2]</code> left <code>R(n)</code> typed <code>number</code>, while <code>R(2)</code> is <code>[2, 4]</code>.</p>
+</li>
+<li class="">
+<p><strong>On <code>interval-js</code>, a user function whose invariant part is subtracted
 computed it on every term.</strong> In <code>\sum_{i=1}^{16} n(x, y, i)</code> with
 <code>n(x, y, i) := \exp(\ldots - F(x, y))</code>, <code>F(x, y)</code> was computed 17 times per
-sample instead of once.</li>
-<li class=""><strong>A letter that names a library operator is a free variable in an
-expression parsed in a scope.</strong> <code>ce.parse(&#x27;y=x+N&#x27;, { scope: ce.createScope() })</code>
-had the unknowns <code>[&quot;x&quot;, &quot;y&quot;]</code>, and the same for <code>D</code>; read outside the scope,
-the name <code>N</code> found the library operator <code>N</code>. It now has <code>[&quot;N&quot;, &quot;x&quot;, &quot;y&quot;]</code>,
-as the expression parsed without a scope, and as <code>evaluate()</code> and <code>subs()</code>
-already treated it.</li>
+sample instead of once.</p>
+</li>
+<li class="">
+<p><strong>A letter that names a library operator is a free variable in an expression
+parsed in a scope.</strong> <code>ce.parse(&#x27;y=x+N&#x27;, { scope: ce.createScope() })</code> had the
+unknowns <code>[&quot;x&quot;, &quot;y&quot;]</code>, and the same for <code>D</code>; read outside the scope, the name
+<code>N</code> found the library operator <code>N</code>. It now has <code>[&quot;N&quot;, &quot;x&quot;, &quot;y&quot;]</code>, as the
+expression parsed without a scope, and as <code>evaluate()</code> and <code>subs()</code> already
+treated it.</p>
+</li>
 </ul><h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="01710-2026-10-27">0.171.0 <em>2026-10-27</em><a href="#01710-2026-10-27" class="hash-link" aria-label="Direct link to 01710-2026-10-27" title="Direct link to 01710-2026-10-27" translate="no">​</a></h2><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="behavior-changes-1">Behavior Changes<a href="#behavior-changes-1" class="hash-link" aria-label="Direct link to Behavior Changes" title="Direct link to Behavior Changes" translate="no">​</a></h3><ul>
 <li class="">
 <p><strong><code>subs()</code> of the variable of a derivative, a series or an indefinite integral
@@ -421,15 +654,15 @@ midpoint of its interval, and would give a number to a symbol typed
 fallback.</p>
 </li>
 <li class="">
-<p><strong>The target of an <code>Assign</code> outside a <code>Block</code> is a free variable.</strong> The
-target is a write to a symbol of the enclosing scope, so <code>unknowns</code> and
+<p><strong>The target of an <code>Assign</code> outside a <code>Block</code> is a free variable.</strong> The target
+is a write to a symbol of the enclosing scope, so <code>unknowns</code> and
 <code>freeVariables</code> list it. Before, any <code>Assign</code>, <code>Declare</code> or <code>DefineFunction</code>
 operand made its target local to the node that held it. Example:
-<code>y=(k\coloneq2)</code> (<code>Equal(y, Assign(k, 2))</code>) had the free variables <code>[&quot;y&quot;]</code>
-and now has <code>[&quot;k&quot;, &quot;y&quot;]</code>, as <code>Assign(k, 2)</code> alone always had. A <code>Block</code>
-still keeps the names it assigns or declares local: <code>(k\coloneq2; kx)</code> has
-the free variable <code>x</code> only. <code>If(z &gt; 0, Assign(z, 5), 0)</code> lists <code>z</code>. The
-<code>subs()</code> of such a target is still open (ROADMAP CE-537).</p>
+<code>y=(k\coloneq2)</code> (<code>Equal(y, Assign(k, 2))</code>) had the free variables <code>[&quot;y&quot;]</code> and
+now has <code>[&quot;k&quot;, &quot;y&quot;]</code>, as <code>Assign(k, 2)</code> alone always had. A <code>Block</code> still
+keeps the names it assigns or declares local: <code>(k\coloneq2; kx)</code> has the free
+variable <code>x</code> only. <code>If(z &gt; 0, Assign(z, 5), 0)</code> lists <code>z</code>. The <code>subs()</code> of
+such a target is still open (ROADMAP CE-537).</p>
 </li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="features">Features<a href="#features" class="hash-link" aria-label="Direct link to Features" title="Direct link to Features" translate="no">​</a></h3><ul>
 <li class="">
