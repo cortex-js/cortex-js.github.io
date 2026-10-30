@@ -21,8 +21,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.5e2c4708.css">
-<script src="/assets/js/runtime~main.6308bb28.js" defer="defer"></script>
-<script src="/assets/js/main.14a11181.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.1b0d3d34.js" defer="defer"></script>
+<script src="/assets/js/main.6f8e41b0.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -92,7 +92,7 @@ outside it. A spent budget throws a <code>CancellationError</code> with
 <p>The engine checks its deadline only inside its own work (evaluation,
 canonicalization). Two read-only properties tell your own code where the
 current span stands:</p>
-<div class="symbols-table"><table><thead><tr><th style="text-align:left">Property</th><th style="text-align:left">Description</th></tr></thead><tbody><tr><td style="text-align:left"><code>ce.timeRemaining</code></td><td style="text-align:left">Milliseconds left before the earliest deadline of the active spans, <code>0</code> or less once it has passed. <code>Infinity</code> when no active span has a time limit (outside any span, or in a step budget with no time limit around it). A spent step budget does not change it.</td></tr><tr><td style="text-align:left"><code>ce.stepBudgetSpent</code></td><td style="text-align:left"><code>true</code> when a step budget of the current span, or of an enclosing one, is spent. Always <code>false</code> outside any span.</td></tr></tbody></table></div>
+<div class="symbols-table"><table><thead><tr><th style="text-align:left">Property</th><th style="text-align:left">Description</th></tr></thead><tbody><tr><td style="text-align:left"><code>ce.timeRemaining</code></td><td style="text-align:left">Milliseconds left before the earliest deadline of the active spans, <code>0</code> or less once it has passed. <code>Infinity</code> when no active span has a time limit (outside any span, or in a step budget with no time limit around it). A spent step budget does not change it.</td></tr><tr><td style="text-align:left"><code>ce.stepBudgetSpent</code></td><td style="text-align:left"><code>true</code> when a step budget of the current span, or of an enclosing one, is spent. Always <code>false</code> outside any span.</td></tr><tr><td style="text-align:left"><code>ce.stepsLeft</code></td><td style="text-align:left">The steps left in the budget of the innermost <code>withStepBudget</code> span, negative once it is spent; <code>undefined</code> when no step budget is active. Inside the span, <code>steps - ce.stepsLeft</code> is the number of steps used, and <code>ce.stepsLeft &lt; 0</code> tells that this span&#x27;s budget, not an enclosing one, is spent.</td></tr></tbody></table></div>
 <p>Both properties describe the span that is active in the current synchronous
 code. Code that runs after an <code>await</code> is outside the span, even when the
 <code>await</code> is inside the <code>withTimeLimit</code> callback: it reads <code>Infinity</code> and

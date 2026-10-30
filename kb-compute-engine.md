@@ -2832,6 +2832,7 @@ current span stands:
 | :--- | :--- |
 | `ce.timeRemaining` | Milliseconds left before the earliest deadline of the active spans, `0` or less once it has passed. `Infinity` when no active span has a time limit (outside any span, or in a step budget with no time limit around it). A spent step budget does not change it. |
 | `ce.stepBudgetSpent` | `true` when a step budget of the current span, or of an enclosing one, is spent. Always `false` outside any span. |
+| `ce.stepsLeft` | The steps left in the budget of the innermost `withStepBudget` span, negative once it is spent; `undefined` when no step budget is active. Inside the span, `steps - ce.stepsLeft` is the number of steps used, and `ce.stepsLeft < 0` tells that this span's budget, not an enclosing one, is spent. |
 
 </div>
 
@@ -3864,9 +3865,28 @@ ce.declare("double", { evaluate: ([x]) => x.mul(2) });
 // Throws: The symbol "double" is already declared in this scope
 ce.declare("double", { evaluate: ([x]) => x.mul(3) });
 
-// Changes the handler of the existing definition
+// Replaces the definition with one that has the new handler
 ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
 ```
+
+An extension applies only to expressions boxed or parsed after it. It makes a
+new definition, and an expression that was boxed before keeps the definition
+it was bound to, including an expression stored as the value of a symbol:
+
+```js
+ce.declare("double", { evaluate: ([x]) => x.mul(2) });
+const before = ce.box(["double", 3]);
+ce.assign("v", ce.box(["double", 3]));
+
+ce.declare("double", { evaluate: ([x]) => x.mul(3) }, { extend: true });
+
+before.evaluate();                    // ➔ 6: boxed before the extension
+ce.box("v").evaluate();               // ➔ 6: stored before the extension
+ce.box(["double", 3]).evaluate();     // ➔ 9: boxed after the extension
+```
+
+To use the new definition, box or parse the expression again after the
+extension.
 
 A patch that changes a flag of a library operator keeps the library handlers
 that do not depend on that flag. Removing `commutative` from `Add` or
@@ -5172,6 +5192,39 @@ ce.declare("bad", { signature: "(number) -> number", pure: true, drawsRandom: tr
 
 ce.declare("bad", { signature: "(number) random -> number", pure: true });
 // ➔ throws: the declared effects and the 'pure'/'drawsRandom' flags disagree
+```
+
+**Caching.** The engine can keep the value of an operator and use it again:
+when an expression uses the same subexpression in several places, and when a
+function is applied again to the same arguments. For an operator that you
+declare (with `ce.declare()`, in a library passed to the constructor, or with
+`ce.loadLibrary()`), and for a JavaScript function that you assign with
+`ce.assign()`, this happens only when you state its purity: `pure: true`,
+`effects: []`, or the `pure` keyword in the signature
+(`"(number) pure -> number"`). `drawsRandom: false` alone does not state
+purity. An operator that states nothing is evaluated at each occurrence, and
+no result computed while its handler ran is kept. The same rule applies to the
+collection handlers of such an operator, to a `subscriptEvaluate` handler, and
+to the JavaScript callbacks of a protocol implementation.
+
+State `pure: true` only when the result depends on nothing but the operands. A
+handler that reads the value of a symbol by name, keeps its own state, or
+reads the clock must not state it:
+
+```js
+let n = 0;
+ce.declare("Count", { signature: "() -> integer", evaluate: () => ce.number(++n) });
+const c = ce.function("Count", []);
+ce.function("List", [c, c, c]).evaluate();
+// ➔ [1, 2, 3]: not cached, each occurrence is evaluated
+
+ce.declare("Twice", {
+  signature: "(number) -> number",
+  pure: true,
+  evaluate: ([x]) => x.mul(2),
+});
+// Cached: the value of a Twice(x) that appears several times in an
+// expression can be reused instead of calling the handler again.
 ```
 
 For a function defined by a body rather than a JavaScript handler, effects are
@@ -13336,6 +13389,13 @@ console.log(g.run(3, 4));
 // ➔ 25
 ```
 
+Pass one argument for each parameter. The compiled function does not check the
+number of arguments, so that a call costs nothing more than a plain JavaScript
+call. With fewer arguments, the result is not defined: for example
+`compile("x \\mapsto x > 0").run()` returns `false`, where the interpreter has
+no value. Inside compiled code, a call with too few arguments is refused when
+the expression is compiled, and the interpreter evaluates it instead.
+
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
@@ -14350,7 +14410,8 @@ The result:
   `struct CEParams { c: f32, }`. Every free symbol that is not a coordinate
   is a **parameter**, a field of this struct, read as `ce_params.<name>`.
 - `params`: the fields of the struct, each with its `name`, `ceType`,
-  `wgslType`, byte `offset` and `size` (and `length` for a list).
+  `wgslType` (`f32`, `vec2f`, `vec3f`, `vec4f` or `array<vec4f, k>`), byte
+  `offset` and `size` (and `length` for a list).
 - `paramsSize`: the size of the parameter buffer in bytes, a multiple of 16.
 - `helpers`: the other declarations that the function needs, by name: the
   shared helpers (`_gpu_sin`, `_gpu_pow2`, …), the readers of list
@@ -14391,20 +14452,91 @@ const wave = wgsl.compileFieldFunction(
 // wave.storageBuffers[0] gives the offsets of `len` and of the elements.
 ```
 
-**Parameters.** A real or integer scalar parameter is an `f32`. A list of
+**Parameters.** A real or integer scalar parameter is an `f32`. A
+parameter declared `integer` is a promise that you write an integral value:
+the field function relies on it (`\lfloor a \rfloor` compiles to
+`ce_params.a`). A list of
 `n` numbers, `n` at most 1024, (`list<number^n>`) is `array<vec4f, k>` with
 `k = ⌈n/4⌉`: element `i` (1-based) is the `f32` at byte `offset + 4(i − 1)`
 of the buffer. The function reads such a list only by position, with the
 rules of `At`: a negative index counts from the end, and `0`, an index that
-is not an integer and an index out of range give `NaN`. The scalars come
-first in the struct, in name order, then the lists in name order, each at a
-multiple of 16 bytes (the stride of `array<vec4f, k>` is 16 bytes, which a
-uniform buffer requires).
+is not an integer and an index out of range give `NaN`.
 
-A symbol with a value (`c := 0.5`) is a parameter too: the field function
-does not read its value in the engine, and you write the value to the buffer.
-A constant (`\pi`, or a symbol declared constant) is folded into the code,
-and a symbol whose value is a function is a user-defined function.
+A **point**, a tuple of 2, 3 or 4 real numbers, is a `vec2f`, `vec3f` or
+`vec4f`. Its type comes from its declaration (`tuple<real, real, real>`) or,
+for a symbol that is not declared, from its value
+(`ce.assign('A', ['Tuple', 1, 2])`). A tuple of integers is a vector of `f32`
+too. A component declared `number` (`tuple<number, number>`) is read as a
+real number, as for a list of type `list<number^n>`: you can write only real
+values into the buffer. A component declared `complex` declines. The
+function reads the point as a WGSL vector, so you can use it whole or by
+component:
+
+```javascript
+// x, y, z and c are declared 'real', as in the first example. A coordinate
+// that is not declared is read with a NaN test: `_gpu_sin(y)`, not `sin(y)`.
+ce.assign('A', ce.box(['Tuple', 1, 2]));
+ce.assign('B', ce.box(['Tuple', 0.5, -1, 2]));
+const field = wgsl.compileFieldFunction(
+  ce.parse('c + \\operatorname{distance}((x,y,z),B) + A.x \\sin(y) - B.z'),
+  { name: 'field', coordinates: ['x', 'y', 'z'] }
+);
+// field.function:
+//   return ce_params.c + sin(y) * ce_params.A.x + -ce_params.B.z
+//     + distance(vec3f(x, y, z), ce_params.B);
+// field.paramsStructSource: struct CEParams { c: f32, A: vec2f, B: vec3f, }
+// offsets: c 0, A 8, B 16; paramsSize 32
+```
+
+`A.x` (or `A_1`) reads the first component, and `\operatorname{distance}`,
+`|A|`, `\operatorname{Norm}`, `\operatorname{Dot}`, the sum and difference of
+points, and `At(A, i)` work as in `compile()` for a symbol declared as a
+point. A point with 1 or more than 4 components, or with a component that is
+not a real number (a complex number, `NaN` or a list), declines.
+
+The scalars come first in the struct, in name order, then the points in name
+order, then the lists in name order. Each field starts at the next multiple
+of its alignment, as the WGSL layout rules require: an `f32` at a multiple of
+4 bytes, a `vec2f` (8 bytes) at a multiple of 8, a `vec3f` (12 bytes) and a
+`vec4f` (16 bytes) at a multiple of 16, and a list at a multiple of 16 bytes
+(the stride of `array<vec4f, k>` is 16 bytes, which a uniform buffer
+requires). Read the offsets from `params`: the padding between two fields is
+not written.
+
+A symbol whose value is a numeric constant is a parameter too: a number
+(`c := 0.5`), or a tuple or list of numbers (`A := (1, 2)`, `L := [1, 2, 3]`).
+The field function does not read its value in the engine, and you write the
+value to the buffer. A symbol whose value reads other symbols, or calls a
+user-defined function, is not a parameter: its value is written into the
+code, as `compile()` does. With
+`A := (x, 1)`, where `x` is a coordinate, `A.x` reads the coordinate `x`. With
+`a := 1`, `b := 2` and `A := (a, b)`, the parameters are `a` and `b`, and `A`
+is compiled as `vec2f(ce_params.a, ce_params.b)`. A value that reads itself
+through other symbols declines. A constant (`\pi`, or a symbol declared
+constant) is folded into the code, and a symbol whose value is a function is
+a user-defined function.
+
+**A user-defined function that reads a parameter.** Declare the parameter
+before its first assignment and before the function is defined:
+
+```javascript
+ce.declare('a', 'real');
+ce.assign('a', 5);
+ce.parse('h(t) := t + a').evaluate();   // reads ce_params.a
+```
+
+Without the declaration, the type of `a` is inferred from its value
+(`integer`), and the result type of `h` comes from that type. The field
+function reads `a` from the buffer as a real number, so that result type is
+not correct there: `\lfloor h(x) \rfloor` would lose its `floor`. The field
+function then declines, and its message names the declaration to add
+(`ce.declare('a', 'real')`, or `ce.declare('A', 'tuple<real, real>')` for a
+point). The same applies when the function reads the parameter through a
+symbol compiled in place (`c := a + 1`), and to a symbol compiled in place
+whose type comes from the parameter (`b := a`). A symbol compiled in place
+with a declared type that its value no longer fits (`b` declared `integer`,
+`b := a`, `a := 5`) declines too: declare `a` as `integer`, or `b` as `real`.
+A parameter with a real value (`a := 2.5`) needs no declaration.
 
 **A parameter change is a buffer write.** The compiled text does not depend
 on the parameter values: write the new values to the buffer, with no new
@@ -14442,8 +14574,8 @@ function writeParams(values) {
   const data = new Float32Array(gyroid.paramsSize / 4);
   for (const p of gyroid.params) {
     const v = values[p.name];
-    if (p.length === undefined) data[p.offset / 4] = v;
-    else data.set(v, p.offset / 4);   // a list: one f32 per element
+    if (p.wgslType === 'f32') data[p.offset / 4] = v;
+    else data.set(v, p.offset / 4);   // a point or a list: one f32 each
   }
   device.queue.writeBuffer(paramsBuffer, 0, data);
 }
@@ -14495,8 +14627,9 @@ const module = [
 - `compile(expr, { to: 'wgsl' })` declines the expression: for example a
   recursive function, a `Random()` outside `WithRandomSeed`, or `Integrate`.
   The diagnostic is the diagnostic of `compile()`.
-- A parameter is a boolean, text, a complex number, a list of unknown length,
-  or a list of more than 1024 elements (`code: 'unsupported-parameter'`).
+- A parameter is a boolean, text, a complex number, a tuple that is not a
+  point of 2, 3 or 4 real numbers, a list of unknown length, or a list of
+  more than 1024 elements (`code: 'unsupported-parameter'`).
   Give a longer list, or a list of unknown length, a `'storage-buffer'`
   hint. A storage buffer cannot hold complex numbers, text, booleans or
   lists of lists either.
@@ -19633,6 +19766,81 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
+##### ComputeEngine.timeRemaining {#timeremaining-1}
+
+```ts
+readonly timeRemaining: number;
+```
+
+The number of milliseconds left before the earliest deadline of the
+active `withTimeLimit` spans (an enclosing span preempts a later inner
+limit), and `0` or less once that deadline has passed. `Infinity` when
+no active span has a time limit, which includes a `withStepBudget` span
+with no `withTimeLimit` around it.
+
+This value and [stepBudgetSpent](#stepbudgetspent-1) describe the span that is active
+in the current synchronous code. Code that runs after an `await`, even
+inside `withTimeLimit` or an `evaluateAsync()` call, is outside the
+span: it reads `Infinity` and `false`.
+
+The engine checks its deadline only inside its own work (evaluation,
+canonicalization). A host loop that runs inside a span and does work of
+its own (walking expressions, building a list) reads this value to stop
+on time: `if (ce.timeRemaining <= 0) break;`.
+
+A spent step budget does not change this value; read
+[stepBudgetSpent](#stepbudgetspent-1) for it.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.stepBudgetSpent {#stepbudgetspent-1}
+
+```ts
+readonly stepBudgetSpent: boolean;
+```
+
+True inside a `withStepBudget` span (or a span nested in one) when a
+step budget of the current span or of an enclosing one is spent; false
+otherwise, and always false outside any span.
+
+When a budget is spent, the engine throws a `CancellationError`, but
+code between the throw and the end of the span can catch it and return
+a value. Such a value is partial. A host that stores values in a cache
+reads this before a write, so that it does not keep a partial value.
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.stepsLeft {#stepsleft-1}
+
+```ts
+readonly stepsLeft: number | undefined;
+```
+
+The number of steps left in the budget of the innermost
+`withStepBudget` span, or `undefined` when no such span is active.
+It is negative once that budget is spent: after the throw that spends
+it, each later check still counts one step, so `steps - ce.stepsLeft`
+is the number of steps used only while the budget is not spent. A
+`withTimeLimit` span nested in a step-budget span does not change it,
+nor does a budget the engine opens for its own search: host code that
+the engine calls during that search reads the host's budget.
+
+Read inside the callback of `withStepBudget`, it tells the two things
+[stepBudgetSpent](#stepbudgetspent-1) cannot: how many steps the span has used
+(`steps - ce.stepsLeft`), and whether THIS span's budget is spent
+(`ce.stepsLeft < 0`) rather than the budget of an enclosing span. A
+step is an opaque unit: compare counts only on one engine version.
+Like [timeRemaining](#timeremaining-1), it describes the span of the current
+synchronous code.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.iterationLimit {#iterationlimit-1}
 
 ```ts
@@ -19908,10 +20116,36 @@ restore(cp): void
 ```
 
 Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again. Expressions built BEFORE `cp` stay
-valid — their definitions are rewritten in place. Expressions built
-during the rewound window are not: cache cell outputs as serialized
-artifacts, never as live boxed nodes.
+stays live and can be restored again.
+
+The definitions that existed when `cp` was taken are rewritten in place,
+and the version counters advance, so every expression that reads them,
+whether it was built before or during the rewound window, reads the
+restored state afterwards and its cached answers are computed again.
+The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
+affected, with one exception: the fields of a mutable object are
+rewound in place, so the `json` and `digest` of that object, and of
+every expression that holds it, can change.
+
+The definitions CREATED during the window are removed from their scope
+and disposed. This includes a symbol that was declared or assigned for
+the first time there, and a free symbol that was boxed for the first
+time there (boxing declares it). An expression built during the window
+that names such a symbol keeps the disposed definition, and the symbol
+is inert: it reads no value and counts as unknown (`unknowns`, a
+compile reads it as an input), also after a later declaration or
+assignment of the same name, and its type is the one its record had
+before the declaration (usually `unknown`). The index of a `Sum` and the
+locals of a `Block` built during the window are not affected: they
+still take their values when the expression runs. Nor is a symbol
+declared in a scope that is not on the scope chain when `restore()`
+runs (a scope pushed and popped during the window): it still resolves
+by name, so it reads a later declaration of the same name in that scope
+with its old type (ROADMAP CE-590). `isSame` with the
+same expression built after the
+restore is false. Do not keep such an expression: build it again to
+read the new definition, and cache a cell output as a serialized
+artifact rather than as a live boxed node.
 
 ####### cp
 
@@ -23226,7 +23460,7 @@ what it can compute from the evaluated operands alone.
 **On a `lazy: true` operator there is no contrast to draw**: `holdMap`
 returns the operands unchanged, so the handler's first parameter is raw
 and held too — and, on the box/parse routes, not even canonicalized (see
-the lazy-operator trap in `CLAUDE.md`: such a handler must canonicalize
+the lazy-operator trap in `ARCHITECTURE.md`: such a handler must canonicalize
 each held operand it consumes).
 
 Read-only: do not mutate it, and do not assume it is present (a handler
@@ -30982,6 +31216,16 @@ Return `undefined` (or an empty string) to fall back to the
 default compilation (a `null` returned from untyped JavaScript is
 tolerated and treated the same). See [OperatorCompileHandler](#operatorcompilehandler).
 
+On the `javascript` target, the code may call two runtime helpers,
+which keep their names and behavior across releases:
+`_SYS.atNoWrap(base, index)` reads the element at a 1-based position
+(or the elements at a list of positions) with no wrap-around, and
+`_SYS.atMask(base, mask)` keeps the elements where a list of booleans
+is `true`, and reads any other index as `atNoWrap` does. The other
+members of `_SYS` are internal and can change in any release. The
+compile guide ("Runtime Helpers for Generated JavaScript") gives the
+details.
+
 The code a caller handler writes runs only on the thread that compiled
 it: the result is not shippable, so `broadcastAsync()` does not send
 it to the kernel pool (`reason: 'not-shippable'`). This holds also
@@ -31898,6 +32142,81 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
+##### IComputeEngine.timeRemaining {#timeremaining}
+
+```ts
+readonly timeRemaining: number;
+```
+
+The number of milliseconds left before the earliest deadline of the
+active `withTimeLimit` spans (an enclosing span preempts a later inner
+limit), and `0` or less once that deadline has passed. `Infinity` when
+no active span has a time limit, which includes a `withStepBudget` span
+with no `withTimeLimit` around it.
+
+This value and [stepBudgetSpent](#stepbudgetspent-1) describe the span that is active
+in the current synchronous code. Code that runs after an `await`, even
+inside `withTimeLimit` or an `evaluateAsync()` call, is outside the
+span: it reads `Infinity` and `false`.
+
+The engine checks its deadline only inside its own work (evaluation,
+canonicalization). A host loop that runs inside a span and does work of
+its own (walking expressions, building a list) reads this value to stop
+on time: `if (ce.timeRemaining <= 0) break;`.
+
+A spent step budget does not change this value; read
+[stepBudgetSpent](#stepbudgetspent-1) for it.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.stepBudgetSpent {#stepbudgetspent}
+
+```ts
+readonly stepBudgetSpent: boolean;
+```
+
+True inside a `withStepBudget` span (or a span nested in one) when a
+step budget of the current span or of an enclosing one is spent; false
+otherwise, and always false outside any span.
+
+When a budget is spent, the engine throws a `CancellationError`, but
+code between the throw and the end of the span can catch it and return
+a value. Such a value is partial. A host that stores values in a cache
+reads this before a write, so that it does not keep a partial value.
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.stepsLeft {#stepsleft}
+
+```ts
+readonly stepsLeft: number | undefined;
+```
+
+The number of steps left in the budget of the innermost
+`withStepBudget` span, or `undefined` when no such span is active.
+It is negative once that budget is spent: after the throw that spends
+it, each later check still counts one step, so `steps - ce.stepsLeft`
+is the number of steps used only while the budget is not spent. A
+`withTimeLimit` span nested in a step-budget span does not change it,
+nor does a budget the engine opens for its own search: host code that
+the engine calls during that search reads the host's budget.
+
+Read inside the callback of `withStepBudget`, it tells the two things
+[stepBudgetSpent](#stepbudgetspent-1) cannot: how many steps the span has used
+(`steps - ce.stepsLeft`), and whether THIS span's budget is spent
+(`ce.stepsLeft < 0`) rather than the budget of an enclosing span. A
+step is an opaque unit: compare counts only on one engine version.
+Like [timeRemaining](#timeremaining-1), it describes the span of the current
+synchronous code.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.iterationLimit {#iterationlimit}
 
 ```ts
@@ -32173,10 +32492,36 @@ restore(cp): void
 ```
 
 Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again. Expressions built BEFORE `cp` stay
-valid — their definitions are rewritten in place. Expressions built
-during the rewound window are not: cache cell outputs as serialized
-artifacts, never as live boxed nodes.
+stays live and can be restored again.
+
+The definitions that existed when `cp` was taken are rewritten in place,
+and the version counters advance, so every expression that reads them,
+whether it was built before or during the rewound window, reads the
+restored state afterwards and its cached answers are computed again.
+The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
+affected, with one exception: the fields of a mutable object are
+rewound in place, so the `json` and `digest` of that object, and of
+every expression that holds it, can change.
+
+The definitions CREATED during the window are removed from their scope
+and disposed. This includes a symbol that was declared or assigned for
+the first time there, and a free symbol that was boxed for the first
+time there (boxing declares it). An expression built during the window
+that names such a symbol keeps the disposed definition, and the symbol
+is inert: it reads no value and counts as unknown (`unknowns`, a
+compile reads it as an input), also after a later declaration or
+assignment of the same name, and its type is the one its record had
+before the declaration (usually `unknown`). The index of a `Sum` and the
+locals of a `Block` built during the window are not affected: they
+still take their values when the expression runs. Nor is a symbol
+declared in a scope that is not on the scope chain when `restore()`
+runs (a scope pushed and popped during the window): it still resolves
+by name, so it reads a later declaration of the same name in that scope
+with its old type (ROADMAP CE-590). `isSame` with the
+same expression built after the
+restore is false. Do not keep such an expression: build it again to
+read the new definition, and cache a cell output as a serialized
+artifact rather than as a live boxed node.
 
 ####### cp
 
