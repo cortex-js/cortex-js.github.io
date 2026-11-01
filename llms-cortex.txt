@@ -8722,7 +8722,7 @@ Source: https://epsil.dev/library/
 
 # Epsil Standard Library
 
-The 710 functions and constants of the standard library, by category.
+The 711 functions and constants of the standard library, by category.
 Each row gives a name, its signature (for a function) or its kind and type
 (for a constant or variable), and the first sentence of its description —
 the same description `epsil doc <name>` prints in full and the editor
@@ -8733,7 +8733,7 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 115 definitions · [full reference](/reference/core/)
+- [Core](#core) — 116 definitions · [full reference](/reference/core/)
 - [Control structures](#control-structures) — 13 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
 - [Collections](#collections) — 126 definitions · [full reference](/reference/collections/)
@@ -8777,6 +8777,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `characters` | `Characters` | `(character \| string) -> list<character>` | Characters(s): split a string into a list of user-perceived characters (grapheme clusters). |
 | — | `Coalesce` | `(any+) -> unknown` | Return the first operand that is not ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`), evaluated left-to-right. |
 | — | `Colon` | `(any, any) -> expression` | Type annotation (`a : b`) — opaque typed head. |
+| `composition` | `Composition` | `(function*) -> function` | The composition of functions, applied right to left: `Composition(f, g, h)(x)` is `f(g(h(x)))` |
 | `conforms` | `Conforms` | `(subject: any, protocols: string+) -> boolean` | True iff the subject conforms to EVERY named protocol. |
 | — | `Declare` | `(symbol, type: (string \| symbol)?, value: any?, attributes: dictionary<any>?) scope -> any` | Declare a symbol in the current scope, optionally assigning a type and an initial value. |
 | — | `DeclareConformance` | `(target: string \| symbol, protocols: any, whereClauseOrImplementation: any?, implementation: dictionary<any>?) scope -> nothing` | Declare that a type CONFORMS to one or more protocols — the lowering of the Epsil `type string is Hashable & Comparable` statement. |
@@ -10104,6 +10105,22 @@ Coalesce(missing, NaN, 3, 4)
 `(any, any) -> expression`
 
 Type annotation (`a : b`) — opaque typed head.
+
+### composition
+
+MathJSON `Composition` · `(function*) -> function`
+
+The composition of functions, applied right to left: `Composition(f, g, h)(x)` is `f(g(h(x)))`
+
+```epsil
+composition(sin, exp)(0)
+// ➔ sin(1)
+```
+
+```epsil
+composition(f, g)(x)
+// ➔ f(g(x))
+```
 
 ### conforms
 
@@ -18972,9 +18989,12 @@ npx epsil mcp --transport streamable-http
 
 The HTTP endpoint defaults to `http://127.0.0.1:8000/mcp`. Configure it with
 `--host <address>`, `--port <number>`, and `--path <path>`. The server binds
-only to loopback by default; using a public bind address does not add HTTPS or
-authentication. Repeat `--allow-origin <origin>` to allow a browser client
-from a non-local origin.
+only to loopback by default. A non-loopback address requires
+`--auth-token-env <name>`; every request must then carry the value of that
+environment variable as a Bearer token. The value must be nonempty and have no
+leading or trailing whitespace. This adds authentication, not TLS, so put a
+public endpoint behind HTTPS. Repeat `--allow-origin <origin>` to allow a browser
+client from a non-local origin.
 
 | Tool        | Purpose                                                        |
 | :---------- | :------------------------------------------------------------- |
@@ -18991,8 +19011,8 @@ The server also exposes the agent-facing language card
 Each `evaluate` call runs in a fresh session: definitions do not persist
 between calls, so every program must be self-contained. The
 `--time-limit <ms>` option sets the default evaluation deadline for the
-`evaluate` tool (default 10000; each call can override it with its
-`timeLimit` argument).
+all tools (default 10000). An `evaluate` or `compile` call can shorten it with
+its `timeLimit` argument, but cannot extend or disable the server deadline.
 
 <ReadMore path="/mcp/">
 See how to **connect ChatGPT, Claude Code, Claude Desktop, or another MCP
@@ -19502,7 +19522,8 @@ sequenceDiagram
   The assistant knows this and writes self-contained programs.
 - **Evaluations have a deadline.** By default a program is canceled after
   10 seconds. Start the server with `epsil mcp --time-limit <ms>` to change
-  the default (`0` disables it); the assistant can also adjust it per call.
+  the server maximum (`0` disables it). The assistant can shorten that limit
+  per `evaluate` or `compile` call, but cannot extend or disable it.
 - **Numeric work can run on worker threads.** Start the server with
   `epsil mcp --workers <n>` to give the engines of the `evaluate` calls a
   pool of `<n>` worker threads; a `findFit` with a global search then scans
@@ -19516,7 +19537,9 @@ sequenceDiagram
   requests to 1 MiB, and rejects unapproved browser origins. Use `--host`,
   `--port`, and `--path` to configure the listener. Repeat
   `--allow-origin <origin>` for browser clients that run on another origin.
-  Binding to a public interface does not add authentication or TLS.
+  A non-loopback bind requires `--auth-token-env <name>` and Bearer
+  authentication using that environment variable's value. It does not add
+  TLS; put a public endpoint behind HTTPS.
 
 <ReadMore path="/cli/">
 The same package also provides a **command-line interface and interactive

@@ -1,4 +1,4 @@
-/* 0.111.0 */import type { Keys } from './types-utils';
+/* 0.111.4 */import type { Keys } from './types-utils';
 import type { InsertOptions, ParseMode, Style, TabularEnvironment } from './core-types';
 import type { Mathfield, Model } from './mathfield';
 /**
@@ -331,7 +331,7 @@ export interface Commands {
 }
 /**  @category Editing Commands */
 export type Selector = Keys<Commands>;
-/* 0.111.0 *//** @category Styles */
+/* 0.111.4 *//** @category Styles */
 export type MathstyleName = 'displaystyle' | 'textstyle' | 'scriptstyle' | 'scriptscriptstyle';
 /** @internal  */
 export type ArgumentType = ParseMode | ('bbox' | 'colspec' | 'delim' | 'value' | 'rest' | 'string' | 'balanced-string' | 'expression' | 'auto');
@@ -745,7 +745,7 @@ export type Selection = {
     ranges: Range[];
     direction?: 'forward' | 'backward' | 'none';
 };
-/* 0.111.0 */import type { KeyboardLayoutName } from './options';
+/* 0.111.4 */import type { KeyboardLayoutName } from './options';
 /**
  * Change the current physical keyboard layout.
  *
@@ -758,7 +758,19 @@ export declare function setKeyboardLayout(name: KeyboardLayoutName | 'auto'): vo
  * @category Localization
  */
 export declare function setKeyboardLayoutLocale(locale: string): void;
-/* 0.111.0 *//**
+/* 0.111.4 *//**
+ * Raised when LaTeX input exceeds a parser resource budget: the length of
+ * the input, the number of tokens, or the nesting depth of the parse.
+ *
+ * This class is declared in `src/public/` because the build publishes only
+ * the type declarations of the files in this directory.
+ *
+ * @category Conversion
+ */
+export declare class LatexResourceLimitError extends Error {
+    constructor(message: string);
+}
+/* 0.111.4 *//**
  * Static rendering web components for MathLive.
  *
  * These components provide lightweight rendering of mathematical expressions
@@ -893,7 +905,7 @@ declare global {
     }
 }
 export {};
-/* 0.111.0 */import type { Selector } from './commands';
+/* 0.111.4 */import type { Selector } from './commands';
 import type { LatexSyntaxError, MacroDictionary, Offset, ParseMode, Registers, Style, Selection, Range, OutputFormat, ElementInfo, InsertOptions } from './core-types';
 import type { InsertStyleHook, Mathfield } from './mathfield';
 import type { InlineShortcutDefinitions, Keybinding, MathfieldOptions } from './options';
@@ -2326,7 +2338,7 @@ declare global {
         MathfieldElement: typeof MathfieldElement;
     }
 }
-/* 0.111.0 */import type { Selector } from './commands';
+/* 0.111.4 */import type { Selector } from './commands';
 import type { ApplyStyleOptions, InsertOptions, Offset, OutputFormat, Style, Range, Selection } from './core-types';
 /** @category Styles */
 export type InsertStyleHook = (sender: Mathfield, at: Offset, info: {
@@ -2361,13 +2373,14 @@ export interface Mathfield {
 export interface Model {
     readonly mathfield: Mathfield;
 }
-/* 0.111.0 *//**
+/* 0.111.4 *//**
  * Server-side rendering exports.
  *
  * These functions do not require a DOM environment and can
  * be used from a server-side environment.
  *
  */
+export { LatexResourceLimitError } from './latex-errors';
 import type { LatexSyntaxError, ParseMode } from './core-types';
 import { LayoutOptions } from './options';
 /**
@@ -2470,7 +2483,7 @@ export declare function convertLatexToAsciiMath(latex: string, parseMode?: Parse
  * @category Conversion
  */
 export declare function convertAsciiMathToLatex(ascii: string): string;
-/* 0.111.0 *//**
+/* 0.111.4 *//**
  *
  * Importing this package in a web page will make the `<math-field>` custom
  * element available. Use it as a drop-in replacement for `<textarea>` or
@@ -2499,7 +2512,7 @@ export declare function convertAsciiMathToLatex(ascii: string): string;
  *
  *
  * @packageDocumentation Mathfield API Reference
- * @version 0.111.0
+ * @version 0.111.4
  *
  */
 import type { VirtualKeyboardInterface } from './virtual-keyboard';
@@ -2524,19 +2537,20 @@ declare global {
         mathVirtualKeyboard: VirtualKeyboardInterface & EventTarget;
     }
 }
-/* 0.111.0 */import type { Mathfield, InsertStyleHook } from './mathfield';
+/* 0.111.4 */import type { Mathfield, InsertStyleHook } from './mathfield';
 import type { Selector } from './commands';
 import type { ParseMode, MacroDictionary, Registers, Range } from './core-types';
 /**
- * Specify behavior for origin validation when using the virtual keyboard.
+ * Specify origin validation when using the virtual keyboard. The default is
+ * same-origin validation. Rejected messages are silently ignored.
  *
  * <div className='symbols-table' style={{"--first-col-width":"32ex"}}>
  *
  * | Value | Description |
  * | ----- | ----------- |
- * | `"same-origin"` | The origin of received message must be the same of hosted window, instead exception will throw. |
- * | `(origin: string) => boolean` | The callback to verify origin to be expected validation. When callback return `false` value, message will rejected and exception will throw. |
- * | `"none"` | No origin validation for post messages. |
+ * | `"same-origin"` | Accept only messages from the same non-opaque origin (default). |
+ * | `(origin: string) => boolean` | Accept messages when the callback returns true. Use an exact allowlist of trusted origins. |
+ * | `"none"` | Disable origin validation. Avoid this on pages containing untrusted frames. |
  *
  * </div>
  *
@@ -2779,7 +2793,7 @@ export type MathfieldOptions = LayoutOptions & EditingOptions & InlineShortcutsO
      * Specify how origin of message from [postMessage](https://developer.mozilla.org/en/docs/Web/API/Window/postMessage)
      * should be validated.
      *
-     * **Default**: `"none"`
+     * **Default**: `"same-origin"`
      */
     originValidator: OriginValidator;
 };
@@ -2908,7 +2922,7 @@ export type StaticRenderOptions = Partial<LayoutOptions> & {
         };
     };
 };
-/* 0.111.0 *//**
+/* 0.111.4 *//**
  * @internal
  */
 type Filter<T, Cond, U extends keyof T = keyof T> = {
@@ -2919,13 +2933,13 @@ type Filter<T, Cond, U extends keyof T = keyof T> = {
  */
 export type Keys<T> = Filter<T, (...args: any[]) => any> & string;
 export {};
-/* 0.111.0 */export type KeyboardModifiers = {
+/* 0.111.4 */export type KeyboardModifiers = {
     alt: boolean;
     control: boolean;
     shift: boolean;
     meta: boolean;
 };
-/* 0.111.0 */import type { KeyboardModifiers } from './ui-events-types';
+/* 0.111.4 */import type { KeyboardModifiers } from './ui-events-types';
 /**
  * The type of a menu item:
  * - `command`: a command that can be selected and executed
@@ -3049,7 +3063,7 @@ export declare function isHeading(item: MenuItem): item is MenuItemHeading;
  * @category Menu
  */
 export type MenuItem<T = unknown> = MenuItemDivider | MenuItemHeading | MenuItemSubmenu | MenuItemCommand<T>;
-/* 0.111.0 */import type { Selector } from './commands';
+/* 0.111.4 */import type { Selector } from './commands';
 import type { ParseMode, Style } from './core-types';
 import type { OriginValidator } from './options';
 /**
@@ -3211,6 +3225,10 @@ export interface VirtualKeyboardOptions {
      * includes `"numeric"`, `"functions"`, `"symbols"`, `"alphabetic"`
      * and `"greek".
      *
+     * Custom layouts can contain HTML and must come from trusted code. An iframe
+     * can select built-in layout names only; configure custom layouts directly
+     * in the window that hosts the keyboard instead.
+     *
      * **See* {@link mathfield/guides/virtual-keyboards | Guide: Virtual Keyboards}
      *
      *
@@ -3270,7 +3288,11 @@ export interface VirtualKeyboardOptions {
      * Specify behavior how origin of message from [postMessage](https://developer.mozilla.org/en/docs/Web/API/Window/postMessage)
      * should be validated.
      *
-     * **Default**: `"none"`
+     * Cross-origin peers must be explicitly allowed with a callback. Custom
+     * layouts and keycap overrides from all cross-window messages are rejected
+     * regardless of this policy. Rejected messages are silently ignored.
+     *
+     * **Default**: `"same-origin"`
      */
     originValidator: OriginValidator;
 }
