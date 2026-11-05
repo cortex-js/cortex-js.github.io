@@ -1451,22 +1451,28 @@ the rational `1/4`, not a float.
 The program pulls together most of the language:
 
 - A **recursive type alias** names the result: a `json` value is a scalar, a
-  `list<json>`, or a dictionary.
+  `list<json>`, or a dictionary. A JSON `null` parses to `missing`, which the
+  alias does not name: a declared type cannot name `missing`, and a value of
+  any declared type can still hold it.
 - Each parse function takes the character list and a 1-based index and
   returns the tuple `(value, indexAfter)` — state is **threaded through
   return values** and read back with a destructuring assignment,
   `(v, j) := parseValue(cs, j)`.
 - `parseValue` dispatches on the next character with a **`match`
   expression**; the string scanner decodes escapes with another.
-- The character predicates take `character | missing`: an indexed read `cs[j]`
-  is absent past the end of input, and that possibility is part of its type.
+- The character predicates take a `character`. An indexed read `cs[j]` is
+  typed `character` and gives `missing` past the end of input, and a
+  `missing` argument at a `character` parameter is an `incompatible-type`
+  error. So each scanning loop tests `j <= length(cs)` before it reads.
+  Where a program must read an absent value, it uses `isMissing`, `??`,
+  `?!` or a default parameter.
 
 ```epsil
-type alias json = number | string | boolean | missing | list<json> | dictionary
+type alias json = number | string | boolean | list<json> | dictionary
 
 let digits = characters("0123456789")
-isDigit(c: character | missing) = c in digits
-isWs(c: character | missing) = c == " " || c == "\n" || c == "\t" || c == "\r"
+isDigit(c: character) = c in digits
+isWs(c: character) = c == " " || c == "\n" || c == "\t" || c == "\r"
 
 // Index of the first non-whitespace character at or after i
 function skipWs(cs: list<character>, i: integer) -> integer {
@@ -1752,7 +1758,10 @@ resolve by **scope**, not by case.
 
 A user binding shadows a library name for the rest of its scope, whichever
 spelling the library name has: a `let`, a `const`, a parameter, a loop
-variable, a `match` pattern, or a `function` definition.
+variable, a `match` pattern, or a `function` definition. A function member
+of a `protocol` shadows a library name the same way, from the `protocol`
+statement onward; the library function stays reachable by its capitalized
+name (`Floor(x)`).
 
 ```epsil
 let sum = 0
@@ -1829,10 +1838,10 @@ definition of an operator that the language builds by name, such as `+`, `<`,
 (the compiler uses its `compile` handler when it has one); and any call of a
 user function on the Python target.
 
-The absence markers `Nothing`, `Missing` and `Undefined` are the exception:
+The markers `Nothing` and `Missing` are the exception:
 they cannot be rebound, and a binding of one of them is an error
-(`absence-marker-binding`). The engine recognizes them by their name — it
-drops `Nothing` from an argument list and reads a `Missing` operand as
+(`absence-marker-binding`). The engine recognizes them by their name — an
+empty block evaluates to `Nothing`, and a `Missing` operand is read as
 absent — so a binding could never behave like the value it holds. In a
 `match`, test for a marker with `== Missing`: a bare `Missing` there would
 be a new variable.
@@ -2506,7 +2515,7 @@ let parts = stringSplit("a b c")
 `s * n` is `stringRepeat(s, n)` and `float(s)`/`int(s)` are `numberFrom(s)`
 (which answers an error value, never NaN, on text that is not a numeral).
 `.find()`/`.index()` is `rangeOf(s, needle)`, which answers the *span* of the
-first occurrence (a `range`) or `nothing` — feed it straight to `slice`;
+first occurrence (a `range`) or `missing` — feed it straight to `slice`;
 `needle in s` (substring) is `containsSequence(s, needle)`, and
 `.startswith()`/`.endswith()` are `startsWith`/`endsWith`. Note that Epsil's
 `c in s` is **character** membership, not substring search.
@@ -2878,7 +2887,7 @@ Surface forms that look like Wolfram but behave differently.
 | `stringReplace[s, t -> r]` | `stringReplace` takes positional arguments, not rules | `stringReplace(s, t, r)` |
 | `StringJoin["ab", "cd"]` | **Silently different.** `stringJoin` takes ONE collection plus an optional separator, and a string is a collection of its characters — so this reads as "join `"ab"`'s characters with the separator `"cd"`" and gives `"acdb"` | `join("ab", "cd")`, or `"\(a)\(b)"` |
 | `StringRiffle[parts, sep]` | Unknown name: the call stays **symbolic and inert**. The collection-plus-separator form is `stringJoin`'s second argument | `stringJoin(parts, sep)` |
-| `StringPosition`, `StringContainsQ`, `StringStartsQ`, `StringEndsQ` | Unknown names: **inert**. The Epsil family is generic over indexed collections and character-wise on strings, and `rangeOf` answers one *span* (or `nothing`), not a list of spans | `rangeOf(s, t)`, `containsSequence`, `startsWith`, `endsWith` |
+| `StringPosition`, `StringContainsQ`, `StringStartsQ`, `StringEndsQ` | Unknown names: **inert**. The Epsil family is generic over indexed collections and character-wise on strings, and `rangeOf` answers one *span* (or `missing`), not a list of spans | `rangeOf(s, t)`, `containsSequence`, `startsWith`, `endsWith` |
 | `StringTrim`, `StringPadLeft`, `StringPadRight` | Unknown names: **inert** (`StringTrim` gets a did-you-mean warning) | `trim`/`trimStart`/`trimEnd`, `padStart`, `padEnd` |
 | `ToExpression["3.14"]` | Unknown name: **inert**. Parsing a numeral is its own operator, and answers an error value (never `NaN`) on text that is not one | `numberFrom("3.14")` |
 | `RandomReal[]`, `RandomInteger[n]` | Inert (with a did-you-mean warning) | `random()`, `random(1..n)` |
@@ -4007,10 +4016,12 @@ at exactly its argument type.
 ### Optional payloads
 
 A type variable may stand in one arm of a union, which is what makes an
-optional payload expressible:
+optional payload expressible. The ground arm marks the case with no payload;
+here it is `boolean`, since a declared type cannot name `missing` (see
+[Absence values](#absence-values)):
 
 ```epsil-live
-type opt<T> = T | missing
+type opt<T> = T | boolean
 let a = opt(1)
 type(a)
 // ➔ TypeFrom("opt<integer>")
@@ -4021,8 +4032,8 @@ nothing about `T`, so `T` is solved to `never` — the narrowest member of the
 family, and (under `out`) a subtype of every other:
 
 ```epsil-live
-type opt<T> = T | missing
-let b = opt(missing)
+type opt<T> = T | boolean
+let b = opt(False)
 type(b)
 // ➔ TypeFrom("opt<never>")
 ```
@@ -4103,12 +4114,17 @@ implicit "for all `T`".
 
 Epsil distinguishes three related kinds of absence:
 
-- `nothing` means “no value here” and is removed from function arguments and
-  collection literals.
+- `nothing` is the value of an empty block or of a statement with no value.
+  It is kept as an element, in function arguments and collection literals
+  too: `[1, nothing]` has two elements.
 - `missing` is a position-preserving missing value. Its type is `missing`.
+  It is a result only: a selection with no match, a read past the end of a
+  collection, or the written `missing`. A declared type cannot name it.
 - `NaN` is the numeric form of an absent or undefined result. Its type is
-  `nan`, which sits outside `real` and `complex` and inside `number`. Numeric
-  operations and missing numeric fields generally normalize absence to `NaN`.
+  `nan`, which sits outside `real` and `complex` and inside `number`. A read
+  past the end of a list of numbers and a missing numeric field give `NaN`;
+  a read past the end of a list of points gives a point whose coordinates
+  are `NaN`.
 
 `isMissing(x)` recognizes both `missing` and `NaN`, regardless of how the
 value arose. `Coalesce(a, b, ...)` evaluates from left to right and returns the
@@ -4118,7 +4134,7 @@ last one unchanged.
 ```epsil-live
 (length([1, missing, 3]), isMissing(missing), isMissing(NaN),
   Coalesce(missing, 0), missing + 1)
-// ➔ (3, True, True, 0, NaN)
+// ➔ (3, True, True, 0, "Missing")
 ```
 
 A missing dictionary field follows the expected value domain: a numeric field
@@ -4127,8 +4143,7 @@ Use `isMissing` when the distinction between those representations is not
 important, and [`??`](/operators/#absence-coalescing) — the operator form
 of `Coalesce` — to supply a fallback.
 
-Three ways discharge a possibly absent value, and the static check accepts
-each of them where it reports the plain read:
+Three ways read a possibly absent value:
 
 - `x ?? fallback` replaces an absent value;
 - `if isMissing(x) { … } else { … }` branches, and the symbol is known
@@ -4137,21 +4152,46 @@ each of them where it reports the plain read:
   and fails with an `expected-present` error when it is not. Use it where
   absence is a violated precondition rather than a case to handle.
 
-**A declared type is a contract on every value the symbol takes.** `let s:
-string = missing` is an error, as `let s: string = 5` is, and so is a later
-`s := missing`; `let xs: list<string> = ["a", missing]` is an error too,
-because the element contract excludes absence. Write the absence into the
-type when it is possible: `let s: string | missing = missing`, `let xs:
-list<string | missing> = ["a", missing]`, or let the type be inferred (`let
-xs = ["a", missing]` is a `list<string | missing>`). A `number` declaration
-admits `NaN`, the numeric absence marker: `let n: number = NaN` is fine, and
-so is `let n: number = zs[i]` for `zs: list<number>`. The types `real`,
-`integer` and `complex` hold finite values only, so `let r: real = zs[i]`
-for `zs: list<real>` is reported: the read is typed `nan | real`. Discharge
-it the same way (`zs[i]?!`, `zs[i] ?? 0`), or declare `real | nan`. A declaration that
-excludes absence and is initialized from a possibly absent value (`let y:
-string = xs[i]`) is reported by the static check; discharge the read with
-`?!`, `??`, or declare `string | missing`.
+A default parameter is not a reader: `(k: real = 2) => k` gives 2 when the
+argument is left out, and only then. A `missing` argument is passed to the
+body (`g(first([]))` is `missing` for `g = (k: real = 2) => k + 1`), and so
+is a `NaN` argument. Write `g(x ?? 2)` to replace an absent argument.
+
+A default is a constant: a number, a string, `true`, `false`, `[]`, `{}`, a
+constant (a library constant, `over: set = Integers`, `k: real = pi`, or a
+symbol declared constant before the function is defined, such as a `const`
+written before it in the same program, with any value), or a symbol that
+the parameter type lists (`mode: symbol<Auto> | symbol<Manual> = Auto`). A
+call that leaves out the argument receives that value, as if it had written
+it. A default that names a variable (`(k = n) => k`), or a symbol that is not
+declared and that no `symbol<…>` parameter type lists, is a static error:
+write a constant, or pass the argument.
+
+Read the absent value before you compute. In the interpreter, any other
+operator over `missing` gives `missing` (`missing + 1` is `missing`), and a
+comparison gives `False` (`missing > 0` is `False`), but compiled code
+promises only the readers above and the
+accessors that move a value without computing on it (`xs[i]`, `first`,
+`last`, `rest`, `length`). Any other operator applied to a possibly absent
+value gives the target's own answer when the program is compiled
+(`undefined > 0` is `false` in JavaScript), so `isMissing(w > 0)` can differ
+between the interpreter and compiled code, and `isMissing(w)` cannot.
+
+**A declared type is a contract on the present values the symbol takes, and
+it cannot name `missing`.** `let s: string | missing = …` and
+`xs: list<string | missing>` are `type-annotation-error`s. A read is typed by
+the element it reads: with `xs: list<string>`, `xs[i]` is typed `string`, and
+it gives `missing` when `i` is past the end. A declaration accepts that
+value where its type accepts a present value: `let y: string = xs[i]` gives
+`missing` past the end, with no diagnostic, and so do `let s: string =
+missing`, a later `s := missing`, and `let xs: list<string> = ["a",
+missing]`. A value of another type is still refused: `let s: string = 5` is
+an error. `NaN` is not absorbed this way: a `number` declaration admits it
+(`let n: number = NaN`, `let n: number = zs[i]` for `zs: list<number>`), but
+the types `real`, `integer` and `complex` hold finite values only, so `let r:
+real = zs[i]` for `zs: list<real>` is an `incompatible-type` error when `i`
+is past the end, since the read is `NaN`. Read the value first (`zs[i]?!`,
+`zs[i] ?? 0`, `isMissing(zs[i])`), or declare `number`.
 
 ```epsil-live
 let xs: list<string> = ["a", "b"]
@@ -4441,39 +4481,83 @@ x = 5
 Assigning to a name that was never declared does establish it, but `let` is
 the explicit and idiomatic way to introduce a mutable binding.
 
+## The rules of block locals
+
+Two rules make sure that a local always has a value when it is read:
+
+1. **A declaration has a value.** `let x = v`, `let x: integer = v`, or a
+   first assignment `x = v` at the own level of a block, declares `x` with
+   its value. `let x: integer` with no value is an error
+   (`declaration-without-value`). One declaration needs no value: a
+   function type, when a `function` statement (or a definition
+   `f(x) = …`) of the same name is in the same block. The definition gives
+   the name its value from the start of the block, so the declaration only
+   gives the signature of the function:
+   `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` is `3`. A
+   definition in an enclosing block does not count: with no definition in
+   the same block, the error asks to define `f` with a function statement
+   in the same block, or to give the declaration a value. A first assignment of a name in a branch of
+   an `if` or a `match`, or in the body of a loop, is an error too
+   (`first-assignment-in-branch`): declare the name with a value before the
+   branch. A use of a local in a statement before the statement that
+   declares it is an error (`read-before-declaration`). A use of the local
+   in the body of a function literal is not checked, because the body runs
+   when the function is called, and the check does not follow calls: in `function g() { f = () => t; v = f(); t = 1; v }`, the call
+   `f()` reads `t` before its declaration, and `g()` gives `1`.
+2. **An assignment is a statement, not a value.** `f(a := 2)` is an error
+   (`assignment-in-operand`), and `a := b := 5` is a syntax error
+   (`chained-assignment`): write two statements. A block whose last statement
+   is an assignment or a declaration has the value `Nothing`; end the block
+   with the name to give its value.
+
+A local can be assigned again after its declaration, also in a branch, a
+loop body or a nested block. The type of the new value must be able to be
+the type of the local: its declared type, or else the type of its first
+value, widened. A number
+widens to `number`, a string or a character to `string`, a boolean to
+`boolean`, and the elements of a list, a set or a tuple widen the same way.
+So `s = 0` then `s = s + 0.5` is valid, and `s = 0` then `s = "x"` is an
+error (`assignment-type-mismatch`). A local whose first value has no known
+type (an untyped parameter) accepts a value of any type.
+
+All these errors are found before the program runs: `epsil check` reports
+them, and a statement that holds one gives the error as its value.
+
+The top level of a program is not a block: its statements run one at a
+time, and a name assigned there is a name of the session. A first
+assignment in a branch or a loop body is an error at the top level too:
+`if c { a = 1 }; a` is `first-assignment-in-branch`. An assignment in a
+branch to a name of the session (assigned by an earlier top-level
+statement, or declared by the host) is not a first assignment:
+`a = 1; if c { a = 2 }; a` is valid. The rules of a use before the
+declaration and of the type of a new value apply only in a block
+(`do { … }`) and in a function body: at the top level, `a = 1; a = "x"; a`
+is valid and gives `"x"`.
+
+| Program                                    | Result                                 |
+| ------------------------------------------ | -------------------------------------- |
+| `let a = 1; b = a + 1; b`                  | `2`                                    |
+| `s = 0; for i in 1..3 { s = s + i }; s`    | `6`                                    |
+| `a = 1; if c { a = 2 }; a`                 | `2` when `c` is true, else `1`         |
+| `let a: integer; if c { a = 1 }; a`        | error: `declaration-without-value`     |
+| `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` | `3` |
+| `let f: (integer) -> integer; f(2)`        | error: `declaration-without-value`     |
+| `if c { a = 1 }; a`                        | error: `first-assignment-in-branch`    |
+| `do { if c { a = 1 }; a }`                 | error: `first-assignment-in-branch`    |
+| `do { a = 1; a = "x"; a }`                 | error: `assignment-type-mismatch`      |
+| `f(a := 2) + a`                            | error: `assignment-in-operand`         |
+| `do { b = 2 }`                             | `Nothing`                              |
+
 What an assignment writes depends on where it is written, and on what is
-declared when the function around it is defined:
-
-```mermaid
-flowchart TD
-  a["x = v"] --> top{"at the top level, or in a block<br/>outside every function?"}
-  top -- yes --> topw["writes x, establishing it if needed<br/>(a top-level block owns the names<br/>its own statements assign)"]
-  top -- "no: in a function body" --> decl{"an enclosing scope declares x<br/>when the function is defined?<br/>(a top-level let or assignment before the function,<br/>a parameter, a local of an enclosing function)"}
-  decl -- no --> local["x is a local of the function body, as with let:<br/>each call starts with no value for it"]
-  local --> read{"read before its first<br/>assignment in this call?"}
-  read -- yes --> rerr["read-before-declaration error value"]
-  read -- no --> ok["the local's value"]
-  decl -- yes --> isconst{"declared const?"}
-  isconst -- yes --> cerr["constant-assignment error value<br/>(epsil check reports it before the run)"]
-  isconst -- no --> outer["writes that binding: the scope effect,<br/>which the function must declare"]
-```
-
-In a function body, an assignment to a name that no enclosing scope
-declares makes a local of the function body, as a `let` does. This is also
-true when the assignment is in a nested block of the body — a branch of an
-`if`, the body of a loop, a `do` block —, as in Python. A function literal
-written in the body owns the names that its own body assigns, and a `let` in
-a nested block declares a local of that block only. The rule is the same
-for every function body that the engine makes from an expression: the term
-of a `Table` is applied as a function at each index, so it owns the names
-that its branches assign, while the term of a `Sum` or a `Product` is
-evaluated again at each index, as a loop body is. Which scope a name
-belongs to is decided where
-the function is **defined**, not where it is called: each call of the
-function gets its own local, and a declaration of the same name made later
-does not change what the function writes. Such an assignment does not write
-a variable outside the function, so it is not the `scope` effect, and the
-function needs no effect specifier:
+declared when the function around it is defined. In a function body, an
+assignment to a name that no enclosing scope declares, at the own level of
+the body or of a nested block, declares a local of that block, as a `let`
+does. Which scope a name belongs to is decided where the function is
+**defined**, not where it is called: each call of the function gets its own
+local, and a declaration of the same name made later does not change what
+the function writes. Such an assignment does not write a variable outside
+the function, so it is not the `scope` effect, and the function needs no
+effect specifier:
 
 ```epsil
 function g(k) { t = k + 1; t }
@@ -4482,53 +4566,17 @@ let t = 0
 // ➔ [2, 3, 0]
 ```
 
-Each call starts with no value for such a local. A read of the local before
-its first assignment in the call is the `read-before-declaration` error, as a
-read of a `let` local before its `let`. The read is not the bare symbol `t`,
-and it does not read a `t` outside the function:
+A use of such a local before its first assignment is an error that is found
+before the program runs:
 
 ```epsil
 function g(k) { u = t; t = k; u }
-g(1)
-// ➔ Error(ErrorCode("read-before-declaration", "t", "assignment"))
 ```
 
-The same holds for a read in the value of the first assignment
-(`t = t + 1` as the first statement), and for a read that runs when no
-assignment ran before it, such as a read after an `if` that assigns the
-local in one branch only:
-
-```epsil
-function g(c) { if c { t = 1 }; t }
-[g(true), g(false)]
-// ➔ [1, Error(ErrorCode("read-before-declaration", "t", "assignment"))]
-```
-
-The same holds for `if c { t = 1 }; t = t + 1` with `c` false. A call of the function that the local holds (`h(1)` before
-`h = (x) => x`) and the collection of a `for` loop (`for i in t { … }`
-before `t = [1, 2]`) use the local too, and give the same error; the loop
-then runs no iteration, and the error is its value. A closure that reads
-the local reads it when it is called, so
-`f = () => t; t = 1; f()` gives `1`. The body of a loop keeps its locals
-from one iteration to the next in one call, so the second iteration can read
-the value that the first one assigned.
-
-`epsil check` reports the read before the program runs when the order is
-certain from the source: the read is in a statement before every statement
-that assigns the local, or it runs before the first assignment in the
-statement that holds it (in the value of the assignment, in the condition
-of an `if` or in a branch before the assignment of that branch, in the body
-of a loop before the assignment of the first iteration). It reports
-a read of a `let` local before its `let` in the same way. The run then does
-not report the same read a second time. A read that
-comes before the first assignment only on some paths (after an `if` that
-assigns the local in one branch) is reported when it happens, by the run.
-
-A block outside every function — a `do` block, an `if` or a loop body at the
-top level of a program — owns the names that its own statements assign, but
-not the names that its nested blocks assign: each nested block owns its
-own. There, a read before the first assignment stays the bare symbol, as a
-read of an undeclared name at the top level does.
+A closure that reads a local reads it when it is called, so
+`f = () => t; t = 1; f()` gives `1`. The body of a loop keeps the locals of
+an enclosing block from one iteration to the next, so the second iteration
+reads the value that the first one assigned.
 
 An assignment to a name that an enclosing scope declares when the function
 is defined — a top-level `let` or assignment written before the function, a
@@ -4895,16 +4943,19 @@ let first = xs[1] ?? 0
 is an error, not a missing value, and propagates.
 
 A function does not accept an absent value at a parameter annotated with a
-type, unless the type says so. With `function f(p: tuple<number, number>)`,
-the call `f(first(filter(xs, c => c[1] > 0)))` is reported by the static
-check, because a filter can find nothing, and it is an `incompatible-type`
-error when the value is absent. Write `f(first(filter(…)) ?? (0, 0))` to give
-a fallback, or annotate the parameter `tuple<number, number> | missing` and
-test `isMissing(p)` in the body. A parameter with no annotation receives the
-absent value, and a parameter annotated with a numeric type (`number`,
-`integer`, `real`) reads it as `NaN`, which such a parameter accepts.
-The first element of a list literal that has one (`first([(1, 2), (3, 4)])`)
-cannot be absent and needs no fallback.
+non-numeric type, and a declared type cannot name `missing`. With
+`function f(p: string)` and `xs: list<string>`, the read `xs[i]` is typed
+`string`, and the call `f(xs[i])` is an `incompatible-type` error when `i`
+is past the end. Write `f(xs[i] ?? "")` to give a fallback, or leave the
+parameter without an annotation and test `isMissing(p)` in the body. A
+parameter with no annotation receives the absent value, and a parameter
+annotated with a numeric type (`number`, `integer`, `real`) reads it as
+`NaN`, which such a parameter accepts. A read past the end of a list of
+points is a point whose coordinates are `NaN`: when no point matches,
+`first(filter(xs, c => c[1] > 5))` is `(NaN, NaN)`, which a parameter
+`p: tuple<number, number>` accepts. `??` and `isMissing` read such a point
+as absent: `ps[i] ?? (0, 0)` is `(0, 0)` when
+`i` is past the end.
 
 It is right-associative, so a chain falls through left to right:
 
@@ -4934,8 +4985,8 @@ Write `{a -> 1, b -> (x ?? 2)}` instead. It is also looser than `||` and `&&`
 ## Presence assertion: `?!` {#presence-assertion}
 
 `x?!` is `AssertPresent(x)`: the value of `x`, or an `expected-present` error
-when `x` is **absent** (`missing`, `NaN`, an indeterminate form such as
-`0/0`). It is the third way to discharge a possibly absent value, beside a
+when `x` is **absent** (`missing`, or `NaN`, which is also the value of an
+indeterminate form such as `0/0`). It is the third way to discharge a possibly absent value, beside a
 fallback (`??`) and a guard (`isMissing`): use it where absence is a violated
 precondition and an invented replacement would hide a bug.
 
@@ -4946,13 +4997,13 @@ let i = 2
 f(xs[i]?!)         // "b"; with i = 5, Error("expected-present", …)
 ```
 
-The static check accepts the asserted value where it would report the plain
-read: the type of `xs[i]?!` is the present part of the type of `xs[i]`
-(`string`, not `missing | string`), so it fits a parameter or a declaration
-that excludes absence. Only the value itself is checked, never the cells of a
+The type of `xs[i]?!` is the type of `xs[i]` (`string`): a read is typed by
+the element it reads, and the absent value is not part of its type. The
+assertion turns an absent value into an error at the read, before it reaches
+a parameter or a declaration. Only the value itself is checked, never the cells of a
 collection: `xs?!` asserts that the list is there, not that no cell is
-absent. `Nothing` is an omission marker, not an absent datum, and passes
-through; an error operand propagates unchanged.
+absent. `Nothing` is the value of an empty block, not an absent datum, and
+passes through; an error operand propagates unchanged.
 
 `?!` is a postfix operator at the factorial's precedence (110). It must abut
 its operand, like `!`, and a following operator needs a space, because an
@@ -5715,10 +5766,12 @@ s = 10
 // ➔ (3, 5, 10)
 ```
 
-Each call starts with no value for such a local: a read of it before its
-first assignment in the call (`function step(k) { r = s; s = k; r }`, or
-`function g(c) { if c { t = 1 }; t }` called with `c` false) is the
-`read-before-declaration` error, not the bare symbol, as for a `let` local.
+A read of such a local before its first assignment in the function body
+(`function step(k) { r = s; s = k; r }`) is the `read-before-declaration`
+error, which `epsil check` reports before the program runs. A first
+assignment in a branch (`function g(c) { if c { t = 1 }; t }`) is the
+`first-assignment-in-branch` error: declare the local with a value before
+the branch.
 
 Reach for `const` when a name should not move at all. Constness is a property
 of the *binding*, not of the value it holds — every value is immutable
@@ -6047,6 +6100,77 @@ value against that annotation.
 ```epsil
 f(x: real) = x + 1
 ```
+
+### Default values {#default-values}
+
+A parameter can have a **default value**, written `= value` after its name
+and its optional type annotation. A call that leaves the argument out gets
+the default:
+
+```epsil
+function scaled(x: number, factor: number = 2) -> number { x * factor }
+```
+
+`scaled(3)` is `6` and `scaled(3, 5)` is `15`. The same spelling works in
+every form of definition, and in an anonymous function:
+
+```epsil
+scaled(x, factor = 2) = x * factor
+```
+
+```epsil
+(x, factor: number = 2) => x * factor
+```
+
+The call is completed when it is read, so `scaled(3)` and `scaled(3, 2)` are
+the same expression, and the signature of the function shows the default:
+`(x: number, factor: number = 2) -> number`. A named argument can skip a
+parameter that has a default: with
+`function f(x, density: number = 1, factor: number = 2)`, the call
+`f(3, factor: 5)` is `f(3, 1, 5)`.
+
+A default value is one of:
+
+- a number, with an optional sign (`2`, `-1`, `0.5`, `NaN`, `-oo`);
+- a string (`"auto"`), without interpolation;
+- `true` or `false`;
+- the empty list `[]` or the empty dictionary `{}` (in a parameter list, `{}`
+  is the empty dictionary, not the empty set);
+- a constant: a library constant (`pi`, `Integers`), or a symbol declared
+  constant before the function is defined: a constant that the host
+  declared, a `const` of an earlier program on the same engine, or a `const`
+  of the same program, in the same block or an enclosing one, written before
+  the function, with any value (`const W = 5; function f(k = W) { k + 1 }`
+  gives `f()` = 6, and `const L = [1]; function g(k = L) { k }` gives `g()`
+  = `[1]`);
+- a symbol that the parameter type lists
+  (`mode: symbol<Auto> | symbol<Manual> = Auto`).
+
+A default is a constant. A symbol that names a variable (a `let` of the
+program), or a symbol that is not declared and that no `symbol<…>` parameter
+type lists, is not a default value: write a constant, or pass the argument.
+A function statement is defined before the statements of its block run, so a
+`const` written after it is not a constant for its defaults:
+`function f(k = W) { k + 1 }; const W = 5` is an error. A known limitation:
+a constant declaration that the host canonicalizes and does not run makes its
+name a constant for a later default. On an engine where `W` is a variable,
+canonicalize `["Declare", "W", {"value": 5, "constant": "True"}]` without
+evaluating it: `(k = W) => k` is then accepted as a constant default, and a
+call of it reads the variable `W`. The parameters with a
+default come after the parameters without one. A function with a rest parameter (`...xs`) has no defaults.
+
+A default fills an argument that the call leaves out, and nothing else: an
+argument that the call supplies is passed to the body as it is, also when it
+is `missing` or `NaN`. Write `f(x ?? 2)` to replace an absent argument.
+
+Any other default is the diagnostic `default-value-invalid`, and so is a
+default that names a parameter of the same list (`(x, k = x) => …`), a
+default that is `Nothing`, and a default on a function with a rest
+parameter. A symbol default that is not constant is the static error
+`expected-a-literal-default`, reported when the function is defined. A default is not supported yet in a function with several
+clauses (a [literal parameter](#multiple-clauses-literal-parameters) makes
+one), on a [`bind` parameter](#bound-variable-parameters-bind), or in a
+[protocol](/protocols/) requirement.
 
 ### Which form to use
 
@@ -7372,6 +7496,72 @@ Three rules follow from that:
   parameters its own payload uses, so there is no one spelling that fits
   every variant. Write the conformance for each variant.
 
+## Extending a protocol
+
+A protocol can **extend** other protocols: it has every requirement of its
+parents plus its own, and a type that conforms to it conforms to each of
+its ancestors too. Write the parents after `extends`, separated by commas
+(`protocol FloorRing extends LinearOrder, Ring {}`). One implementation
+block supplies the members of the whole hierarchy:
+
+```epsil-live
+protocol PartialOrder {
+  function compare(self: Self, other: Self) -> integer
+}
+protocol FloorOrder extends PartialOrder {
+  function floor(self: Self) -> integer
+}
+
+type Money = tuple<cents: integer> is FloorOrder {
+  function compare(self: Money, other: Money) -> integer { self.cents - other.cents }
+  function floor(self: Money) -> integer { self.cents }
+}
+
+compare(Money(250), Money(100))
+// ➔ 150
+```
+
+`Money` now conforms to `FloorOrder` and to `PartialOrder`: a function
+written for `where T is PartialOrder` accepts a `Money`, and `compare`
+dispatches to the implementation above.
+
+The rules:
+
+- **Parents first.** A parent must be declared before the protocol that
+  extends it; an unknown parent is `protocol-unknown`, and a protocol cannot
+  extend itself through its parents (`protocol-extends-cycle`). A parent
+  may be listed even when another parent already extends it (a diamond is
+  allowed).
+- **One block for the hierarchy.** The block of `type T is FloorOrder { … }`
+  implements the members of `FloorOrder` and of every ancestor. A member
+  that an ancestor requires and the block leaves out is
+  `protocol-implementation-missing`, and nothing is registered: "the
+  `PartialOrder` protocol, which `FloorOrder` extends, expects a definition
+  of `compare`". An ancestor that `T` already conforms to — declared
+  earlier, or inherited from a supertype — needs no members in the block. A
+  member that an ancestor implemented in an earlier block of the same
+  program is `protocol-implementation-duplicate`; put each member in one
+  block.
+- **A member name is declared by one protocol of a hierarchy.** A protocol
+  cannot declare a member that one of its ancestors declares
+  (`protocol-member-inherited`), and it cannot extend two parents that both
+  reach a member of the same name (`protocol-extends-member-conflict`).
+  Two protocols that are not related may still share a member name, as
+  before.
+- **An extension is never removed.** Running a `protocol` statement again
+  can add parents, and every type that conforms to the protocol then
+  conforms to the new parents too; it cannot drop one
+  (`protocol-extends-removal`). Start a new engine to drop it.
+- **A qualified name names the protocol that declares the member.**
+  `PartialOrder.compare` and `x.(PartialOrder.compare)(y)` reach `compare`;
+  `FloorOrder.compare` is `protocol-member-unknown`, with the hint "write
+  `PartialOrder.compare`".
+
+When an edited program moves a member from a protocol to its parent, run
+the parent's statement first, then the descendant's statement without the
+member. Until the descendant's statement runs, the end of each run reports
+`protocol-extends-member-conflict` for it.
+
 ## Calling a protocol function
 
 A protocol function is called like any function. The implementation is
@@ -7419,11 +7609,28 @@ flowchart TD
 
 ### When the bare name is taken, qualify
 
-Two situations take the bare name away. A lexically visible definition of
-the same name **shadows** protocol members — your `size` wins over any
-protocol's. And two protocols can both declare a member that applies to the
-same receiver, making the bare call ambiguous. Both have the same escape
-hatch: qualify the member with the protocol's name.
+A library function does not take the bare name. A protocol function member
+shadows the lowercase spelling of a library function of the same name, as a
+user `function` does: after the `protocol` statement, a bare `floor(m)`
+calls the protocol member. The library function stays reachable by its
+capitalized name, `Floor(x)`.
+
+```epsil-live
+protocol Rounded { function floor(self: Self) -> integer }
+type Money = tuple<cents: integer>
+type Money is Rounded { function floor(self: Money) -> integer { self.cents } }
+
+(floor(Money(3)), Floor(2.5))
+// ➔ (3, 2)
+```
+
+Two situations take the bare name away. A definition of your own of the
+same name (a `function`, a `let`, a parameter) that is lexically visible
+**shadows** protocol members — your `size` wins over any protocol's, and
+your `function floor` wins over `Rounded.floor`. And two protocols can both
+declare a member that applies to the same receiver, making the bare call
+ambiguous. Both have the same escape hatch: qualify the member with the
+protocol's name (`Rounded.floor(m)`).
 
 ```epsil
 compare("a", "b")
@@ -7434,6 +7641,13 @@ compare("a", "b")
 Comparable.compare("a", "b")   // ➔ "<" — just Comparable's
 Comparator.compare("a", "b")   // ➔ -1  — just Comparator's
 ```
+
+A misspelled protocol name is reported only when some protocol declares the
+member: with only `Comparator` declared, `Comparble.compare("a", "b")` is
+`protocol-unknown`. When no protocol declares the member, the name is an
+ordinary free symbol, and the call stays unevaluated, as `x.compare("a", "b")`
+does: `Comparble.compare("a", "b")` is then
+`Apply(Field(Comparble, "compare"), "a", "b")`, with no diagnostic.
 
 The qualified name is also a first-class **value** — pass it wherever a
 function is expected:
@@ -7682,7 +7896,14 @@ each names the protocol, the type, and the way out. The full set of codes,
 grouped by when they fire:
 
 - **Declaring**: `protocol-member-keyword-missing`,
-  `protocol-self-required`, `protocol-scope-invalid`.
+  `protocol-self-required`, `protocol-scope-invalid`,
+  `protocol-name-expected` (no protocol name after `extends` or a comma),
+  `protocol-unknown` (a parent that is not a declared protocol),
+  `protocol-extends-cycle`, `protocol-extends-removal`,
+  `protocol-member-inherited` (a member an ancestor already declares),
+  `protocol-extends-member-conflict` (two protocols of one hierarchy declare
+  the same member name; also reported at the end of a run after a
+  replacement causes it, until it is resolved).
 - **Conforming**: `protocol-conformance-target-invalid`,
   `protocol-target-unknown`, `protocol-conformance-overlap`,
   `protocol-implementation-split` (an implementation block on a
@@ -8416,7 +8637,7 @@ The check runs twice by design: once statically, when the program is canonicaliz
 
 A presence assertion `x?!` (`AssertPresent(x)`) was evaluated on an absent value: `missing`, `NaN`, or an indeterminate form such as `0/0`. The assertion says "this value is present, fail otherwise", and it failed; the error names the operand as written.
 
-An absent value is a data state, not a bug in itself: an index out of range (`xs[i]`), a `first(filter(…))` that found nothing, a restricted value whose condition did not hold. Decide what the program should do when it happens. Write `x ?? fallback` to replace the absent value, test it with `isMissing(x)` and branch, or keep the assertion where absence really is a violated precondition and let the error propagate (`if let v: !error = …` catches it). `Nothing` is an omission marker, not an absent datum, and passes the assertion.
+An absent value is a data state, not a bug in itself: an index out of range (`xs[i]`), a `first(filter(…))` that found nothing, a restricted value whose condition did not hold. Decide what the program should do when it happens. Write `x ?? fallback` to replace the absent value, test it with `isMissing(x)` and branch, or keep the assertion where absence really is a violated precondition and let the error propagate (`if let v: !error = …` catches it). `Nothing` is the value of an empty block, not an absent datum, and passes the assertion.
 
 ## `no-product-between-points`
 
@@ -8510,6 +8731,21 @@ A named argument supplied an optional parameter while an optional parameter decl
 
 Arguments are matched to declared positions, and there is no way to leave a hole in the argument list — so an optional parameter can only be named when every optional parameter declared before it is also supplied (by position or by name). Supply the earlier optional too, or omit both.
 
+A parameter with a default value is never the cause: when a named argument skips it, it takes its default. With `function f(x, density: number = 1, factor: number = 2)`, the call `f(3, factor: 5)` is `f(3, 1, 5)`. Only an optional parameter WITHOUT a default (`number?` in a declared signature) leaves a hole.
+
+## `default-value-invalid`
+
+A parameter's default value (the part after `=` in `function f(x, k: number = 2)` or `(x, k = 2) => …`) is not one the language accepts here. A default is a constant: a number (with an optional sign), a string, `true` or `false`, the empty list `[]`, the empty dictionary `{}`, a constant (a constant of the library, `Integers`, `Pi`, or a symbol declared constant before the function is defined) or a symbol that the parameter type lists (`mode: symbol<Auto> | symbol<Manual> = Auto`) — a value that the signature can store and print, as in `(x: number, k: number = 2) -> number`. A default fills an argument that the call leaves out, and nothing else.
+
+The message gives the reason:
+- Any other expression (`k = x + 1`, `xs = [1, 2]`) has no spelling in a signature. For a computed or non-empty default, leave the parameter required and pass the value at each call.
+- A symbol that names a variable (`k = n`, `k = weights`), or that is not declared and is not listed by a `symbol<…>` parameter type, is refused: a default is a constant, and such a symbol would be read when the call runs. Write a constant, or pass the argument.
+- A default that names a parameter of the same list (`(x, k = x) => …`) is refused.
+- A function with a rest parameter (`(x, k = 2, ...rest) => …`) has no defaults: drop the default or the rest parameter.
+- `Nothing` and `Missing` are refused: `Nothing` is the value of an empty block, not an argument value, and `Missing` is a result only, not a value that a call supplies.
+- A `bind` parameter of a `hold` definition cannot have a default: it names a variable that the caller writes.
+- A default beside a literal parameter (`function f(0, k = 2)`) is refused: a literal parameter makes the definition a clause of a multi-clause function, and a default in a multi-clause function is not supported yet, because the clause that receives a call is not always known when the call is completed with the default. For the same reason, adding a second clause to a function with a default (or a clause with a default to a function that has several) is refused when the definition runs.
+
 ## `zero-index`
 
 Indexing is 1-based: `xs[1]` is the first element of a collection and `xs[n]` the n-th, so the literal index 0 never names an element (it yields NaN).
@@ -8532,9 +8768,9 @@ Write `x => x + 1`; the fixit in the diagnostic replaces the arrow for you. The 
 
 ## `chained-assignment`
 
-`a = b = 5` does not chain: `=` only assigns as a whole statement, so the OUTER `=` assigns and the inner one compares — `a` receives the boolean of `b = 5`.
+An assignment is a statement, not a value, so assignments do not chain. In `a = b = 5` the OUTER `=` assigns and the inner one compares: `a` would receive the boolean of `b = 5`. In `a := b := 5` the inner assignment is an operand, which is not allowed.
 
-Write `a := b := 5` to actually chain the assignment, or `a := (b == 5)` if the comparison was the intent.
+Write two statements, `b := 5; a := b`, or `a := (b == 5)` if the comparison was the intent.
 
 ## `assign-in-condition`
 
@@ -8598,7 +8834,7 @@ Rename one side so the two agree — the quick fix renames the annotation's para
 
 ## `absence-marker-binding`
 
-A binding names one of the absence markers `Nothing`, `Missing` or `Undefined`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — `Nothing` is dropped from an argument list, and an arithmetic operand named `Missing` or `Undefined` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
+A binding names one of the absence markers `Nothing` or `Missing`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — an arithmetic operand named `Nothing` is refused as a non-number, and an arithmetic operand named `Missing` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
 
 Choose another name. In a `match`, a bare name is a new variable, not a comparison: to test for the marker, write `== Missing`.
 
@@ -8612,13 +8848,25 @@ A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k =
 
 ## `read-before-declaration`
 
-A local of a block was read or assigned before its `let` or `const` statement ran. In `do { let a = k; let k = 2; a }` the first statement reads `k`, which the block declares only in the next statement. In `do { k = 5; let k = 2 }` the first statement assigns it: the assignment does not write a `k` of an enclosing scope, because the name `k` in the block is the local.
+A statement of a block uses a local of the block before the statement that declares it. A local is declared by a `let` or a `const`, or by the first assignment of the name at the own level of the block. In `do { let a = k; let k = 2; a }` the first statement reads `k`, which the block declares only in the next statement. In `do { k = 5; let k = 2 }` the first statement assigns it. In `function g(k) { u = t; t = k; u }` the first statement reads `t`.
 
-Each run of a block — a function call, an iteration of a loop body, a run of an `if` or `do` block — gets its own bindings for the locals of the block when it starts, as in JavaScript. A closure created in the block before a `let` therefore reads the binding of its own run: in `for i in [1, 2] { fs = [...fs, () => k]; let k = i }` the two closures give `1` and `2`. Until the `let` runs, the binding has no value, and reading it or assigning it (directly, or by calling such a closure too early) is this error.
+The error is found before the program runs. Move the declaration before the first use, or give the local another name. The initializer of a `let` is not such a use: `let t = t * 2` in a nested block reads the OUTER `t`. The value of a first assignment is not such a use either: `t = t + 1` as the first assignment of `t` reads the `t` of an enclosing scope, as `let t = t + 1` does. A use in a function literal is not such a use either, because it runs when the function is called: a function can read a local that a later statement of the block declares.
 
-Move the `let` before the first read or assignment, or give the local another name. The initializer of the `let` itself is not such a read: `let t = t * 2` in a nested block reads the OUTER `t`. Top-level statements of a program are not a block, so there a name declared later is an ordinary symbol until its `let` runs.
+## `declaration-without-value`
 
-In a function body, an assignment to a name that no enclosing scope declares where the function is written makes the name a local of the block, as a `let` does, and each call starts with no value for it. A read of such a local before its first assignment is this error too: `function g(k) { u = t; t = k; u }` reads `t` in the first statement, and `t = t + 1` as the first statement reads `t` before it assigns it. A call of the function that a local holds (`h(1)` before `h = (x) => x`, or before `let h = …`) and the collection of a `for` loop (`for i in t { … }` before `t` has a value) use the local too, and are this error; the loop then runs no iteration. Assign the local before the first read, or, to read a variable outside the function, declare it before the function. A closure that reads the local is not such a read until it is called, and in a block outside every function (a `do` block at the top level of a program) a read before the first assignment stays the bare symbol.
+A `let` or a `const` declares a name without a value: `let x: integer`. A declaration gives the name its value, so that a read of the name never finds a local with no value. Write the value in the declaration: `let x: integer = 0`. To give the value later in a branch, declare the name with a first value before the branch: `let t = 0; if c { t = 1 }`. One declaration needs no value: the signature of a function that a `function` statement of the same name in the same block defines, `let f: (integer) -> integer; function f(x) { x + 1 }`.
+
+## `first-assignment-in-branch`
+
+The first assignment of a name is in a branch of an `if`, in a branch of a `match` or in the body of a loop. In `if c { t = 1 }; t`, the name `t` has no value when `c` is false. A first assignment declares a local only at the own level of a block that is not in a branch or a loop body. Declare the name with a value before the branch, `let t = 0; if c { t = 1 }; t`, or with a `let` in the branch when the name is a local of the branch only.
+
+## `assignment-in-operand`
+
+An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`.
+
+## `assignment-type-mismatch`
+
+An assignment gives a local a value whose type cannot be the type of the local. The type of a local is its declared type (`let n: integer = 0`), or else the type of its first value, widened: a number gives `number`, a string gives `string`, a boolean gives `boolean`, and the elements of a list, a set or a tuple widen the same way. So `s = 0` then `s = s + 0.5` is valid, and `s = 0` then `s = "x"` is this error. Use another name for a value of another type.
 
 ## `constant-assignment`
 
@@ -8733,8 +8981,8 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 116 definitions · [full reference](/reference/core/)
-- [Control structures](#control-structures) — 13 definitions · [full reference](/reference/control-structures/)
+- [Core](#core) — 117 definitions · [full reference](/reference/core/)
+- [Control structures](#control-structures) — 12 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
 - [Collections](#collections) — 126 definitions · [full reference](/reference/collections/)
 - [Colors](#colors) — 20 definitions · [full reference](/reference/colors/)
@@ -8765,7 +9013,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `apply` | `Apply` | `(name: any, arguments: any*) -> unknown` | Apply a function to a list of arguments |
 | `applyWhole` | `ApplyWhole` | `(name: any, arguments: any*) -> unknown` | Apply a function to arguments, each bound whole (engine-internal). |
 | `arc` | `Arc` | `(any+) -> number` | Arc / wide-hat accent measure (`\widehat{ABC}`) — opaque typed head; not evaluated. |
-| — | `AssertPresent` | `(any) -> unknown` | Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`). |
+| — | `AssertPresent` | `(any) -> unknown` | Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `NaN`, or a point whose coordinates are all `NaN`). |
 | — | `Assign` | `(expression \| symbol, any) scope -> any` | Assign a value to a symbol or define a sequence. |
 | `assume` | `Assume` | `(any) scope -> string` | Record an assumption about a symbol. |
 | `baseForm` | `BaseForm` | `(T, (number \| string)?) -> T where T: number` | `BaseForm(expr, base=10)` |
@@ -8775,13 +9023,13 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `caseFold` | `CaseFold` | `(character \| string) -> string` | CaseFold(s): a case-folded form of `s`, for case-insensitive comparison — `CaseFold(a) == CaseFold(b)` tests equality ignoring case. |
 | `characterFrom` | `CharacterFrom` | `(character \| string) -> character` | CharacterFrom(s): the character `s` denotes. |
 | `characters` | `Characters` | `(character \| string) -> list<character>` | Characters(s): split a string into a list of user-perceived characters (grapheme clusters). |
-| — | `Coalesce` | `(any+) -> unknown` | Return the first operand that is not ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`), evaluated left-to-right. |
+| — | `Coalesce` | `(any+) -> unknown` | Return the first operand that is not ABSENT (`Missing`, `NaN`, or a point whose coordinates are all `NaN`), evaluated left-to-right. |
 | — | `Colon` | `(any, any) -> expression` | Type annotation (`a : b`) — opaque typed head. |
 | `composition` | `Composition` | `(function*) -> function` | The composition of functions, applied right to left: `Composition(f, g, h)(x)` is `f(g(h(x)))` |
 | `conforms` | `Conforms` | `(subject: any, protocols: string+) -> boolean` | True iff the subject conforms to EVERY named protocol. |
 | — | `Declare` | `(symbol, type: (string \| symbol)?, value: any?, attributes: dictionary<any>?) scope -> any` | Declare a symbol in the current scope, optionally assigning a type and an initial value. |
 | — | `DeclareConformance` | `(target: string \| symbol, protocols: any, whereClauseOrImplementation: any?, implementation: dictionary<any>?) scope -> nothing` | Declare that a type CONFORMS to one or more protocols — the lowering of the Epsil `type string is Hashable & Comparable` statement. |
-| — | `DeclareProtocol` | `(string \| symbol, members: dictionary<any>?) scope -> nothing` | Declare a PROTOCOL: a set of function and property requirements a type may declare itself to satisfy. |
+| — | `DeclareProtocol` | `(string \| symbol, members: dictionary<any>?, parents: any?) scope -> nothing` | Declare a PROTOCOL: a set of function and property requirements a type may declare itself to satisfy. |
 | — | `DeclareSumType` | `(string \| symbol, any*) scope -> nothing` | Declare a SUM TYPE: N nominal variants plus the transparent union that names them, in one statement — the lowering of the Epsil sugar `type node = lit(num: number) \| plus(op1: node, op2: node)`. |
 | — | `DeclareType` | `(string \| symbol, type: string \| symbol \| type, attributes: dictionary<any>?) scope -> nothing` | Declare a type. |
 | — | `DefineFunction` | `(symbol, function, dictionary<any>?) scope -> nothing` | Define one clause of a (possibly multi-clause) function: `DefineFunction(f, Function(body, params…))`. |
@@ -8792,7 +9040,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `evaluate` | `Evaluate` | `(any) -> unknown` | Evaluate an expression. |
 | `evaluateAt` | `EvaluateAt` | `(function, lower: expression, upper: expression) -> unknown` | Evaluate a function at one point or between two bounds. |
 | `findRoot` | `FindRoot` | `(any, any, dictionary?) -> dictionary` | FindRoot(equations, params): numerically find parameter values that |
-| — | `Function` | `(expression, (function \| symbol)*) -> function` | A function literal |
+| — | `Function` | `(expression, (function \| symbol)*) -> function` | Function(body, param1, param2, …): a function literal. |
 | `geometricVector` | `GeometricVector` | `(any, any) -> expression` | Geometric vector (directed segment between two points) — opaque typed head. |
 | `graphemeClusters` | `GraphemeClusters` | `(character \| string) -> list<character>` | A collection of grapheme clusters from a string. |
 | `head` | `Head` | `(any) -> symbol` | Return the head of an expression, the name of the operator |
@@ -8805,7 +9053,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `integerString` | `IntegerString` | `(integer, integer?) -> string` | `IntegerString(n, base=10)` return a string representation of the integer `n` in base `base`. |
 | — | `InvisibleOperator` | `function` | Implicit operator used for juxtapositions such as function application or multiplication. |
 | `isError` | `IsError` | `(any) -> boolean` | True if the expression is an `Error` value, or a frozen expression embedding one (`"a" + 1`). |
-| `isMissing` | `IsMissing` | `(any) -> boolean` | True for `Missing`, `Undefined`, `NaN`, or `Indeterminate`, regardless of provenance. |
+| `isMissing` | `IsMissing` | `(any) -> boolean` | True for `Missing`, `NaN`, or a point whose coordinates are all `NaN`, regardless of provenance. |
 | — | `Latex` | `(any+) -> string` | Serialize an expression to LaTeX |
 | — | `LatexString` | `(string) -> string` | Value preserving type conversion/tag indicating the string is a LaTeX string |
 | — | `MatchesType` | `(subject: any, type: string \| type) -> boolean` | True iff the first operand, EVALUATED, is a value of the given type — the engine form of the Epsil `x is T` test and of `match` type patterns, which both lower here. |
@@ -8813,10 +9061,11 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `N` | `(any, (integer \| list<number>)?) -> unknown` | N(expr): numerically evaluate an expression |
 | `nSolve` | `NSolve` | `(any, any*) -> list` | NSolve(equation, unknown): the solutions of an equation as floats. |
 | — | `NamedArgument` | `(string, any) -> nothing` | NamedArgument(name, value): one named argument of a call (Epsil |
-| `nothing` | `Nothing` | variable `nothing` | The absence of a value; the sole member of the unit type. |
+| `nothing` | `Nothing` | variable `nothing` | The value of an empty block or of a statement with no value; the sole member of the unit type. |
 | `numberFrom` | `NumberFrom` | `(character \| string, base: (character \| integer \| string)?) -> number` | NumberFrom(s): the number the string `s` denotes — optional surrounding whitespace, an optional sign, then ASCII digits with an optional "." fraction and an optional e/E exponent, or one of "oo", "+oo", "-oo", "NaN", "Indeterminate". |
 | `numericApproximation` | `NumericApproximation` | `(any) -> unknown` | Numerically evaluate an expression, as the `.N()` method does (engine-internal). |
 | — | `Object` | `(any, string?) -> unknown` | Provenance head for the snapshot of a mutable object: `["Object", <record>, "'TypeName'"]`. |
+| — | `Optional` | `(any, any) -> nothing` | Optional(param, default): a parameter of a function literal with a |
 | — | `OverParen` | `(any+) -> expression` | Over-paren accent (`\overparen{BC}`) — opaque typed head; not evaluated. |
 | `padEnd` | `PadEnd` | `(character \| string, n: integer, pad: (character \| string)?) -> string` | PadEnd(s, n, pad=" "): `s` padded at the END to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
 | `padStart` | `PadStart` | `(character \| string, n: integer, pad: (character \| string)?) -> string` | PadStart(s, n, pad=" "): `s` padded at the START to `n` characters by repeating `pad` (its final copy truncated on a character boundary). |
@@ -8888,12 +9137,11 @@ The [Control structures reference](/reference/control-structures/) has the full 
 | — | `Condition` | `(expression, symbol?) -> boolean` | Test whether a value satisfies one or more conditions. |
 | — | `Continue` | `() -> nothing` | Skip to the next iteration of the enclosing loop. |
 | `fixedPoint` | `FixedPoint` | `(function, initial: any, maxIterations: integer?) -> unknown` | Apply a function repeatedly, starting from an initial value, until two successive values are the same: `FixedPoint(f, x)` is the first of `f(x)`, `f(f(x))`, … that `f` maps to itself. |
-| — | `If` | `(expression, expression, expression?) -> any` | `If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is `Missing` when `c` is `False`. |
+| — | `If` | `(expression, expression, expression?) -> any` | `If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is the absent value of the domain of `e1` when `c` is `False`: `NaN` for a number, `Missing` otherwise, as for a restriction `e1\{c\}`, which… |
 | — | `Loop` | `(body: expression, iterators: expression*) -> any` | Imperative loop, evaluated **for effect**. |
 | — | `Match` | `(expression, expression+) -> unknown` | Structural pattern match. |
 | — | `MatchCase` | `(expression, expression, expression?) -> nothing` | A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. |
 | — | `Pin` | `(expression) -> nothing` | Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure. |
-| `when` | `When` | `(expression, boolean) -> any` | Conditional/restriction value. |
 | — | `Which` | `(expression+) -> unknown` | `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. |
 
 ## Logic
@@ -8939,7 +9187,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `adjoin` | `Adjoin` | `(set<any>, any+) -> set` | The ring obtained by adjoining one or more elements to a base ring. |
 | `all` | `All` | `(collection<T>, predicate: ((T) any -> boolean)?) -> boolean where T` | Return True if the predicate holds for every element of the collection (or if every element is True when no predicate is given). |
 | `any` | `Any` | `(collection<T>, predicate: ((T) any -> boolean)?) -> boolean where T` | Return True if the predicate holds for at least one element of the collection (or if any element is True when no predicate is given). |
-| `append` | `Append` | `(collection<any>, (missing \| value)+) -> collection` | Add one or more elements to the end of a collection. |
+| `append` | `Append` | `(collection<any>, any+) -> collection` | Add one or more elements to the end of a collection. |
 | `argMax` | `ArgMax` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that maximizes the given key function (or the element itself when no key is given). |
 | `argMin` | `ArgMin` | `(indexed_collection<T>, key: ((T) any -> unknown)?) -> integer where T` | Return the 1-based index of the element that minimizes the given key function (or the element itself when no key is given). |
 | — | `At` | `(value: any, index: (boolean \| character \| indexed_collection<any> \| number \| string)+) -> unknown` | Access an element of an indexed collection. |
@@ -8970,7 +9218,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
 | `fill` | `Fill` | `(function, tuple) -> list` | Produce a 2D list (matrix) by applying a function to each pair of row and column indexes. |
 | `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
-| `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate, or Nothing if none found. |
+| `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate. |
 | `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
 | `flatMap` | `FlatMap` | `(collection<T>, mapping: (T) any -> U) -> list where T, U` | Map a function over a collection and concatenate the results into a single list, splicing collection-valued results and keeping scalar results as single elements. |
 | `fold` | `Fold` | `(reducer: (unknown, T) any -> unknown, initial: value, collection<T>) -> value where T` | Fold a collection to a single value, applying a binary function f(accumulator, element) left to right from an initial value. |
@@ -9024,7 +9272,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `quotientRing` | `QuotientRing` | `(set<any>, any) -> set` | The quotient of a ring by the ideal generated by the second argument. |
 | `randomShuffle` | `RandomShuffle` | `((T) random -> T where T: string) & ((indexed_collection<T>) random -> list<T> where T: any)` | Randomize the order of the elements in the collection. |
 | — | `Range` | `(number, number?, step: number?) -> list<number>` | A sequence of numbers from a start to an end value with an optional step. |
-| `rangeOf` | `RangeOf` | `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> nothing \| range where T` | Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Nothing` when it does not occur. |
+| `rangeOf` | `RangeOf` | `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> missing \| range where T` | Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Missing` when it does not occur. |
 | `rationalNumbers` | `RationalNumbers` | constant `set<rational>` | The set of all finite rational numbers. |
 | `realNumbers` | `RealNumbers` | constant `set<real>` | The set of all finite real numbers. |
 | `reduce` | `Reduce` | `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> value where T` | Reduce (fold) a collection to a single value by repeatedly applying a binary function, with an optional initial value. |
@@ -9041,7 +9289,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `setFrom` | `SetFrom` | `(value*) -> set` | Create a set from the elements of a collection. |
 | `setMinus` | `SetMinus` | `(set<any>, value*) -> set` | Return the set difference between the first set and subsequent values. |
 | — | `Single` | `(value: T) -> tuple<T> where T` | A tuple with a single element |
-| `slice` | `Slice` | `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing \| range) -> T \| nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, span: nothing \| range) -> list<T> \| nothing where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)` | Return a contiguous run of elements from an indexed collection. |
+| `slice` | `Slice` | `((value: T, span: range) -> T where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)` | Return a contiguous run of elements from an indexed collection. |
 | `sort` | `Sort` | `((T, order: (((character) any -> unknown) \| ((character, character) any -> boolean \| number))?) -> T where T: string) & ((indexed_collection<T>, order: (((T) any -> unknown) \| ((any, any) any -> boolean \| number))?) -> list<T> where T: any)` | Return the elements of the collection sorted according to the given comparison function. |
 | `startsWith` | `StartsWith` | `(indexed_collection<T>, prefix: indexed_collection<T>) -> boolean where T` | Return `True` when the indexed collection begins with `prefix` as a contiguous subsequence. |
 | `subset` | `Subset` | `(any, any*) -> boolean` | Test whether the first collection is a strict subset of the second. |
@@ -9121,7 +9369,7 @@ The [Relations reference](/reference/relop/) has the full description and the ex
 | — | `NotApprox` | `(any, any*) -> boolean` | Negated approximate-equality relation (not approximately equal). |
 | — | `NotApproxEqual` | `(any*) -> unknown` | Negated approximately-equal relation. |
 | — | `NotApproxNotEqual` | `(any, any*) -> boolean` | Negated approximately-not-equal relation. |
-| — | `NotEqual` | `(any, any) -> boolean` | Inequality comparison (not equal to). |
+| — | `NotEqual` | `(any, any*) -> boolean` | Inequality comparison (not equal to). |
 | — | `NotGreater` | `(any, any*) -> boolean` | Negated greater-than relation (not greater than). |
 | — | `NotGreaterNotEqual` | `(any, any*) -> boolean` | Neither greater than nor equal to. |
 | — | `NotLess` | `(any, any*) -> boolean` | Negated less-than relation (not less than). |
@@ -9194,7 +9442,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `im` | `Im` | `(complex \| infinity) -> number` | `Im` is an alias for `Imaginary`, which is the preferred name. |
 | `imaginary` | `Imaginary` | `(complex \| infinity) -> number` | Imaginary part of a complex number. |
 | `imaginaryUnit` | `ImaginaryUnit` | constant `imaginary` = `i` | The imaginary unit, whose square is −1. |
-| — | `Indeterminate` | constant `number` = `Indeterminate` | Indeterminate, the exact answer to an indeterminate form such as 0/0: a number with no value. |
+| — | `Indeterminate` | constant `number` = `NaN` | An input spelling of NaN. |
 | `infimum` | `Infimum` | `(value*) -> number` | Like Min, but defined for open sets. |
 | `interpret` | `Interpret` | `(any) -> any` | Interpret a notational expression as its mathematical meaning. |
 | `isComposite` | `IsComposite` | `(number) -> boolean` | `IsComposite(n)` returns `True` if `n` is a composite number |
@@ -9216,7 +9464,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `min` | `Min` | `(value+) -> number` | Minimum of two or more numbers. |
 | — | `Mod` | `(real, real) -> real` | Modulo: the remainder of the floored division of x by y. |
 | — | `Multiply` | `(number*) -> number` | Product of two or more values. |
-| — | `NaN` | constant `number` = `NaN` | Not a Number, the result of a floating-point operation that is undefined or unrepresentable, such as 0.0/0.0. |
+| — | `NaN` | constant `number` = `NaN` | Not a Number, the result of a floating-point operation that is undefined or unrepresentable, such as 0.0/0.0, or of an exact form with no value, such as 0/0. |
 | — | `Negate` | `(complex \| infinity) -> number` | Additive Inverse |
 | `negativeInfinity` | `NegativeInfinity` | constant `-oo` = `-oo` | Negative infinity (−∞). |
 | `numerator` | `Numerator` | `(number) -> nothing \| number` | Numerator of an expression |
@@ -9322,13 +9570,13 @@ The [Calculus reference](/reference/calculus/) has the full description and the 
 | `integrate` | `Integrate` | `(function, limits+) -> list<tuple> \| number \| tensor \| tuple` | Symbolic integral with optional bounds. |
 | `interpolatingFunction` | `InterpolatingFunction` | `(list<any>, number?) -> number` | Piecewise-quartic dense-output interpolant of a numeric ODE solution (produced by `NDSolveFunction`). |
 | `jacobianMatrix` | `JacobianMatrix` | `(any, any?) -> value` | JacobianMatrix(fs, vars): the matrix of partial derivatives |
-| `limit` | `Limit` | `(function, point: number, direction: number?) -> number` | Limit of a function |
+| `limit` | `Limit` | `(function, point: number, direction: number?) -> number` | Limit of a function. |
 | — | `Limits` | `(index: symbol, lower: value, upper: value) -> tuple` | Limits of a function |
 | `nd` | `ND` | `(function, at: number) -> list<number> \| number \| tuple` | Numerical derivative evaluated at a point. |
 | `ndSolve` | `NDSolve` | `(expression, symbol, limits: symbol \| tuple, number, number?) -> list` | Numerical differential equation solver. |
 | `ndSolveFunction` | `NDSolveFunction` | `(expression, symbol, limits: symbol \| tuple, number) -> function` | Numerically solve an ordinary differential equation and return the solution as an applicable function (a `Function` literal wrapping an `InterpolatingFunction`), usable at any point of the integration interval. |
 | `nIntegrate` | `NIntegrate` | `(function, lower: number, upper: number) -> number` | Numerical approximation of a definite integral. |
-| `nLimit` | `NLimit` | `(function, point: number, direction: number?) -> number` | Numerical approximation of the limit of a function |
+| `nLimit` | `NLimit` | `(function, point: number, direction: number?) -> number` | Numerical approximation of the limit of a function. |
 | `normal` | `Normal` | `(value) -> value` | Strip Big-O remainder terms from a series, yielding the truncated polynomial. |
 | `polygonContour` | `PolygonContour` | `(vertices: list<complex>, orientation: integer?) -> expression` | Simple closed polygon: a list of complex vertices in traversal order, with optional orientation override (+1 or -1). |
 | `rSolve` | `RSolve` | `(expression, symbol, symbol) -> expression` | Symbolic recurrence equation solver. |
@@ -9530,11 +9778,11 @@ The [Statistics reference](/reference/statistics/) has the full description and 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
 | `betaRegularized` | `BetaRegularized` | `(complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Regularized incomplete beta function I_x(a, b) |
-| `binCounts` | `BinCounts` | `(collection<nothing \| number>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
+| `binCounts` | `BinCounts` | `(collection<number>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
 | `binomialDistribution` | `BinomialDistribution` | `(integer<0..>, real<0..1>) -> expression<BinomialDistribution>` | Binomial distribution: number of successes in n independent trials, each with success probability p. |
 | `cdf` | `CDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..1>` | Cumulative distribution function P(X ≤ x) of a distribution. |
-| `correlation` | `Correlation` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
-| `covariance` | `Covariance` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `correlation` | `Correlation` | `(collection<number \| tuple>, collection<number>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `covariance` | `Covariance` | `(collection<number \| tuple>, collection<number>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
 | `erf` | `Erf` | `(complex \| signed_infinity) -> complex` | Gauss error function |
 | `erfInv` | `ErfInv` | `(complex \| infinity) -> number` | Inverse of the error function |
 | `erfc` | `Erfc` | `(complex \| signed_infinity) -> complex` | Complementary error function: 1 - Erf(x) |
@@ -9542,28 +9790,28 @@ The [Statistics reference](/reference/statistics/) has the full description and 
 | `exponentialDistribution` | `ExponentialDistribution` | `(real<0<..>) -> expression<ExponentialDistribution>` | Exponential distribution with rate parameter λ. |
 | `findFit` | `FindFit` | `(any, any, any, any, dictionary?) -> dictionary` | Nonlinear least-squares fit of a model to data. |
 | `gammaRegularized` | `GammaRegularized` | `(complex \| infinity, complex \| infinity) -> number` | Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a) |
-| `histogram` | `Histogram` | `(collection<nothing \| number>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
-| `interquartileRange` | `InterquartileRange` | `((collection<nothing \| number> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
-| `kurtosis` | `Kurtosis` | `((collection<nothing \| number> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
+| `histogram` | `Histogram` | `(collection<number>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
+| `interquartileRange` | `InterquartileRange` | `((collection<number> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
+| `kurtosis` | `Kurtosis` | `((collection<number> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
 | `linearRegression` | `LinearRegression` | `(any+) -> tuple<number, number>` | Least-squares linear fit b0 + b1·x. |
-| `mean` | `Mean` | `((collection<nothing \| number> \| distribution \| number)+) -> number` | Arithmetic mean (average) of a collection of numbers. |
-| `median` | `Median` | `((collection<nothing \| number> \| number)+) -> nan \| real \| signed_infinity` | Median of a collection of numbers. |
-| `mode` | `Mode` | `((collection<nothing \| number> \| number)+) -> nan \| real \| signed_infinity` | Most frequently occurring value in a collection. |
+| `mean` | `Mean` | `((collection<number> \| distribution \| number)+) -> number` | Arithmetic mean (average) of a collection of numbers. |
+| `median` | `Median` | `((collection<number> \| number)+) -> nan \| real \| signed_infinity` | Median of a collection of numbers. |
+| `mode` | `Mode` | `((collection<number> \| number)+) -> nan \| real \| signed_infinity` | Most frequently occurring value in a collection. |
 | `normalDistribution` | `NormalDistribution` | `(real, real<0<..>) -> expression<NormalDistribution>` | Normal (Gaussian) distribution with mean μ and standard deviation σ. |
 | `pdf` | `PDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..>` | Probability density (continuous) or mass (discrete) function of a distribution, evaluated at x. |
 | `poissonDistribution` | `PoissonDistribution` | `(real<0<..>) -> expression<PoissonDistribution>` | Poisson distribution with rate parameter λ. |
 | `polynomialFit` | `PolynomialFit` | `(any+) -> list<number>` | Least-squares polynomial fit of the given degree. |
-| `populationCovariance` | `PopulationCovariance` | `(collection<nothing \| number \| tuple>, collection<nothing \| number>?) -> nan \| real` | Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
-| `populationStandardDeviation` | `PopulationStandardDeviation` | `((collection<nothing \| number> \| number)+) -> nan \| real<0..>` | Population Standard Deviation of a collection of numbers. |
-| `populationVariance` | `PopulationVariance` | `((collection<nothing \| number> \| number)+) -> nan \| real<0..>` | Population variance of a collection of numbers. |
+| `populationCovariance` | `PopulationCovariance` | `(collection<number \| tuple>, collection<number>?) -> nan \| real` | Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
+| `populationStandardDeviation` | `PopulationStandardDeviation` | `((collection<number> \| number)+) -> nan \| real<0..>` | Population Standard Deviation of a collection of numbers. |
+| `populationVariance` | `PopulationVariance` | `((collection<number> \| number)+) -> nan \| real<0..>` | Population variance of a collection of numbers. |
 | `quantile` | `Quantile` | `(collection<any> \| distribution, real<0..1>) -> nan \| real \| signed_infinity` | Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. |
-| `quartiles` | `Quartiles` | `((collection<nothing \| number> \| number)+) -> tuple<lower: nan \| real \| signed_infinity, mid: nan \| real \| signed_infinity, upper: nan \| real \| signed_infinity>` | Lower quartile, median, and upper quartile of a collection. |
+| `quartiles` | `Quartiles` | `((collection<number> \| number)+) -> tuple<lower: nan \| real \| signed_infinity, mid: nan \| real \| signed_infinity, upper: nan \| real \| signed_infinity>` | Lower quartile, median, and upper quartile of a collection. |
 | `randomSample` | `RandomSample` | `((T, number) random -> T where T: string) & ((indexed_collection, number) random -> list)` | RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`, without replacement. "Without replacement" is over POSITIONS, not values: on a multiset, repeats are expected — RandomSample([1, 1, 2], 2) can return [1, 1]. |
-| `skewness` | `Skewness` | `((collection<nothing \| number> \| number)+) -> nan \| real` | Skewness of a collection of numbers. |
+| `skewness` | `Skewness` | `((collection<number> \| number)+) -> nan \| real` | Skewness of a collection of numbers. |
 | `slidingWindow` | `SlidingWindow` | `((S, integer, integer?) -> list<string> where S: string) & ((collection, integer, integer?) -> list<list>)` | Return overlapping sliding windows of fixed size over the collection. |
-| `standardDeviation` | `StandardDeviation` | `((collection<nothing \| number> \| distribution \| number)+) -> nan \| real<0..>` | Sample Standard Deviation of a collection of numbers. |
+| `standardDeviation` | `StandardDeviation` | `((collection<number> \| distribution \| number)+) -> nan \| real<0..>` | Sample Standard Deviation of a collection of numbers. |
 | `uniformDistribution` | `UniformDistribution` | `(real, real) -> expression<UniformDistribution>` | Continuous uniform distribution on the interval [a, b]. |
-| `variance` | `Variance` | `((collection<nothing \| number> \| distribution \| number)+) -> nan \| real<0..>` | Sample variance of a collection of numbers. |
+| `variance` | `Variance` | `((collection<number> \| distribution \| number)+) -> nan \| real<0..>` | Sample variance of a collection of numbers. |
 
 ## Units
 
@@ -9639,29 +9887,29 @@ keeps its MathJSON spelling.
 
 ## Absent values
 
-Four values mark that a value is absent. They do not behave the same way.
+Three values mark that a value is absent. They do not behave the same way.
 
 | Value       | Meaning                                                                   |
 | :---------- | :------------------------------------------------------------------------ |
-| `nothing`   | No value at all. It is removed from argument lists and collection literals. |
+| `nothing`   | The value of an empty block or of a statement with no value. It is kept where it is written. |
 | `missing`   | A position exists, but its value is absent (R `NA`, Julia `missing`).      |
-| `Undefined` | The result is not defined.                                                 |
 | `NaN`       | A number that is not defined (Not a Number).                              |
 
-`nothing` disappears where it is written. `missing` keeps its position, and an
-arithmetic operation on it gives `NaN`:
+`nothing` is kept where it is written, and an arithmetic operation on it is a
+type error. `missing` keeps its position, and an arithmetic operation on it
+gives `missing`:
 
 ```epsil
 [12, nothing, 34]
-// ➔ [12, 34]
+// ➔ [12,"Nothing",34]
 ```
 
 ```epsil
-[nothing + 1, missing + 1]
-// ➔ [1, NaN]
+[missing + 1, 2]
+// ➔ ["Missing",2]
 ```
 
-`isMissing` is true for `missing`, `Undefined` and `NaN`. `Coalesce` returns
+`isMissing` is true for `missing` and `NaN`. `Coalesce` returns
 the first operand that is not absent:
 
 ```epsil
@@ -9982,7 +10230,7 @@ arc(A, B, C)
 
 `(any) -> unknown`
 
-Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`). `Nothing` is an omission marker, not an absent datum, and passes through; an error operand propagates. Epsil spells it `x?!`. Only the value itself is checked, never the cells of a collection.
+Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `NaN`, or a point whose coordinates are all `NaN`). `Nothing` is the value of an empty block, not an absent datum, and passes through; an error operand propagates. Epsil spells it `x?!`. Only the value itself is checked, never the cells of a collection.
 
 ```epsil
 [1, 2][1]?!
@@ -10040,9 +10288,7 @@ BuiltinFunction("Sqrt")(16)
 
 MathJSON `CanonicalForm` · `(any, symbol*) -> any`
 
-Return the canonical form of an expression
-
-Can be used to sort arguments of an expression.
+Return the canonical form of an expression Can be used to sort arguments of an expression.
 
 Sorting arguments of commutative functions is a weak form of canonicalization that can be useful in some cases, for example to accept "x+1" and "1+x" while rejecting "x+1" and "2x-x+1"
 
@@ -10093,7 +10339,7 @@ characters("héllo")
 
 `(any+) -> unknown`
 
-Return the first operand that is not ABSENT (`Missing`, `Undefined`, `NaN`, or `Indeterminate`), evaluated left-to-right. If every operand is absent, the last operand’s value is returned verbatim (still absent). `Nothing` passes through without selecting a fallback.
+Return the first operand that is not ABSENT (`Missing`, `NaN`, or a point whose coordinates are all `NaN`), evaluated left-to-right. If every operand is absent, the last operand’s value is returned verbatim (still absent). `Nothing` passes through without selecting a fallback.
 
 ```epsil
 Coalesce(missing, NaN, 3, 4)
@@ -10161,9 +10407,9 @@ type string is Copyable
 
 ### DeclareProtocol
 
-`(string | symbol, members: dictionary<any>?) scope -> nothing`
+`(string | symbol, members: dictionary<any>?, parents: any?) scope -> nothing`
 
-Declare a PROTOCOL: a set of function and property requirements a type may declare itself to satisfy. Protocols are engine-global (not lexically scoped) and are NOT types, so this is only valid at the top level of a program. The name is a symbol (or a string); the optional members ride as a dictionary of `member -> ["Pair", "function"|"readonly"|"readwrite", signature]`, with the signature as a type-expression string. A `function` member's first parameter must be typed `Self`, the substitution token standing for the conforming type. A protocol with no members is a SEMANTIC protocol (a marker). Evaluates to `Nothing`.
+Declare a PROTOCOL: a set of function and property requirements a type may declare itself to satisfy. Protocols are engine-global (not lexically scoped) and are NOT types, so this is only valid at the top level of a program. The name is a symbol (or a string); the optional members ride as a dictionary of `member -> ["Pair", "function"|"readonly"|"readwrite", signature]`, with the signature as a type-expression string. A `function` member's first parameter must be typed `Self`, the substitution token standing for the conforming type. A protocol with no members is a SEMANTIC protocol (a marker). An optional third operand `["List", parent, …]` names the protocols this one EXTENDS: a type that conforms to it conforms to each of them, and its implementation block may implement their members. The members operand is then required (`["Dictionary"]` when there are none). Evaluates to `Nothing`.
 
 ```epsil
 protocol Area { function area(self: Self) -> number }
@@ -10285,61 +10531,13 @@ evaluateAt(x => x^2, 1, 3)
 
 MathJSON `FindRoot` · `(any, any, dictionary?) -> dictionary`
 
-FindRoot(equations, params): numerically find parameter values that
+FindRoot(equations, params): numerically find parameter values that zero the residuals. `equations` is an equation (`lhs == rhs`), a bare residual expression (read as `= 0`), or a list of either. `params` is a list of specs (a bare symbol, `(a, a0)`, or `(a, a0, lo, hi)` with box constraints), matching `FindFit`. Returns a record &#123;parameters, converged, stationary, residualNorm, iterations&#125;.
 
-zero the residuals. `equations` is an equation (`lhs == rhs`), a bare
+`converged` is true only at a root: every residual is within the engine's tolerance scaled by its own equation, `|r_i| ≤ tolerance · (1 + Σ_j |J_ij| · max(1, |θ_j|))`, with `J` the Jacobian and `θ` the parameters, so a minimum of the sum of squared residuals that is not a root (`a^2 + 1 = 0`) is `converged: False`.
 
-residual expression (read as `= 0`), or a list of either. `params` is
+When the residual is above `tolerance`, the residual itself must confirm the Jacobian term: with each parameter moved by `±2 · tolerance · max(1, |θ_j|)` toward and away from the zero, the change of the residual is the change the Jacobian predicts to within half, and the residual reaches `tolerance`, changes sign, or touches 0 to within the rounding of the parameters. So a steep equation with no root (`2 - sin(10^18 a) = 0`) is not `converged` either.
 
-a list of specs (a bare symbol, `(a, a0)`, or `(a, a0, lo, hi)` with
-
-box constraints), matching `FindFit`. Returns a record
-
-&#123;parameters, converged, stationary, residualNorm, iterations&#125;.
-
-`converged` is true only at a root: every residual is within the
-
-engine's tolerance scaled by its own equation,
-
-`|r_i| ≤ tolerance · (1 + Σ_j |J_ij| · max(1, |θ_j|))`, with `J` the
-
-Jacobian and `θ` the parameters, so a minimum of the sum of squared
-
-residuals that is not a root (`a^2 + 1 = 0`) is `converged: False`.
-
-When the residual is above `tolerance`, the residual itself must
-
-confirm the Jacobian term: with each parameter moved by
-
-`±2 · tolerance · max(1, |θ_j|)` toward and away from the zero, the
-
-change of the residual is the change the Jacobian predicts to within
-
-half, and the residual reaches `tolerance`, changes sign, or touches
-
-0 to within the rounding of the parameters. So a steep equation with
-
-no root (`2 - sin(10^18 a) = 0`) is not `converged` either.
-
-`stationary` is the solver's own stop test, true at such a minimum
-
-too; a stacked system of data rows next to an equation reads it as
-
-`FindFit` reads `converged`. An optional third argument is the options
-
-dictionary of `FindFit`: `{global: {b: [lo, hi]}}` searches the
-
-named parameters (at most two) over the range for the lowest sum
-
-of squared residuals of the whole system; the constant phase
-
-coefficients of the equations (`3.22` in `cos(3.22 b + c)`) space
-
-the grid as the span of a variable does for a fit. With a kernel
-
-pool on the engine (`ce.workers`), `evaluateAsync()` scans the grid
-
-on the workers.
+`stationary` is the solver's own stop test, true at such a minimum too; a stacked system of data rows next to an equation reads it as `FindFit` reads `converged`. An optional third argument is the options dictionary of `FindFit`: `{global: {b: [lo, hi]}}` searches the named parameters (at most two) over the range for the lowest sum of squared residuals of the whole system; the constant phase coefficients of the equations (`3.22` in `cos(3.22 b + c)`) space the grid as the span of a variable does for a fit. With a kernel pool on the engine (`ce.workers`), `evaluateAsync()` scans the grid on the workers.
 
 ```epsil
 findRoot(x^2 - 2, [(x, 1)])
@@ -10350,11 +10548,18 @@ findRoot(x^2 - 2, [(x, 1)])
 
 `(expression, (function | symbol)*) -> function`
 
-A function literal
+Function(body, param1, param2, …): a function literal.
+
+A parameter is a symbol, `Typed(symbol, type)`, a rest parameter `Spread(symbol)` (last), a destructuring pattern `Tuple(…)`, or a parameter with a default value `Optional(param, default)`, where `param` is a symbol or `Typed(symbol, type)` and `default` is a number, a string, `True`, `False`, a symbol, `List()` or `Dictionary()`. The parameters with a default come after the required ones. A call that supplies the required parameters is a full call: each parameter it leaves out receives its default.
 
 ```epsil
 (x => x^2 + 1)(3)
 // ➔ 10
+```
+
+```epsil
+((x, k = 2) => x * k)(3)
+// ➔ 6
 ```
 
 ### geometricVector
@@ -10405,23 +10610,11 @@ Hold(1 + 2)
 
 `(any, any?) -> expression`
 
-HoldValues(body): evaluate `body` with its assigned free symbols
+HoldValues(body): evaluate `body` with its assigned free symbols shielded — each such symbol becomes a pure symbol (its declared type and in-scope assumptions apply, its assigned value does NOT) for the duration. The value-blind counterpart of evaluating `body` directly; analogous to Mathematica's `Block[{x}, …]`.
 
-shielded — each such symbol becomes a pure symbol (its declared type
+HoldValues(body, [x, y]): shield only the listed symbols (a List, Set, Tuple, or a single symbol); every other symbol resolves normally.
 
-and in-scope assumptions apply, its assigned value does NOT) for the
-
-duration. The value-blind counterpart of evaluating `body` directly;
-
-analogous to Mathematica's `Block[{x}, …]`.
-
-HoldValues(body, [x, y]): shield only the listed symbols (a List,
-
-Set, Tuple, or a single symbol); every other symbol resolves normally.
-
-Constants (`Pi`, `ExponentialE`, …) are never shielded, assumptions
-
-survive the shield, and the global values are intact afterwards.
+Constants (`Pi`, `ExponentialE`, …) are never shielded, assumptions survive the shield, and the global values are intact afterwards.
 
 ```epsil
 let x = 5
@@ -10510,7 +10703,7 @@ isError(1 + 1)
 
 MathJSON `IsMissing` · `(any) -> boolean`
 
-True for `Missing`, `Undefined`, `NaN`, or `Indeterminate`, regardless of provenance. `Nothing` is not an absent datum.
+True for `Missing`, `NaN`, or a point whose coordinates are all `NaN`, regardless of provenance. `Nothing` is not an absent datum.
 
 ```epsil
 [isMissing(missing), isMissing(NaN), isMissing(0)]
@@ -10558,18 +10751,14 @@ A value that is absent but whose position is preserved (Julia `missing`, R `NA`)
 
 ```epsil
 missing + 1
-// ➔ NaN
+// ➔ "Missing"
 ```
 
 ### N
 
 `(any, (integer | list<number>)?) -> unknown`
 
-N(expr): numerically evaluate an expression
-
-N(expr, precision): evaluate to `precision` significant digits
-
-N(expr, [precision, accuracy]): evaluate with a precision goal and an accuracy goal
+N(expr): numerically evaluate an expression N(expr, precision): evaluate to `precision` significant digits N(expr, [precision, accuracy]): evaluate with a precision goal and an accuracy goal
 
 ```epsil
 N(pi)
@@ -10592,19 +10781,9 @@ MathJSON `NSolve` · `(any, any*) -> list`
 
 NSolve(equation, unknown): the solutions of an equation as floats.
 
-It is Mathematica `NSolve`: it takes the same operands as `Solve`,
+It is Mathematica `NSolve`: it takes the same operands as `Solve`, including domain specs and systems of equations, and gives the `N` of each solution of `Solve`:
 
-including domain specs and systems of equations, and gives the `N` of
-
-each solution of `Solve`:
-
-`NSolve(x^2 == 2, x)` → `[1.414…, -1.414…]`. When `Solve` finds no
-
-solution set, `NSolve` stays unevaluated: for a polynomial `Solve`
-
-already gives numeric roots when there is no closed form, and
-
-`FindRoot` gives one local root from a start value.
+`NSolve(x^2 == 2, x)` → `[1.414…, -1.414…]`. When `Solve` finds no solution set, `NSolve` stays unevaluated: for a polynomial `Solve` already gives numeric roots when there is no closed form, and `FindRoot` gives one local root from a start value.
 
 ```epsil
 nSolve(x^2 == 2, x)
@@ -10615,21 +10794,13 @@ nSolve(x^2 == 2, x)
 
 `(string, any) -> nothing`
 
-NamedArgument(name, value): one named argument of a call (Epsil
-
-surface syntax: `f(rate: 0.05)`).
+NamedArgument(name, value): one named argument of a call (Epsil surface syntax: `f(rate: 0.05)`).
 
 A parse-level carrier, like `Spread`, but one that never survives:
 
-the enclosing call consumes it at canonicalization, permuting the
+the enclosing call consumes it at canonicalization, permuting the written arguments into the order its callee declares.
 
-written arguments into the order its callee declares.
-
-Reaching this definition therefore means the carrier was NOT
-
-consumed — the callee supplied no parameter names to match — which
-
-is the `argument-names-unavailable` error.
+Reaching this definition therefore means the carrier was NOT consumed — the callee supplied no parameter names to match — which is the `argument-names-unavailable` error.
 
 ```epsil
 ((x, y) => x - y)(y: 2, x: 10)
@@ -10640,11 +10811,11 @@ is the `argument-names-unavailable` error.
 
 MathJSON `Nothing` · variable `nothing`
 
-The absence of a value; the sole member of the unit type.
+The value of an empty block or of a statement with no value; the sole member of the unit type. A list keeps it as an element.
 
 ```epsil
 [1, nothing, 2]
-// ➔ [1,2]
+// ➔ [1,"Nothing",2]
 ```
 
 ### numberFrom
@@ -10676,6 +10847,21 @@ Numerically evaluate an expression, as the `.N()` method does (engine-internal).
 `(any, string?) -> unknown`
 
 Provenance head for the snapshot of a mutable object: `["Object", <record>, "'TypeName'"]`. The record holds the object's stored fields at the moment it was serialized; the second operand names the nominal type the object had. Not a constructor and not an ascription — it wraps data, it does not make an object.
+
+### Optional
+
+`(any, any) -> nothing`
+
+Optional(param, default): a parameter of a function literal with a default value (Epsil surface syntax: `(x, k = 2) => x * k`).
+
+A call that leaves out the argument of the parameter receives the default. `param` is a symbol or `Typed(symbol, type)`; `default` is a number, a string, `True`, `False`, a symbol, `[]` or `{}`.
+
+A parse-level carrier, like `Spread`: only the parameter list of a `Function` literal reads it. Anywhere else it is the `unexpected-argument` error.
+
+```epsil
+((x, k = 2) => x * k)(3)
+// ➔ 6
+```
 
 ### OverParen
 
@@ -10838,9 +11024,7 @@ Random(): non-deterministic real in [0, 1)
 
 Random(Interval(a, b)): a real in [a, b) (endpoint markers ignored)
 
-Random(Range(...)): an element of the range
-
-Random(xs): an element of the finite collection `xs`
+Random(Range(...)): an element of the range Random(xs): an element of the finite collection `xs`
 
 ```epsil
 random()
@@ -10885,17 +11069,9 @@ ReleaseHold(Hold(1 + 2))
 
 MathJSON `ReplaceAll` · `(any, any+) -> any`
 
-ReplaceAll(expr, rules): apply one or more replacement rules to `expr`,
+ReplaceAll(expr, rules): apply one or more replacement rules to `expr`, then evaluate the result (Mathematica `expr /. rules`).
 
-then evaluate the result (Mathematica `expr /. rules`).
-
-A rule is `Rule(lhs, rhs)`, or `lhs -> rhs` in LaTeX (parsed as `To`;
-
-in Epsil `->` builds a dictionary entry, which is not a rule). Several
-
-rules may be given as extra arguments or as a `List`/`Set` of rules;
-
-they are applied simultaneously in a single pass.
+A rule is `Rule(lhs, rhs)`, or `lhs -> rhs` in LaTeX (parsed as `To`; in Epsil `->` builds a dictionary entry, which is not a rule). Several rules may be given as extra arguments or as a `List`/`Set` of rules; they are applied simultaneously in a single pass.
 
 ```epsil
 replaceAll(x^2 + x, Rule(x, 3))
@@ -10963,11 +11139,7 @@ MathJSON `Simplify` · `(any, any?) -> expression`
 
 Simplify(expr): simplify an expression.
 
-Simplify(expr, assumptions): simplify under one or more boolean
-
-assumptions (e.g. `x > 0`), or a `List`/`And` of them. The assumptions
-
-hold only for the duration of the simplification.
+Simplify(expr, assumptions): simplify under one or more boolean assumptions (e.g. `x > 0`), or a `List`/`And` of them. The assumptions hold only for the duration of the simplification.
 
 ```epsil
 simplify(sin(x)^2 + cos(x)^2)
@@ -10983,19 +11155,11 @@ simplify(sqrt(x^2), x > 0)
 
 MathJSON `Solve` · `(any, any*) -> list`
 
-Solve(equation, unknown): the list of solutions of an equation for the
+Solve(equation, unknown): the list of solutions of an equation for the unknown. The equation may be an `Equal` expression or a bare expression (read as `= 0`), e.g. `Solve(x^2 - 1 == 0, x)` or `Solve(x^2 - 1, x)`.
 
-unknown. The equation may be an `Equal` expression or a bare expression
+The unknown may be omitted: it defaults to the equation's single free variable, or to `x` when there are several and one of them is `x`.
 
-(read as `= 0`), e.g. `Solve(x^2 - 1 == 0, x)` or `Solve(x^2 - 1, x)`.
-
-The unknown may be omitted: it defaults to the equation's single free
-
-variable, or to `x` when there are several and one of them is `x`.
-
-Solve([eq1, eq2, …], [x, y, …]): solve a system of equations; each
-
-solution is a tuple of values in the order of the variable list, e.g.
+Solve([eq1, eq2, …], [x, y, …]): solve a system of equations; each solution is a tuple of values in the order of the variable list, e.g.
 
 Solve([x + y == 3, x - y == 1], [x, y]) → [(2, 1)].
 
@@ -11024,15 +11188,9 @@ sphere(O, r)
 
 `(any) -> unknown`
 
-Spread(t): splice the elements of the tuple `t` into the enclosing
+Spread(t): splice the elements of the tuple `t` into the enclosing argument list (Epsil surface syntax: `f(...t)`).
 
-argument list (Epsil surface syntax: `f(...t)`).
-
-A literal tuple splices at canonicalization; a symbolic argument is
-
-spliced by the enclosing call at evaluation (step 0 of the evaluate
-
-path), which re-validates the resulting arity.
+A literal tuple splices at canonicalization; a symbolic argument is spliced by the enclosing call at evaluation (step 0 of the evaluate path), which re-validates the resulting arity.
 
 ```epsil
 max(...(4, 9, 2))
@@ -11411,21 +11569,11 @@ WildcardSequence(x)
 
 MathJSON `WithRandomSeed` · `(real | string, any) -> expression`
 
-WithRandomSeed(seed, body): evaluate `body` with a random seed frame
+WithRandomSeed(seed, body): evaluate `body` with a random seed frame seeded by `seed` (a finite real or a string). The block replays identically, while repeated draws WITHIN the frame differ (the n-th draw is hash(seed, n)).
 
-seeded by `seed` (a finite real or a string). The block replays
+Scoping is dynamic: the frame is active through user-function calls, not just lexically inside `body`. Frames nest and the innermost wins.
 
-identically, while repeated draws WITHIN the frame differ (the n-th
-
-draw is hash(seed, n)).
-
-Scoping is dynamic: the frame is active through user-function calls,
-
-not just lexically inside `body`. Frames nest and the innermost wins.
-
-Counters are per-frame, so a nested frame does not perturb its
-
-parent's subsequent draws.
+Counters are per-frame, so a nested frame does not perturb its parent's subsequent draws.
 
 Outside any frame, draws are live (non-deterministic).
 
@@ -11442,7 +11590,7 @@ Source: https://epsil.dev/reference/control-structures/
 
 # Control structures
 
-The 13 definitions of the control structures library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The 12 definitions of the control structures library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
@@ -11507,8 +11655,8 @@ fixedPoint(cos, 1.0)
 
 `(expression, expression, expression?) -> any`
 
-`If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is `Missing` when `c` is `False`. Only the selected expression is evaluated.
-When `c` is a list of booleans (`L < 3` with `L` a list), the selection is made at each position and the value is a list: `If([True, False, True], 1, 0)` is `[1, 0, 1]`, and with `L = [1, 3, 5]`, `If(L < 3, L, 0)` is `[1, 0, 0]`. `If(c, e1, e2)` is then `Which(c, e1, True, e2)`: see `Which` for the rules of element-wise selection.
+`If(c, e1, e2)` evaluates to `e1` when `c` is `True` and to `e2` otherwise; without `e2` it is the absent value of the domain of `e1` when `c` is `False`: `NaN` for a number, `Missing` otherwise, as for a restriction `e1\{c\}`, which parses to `If(c, e1)`. Only the selected expression is evaluated.
+When `c` is a flat list of booleans (`L < 3` with `L` a list), the selection is made at each position and the value is a list: `If([True, False, True], 1, 0)` is `[1, 0, 1]`, and with `L = [1, 3, 5]`, `If(L < 3, L, 0)` is `[1, 0, 0]`. `If(c, e1, e2)` is `Which(c, e1, True, e2)`: see `Which` for the rules of element-wise selection. A condition that is a scalar selects an arm whole, also when the arm is a list.
 
 ### Loop
 
@@ -11534,27 +11682,15 @@ A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, bo
 
 Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure.
 
-### when
-
-MathJSON `When` · `(expression, boolean) -> any`
-
-Conditional/restriction value. `When(e, cond)` evaluates to:
-  - `e` when `cond` evaluates to `True`
-  - the absence marker of the type of `e` when `cond` evaluates to `False` (the "masking rule"): `NaN` for a number, `Missing` — the position-preserving absent datum, the answer a selection with no selected branch gives — for a point, a list, a string or a value not provably numeric; consumers like 2D plotters skip masked points
-  - `When(e, cond_simplified)` when `cond` is indeterminate (holds)
-Stacked restrictions canonicalize: `When(When(e, c1), c2)` → `When(e, And(c1, c2))`.
-Compiles to ternary `(cond) ? (e) : NaN` in JS and GLSL.
-
 ### Which
 
 `(expression+) -> unknown`
 
 `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. A last clause with the condition `True` is the default. Only the selected expression is evaluated.
-Element-wise selection: when a condition is a list of booleans (`L < 3` with `L` a list), the selection is made at each position, as `numpy.select` does, and the value is a list. At each position, the first clause whose condition is `True` there gives the value: an expression that is a list gives its element at that position, any other expression gives its own value. With `L = [1, 3, 5]`, `Which(L < 2, 10, L < 4, L, True, 0)` is `[10, 3, 0]`.
+Element-wise selection: when a condition is a flat list of booleans (`L < 3` with `L` a list), the selection is made at each position, as `numpy.select` does, and the value is a list. At each position, the first clause whose condition is `True` there gives the value: an expression that is a list gives its element at that position, any other expression gives its own value. With `L = [1, 3, 5]`, `Which(L < 2, 10, L < 4, L, True, 0)` is `[10, 3, 0]`.
   - A condition that is not a list applies to every position.
-  - Every list must have the length of the condition, else the value is an `incompatible-dimensions` error.
-  - A position that no clause selects holds `NaN` when every expression is a number, `Missing` otherwise.
-  - A condition that is a list of lists (a comparison of a matrix) selects at every level; an expression with fewer levels than the condition is an `incompatible-dimensions` error, one with more levels is taken whole at each position.
+  - Every expression is a number, a point, or a flat list of numbers or of points with the length of the condition, and all have one kind. A nested list, a list of another length, a string and a list of strings are static errors, as is a condition that is a nested list or holds a `Missing` cell. A relation (a boolean) is accepted.
+  - A position that no clause selects holds `NaN` for a number, a point whose coordinates are `NaN` for a point, and `Missing` for a boolean.
 
 ---
 
@@ -12054,7 +12190,7 @@ any([1, 3, 4], x => x % 2 == 0)
 
 ### append
 
-MathJSON `Append` · `(collection<any>, (missing | value)+) -> collection`
+MathJSON `Append` · `(collection<any>, any+) -> collection`
 
 Add one or more elements to the end of a collection.
 
@@ -12449,10 +12585,6 @@ Return the elements of the collection for which the predicate function returns T
 
 Equivalent to `[x for x in xs if p(x)]`.
 
-Immediate `Nothing` inputs are dropped without calling the predicate.
-
-`Missing` and markers nested inside a datum still reach the predicate.
-
 ```epsil
 filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 // ➔ [2,4,6]
@@ -12462,7 +12594,7 @@ filter([1, 2, 3, 4, 5, 6], x => x % 2 == 0)
 
 MathJSON `Find` · `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any`
 
-Return the first element of the collection satisfying the predicate, or Nothing if none found.
+Return the first element of the collection satisfying the predicate. When no element satisfies it, return the absent value of the domain of the elements: `NaN` for numbers, a point whose coordinates are all `NaN` for points, and `Missing` otherwise.
 
 ```epsil
 find([1, 4, 9, 16], x => x > 5)
@@ -12747,21 +12879,9 @@ MathJSON `Map` · `(mapping: (T) any -> U, collection<T>+) -> indexed_collection
 
 Return the collection where each element has been transformed by the mapping function.
 
-With a single collection, equivalent to `[f(x) for x in xs]`. With
+With a single collection, equivalent to `[f(x) for x in xs]`. With multiple collections, combines them element-wise (like `zipWith`): 
 
-multiple collections, combines them element-wise (like `zipWith`): 
-
-`Map(f, xs, ys) = [f(x1, y1), f(x2, y2), …]`, with the length of the
-
-shortest input. The mapping function is always the FIRST argument.
-
-An immediate `Nothing` input bypasses the callback and remains `Nothing`
-
-at that position. With multiple sources, any `Nothing` coordinate bypasses
-
-the whole callback. Nested `Nothing` and `Missing` are passed to the callback.
-
-The view keeps its raw length; `ListFrom` materializes it and omits `Nothing`.
+`Map(f, xs, ys) = [f(x1, y1), f(x2, y2), …]`, with the length of the shortest input. The mapping function is always the FIRST argument.
 
 ```epsil
 map(x => x^2, [1, 2, 3])
@@ -13127,11 +13247,11 @@ Range(1, 10, 3)
 
 ### rangeOf
 
-MathJSON `RangeOf` · `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> nothing | range where T`
+MathJSON `RangeOf` · `(indexed_collection<T>, indexed_collection<T>, from: integer?) -> missing | range where T`
 
-Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Nothing` when it does not occur.
+Return the 1-based inclusive index span of the first occurrence of `needle` as a contiguous subsequence of the indexed collection, or `Missing` when it does not occur.
 
-The search starts at index `from` (1 by default) and the span is always expressed in the original collection's indices, so `RangeOf(xs, needle, Last(r) + 1)` finds the next non-overlapping occurrence and the loop ends at `Nothing`.
+The search starts at index `from` (1 by default) and the span is always expressed in the original collection's indices, so `RangeOf(xs, needle, Last(r) + 1)` finds the next non-overlapping occurrence and the loop ends at `Missing`.
 
 On a string the needle is matched character by character, so a match never begins or ends inside a grapheme cluster.
 
@@ -13340,7 +13460,7 @@ Single(5)
 
 ### slice
 
-MathJSON `Slice` · `((value: T, span: range) -> T where T: string) & ((value: T, span: nothing | range) -> T | nothing where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, span: nothing | range) -> list<T> | nothing where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)`
+MathJSON `Slice` · `((value: T, span: range) -> T where T: string) & ((value: T, start: number, end: number) -> T where T: string) & ((value: indexed_collection<T>, span: range) -> list<T> where T: any) & ((value: indexed_collection<T>, start: number, end: number) -> list<T> where T: any)`
 
 Return a contiguous run of elements from an indexed collection.
 
@@ -13441,13 +13561,7 @@ symmetricDifference({1, 2, 3}, {2, 3, 4})
 
 MathJSON `Table` · `(function, integer, integer?) -> collection`
 
-An alias for `Tabulate` (the preferred name) that additionally accepts
-
-Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from
-
-1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`,
-
-and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
+An alias for `Tabulate` (the preferred name) that additionally accepts Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from 1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`, and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
 
 ```epsil
 table(i^2, (i, 1, 5))
@@ -13884,7 +13998,7 @@ Negated approximately-not-equal relation.
 
 ### NotEqual
 
-`(any, any) -> boolean`
+`(any, any*) -> boolean`
 
 Inequality comparison (not equal to).
 
@@ -14155,12 +14269,11 @@ apart.
   direction. Arithmetic on a signed
   infinity (`oo`, `-oo`) gives a signed infinity.
 - An **indeterminate form**, such as `0/0`, `oo - oo` or `oo * 0`, gives
-  `Indeterminate`: an exact question with no value. With a float operand
-  (`0.0/0.0`), and under `N`, it gives `NaN`.
+  `NaN`: a question with no value.
 
 ```epsil
 [1/0, 0/0, oo + 1, oo - oo, oo * 0, 1/oo]
-// ➔ [~oo, Indeterminate, +oo, Indeterminate, Indeterminate, 0]
+// ➔ [~oo, NaN, +oo, NaN, NaN, 0]
 ```
 
 `NaN` propagates: a numeric function of `NaN` is `NaN`. This is true for
@@ -14850,20 +14963,20 @@ The imaginary unit, whose square is −1.
 
 ### Indeterminate
 
-constant `number` = `Indeterminate`
+constant `number` = `NaN`
 
-Indeterminate, the exact answer to an indeterminate form such as 0/0: a number with no value. Its numeric approximation is NaN.
+An input spelling of NaN.
 
 ```epsil
-[0/0, Indeterminate + 1, N(0/0)]
-// ➔ [Indeterminate,Indeterminate,NaN]
+[Indeterminate, Indeterminate + 1]
+// ➔ [NaN,NaN]
 ```
 
 ### infimum
 
 MathJSON `Infimum` · `(value*) -> number`
 
-Like Min, but defined for open sets. Nothing data are omitted.
+Like Min, but defined for open sets.
 
 ```epsil
 [infimum(1, 3, 2), infimum(interval(0, 1))]
@@ -15044,7 +15157,7 @@ N(machineEpsilon)
 
 MathJSON `Max` · `(value*) -> number`
 
-Maximum of two or more numbers. Nothing data are omitted.
+Maximum of two or more numbers.
 
 ```epsil
 [max(3, 7, 2), max([3, 7, 2])]
@@ -15071,7 +15184,7 @@ N(measurement(5, 0.2) * measurement(3, 0.4))
 
 MathJSON `Min` · `(value+) -> number`
 
-Minimum of two or more numbers. Nothing data are omitted.
+Minimum of two or more numbers.
 
 ```epsil
 [min(3, 7, 2), min([3, 7, 2])]
@@ -15104,11 +15217,11 @@ Product of two or more values.
 
 constant `number` = `NaN`
 
-Not a Number, the result of a floating-point operation that is undefined or unrepresentable, such as 0.0/0.0. An exact form with no value, such as 0/0, is Indeterminate.
+Not a Number, the result of a floating-point operation that is undefined or unrepresentable, such as 0.0/0.0, or of an exact form with no value, such as 0/0.
 
 ```epsil
-[NaN + 1, 0.0/0.0]
-// ➔ [NaN,NaN]
+[NaN + 1, 0.0/0.0, 0/0]
+// ➔ [NaN,NaN,NaN]
 ```
 
 ### Negate
@@ -15225,7 +15338,7 @@ PreIncrement(5)
 
 MathJSON `Product` · `(any, tuple*) -> number`
 
-`Product(f, a, b)` computes the product of `f` from `a` to `b`. Nothing factors are omitted.
+`Product(f, a, b)` computes the product of `f` from `a` to `b`.
 
 ```epsil
 product(k, (k, 1, 5))
@@ -15378,7 +15491,7 @@ Difference between two or more values.
 
 MathJSON `Sum` · `(any, tuple*) -> number`
 
-`Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L`. Nothing terms are omitted.
+`Sum(f, [a, b])` computes the sum of `f` from `a` to `b`; `Sum(L)` sums the elements of a collection `L`.
 
 ```epsil
 sum(k^2, (k, 1, 10))
@@ -15394,7 +15507,7 @@ sum(1/k^2, (k, 1, oo))
 
 MathJSON `Supremum` · `(value*) -> number`
 
-Like Max, but defined for open sets. Nothing data are omitted.
+Like Max, but defined for open sets.
 
 ```epsil
 [supremum(1, 3, 2), supremum(interval(0, 1))]
@@ -16394,17 +16507,11 @@ Piecewise-quartic dense-output interpolant of a numeric ODE solution (produced b
 
 MathJSON `JacobianMatrix` · `(any, any?) -> value`
 
-JacobianMatrix(fs, vars): the matrix of partial derivatives
+JacobianMatrix(fs, vars): the matrix of partial derivatives ∂fᵢ/∂xⱼ, one row per function and one column per variable.
 
-∂fᵢ/∂xⱼ, one row per function and one column per variable.
+`fs` is a list of expressions. A single (non-list) expression is the gradient case: the result is the flat vector [∂f/∂x₁, …, ∂f/∂xₙ].
 
-`fs` is a list of expressions. A single (non-list) expression is the
-
-gradient case: the result is the flat vector [∂f/∂x₁, …, ∂f/∂xₙ].
-
-`vars` is a list of symbols and may be omitted, in which case the
-
-free variables of `fs` are used, in lexicographic order.
+`vars` is a list of symbols and may be omitted, in which case the free variables of `fs` are used, in lexicographic order.
 
 Example: JacobianMatrix([x^2 y, x + z], [x, y, z]).
 
@@ -16412,7 +16519,15 @@ Example: JacobianMatrix([x^2 y, x + z], [x, y, z]).
 
 MathJSON `Limit` · `(function, point: number, direction: number?) -> number`
 
-Limit of a function
+Limit of a function.
+
+Limit(f, x, a) is the limit of f as x approaches a.
+
+Limit(f, a) does not write the variable: it is the first, in sorted order (an uppercase letter before a lowercase one), of the symbols that the expression f reads from outside: not a constant, a library name, a function, or a symbol bound inside f such as the index of a Sum. A symbol with an assigned value is a candidate too, so an assignment does not change the variable. A bare symbol f names a function: Limit(Sin, a) is the limit of sin(t) as t approaches a.
+
+The variable is bound: it never takes the value assigned to a symbol of the same name.
+
+Example: Limit(Sqrt(x), 3) is sqrt(3), also after x := 4.
 
 ### Limits
 
@@ -16448,7 +16563,11 @@ Numerical approximation of a definite integral.
 
 MathJSON `NLimit` · `(function, point: number, direction: number?) -> number`
 
-Numerical approximation of the limit of a function
+Numerical approximation of the limit of a function.
+
+NLimit(f, a) finds its variable with the same rule as Limit(f, a):
+
+the first of the symbols written in the expression f, in sorted order, also when it has an assigned value. A bare symbol f names a function.
 
 ### normal
 
@@ -18307,7 +18426,7 @@ Regularized incomplete beta function I_x(a, b)
 
 ### binCounts
 
-MathJSON `BinCounts` · `(collection<nothing | number>, list<number> | number) -> list<number>`
+MathJSON `BinCounts` · `(collection<number>, list<number> | number) -> list<number>`
 
 Count the number of elements falling into each bin.
 
@@ -18330,15 +18449,15 @@ Cumulative distribution function P(X ≤ x) of a distribution.
 
 ### correlation
 
-MathJSON `Correlation` · `(collection<nothing | number | tuple>, collection<nothing | number>?) -> nan | real<-1..1>`
+MathJSON `Correlation` · `(collection<number | tuple>, collection<number>?) -> nan | real<-1..1>`
 
-Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
+Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs.
 
 ### covariance
 
-MathJSON `Covariance` · `(collection<nothing | number | tuple>, collection<nothing | number>?) -> nan | real`
+MathJSON `Covariance` · `(collection<number | tuple>, collection<number>?) -> nan | real`
 
-Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
+Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs.
 
 ### erf
 
@@ -18384,7 +18503,7 @@ Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a)
 
 ### histogram
 
-MathJSON `Histogram` · `(collection<nothing | number>, list<number> | number) -> list<tuple<number, integer>>`
+MathJSON `Histogram` · `(collection<number>, list<number> | number) -> list<tuple<number, integer>>`
 
 Compute a histogram of the values in a collection. Returns a list of (bin start, count) tuples.
 
@@ -18395,15 +18514,15 @@ histogram([1, 2, 2, 3], 3)
 
 ### interquartileRange
 
-MathJSON `InterquartileRange` · `((collection<nothing | number> | number)+) -> +oo | nan | real<0..>`
+MathJSON `InterquartileRange` · `((collection<number> | number)+) -> +oo | nan | real<0..>`
 
-Interquartile range (Q3 - Q1) of a collection. Immediate Nothing data are omitted; sample sizes count retained data.
+Interquartile range (Q3 - Q1) of a collection.
 
 ### kurtosis
 
-MathJSON `Kurtosis` · `((collection<nothing | number> | number)+) -> nan | real`
+MathJSON `Kurtosis` · `((collection<number> | number)+) -> nan | real`
 
-Kurtosis of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Kurtosis of a collection of numbers.
 
 ### linearRegression
 
@@ -18413,15 +18532,15 @@ Least-squares linear fit b0 + b1·x. Returns Tuple(b0, b1), or the fitted expres
 
 ### mean
 
-MathJSON `Mean` · `((collection<nothing | number> | distribution | number)+) -> number`
+MathJSON `Mean` · `((collection<number> | distribution | number)+) -> number`
 
-Arithmetic mean (average) of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Arithmetic mean (average) of a collection of numbers.
 
 ### median
 
-MathJSON `Median` · `((collection<nothing | number> | number)+) -> nan | real | signed_infinity`
+MathJSON `Median` · `((collection<number> | number)+) -> nan | real | signed_infinity`
 
-Median of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Median of a collection of numbers.
 
 ```epsil
 median([3, 1, 4, 2])
@@ -18430,9 +18549,9 @@ median([3, 1, 4, 2])
 
 ### mode
 
-MathJSON `Mode` · `((collection<nothing | number> | number)+) -> nan | real | signed_infinity`
+MathJSON `Mode` · `((collection<number> | number)+) -> nan | real | signed_infinity`
 
-Most frequently occurring value in a collection. Immediate Nothing data are omitted; sample sizes count retained data.
+Most frequently occurring value in a collection.
 
 ```epsil
 mode([1, 2, 2, 3])
@@ -18465,21 +18584,21 @@ Least-squares polynomial fit of the given degree. Returns the ascending coeffici
 
 ### populationCovariance
 
-MathJSON `PopulationCovariance` · `(collection<nothing | number | tuple>, collection<nothing | number>?) -> nan | real`
+MathJSON `PopulationCovariance` · `(collection<number | tuple>, collection<number>?) -> nan | real`
 
-Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. An observation is skipped if either coordinate (or the whole row) is Nothing. Raw source lengths must match before omission; all terms use the same retained observations.
+Population covariance (n denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs.
 
 ### populationStandardDeviation
 
-MathJSON `PopulationStandardDeviation` · `((collection<nothing | number> | number)+) -> nan | real<0..>`
+MathJSON `PopulationStandardDeviation` · `((collection<number> | number)+) -> nan | real<0..>`
 
-Population Standard Deviation of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Population Standard Deviation of a collection of numbers.
 
 ### populationVariance
 
-MathJSON `PopulationVariance` · `((collection<nothing | number> | number)+) -> nan | real<0..>`
+MathJSON `PopulationVariance` · `((collection<number> | number)+) -> nan | real<0..>`
 
-Population variance of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Population variance of a collection of numbers.
 
 ### quantile
 
@@ -18489,9 +18608,9 @@ Quantile (inverse CDF): the least x with CDF(x) ≥ p, for p in [0, 1]. The firs
 
 ### quartiles
 
-MathJSON `Quartiles` · `((collection<nothing | number> | number)+) -> tuple<lower: nan | real | signed_infinity, mid: nan | real | signed_infinity, upper: nan | real | signed_infinity>`
+MathJSON `Quartiles` · `((collection<number> | number)+) -> tuple<lower: nan | real | signed_infinity, mid: nan | real | signed_infinity, upper: nan | real | signed_infinity>`
 
-Lower quartile, median, and upper quartile of a collection. Uses the Moore–McCabe (exclusive-hinges) convention: the sample is split at its median, and Q1/Q3 are the medians of the lower/upper halves with the overall median excluded from both halves when the sample size is odd. Immediate Nothing data are omitted; sample sizes count retained data.
+Lower quartile, median, and upper quartile of a collection. Uses the Moore–McCabe (exclusive-hinges) convention: the sample is split at its median, and Q1/Q3 are the medians of the lower/upper halves with the overall median excluded from both halves when the sample size is odd.
 
 ```epsil
 quartiles([1, 2, 3, 4, 5])
@@ -18506,9 +18625,9 @@ RandomSample(xs, k): a list of k elements drawn from the indexed collection `xs`
 
 ### skewness
 
-MathJSON `Skewness` · `((collection<nothing | number> | number)+) -> nan | real`
+MathJSON `Skewness` · `((collection<number> | number)+) -> nan | real`
 
-Skewness of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Skewness of a collection of numbers.
 
 ### slidingWindow
 
@@ -18528,9 +18647,9 @@ slidingWindow("abcd", 2)
 
 ### standardDeviation
 
-MathJSON `StandardDeviation` · `((collection<nothing | number> | distribution | number)+) -> nan | real<0..>`
+MathJSON `StandardDeviation` · `((collection<number> | distribution | number)+) -> nan | real<0..>`
 
-Sample Standard Deviation of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Sample Standard Deviation of a collection of numbers.
 
 ### uniformDistribution
 
@@ -18540,9 +18659,9 @@ Continuous uniform distribution on the interval [a, b].
 
 ### variance
 
-MathJSON `Variance` · `((collection<nothing | number> | distribution | number)+) -> nan | real<0..>`
+MathJSON `Variance` · `((collection<number> | distribution | number)+) -> nan | real<0..>`
 
-Sample variance of a collection of numbers. Immediate Nothing data are omitted; sample sizes count retained data.
+Sample variance of a collection of numbers.
 
 ---
 
@@ -19461,7 +19580,8 @@ it as (here `vec2`, the uniform to declare), and whether it was declared or
 inferred. When the target declines, `ok` is `false`, there is no `code`, and
 `error` and `diagnostic` give the reason. `to` is `javascript` (the default),
 `glsl`, `wgsl`, `python` or `interval-js`, and `mode` selects the arithmetic
-discipline: `auto` (the default), `strict` or `complex`.
+discipline: `strict` (the default), `complex` or, on `javascript` only,
+`bigint`.
 
 Each call uses a new engine. A symbol that is not declared has the type
 inferred from its uses, so declare the types the compilation depends on with
@@ -19815,7 +19935,7 @@ search by concept with `epsil doc <keywords>`.
   `StringJoin(xs, sep?)` to join ONE collection with an optional separator
   (a string subject means its characters, so `stringJoin("ab", "cd")` is
   `"acdb"`, not `"abcd"` — use `join` or `"\(a)\(b)"` to concatenate).
-  Substring search is `rangeOf(s, needle)` (a span, or `nothing`),
+  Substring search is `rangeOf(s, needle)` (a span, or `missing`),
   `containsSequence`, `startsWith`, `endsWith` — `c in s` is *character*
   membership. Also `StringReplace(s, target, replacement, count?)`,
   `trim`/`trimStart`/`trimEnd`, `stringRepeat`, `padStart`/`padEnd`,
@@ -19824,8 +19944,9 @@ search by concept with `epsil doc <keywords>`.
   string operation, and a dictionary lookup `d[c]`, accepts a character as the
   one-character string (`toUpperCase(s[1])`, no `String(c)` needed).
 - **Dictionaries**: `keys`, `values`.
-- **Absence**: `missing` preserves a missing position; `nothing` is omitted
-  from arguments and collections; `isMissing`, `Coalesce`.
+- **Absence**: `missing` preserves a missing position; `nothing` is the value
+  of an empty block, kept as an element like any other value; `isMissing`,
+  `Coalesce`.
 - **Symbolic**: `simplify`, `HoldValues(body)` (evaluate `body` with its
   assigned symbols kept symbolic), `solve(eq == v, x)`, `D(expr, x)`,
   `derivative(f)`, `integrate`, `N`, `type`, `isError(x)` (true for an error

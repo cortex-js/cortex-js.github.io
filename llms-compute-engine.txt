@@ -1644,7 +1644,9 @@ applies the function.
 
 Within one evaluation, the symbolic result of such a call is a value: it is
 not resolved again when the name is assigned later in the same evaluation.
-So `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
+So with `h` declared by `ce.declare('h', 'function')` (a first assignment of
+a name in a branch of an `If` is the error `first-assignment-in-branch`),
+`Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
 term `h(1)` was computed while `h` had no value, and the assignment at
 `k = 2` does not reach it. A later evaluation resolves the stored result
 again:
@@ -3972,6 +3974,15 @@ ce.declare("double", {
 }, { extend: true });
 ```
 
+An argument of the signature can have a default value, for example
+`"(x: number, factor: number = 2) -> number"`. A call that leaves out the
+argument gets the default value when it is made canonical, so the `evaluate`
+handler always receives every argument. The default fills only an argument
+that the call leaves out: an absent value that the call supplies (`Missing`,
+`NaN`) is passed as the argument. The default is a constant: a number, a
+boolean, a string, `[]`, `{}`, or a constant symbol. See
+[Default Values](/compute-engine/guides/types/#default-values).
+
 The optional `description` and `keywords` properties make a definition easier
 to discover with `ce.searchDefinitions()`. The search includes definition
 names, descriptions, synonyms, keywords, and associated LaTeX commands:
@@ -4247,11 +4258,8 @@ A hook that answers `undefined` declines, and the expression stays as it is.
 
 Three optional fields describe a value of the kind:
 
-- `isExact(value)` answers whether `value` is exact. The engine reads it for
-  the rule that an inexact operand changes an `Indeterminate` answer to
-  `NaN`: `Max(x, Indeterminate)` is `NaN` when `x` is inexact, and
-  `Indeterminate` when `x` is exact. Without `isExact`, every value of the
-  kind is exact. The library `Measurement` answers `false` for every value,
+- `isExact(value)` answers whether `value` is exact. Without `isExact`, every
+  value of the kind is exact. The library `Measurement` answers `false` for every value,
   and `Quantity` answers whether the magnitude is exact.
 - `isNaN(value)` answers whether `value` stands for no value, as the number
   `NaN` does. Such a value follows the rule of `NaN`: `Max`, `Min`,
@@ -5055,7 +5063,7 @@ ce.box(["Sin", ["Enclosure", 0, 1]]).N();
 ce.box(["Divide", 1, ["Enclosure", 0, 1]]).evaluate();
 // ➔ Enclosure(1, +oo)
 ce.box(["Ln", ["Enclosure", -2, -1]]).evaluate();
-// ➔ Indeterminate: the image is empty
+// ➔ NaN: the image is empty
 ```
 
 - **The endpoints.** The canonical form orders them (`Enclosure(2, 1)` is
@@ -5133,6 +5141,106 @@ interpreter leaves unevaluated declines, and with `fallback: true` the
 compilation throws instead of running the interpreter, because the fallback
 of this target would give a number to `x`. The code cannot be loaded again
 from its stored form, and an input typed `list<enclosure>` declines.
+
+### Declaring a Protocol
+
+A **protocol** names a set of functions that a type must implement. A type
+**conforms** to the protocol by giving an implementation of each function,
+and a call of the function then dispatches on the type of its first
+argument. Protocols are how a generic function says what it needs of its
+arguments without naming a type: "anything that can be compared", "anything
+that has a floor".
+
+`ce.declareProtocol()` declares the requirements. Each function takes the
+conforming type, written `Self`, as its first parameter:
+
+```js
+ce.declareProtocol("PartialOrder", {
+  functions: { compare: "(self: Self, other: Self) -> integer" },
+});
+```
+
+`ce.declareProtocolImplementation()` makes a type conform, with one
+JavaScript callback per function. The callbacks receive boxed expressions and
+return a value the engine boxes:
+
+```js
+ce.declareType("Money", "tuple<cents: integer>");
+
+ce.declareProtocolImplementation("Money", "PartialOrder", {
+  functions: {
+    compare: (a, b) => a.ops[0].re - b.ops[0].re,
+  },
+});
+
+const money = (cents) => ce.box(["Money", cents]);
+ce.box(["compare", money(250), money(100)]).evaluate().toString();
+// ➔ "150"
+```
+
+The callbacks are trusted like any host handler: the engine checks that every
+required function is given and that no unknown one is, but it cannot check
+the callbacks against the signatures. A second implementation of the same
+protocol for the same type throws (`protocol-implementation-duplicate`).
+
+`ce.conformsTo(type, protocol)` answers whether a type conforms, without
+calling anything. A conformance declared for a type holds for its subtypes:
+with an implementation for `number`, `ce.conformsTo("integer", "PartialOrder")`
+is `true`.
+
+#### Requiring conformance in a signature
+
+A generic function requires conformance with the `is` slot of a `where`
+clause. A call whose argument does not conform is rejected with
+`protocol-constraint-unsatisfied`:
+
+```js
+ce.declare("smallest", {
+  signature: "(a: T, b: T) -> T where T is PartialOrder",
+  evaluate: ([a, b]) =>
+    ce.box(["compare", a, b]).evaluate().re <= 0 ? a : b,
+});
+
+ce.box(["smallest", money(250), money(100)]).evaluate().toString();
+// ➔ "Money(100)"
+```
+
+#### Extending a protocol
+
+A protocol can **extend** others. It then has every requirement of its
+parents plus its own, and a type that conforms to it conforms to every
+parent. The parents must be declared first:
+
+```js
+ce.declareProtocol(
+  "FloorOrder",
+  { functions: { floor: "(self: Self) -> integer" } },
+  { extends: ["PartialOrder"] },
+);
+
+ce.declareProtocolImplementation("Money", "FloorOrder", {
+  functions: {
+    compare: (a, b) => a.ops[0].re - b.ops[0].re,
+    floor: (a) => Math.floor(a.ops[0].re / 100),
+  },
+});
+
+ce.conformsTo("Money", "PartialOrder"); // ➔ true
+ce.box(["floor", money(250)]).evaluate().toString(); // ➔ "2"
+```
+
+One implementation block supplies the inherited functions too; an inherited
+function that is left out is `protocol-implementation-missing`, unless the
+type already conforms to that parent. A member name is declared by one
+protocol of a hierarchy: a protocol cannot declare a function that a parent
+declares, and it cannot extend two parents that both declare a function of the
+same name. A protocol never loses a parent once declared.
+
+<ReadMore path="https://epsil.dev/protocols/" >
+Protocols are also declared in **Epsil**, with `protocol … { … }`,
+`type … is …` and `protocol A extends B, C`. The Epsil page describes the
+diagnostics, properties and conditional conformance. <Icon name="chevron-right-bold" />
+</ReadMore>
 
 ### Declaring the Effects of a Function
 
@@ -5439,6 +5547,95 @@ Only `console` and `entropy` have a handler today. The other capability labels
 (`network`, `fs_read`, `fs_write`, `time`, `environment`) will get one together
 with the first library operator that needs it.
 
+### Declaring the Role of Each Operand
+
+By default, an operator evaluates each of its operands before its `evaluate`
+handler runs, and a `lazy` operator evaluates none of them. The `operands`
+handler of a definition gives a **role** to each operand instead: it receives
+the operands of an application and returns one role per operand, in operand
+order. A position that the returned array leaves out has the default role:
+`value` for an operator that is not lazy, `raw` for a lazy operator.
+
+| Role | The operand is |
+| :--- | :--- |
+| `{ kind: "value" }` | a value: canonicalized, checked against the signature, and evaluated before the `evaluate` handler runs. In a `lazy` operator the operand is kept as written, and a bare `N` or `D` there is a variable, not the library operator. |
+| `{ kind: "held" }` | a value that the `evaluate` handler receives canonical but not evaluated, so that it can read the operand as written. The operand is checked against the signature and broadcast over a list as a `value` is. Not valid on a `lazy` operator. |
+| `{ kind: "statement" }` | a statement that the operator runs zero, one or several times (a loop body, a branch). An `Assign` or a `Declare` is valid there. The operand is canonicalized as a branch of an `If` is, and it is not evaluated before the handler. |
+| `{ kind: "raw" }` | kept as written, not canonicalized and not evaluated. Valid only on a `lazy` operator. |
+| `{ kind: "opaque" }` | kept as written, and an `Assign` or a `Declare` in it is valid (the expression of `Hold`). Valid only on a `lazy` operator. |
+| `{ kind: "bound", type? }` | a symbol that is a bound variable of the operator (the variable of `D`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
+| `{ kind: "clause", type? }` | an indexing set, such as `Limits(k, 1, 10)` or `Element(k, S)`, whose index is a bound variable of the operator (the clauses of `Sum`). See [Declaring an Operator that Binds a Variable](#declaring-an-operator-that-binds-a-variable). |
+
+An `Assign` or a `Declare` operand at a `value`, `held`, `raw`, `bound`
+or `clause` position is the error `assignment-in-operand`: an assignment is a
+statement, not a value.
+
+The roles should depend only on the number of operands and on their
+positions. When the operator is declared, the engine also calls the handler
+with zero to three `Nothing` operands, so that a role that is not valid for
+the operator is refused then: the handler must have no side effects.
+
+For example, `Do(body, n)` runs a statement `n` times. The count is a value,
+and the body is a statement:
+
+```js
+ce.declare("Do", {
+  signature: "(expression, integer) -> nothing",
+  operands: () => [{ kind: "statement" }, { kind: "value" }],
+  evaluate: ([body, n], { engine }) => {
+    for (let i = 0; i < n.re; i++) body.evaluate();
+    return engine.Nothing;
+  },
+});
+
+ce.box([
+  "Block",
+  ["Assign", "s", 0],
+  ["Do", ["Assign", "s", ["Add", "s", 1]], 5],
+  "s",
+]).evaluate();
+// ➔ 5
+```
+
+The body of `Do` is a branch: the engine cannot know how many times the
+operator runs it, so a first assignment there does not declare a variable. An
+assignment of a name that no enclosing scope declares is an error:
+
+```js
+ce.box(["Do", ["Assign", "t", 1], 3]);
+// ➔ ["Do", ["Error", ["ErrorCode", "'first-assignment-in-branch'", "'t'"]], 3]
+```
+
+A `held` operand lets a handler read an operand before it is evaluated, while
+the operator keeps the checks of an operator that is not lazy: the signature,
+the result type and the broadcast. This `ModP` computes `Fibonacci(n) mod p`
+without the value of `Fibonacci(n)`, which has more than 200,000 digits for
+`n = 10^6`:
+
+```js
+ce.declare("ModP", {
+  signature: "(integer, integer) -> integer",
+  operands: () => [{ kind: "held" }, { kind: "value" }],
+  evaluate: ([x, p], { engine }) => {
+    if (x.operator === "Fibonacci") {
+      const n = x.op1.evaluate().re;
+      const m = p.re;
+      let [a, b] = [0, 1];
+      for (let i = 0; i < n; i++) [a, b] = [b, (a + b) % m];
+      return engine.number(a);
+    }
+    return engine.function("Mod", [x.evaluate(), p]).evaluate();
+  },
+});
+
+ce.box(["ModP", ["Fibonacci", ["Power", 10, 6]], 1000]).evaluate();
+// ➔ 875
+ce.box(["ModP", ["Multiply", 3, 4], 5]).evaluate();
+// ➔ 2
+ce.box(["ModP", "'a'", 3]);
+// ➔ ["ModP", ["Error", ["ErrorCode", "'incompatible-type'", "'integer'", "'string'"], "'a'"], 3]
+```
+
 ### Declaring an Operator that Binds a Variable
 
 Some operators own a **bound variable**: the `k` of a summation, the `x` of a
@@ -5447,36 +5644,48 @@ must be a *new* variable belonging to the operator, shadowing any same-named
 symbol outside it, and it must stay symbolic even if a symbol of the same name
 has a value.
 
-**To declare a binder**, give the `scoped` property a **binding-site
-selector** instead of `true`. The selector tells the engine which operands are
-binding sites; the engine then declares those variables in the operator's own
-scope before your operands are canonicalized, and makes every occurrence in
-the other operands refer to that binding — consistently across the LaTeX,
+**To declare a binder**, give the operands that hold its bound variables the
+role `bound` or `clause` in the [`operands` handler](#declaring-the-role-of-each-operand).
+The engine then gives the operator its own scope, declares those variables in
+it before your operands are canonicalized, and makes every occurrence in the
+other operands refer to that binding — consistently across the LaTeX,
 MathJSON, and `ce.function()` routes.
 
-The prebuilt selectors cover the common shapes:
+- `{ kind: "bound", type? }` — the operand is a symbol that is a bound
+  variable (like the variables of `D`, or the expansion variable of
+  `Series`). An operand that is not a symbol declares nothing. As for `D`,
+  the variable stays a free variable of the expression: the value of
+  `D(x^2, x)` is a function of `x`.
+- `{ kind: "clause", type? }` — the operand is an indexing set whose index is
+  a bound variable: `["Limits", "k", 1, 10]`, `["Element", "k", collection]`
+  (`["Element", ["Tuple", "p", "q"], pairs]` binds both `p` and `q`), a tuple
+  `["Tuple", "k", 1, 10]`, or a symbol (like the clauses of `Sum`,
+  `Product`, `Integrate` or a comprehension). Consecutive `clause` operands
+  are read as the clauses of `Sum`: in `["MySum", body, "k", 1, "n"]`, the
+  operands after `k` are its bounds, so `k` is bound and `n` is not.
 
-- `operandSites(...indices)` — the operands at these positions are bare
-  bound-variable symbols (like `Series`' expansion variable).
-- `operandsFrom(first)` — every operand from position `first` on is a bound
-  variable (like `D`'s variadic differentiation variables).
-- `indexingSetSites(first)` — the first element of each `Element`- or
-  `Limits`-shaped operand from position `first` on is a bound variable (like
-  `Sum`, `Product`, or a comprehension: `["Element", "k", collection]`).
-- `limitsIndexSites(op)` — the index inside the single `Limits` operand at
-  position `op`.
+The optional `type` is the type of the variable (`unknown` when it is left
+out). For a `clause`, it applies to the index of a range such as `Limits`,
+narrowed to the range when the bounds are integer literals:
+`["Limits", "k", 1, 10]` with `type: "integer"` declares `k` as
+`integer<1..10>`. The index of an `Element` clause does not take `type`: it
+is `integer<1..16>` for `["Element", "k", ["Range", 1, 16]]`, and otherwise
+an inferred `unknown`. The index of a clause is not a free variable of the
+expression.
 
 For example, an operator that computes the maximum of an expression over an
 indexing set:
 
 ```js
-import { ComputeEngine, indexingSetSites } from "@cortex-js/compute-engine";
+import { ComputeEngine } from "@cortex-js/compute-engine";
 
 const ce = new ComputeEngine();
 
 ce.declare("MaxOver", {
   lazy: true,
-  scoped: indexingSetSites(1),
+  // The body is kept as written; the second operand is an indexing set
+  // whose index is the bound variable.
+  operands: () => [{ kind: "raw" }, { kind: "clause" }],
   signature: "(expression, expression) -> number",
   evaluate: (ops, { engine }) => {
     // A lazy operator receives its operands unevaluated: canonicalize
@@ -5515,9 +5724,19 @@ console.log(ce.parse("k").evaluate());
 
 A few notes:
 
-- `scoped: true` (without a selector) still means "this operator has a scope,
-  but no syntactic bound variables" — appropriate for `Block`-like operators
-  whose scope holds declarations.
+- The engine finds that an operator is a binder when the operator is
+  declared, from the calls of the `operands` handler with zero to three
+  `Nothing` operands. A handler that gives one role per position
+  (`(ops) => ops.map((_, i) => i === 0 ? { kind: "raw" } : { kind: "clause" })`)
+  or a fixed array does so. A `bound` or `clause` role that the handler
+  gives only for the operands of an application is an error.
+- `scoped: true` means "this operator has a scope, but no syntactic bound
+  variables" — appropriate for `Block`-like operators whose scope holds
+  declarations. The `scoped` flag is a boolean: a function as its value
+  throws an error.
+- A `statement` operand of a binder is canonicalized in the scope of the
+  operator, so an assignment of the bound variable there writes the bound
+  variable, not a same-named global.
 - With multiple indexing clauses, **later clauses see earlier bindings**: a
   collection expression in clause 2 may reference the index of clause 1, and a
   collection in clause 1 that mentions the *name* of clause 2's index refers
@@ -6101,8 +6320,9 @@ The same attributes dictionary carries the other definition attributes:
 - `bind: ["i"]` — with `hold`, the named parameters are **bound variables**:
   the call must pass a symbol there, and the parameter is substituted by that
   symbol in the body (`hold mySum(body, bind i, n) = Sum(body, i, 1, n)`),
-  the definition being installed as a binder (`scoped: operandSites(…)`), so
-  the call declares the symbol in its own scope like `Sum` does.
+  the definition being installed as a binder (the operand role `bound` at
+  each such position), so the call declares the symbol in its own scope like
+  `Sum` does.
 - `commutative`, `associative`, `idempotent`, `involution` — the operator
   flags of the same names, applied when a call is canonicalized. An
   associative function is binary; a flattened n-ary call is folded pairwise.
@@ -6557,19 +6777,30 @@ spelling appears only with `{canonical: false}`.
 
 The `else` branch is optional: `\keyword{if} x > 0 \keyword{then} x` parses to
 `["If", ["Less", 0, "x"], "x"]`. When it is omitted and the condition is false,
-no branch is selected and the result is `Missing` — the marker for a value the
-expression never supplied.
+no branch is selected and the result is the absent value of the branch: `NaN`
+for a number, a point of `NaN` coordinates for a point, and `Missing` — the
+marker for a value the expression never supplied — for any other value. Test
+for it with `IsMissing` or supply a value with
+`Coalesce` (`??`) before computing on it: compiled code carries the marker to
+those operators, but what any other operator makes of it (`Missing + 1`,
+`Missing > 0`) is not specified there; see
+[Caveats of compiled code](/compute-engine/guides/compiling/#values-that-are-absent).
 
 ### Local Bindings with `where`
 
 The `where` keyword binds variables to values in an expression:
 
 ```live
-console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1,\\; b \\coloneq 2").json);
-// ➔ ["Block", ["Declare", "a"], ["Assign", "a", 1],
-//             ["Declare", "b"], ["Assign", "b", 2],
+console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1, b \\coloneq 2").json);
+// ➔ ["Block", ["Declare", "a", "'unknown'", 1],
+//             ["Declare", "b", "'unknown'", 2],
 //             ["Add", "a", "b"]]
 ```
+
+Each binding declares its name with a value. A binding is a statement, so it
+cannot be an operand: `f(a \coloneq 2)` is the error `assignment-in-operand`,
+and `a \coloneq b \coloneq 1` is the syntax error `chained-assignment`. Write
+two statements instead.
 
 ### Loops
 
@@ -6583,13 +6814,23 @@ console.log(ce.parse("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyw
 ### Semicolon Blocks
 
 Semicolons separate statements in a block. When any statement is an assignment,
-the result is wrapped in a `Block` with automatic variable declarations:
+the result is wrapped in a `Block`. The first assignment of a name is its
+declaration, and it has a value:
 
 ```live
-console.log(ce.parse("x \\coloneq 3;\\; x^2 + 1").json);
-// ➔ ["Block", ["Declare", "x"], ["Assign", "x", 3],
+console.log(ce.parse("x \\coloneq 3; x^2 + 1").json);
+// ➔ ["Block", ["Declare", "x", "'unknown'", 3],
 //             ["Add", ["Power", "x", 2], 1]]
 ```
+
+A block that ends with an assignment has the value `Nothing`: end the block
+with the name. The first assignment of a name must be at the level of the
+block. In a branch of an `If`, in a loop body or in a case of a `Match`, it is
+the error `first-assignment-in-branch`: assign a value to the name before the
+branch. A use of a name before its declaration is the error
+`read-before-declaration`. A later assignment must keep the type of the local
+(a number can become another number, not a string); otherwise it is the error
+`assignment-type-mismatch`.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
 Read more about the **control structure** operators.
@@ -6680,28 +6921,44 @@ notation — only arity-1 forms are affected.
 ### Restriction Braces
 
 Trailing `\{cond\}` after an expression masks the value by a predicate. This
-parses to the `["When", expr, cond]` head:
+parses to a single-branch `["If", cond, expr]`:
 
 ```live
 console.log(ce.parse("f(x)\\left\\{0 < x < 2\\right\\}").json);
-// ➔ ["When", ["f", "x"], ["Less", 0, "x", 2]]
+// ➔ ["If", ["Less", 0, "x", 2], ["f", "x"]]
 ```
 
-When `cond` evaluates to `True`, the expression evaluates to its left
-operand; when `False`, to `Missing`, the absent-value marker — the same
-value a `Which` with no matching clause gives. Indeterminate predicates
-hold.
+When `cond` evaluates to `True`, the expression evaluates to `expr`; when
+`False`, to the absent value of `expr`: `NaN` for a number, a point of `NaN`
+coordinates for a point, and `Missing` for any other value. An undecided predicate holds the expression
+unevaluated. Discharge an absent value with `IsMissing` or `Coalesce`
+before computing on it when the expression is compiled.
 
-Stacked restrictions chain and canonicalize to a single `When` with an
-`And` predicate:
+The restriction applies to the whole of the smallest group that holds it:
+the whole statement (a relation included), one side of `\to`, the body of
+`for` or `where`, one comma item, the content of a delimiter or of a LaTeX
+argument, a piecewise condition or arm, the body of a big operator, or one
+operand of a logical connective.
+
+```live
+console.log(ce.parse("y=x^2\\{x>0\\}").json);
+// ➔ ["If", ["Less", 0, "x"], ["Equal", "y", ["Power", "x", 2]]]
+```
+
+Stacked restrictions in one group merge into a single `If` with an `And`
+condition, in written order:
 
 ```live
 console.log(ce.parse("x\\left\\{x>0\\right\\}\\left\\{x<10\\right\\}").json);
-// ➔ ["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
+// ➔ ["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]
 ```
 
-Standalone `\{1, 2, 3\}` (no preceding expression) continues to parse as a
-`Set` literal — the disambiguation is positional.
+A condition alone in braces, with no expression before it, is the value 1
+where the condition holds: `\{x>1\}` is `["If", ["Less", 1, "x"], 1]`.
+Standalone `\{1, 2, 3\}` continues to parse as a `Set` literal.
+
+The serializer does not write the brace: a single-branch `If` is written
+with `where`, for example `x^2\text{ where }0\lt x`.
 
 ### List Ranges
 
@@ -6757,7 +7014,7 @@ is parsed before the keyword fires. Bound names do not leak into the
 enclosing scope.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
-Read more about the `Loop` and `When` operators in the **control structures** reference.
+Read more about the `Loop` operator and restrictions in the **control structures** reference.
 </ReadMore>
 
 ## Customizing Parsing
@@ -7788,7 +8045,7 @@ list.
 
 ```javascript
 // `expr \operatorname{with} a = v_1, b = v_2` parses to
-// `Block(Declare(a), Assign(a, v_1), Declare(b), Assign(b, v_2), expr)`
+// `Block(Declare(a, "unknown", v_1), Declare(b, "unknown", v_2), expr)`
 {
   symbolTrigger: "with",
   kind: "infix",
@@ -7819,7 +8076,7 @@ list.
       const name = parser.binderSymbol(binding[1]);
       if (name === null) return null;
       names.add(name);
-      block.push(["Declare", name], ["Assign", name, binding[2]]);
+      block.push(["Declare", name, "unknown", binding[2]]);
       parser.skipVisualSpace();
     } while (parser.match(","));
     if (block.length === 0) return null;
@@ -7833,7 +8090,7 @@ list.
 
 With this entry and `n` declared `list<number>`,
 `n_{0}+1\operatorname{with}n_{0}=2` parses to
-`["Block", ["Declare", "n_0"], ["Assign", "n_0", 2], ["Add", "n_0", 1]]`
+`["Block", ["Declare", "n_0", "unknown", 2], ["Add", "n_0", 1]]`
 and evaluates to `3`; `n_{1}` outside the clause is still the first element
 of `n`.
 
@@ -8077,10 +8334,11 @@ ce.parse("n").type;
 ```
 
 Alternatively, to declare the type of a symbol you can evaluate a 
-`["Declare"]` expression
+`["Declare"]` expression. A `["Declare"]` expression has a value: without one
+it is the error `declaration-without-value`.
 
 ```js
-ce.expr(["Declare", "n", "'integer'"]).evaluate();
+ce.expr(["Declare", "n", "'integer'", 0]).evaluate();
 ce.parse("n").type;
 // ➔ "integer"
 ```
@@ -8182,14 +8440,14 @@ The following distinctions matter:
 - `unknown` restricts nothing: the absence types `nothing` and `missing`,
   the `error` type and `any` are all subtypes of it, as `never` is. A
   content contract is what excludes absence: `expression` and `value`
-  exclude the immediate markers, and `number | missing` admits one
-  explicitly. To state that absence is possible in a contract, write it
-  down, or use `any`.
+  exclude the immediate markers. A declared type cannot name `missing`, so
+  a position that may hold an absent value is declared `any` or `unknown`,
+  or is not declared.
   Call admission is a different question: at an operator parameter, a value
-  typed `T | missing` — a lookup
-  with a computed key, such as `xs[i]` — and a collection of such values
-  (`list<missing | string>`) are accepted where `T` or a collection of `T` is
-  expected; whether an element is absent is decided when the program runs.
+  that may be absent — a lookup with a computed key, such as `xs[i]` — and a
+  collection of such values (`list<missing | string>`, an inferred type) are
+  accepted where `T` or a collection of `T` is expected; whether an element is
+  absent is decided when the program runs.
   With `xs := ["a", "b"]`, `StringJoin(Map(i ↦ xs[i], [1, 2]), "")` is
   `"ab"`, and with the index `5` the result is an `incompatible-type` error
   that names the absent element. A collection whose cells can only be absent
@@ -8258,7 +8516,7 @@ The Compute Engine supports the following primitive types:
 | `any`      | The universal or top type. Every type is a subtype of, and therefore matches, `any` |
 | `error` | The type of an **invalid expression**, such as `["Error"]` |
 | `nothing`       | The type whose only member is the symbol `Nothing`; the unit type                                             |
-| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value |
+| `missing`       | The type whose only member is the symbol `Missing`; a position-preserving absent value. It can be inferred, but a declaration cannot name it |
 | `never`       | The type that has no values; the empty type or **bottom type**. It is a subtype of every type, which is why the empty collection — whose elements are drawn from no values at all — types as `list<never>` and is a member of every list type |
 | `unknown`       | An inference marker: a type still to be inferred, which each assignment or use refines. As a set of values it restricts nothing (every type is a subtype of it), and it proves no contract (it is a subtype only of `any` and itself). |
 | `expression`       | The type of a symbolic expression that represents a mathematical object, such as `["Add", 1, "x"]`, a `symbol`, a `function` or a `value`  |
@@ -8780,7 +9038,7 @@ The type `broadcastable<T>` represents a value that is either a scalar `T` or
 a collection of `T` applied element-wise — the static type of an expression
 that may **broadcast** at evaluation. It is the union `T | tensor<T>`: a `T`,
 or an array of any rank whose cells are `T`. `T` is a type that cannot hold a
-list: a number type, `boolean`, `string`, a tuple, `integer | missing`. For
+list: a number type, `boolean`, `string`, or a tuple. For
 example `broadcastable<number>` is a number or an array of numbers,
 `broadcastable<boolean>` is a boolean or an array of booleans (the result of a
 comparison over a matrix is a matrix of booleans), and
@@ -8904,6 +9162,93 @@ ce.type("(integer, integer?) -> number")
 // ➔ true
 ```
 
+### Default Values
+
+A named argument can have a **default value**, written after its type with
+`=`: `(x: number, factor: number = 2) -> number`. An argument with a default
+value is optional, and it must come after the required arguments. Do not
+write `?` together with `=`: `number? = 2` is a syntax error.
+
+A default value is a constant, one of:
+
+- a number, including `-1`, `NaN` and `+oo`
+- a string, `true` or `false`
+- the empty list `[]` or the empty dictionary `{}`
+- a constant symbol:
+  - a constant of the standard library, for example `over: set = Integers`
+    or `k: real = Pi`;
+  - a symbol declared as a constant, for example
+    `weights: list<number> = DefaultWeights` after
+    `ce.declare("DefaultWeights", { isConstant: true, value: … })`;
+  - a symbol that the type of the argument lists, for example
+    `mode: symbol<Auto> | symbol<Manual> = Auto`.
+
+The default value is bound where the function is declared, not read where
+the function is called. A call that leaves out the argument receives the
+default as if the call had written it. A default that names a variable, for
+example `k: number = n` with `n` declared without `isConstant: true`, is an error:
+`ce.declare()` throws for such a signature, and a function literal with such
+a parameter is the error `expected-a-literal-default`. Write a constant, or
+pass the argument. For
+any other value, declare a constant and use its name as the default.
+
+In compiled code, a default that is a constant of the standard library or a
+symbol that the type lists is filled in. A default that names a constant
+that you declared is filled in with the value of the constant, read where the
+function is declared: after `ce.declare("W0", { isConstant: true, value: 5 })`
+and `f := (k = W0) ↦ k + 1`, the compiled `f()` gives `6`. The value must be
+a number, a string, a boolean, a list or tuple of such values, or `{}`. For
+any other value, and for an Epsil `const` in a program that is compiled
+before it runs, the compilation falls back to the interpreter. To compile
+such a call, write the value as the default, or pass the argument.
+
+The default value is filled in when the expression is made canonical. A call
+that leaves out the argument and a call that supplies the default value are
+the same expression, so the `evaluate` handler always receives every
+argument:
+
+```js
+ce.declare("Scaled", {
+  signature: "(x: number, factor: number = 2) -> number",
+  evaluate: ([x, factor]) => x.mul(factor),
+});
+
+ce.box(["Scaled", 3]).json;         // ➔ ["Scaled", 3, 2]
+ce.box(["Scaled", 3]).evaluate();   // ➔ 6
+```
+
+The default fills only an argument that the call leaves out. An absent value
+that the call supplies, written or computed, is passed as the argument, and
+the rules of `Missing` then apply. A default no longer fills a supplied absent
+value. To replace an absent argument, write `Coalesce` in the call:
+
+```js
+ce.box(["Scaled", 3, "Missing"]).json;                      // ➔ ["Scaled", 3, "Missing"]
+ce.box(["Scaled", 3, "Missing"]).evaluate();                // ➔ Missing
+ce.box(["Scaled", 3, ["Divide", 0, 0]]).evaluate();         // ➔ NaN
+ce.box(["Scaled", 3, ["Coalesce", "Missing", 2]]).evaluate(); // ➔ 6
+```
+
+Compiled code follows the same rule: see
+[Lambda Expressions](/compute-engine/guides/compiling/#lambda-expressions).
+
+For matching, an argument with a default value is optional: a function type
+with a default value matches a signature that does not have the argument,
+but not the reverse.
+
+```js
+ce.type("(x: integer, k: integer = 1) -> number")
+  .matches("(integer) -> number");
+// ➔ true
+
+ce.type("(integer) -> number")
+  .matches("(x: integer, k: integer = 1) -> number");
+// ➔ false
+```
+
+Default values are not accepted in an overloaded signature, on a generic
+parameter, or in a nested position such as the argument of a function-valued
+argument.
 
 
 ### Variadic Arguments
@@ -9121,6 +9466,13 @@ ce.assign("bump", ce.box(["Function",
   ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
 ```
 
+The same refusal applies when the function is the `value` of a declaration in
+the global scope: `ce.declare("f", { type: "(number) -> number", value })`, or
+`{ value }` with no type, whether `value` is a boxed expression, MathJSON,
+LaTeX or a function that returns one. A literal that states its own effects
+(`(number) scope -> number` on the literal) is accepted when its body keeps to
+them.
+
 An **anonymous** literal is not gated — it has no annotation surface, and its
 arrow carries the inferred `scope` honestly — so a factory that returns a
 writing closure still installs under a bare arrow; the `scope` lives on the
@@ -9237,6 +9589,26 @@ an error pass unchanged; a real float passes under `integer` or `rational`.
 Compiled code does not make this check. Assigning a typed literal to a symbol
 gives that symbol the annotated signature, including the return type.
 
+When a function literal is assigned to a symbol declared with a signature,
+the declared result is ascribed to the body. A body whose inferred type is
+only wider than the declared result is accepted: `n ↦ n + 1` under
+`(integer) -> integer` is inferred `number`. A body whose type has no value in
+common with the declared result is refused, as a value of the wrong type is
+refused for a declared symbol:
+
+```js
+ce.declare("g", "(integer) -> integer");
+ce.assign("g", ce.box(["Function", "'hello'", "n"]));
+// ➔ throws: the value of type "(n: unknown) -> string" is not compatible
+//   with the type "(integer) -> integer"
+```
+
+`NaN`, `Missing` and `Nothing` in the type of the body are not part of this
+test. A body that gives a collection under a scalar result is accepted when a
+parameter can receive a collection whole, because the result can then be the
+broadcast of the declared result. A body with a `Return` before its last
+statement is not tested.
+
 The return ascription may also be a **full signature carrying effects** — this
 is how a definition states its effect contract
 (`function roll(n) random -> integer { … }` lowers to a body ascribed
@@ -9321,7 +9693,7 @@ element, a record field), inside a nested signature, and in **one arm of a
 union**:
 
 ```js
-ce.type("(T | missing) -> list<T> where T"); // an optional argument
+ce.type("(T | string) -> list<T> where T"); // T in one arm of a union
 ce.type("(list<T> | string) -> T where T");
 ```
 
@@ -9643,6 +10015,17 @@ ce.box(["f", "'a'"]).type; // ➔ "string"
 ce.box(["f", "'a'"]).evaluate().toString(); // ➔ "0"
 ```
 
+One test is made when the literal is assigned: when each type variable of the
+result has a bound, a body whose type has no value in common with the result
+read at those bounds is refused, as for a declared ground signature:
+
+```js
+ce.declare("f", "(x: T) -> T where T: number");
+ce.assign("f", ce.box(["Function", ["Greater", "x", 0], "x"]));
+// ➔ throws: the value of type "(x: unknown) -> boolean" is not compatible
+//   with the type "(x: T) -> T where T: number"
+```
+
 **Reading a polytype return annotation.** A polytype ascribed to the body of a
 literal is always the literal's **own** signature — the same reading as an
 effect-bearing annotation (see [Typed Function Literals](#typed-function-literals)).
@@ -9720,7 +10103,8 @@ A **literal type** is a type that represents a single value.
 
 The value can be:
 - a boolean: `true` or `false`
-- a number, such as `42`, `-3.14`, or `6.022e23`
+- a number, such as `42`, `-3.14`, or `6.022e23`. A hexadecimal (`0x1F`) or
+  binary (`0b101`) integer is also accepted: `0x1F` is the literal type `31`
 - a string, such as `"yellow"`, 
 
 Literal types can be used in conjunction with a union to represent a type that 
@@ -10396,6 +10780,41 @@ A type reaches a symbol on one of two tracks, and they behave differently:
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
 
+An assignment to a symbol with a declared type accepts a value whose type
+**overlaps** the declared type, as a function call accepts such an argument.
+The value is then tested each time the symbol is evaluated: a value that is
+not of the declared type is an `incompatible-type` error at that read. A
+value whose type has no value in common with the declared type, or a value
+made only of literals and constants that is not of the declared type, is
+still refused when it is assigned.
+
+```js
+ce.declare("a", "real");
+ce.declare("P", "tuple<real, real>");
+
+// The value is typed tuple<complex, real>: the square root of a negative
+// number is imaginary. The type overlaps tuple<real, real>, so the
+// assignment is accepted.
+ce.assign("P", ce.parse("(\\sqrt{1-a^2}, a)"));
+
+ce.assign("a", 0.6);
+ce.box("P").evaluate();
+// ➔ (0.8, 0.6)
+
+ce.assign("a", 2);
+ce.box("P").evaluate();
+// ➔ Error(ErrorCode("incompatible-type", "tuple<real, real>",
+//          "tuple<imaginary, integer>"), (sqrt(3)i, 2))
+
+ce.declare("s", "string");
+ce.assign("s", ce.parse("a + 1"));
+// ➔ throws: The value "a + 1" of type "real" is not compatible with the
+//   type "string"
+```
+
+Compiled code does not test the value: it reads the symbol as a value of its
+declared type, and a value outside that type gives an unspecified result.
+
 For a **bare collection annotation**, the contract is the *constructor*
 and the element slot is a placeholder that refines from evidence: `a: list`
 holding `[1, 2, 3]` reports `list<integer>` — the element type came
@@ -10408,33 +10827,44 @@ full contract and never moves. For non-collection loose annotations the
 same principle applies at whole-type granularity: `x: unknown` behaves
 like no annotation at all, while `x: any` is a fixed contract.
 
-**A declared type is a contract on every value, absence included.** `s:
-string` refuses `Missing` and `Undefined` as it refuses `5`, and `xs:
-list<string>` refuses `["a", Missing]`: the element contract excludes
-absence. Write the absence into the type when it is possible (`string |
-missing`, `list<string | missing>`), or use a refining declaration (`list`,
-`list<unknown>`). A `number` declaration admits `NaN`, the numeric absence
-marker (`real`, `integer` and `complex` hold finite values and refuse it;
-declare `real | nan`), so `n: number := 3 {a > 0}` binds (a numeric restriction masks to
-`NaN`), while `p: tuple<number, number> := (1, 2) {a > 0}` needs
-`tuple<number, number> | missing`. The reader of a declared symbol can then
-trust the declaration: a symbol declared `string` holds a string.
+**A declared type describes the present values; `Missing` sits outside
+it, as `NaN` sits outside `real`.** A declared type cannot name `missing`
+(`string | missing` and `list<string | missing>` are errors: `ce.declare`
+throws, and `Typed` and `Declare` give an error expression). An assignment
+still accepts the absent value: `s: string` accepts `Missing` (for example
+`s := xs[5]` with `xs = ["a", "b"]`) but refuses `5`, and
+`xs: list<string>` accepts `["a", Missing]` but refuses `[5, Missing]`.
+The absent value is read with `IsMissing` or `Coalesce`; a point whose
+coordinates are all `NaN` is absent for them. A `number`
+declaration admits `NaN`, the numeric absence marker (`real`, `integer` and
+`complex` hold finite values and refuse it; declare `real | nan`), so
+`n: number := 3 {a > 0}` binds (a numeric restriction masks to `NaN`).
 
 **A possibly absent value at a contract that excludes absence** (`xs[i]`,
-typed `missing | string`, at a `string` parameter or as the initializer of
-`y: string`) is admitted by the engine and checked when the call runs; the
-Epsil static check reports it. Three discharges exist, and the check accepts
-each of them: a fallback (`xs[i] ?? "d"`), a guard (`isMissing(v)`, which
-narrows `v` in the present branch), and the presence assertion
+typed `string`, at a `string` parameter) is admitted by the engine and
+checked when the call runs. Three discharges exist: a fallback
+(`xs[i] ?? "d"`), a guard (`isMissing(v)`, which narrows `v` in the present branch), and the presence assertion
 `xs[i]?!` (`AssertPresent`), which returns the value when present and an
 `expected-present` error when absent. The assertion's type is the present
 part of the operand's type. A library operator whose parameter excludes
 absence refuses an absent argument at evaluation with an `incompatible-type`
-error naming the parameter, as a user function does; numeric and collection
-operators answer the marker of their result instead (`Sin(Missing)` is
-`NaN`, `Reverse(Missing)` is `Missing`), and operators that own their
-absence semantics (`Length`, `Equal`, the reducers, `Coalesce`, `IsMissing`)
-keep their own answers.
+error naming the parameter, as a user function does for a parameter of another
+type; a call with `Missing` at a parameter declared as a number or a point
+gives `Missing` without running the body (`((x: integer) ↦ x + 1)(Missing)` is
+`Missing`), also when the parameter has a default value: a default fills only
+an argument that the call leaves out. Numeric and collection
+operators answer `Missing` instead (`Sin(Missing)` and `Reverse(Missing)` are
+`Missing`; a comparison is `False`), and operators that own their
+absence semantics (`Equal`, `Coalesce`, `IsMissing`) keep their own answers.
+`Length(Missing)`, and `Sum`, `Product`, `Max` and `Mean` of a collection with
+a `Missing` datum, are `Missing` (an error datum still gives the error). These are the interpreter's answers. Compiled code
+guarantees only the three discharges and the accessors
+that move an absent value without computing on it (`At`, `First`, `Last`,
+`Rest`, `Length`); any other operator over an absent operand gives the
+target's own value there (`undefined > 0` is `false` in JavaScript), so a
+program that is compiled discharges a possibly absent value before it
+computes on it. See
+[Values that are absent](/compute-engine/guides/compiling/#values-that-are-absent).
 
 ### When Inference Triggers
 
@@ -10571,15 +11001,16 @@ you do write one of the loose spellings, pick by role:
   let inference track the values. The bare form says "some collection of
   values, to be determined", which is almost always what you mean about
   your own data.
-- **Expecting absent entries in your own data?** Say so: `list<number |
-  missing>` for a specific hole type, or `list<any>` to leave the door
-  fully open. Writing it down is what buys you checking — see below.
+- **Expecting absent entries in your own data?** A type cannot name
+  `missing`. Use `list<any>` to leave the door fully open, or read each
+  entry with `IsMissing` or `Coalesce`. Inference still gives a list that
+  holds `Missing` the type `list<integer | missing>`.
 
 ### Why absence is not part of `expression` (for the curious)
 
 The distinctions above rest on one deliberate choice: a **content contract**
-(`expression`, `value`, `number`, `list<integer>`) never includes absence
-unless it says so. `Missing` is not a value a position might turn out to
+(`expression`, `value`, `number`, `list<integer>`) never includes absence.
+`Missing` is not a value a position might turn out to
 contain; it is the positioned absence of one. The inference marker
 `unknown` is a different kind of thing: it says nothing about the position
 yet, so it excludes nothing, and a declaration that uses it is refined by
@@ -10589,23 +11020,20 @@ read as evidence either way: a `Tuple` slot or a callback result typed
 `unknown` does not prove that it can hold `Nothing`, and it does not prove
 that it cannot.
 
-What this buys is that **absence is opt-in for a contract** — the
-`Option`/`Maybe` discipline rather than nullable-by-default. An absent case
-enters a contract only when someone writes it down, and then every consumer
-is forced to see it:
+What this buys is that **absence is outside a declared contract**, as `NaN`
+is outside `real`. A declaration cannot name `missing`, so a declared symbol
+never holds an absent value. A result type can still show an absent case:
 
-- `RangeOf` returns `range | nothing` — the not-found case is *in the
+- `RangeOf` returns `range | missing` — the not-found case is *in the
   type*, so code that feeds the result to `Slice` is checked against it.
 - `[1, Missing]` types as `list<integer | missing>` — the hole is
-  visible, and the missing-propagation machinery keys off exactly that
-  visibility.
-- A parameter, lambda slot, or inferred type that never mentions absence
-  genuinely never receives it silently.
+  visible in the inferred type, which cannot be written in a declaration.
+- A parameter or declared symbol genuinely never receives an absent value
+  silently.
 
 If `missing` were a subtype of `expression`, every parameter declared with
-a content contract would admit `Missing` without anyone having said so,
-and `| missing` annotations would become decoration. The inference marker
-is where "not said yet" lives; the contracts are where "said" lives.
+a content contract would admit `Missing`. The inference marker is where "not
+said yet" lives; the contracts are where "said" lives.
 
 ## Defining New Types
 
@@ -11127,10 +11555,11 @@ plausible-looking variant of each does not describe JSON:
   (the default), the types would be opaque — their only inhabitants are
   constructor applications, and `ce.type("list<number>").matches("json")`
   would be `false`.
-- `missing`, not `nothing`, for JSON `null`. `Nothing` means "no value here"
-  and is *erased* from collection literals — `[1, Nothing, 3]` has two
-  elements. `Missing` is position-preserving, so it survives inside an array
-  or as a dictionary value.
+- `missing`, not `nothing`, for JSON `null`. `Nothing` is the value of an
+  empty block or of a statement with no value, and an operator that needs a
+  value gives an `incompatible-type` error for it. `Missing` is the absent
+  datum: it keeps its position inside an array or as a dictionary value, and
+  `IsMissing` and `Coalesce` read it.
 - `real`, not `number`. The engine's `number` admits complex and
   non-finite values, so `2 + 3i`, `NaN` and $+\infty$ would all be accepted
   as JSON, and none of them is representable in JSON. Bare `real` is finite
@@ -12117,6 +12546,43 @@ When a `Divide` expression has a denominator already in factored form (a product
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
+## Undefined Points and Lists
+
+`simplify()` can remove the points where an expression has no value. For
+example, \\( y + 0 \cdot \frac\{1\}\{t\} \\) simplifies to \\( y \\), which has a
+value at \\( t = 0 \\). To keep the undefined points of an expression, do not
+simplify it.
+
+An operand that is a list is not a scalar. With `L` declared as a list, a zero
+times `L` or over `L` stays as it is, and it gives a list when `L` has a value:
+
+```live
+ce.declare('L', 'list<real>');
+const expr = ce.box(['Add', ['Multiply', 0, 'L'], 1]).simplify();
+ce.assign('L', ce.box(['List', 1, 2, 3]));
+expr.evaluate().json;
+// ➔ ["List", 1, 1, 1]
+```
+
+## Testing an Identity
+
+`simplify()` does not decide every identity: \\( \frac\{x^2\}\{x\} \\) simplifies
+to \\( x \\), but \\( \frac\{x^2\}\{x\} - x \\) stays as it is, and so does
+\\( x = x \\).
+
+To find that two expressions are equal wherever both are defined, use
+`isIdenticallyEqual()`. It compares them at random points. `true` is a very
+strong indication, and not a proof. `undefined` means that the identity is not
+established.
+
+```live
+ce.parse('\\frac{x^2}{x}').isIdenticallyEqual(ce.parse('x'));
+// ➔ true
+```
+
+Compare the two expressions, and not their difference with `0`: the rounding
+error of a difference can make the answer for a true identity `undefined`.
+
 ## Using Assumptions
 
 Assumptions are additional information available about some symbols, for example
@@ -12722,6 +13188,10 @@ compile(ce.box(['Sum', 'S'])).run({ S: 5 });
 
 Nothing else is checked, converted, or copied:
 
+- a value of another type is not refused, and the result is undefined: it
+  can differ from the value of the interpreter, and between targets. With
+  `x` declared `real`, `x + 1` gives `2` for `x = true` and `"ab1"` for
+  `x = "ab"`. See [Supplying Inputs](#supplying-inputs);
 - the entries of a list input are never read. A `{re, im}` object, a string
   or a typed array at an entry of a list the code reads on the real lane
   computes with that value, as it would in plain JavaScript;
@@ -12767,9 +13237,11 @@ f({ x: 3 });
 `runtimeVersion` fields of the result, and the `preambleOnce`,
 `preamblePerCall` and `callCode` fields when the code has a preamble. It
 evaluates the definitions that read nothing per call (a constant list, a
-memo) once, and it applies the same input conversions as `run()`: a
-real given to a complex-declared symbol is lifted, and a `Float64Array` for a
-list symbol is copied. `load()` throws when `result.runtimeVersion` is not
+memo) once, and it applies the same input steps as `run()`: a number given
+for a complex binding is lifted, `~oo` given for a real binding is projected
+to `Infinity`, another `{re, im}` value given for a real binding is refused,
+and a string or a typed array given for a binding read as an array is
+refused. `load()` throws when `result.runtimeVersion` is not
 `runtime.runtimeVersion`, or when the stored code has none.
 
 To run the stored code on a worker pool, the runtime entry also exports
@@ -12835,7 +13307,8 @@ once and writes every result into one `Float64Array`: the conversions run once
 per batch, the compiled body once per cell. Measured 2026-10-20: 20 % faster
 than `run()` per cell on the main thread, and the batch is what a worker
 thread receives (below). It is present on a `javascript` result compiled from
-an expression (`calling: 'expression'`) and on an `interval-js` result.
+an expression (`calling: 'expression'`) and on an `interval-js` result
+compiled from an expression.
 
 ```javascript
 const f = compile(ce.parse('\\sin(x)\\cos(y) + a'));
@@ -12936,8 +13409,10 @@ is `1` or `0`; a complex value with a zero imaginary part is its real part; a
 cell whose evaluation throws, or gives any other non-number (a complex value
 with a non-zero imaginary part, a list), is `NaN`. Cell for cell, the value is
 the one `run()` gives: the same compiled body runs with the same conversions.
-A missing variable, a length mismatch or a wrong element type throws before
-the loop.
+A length mismatch throws before the loop. A variable left out, or a value
+outside its declared type (a boolean for a variable declared `real`), is not
+refused: the result is undefined. With `a` left out, the example above gives
+`NaN` in every cell.
 
 **Several outputs per cell.** An expression whose type is a tuple of two or
 more elements that can be numbers writes that many values per cell into the
@@ -13199,6 +13674,113 @@ three things happened:
 `CompilationResult.unsupported` lists the same heads declaratively, so a caller
 can branch on the condition without parsing the message.
 
+### Inputs With No Type and Values With No Settled Shape
+
+Compiled code settles the shape of every value (a number, a complex number, a
+string, a list, a point or a matrix) at compile time, and does not test it at
+run time. Two declines follow from this rule. Both occur on every target, and
+with the default fallback the interpreter computes the value.
+
+**An input with no type declines**, with `diagnostic.code` `'untyped-input'`.
+An input is a free symbol of the compiled code. When its type is `unknown` or
+`any`, `unsupported` holds its name:
+
+```javascript
+const r = compile(ce.box(['If', ['Less', 'M', 3], 'M', 0]));
+r.success          // ➔ false
+r.unsupported      // ➔ ['M']
+r.run({ M: [1, 5] }) // ➔ [1, 0], from the interpreter
+```
+
+Declare the input (`ce.declare('M', 'real')`). When the host can pass both
+shapes, declare a union such as `real | list<real>`: a union compiles. A
+parameter of a function is not an input, so `t ↦ 2t` compiles.
+
+**A value with no settled shape declines**, with `diagnostic.code`
+`'unsettled-shape'`, and `unsupported` holds the sub-expression:
+
+- A conditional whose branches have different shapes. With `x: real`,
+  `If(x > 0, [1, 2], 3)` declines.
+- A name that gets values of different shapes in one scope. A local has the
+  type of its first value, and an assignment of a value of another type is the
+  static error `assignment-type-mismatch`: `Block(p ≔ 0; p ≔ [1, 2]; p)` is
+  invalid, so it declines with `'compile-error'`. The shapes can differ only
+  when the declared type admits both, and a declared `any` does:
+  `Block(Declare(p, "any", 0), Assign(p, [1, 2]), p)` declines. The order of
+  the assignments is not examined, and the length of a list is not part of its
+  shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
+  is a union of shapes (`real | list<real>`) compiles with one body per
+  member.
+- A function literal that assigns a name of an enclosing scope (a callback, a
+  stored function, a user function that the code calls).
+  `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
+  the compilation, and a function that `Apply` applies where it is written to
+  scalar arguments, still compile.
+- A list whose element type is a union of shapes. With
+  `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
+  declines, and `unsupported` holds `CS`. With the fallback, the interpreter
+  gives `[2, [6, 8]]` for `CS = [1, [3, 4]]`.
+- A node whose code a `compile` handler of its definition writes, when the
+  static type of the node admits values of different shapes and code that no
+  handler wrote reads its value. With `x: real` and `HostPair` declared with
+  the signature `(real) -> real | list<real>` and a `compile` handler that
+  returns a list, `HostPair(x)` compiles and gives `[3, 3]` for `x = 3`, but
+  `HostPair(x) + 1` declines. The node compiles as the value of the whole
+  expression, as an operand of another node whose code a handler writes, or
+  when its type has one shape (a `missing` member is not a shape). To compile
+  the consumer, give the node a type of one shape, or write the code of the
+  consumer with a handler too.
+
+**A call selects the variant of the function from the static type of its
+argument.** With `f := t ↦ 2t`, `f(L)` with `L: list<real>` compiles to a map
+of the scalar variant over the list, and `f(p)` with `p: tuple<real, real>`
+calls a variant compiled for a point. No test of the shape runs. An input
+declared with a union of shapes gets one test, where it is bound, and one
+body per member. With `y: real | tuple<real, real>`, `f(y)` compiles to
+`Array.isArray(y) ? f_point(y) : f(y)`, and gives `6` for `y = 3` and
+`[2, 4]` for `y = [1, 2]`. To avoid the test, declare one shape, or compile
+one function for each shape.
+
+### Supplying Inputs
+
+The compiled code assumes that each input holds a value of its declared type,
+and does not test it. So:
+
+- **Declare the type and the shape of each input that you will pass**:
+  `ce.declare("x", "real")`, `ce.declare("L", "list<real>")`,
+  `ce.declare("P", "tuple<real, real>")`. An input with no type declines.
+- **When an input can have two shapes**, compile one function for each
+  shape, or declare the union (`real | tuple<real, real>`). One function for
+  each shape has no run-time test. The union costs one test on each call,
+  where the input is bound.
+- **Supply every input** that `CompilationResult.freeSymbols` lists, with a
+  value of its declared type. `freeSymbolTypes` gives the type of each one.
+  The compiled code does not test for an input that is left out, so when a
+  value can be missing, test it before the call.
+- **A value outside its type gives an undefined result.** The result can
+  differ from the value of the interpreter, and it can differ between
+  targets. A declared `real` holds only finite values: to get a defined
+  result for `NaN` or `±Infinity`, declare the input
+  `real | signed_infinity | nan`.
+
+```javascript
+ce.declare("x", "real");
+ce.declare("L", "list<real>");
+
+const f = compile(ce.parse("x > 0"));
+f.code;      // ➔ "0 < _.x"
+f.run({});   // ➔ false: undefined result, x is left out
+             //   (the interpreter has no value for x > 0)
+
+compile(ce.box(["Sum", "L"])).run({});
+// ➔ throws TypeError: undefined result, L is left out
+```
+
+An absent value is not an input. A declared type cannot name `missing`, so an
+input cannot be declared `real | missing`.
+[Values That Are Absent](#values-that-are-absent) describes the absent values
+that a program produces.
+
 ### Values That May Be Lists
 
 An operand typed
@@ -13396,14 +13978,42 @@ call. With fewer arguments, the result is not defined: for example
 no value. Inside compiled code, a call with too few arguments is refused when
 the expression is compiled, and the interpreter evaluates it instead.
 
+A parameter with a default value (see
+[Default Values](/compute-engine/guides/types/#default-values)) can be left
+out of a compiled call, as in the interpreter. The default fills only an
+argument that the call leaves out. An absent value given at that position
+(`NaN` in JavaScript, for example) is passed to the body, and the result is
+not defined, as for any other operator that gets an absent operand (see
+[Values That Are Absent](#values-that-are-absent)):
+
+```js
+const f = compile(ce.box(["Function", "k",
+  ["Optional", ["Typed", "k", "'real'"], 2]]));
+f.code;        // ➔ "(k) => { if (k === undefined) k = 2; return k; }"
+f.run();       // ➔ 2
+f.run(5);      // ➔ 5
+f.run(NaN);    // ➔ NaN
+```
+
+Inside compiled code, every target (JavaScript, Python, GLSL, WGSL and
+interval-js) adds the default value to each call that leaves the argument out
+when the expression is compiled. With
+`g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
+`g(At(L, 100))` passes the `NaN` of a read past the end of the list to `g`,
+and the result is not defined (the JavaScript code gives `NaN`); the
+interpreter passes `Missing` and gives `Missing`. To replace an absent
+argument, write `Coalesce` in the call: `g(Coalesce(At(L, 100), 2))` gives `3`.
+
 Lambdas are useful when the variable name is user-specified rather than assumed
 by convention. A lambda like `\theta \mapsto 1 + \cos(\theta)` makes the
 parameter explicit, avoiding ambiguity.
 
-**Declared parameter types are checked.** A compiled call of a user function
-whose parameters have declared types checks the argument at run time when its
-static type does not prove the declared type. The compiled value is `NaN`
-where the interpreter answers an `incompatible-type` error:
+**Declared parameter types are not checked.** A compiled call of a user
+function does not test its arguments against the declared types of the
+parameters. An argument whose static type does not prove a parameter type
+that holds only some real numbers (`integer`, `real<0..>`) is assumed to hold
+it. Where the interpreter gives an `incompatible-type` error, the compiled
+value is not defined:
 
 ```js
 ce.declare("h", { signature: "(x: integer) -> integer" });
@@ -13411,16 +14021,69 @@ ce.assign("h", ce.parse("x \\mapsto 2x"));
 ce.declare("y", "real");
 
 const f = compile(ce.parse("h(y)"));
+f.code;             // ➔ "_fn_h(_.y)"
 f.run({ y: 3 });    // ➔ 6
-f.run({ y: 2.5 });  // ➔ NaN  (the interpreter gives an incompatible-type error)
+f.run({ y: 2.5 });  // ➔ 5  (the interpreter gives an incompatible-type error)
 
 compile(ce.box(["Map", "h", ["List", 1, 2.5]])).run();
-// ➔ [2, NaN]  (a function value handed to Map is checked per element)
+// ➔ [2, 5]
 ```
 
-An argument whose static type is already below the declared type needs no
-test, and a parameter typed `number` or `complex` has none. The declared
-result type is not checked in compiled code.
+An argument whose static type has no value of the parameter type declines.
+A body whose value cannot be of the declared result type is refused when the
+function is assigned, so no call of it is compiled: with `h` declared
+`(number) -> number`, `ce.assign("h", ce.parse("t \\mapsto [t, t]"))` throws
+an `incompatible-type` error (see
+[Typed Function Literals](/compute-engine/guides/types/#typed-function-literals)).
+
+### Function Values
+
+Compiled code calls a function only when it can see the function where the
+call is written. A call compiles when the function is:
+
+- a function defined with `ce.assign()` or `ce.declare()` with a value;
+- a local of a block declared with a function literal as its value;
+- a function literal written at the call site.
+
+The callbacks of `Map`, `Filter`, `Sort`, `Fold` and `Reduce` compile when they
+are one of these. A derivative of a defined function also compiles: with
+`p = x ↦ x^3`, `p'(u)` (`Apply(Derivative(p, 1), u)`) compiles to a call of
+the literal `x ↦ 3x^2`.
+
+```js
+ce.declare("L", "list<real>");
+ce.declare("u", "real");
+ce.assign("sq", ce.parse("t \\mapsto t^2"));
+ce.assign("p", ce.parse("x \\mapsto x^3"));
+
+compile(ce.box(["Map", "sq", "L"])).run({ L: [1, 2, 3] });  // ➔ [1, 4, 9]
+compile(ce.box(["Filter", "L", ["Function", ["Greater", "x", 1], "x"]]))
+  .run({ L: [1, 2, 3] });                                    // ➔ [2, 3]
+compile(ce.parse("p'(u)")).run({ u: 2 });                    // ➔ 12
+```
+
+These forms do not compile, and with the default fallback the interpreter
+evaluates them:
+
+- a partial application or a curried call: `Apply(f, 1)` with `f` a function
+  of two parameters, or `Apply(Apply(f, 1), u)`;
+- a function passed as an argument to a user function, for example
+  `h(x ↦ x + u)`, and a function with a parameter declared with a function
+  type, for example `h = (g: function) ↦ g(1)`;
+- a call whose value is a function: with `mk = a ↦ (x ↦ x + a)`,
+  `Apply(mk(1), u)`;
+- a call of a function stored in a local of a block that is assigned more than
+  once, assigned inside a nested statement, or assigned the result of a call.
+
+```js
+ce.assign("f", ce.box(["Function", ["Add", "x", "y"], "x", "y"]));
+const r = compile(ce.box(["Apply", ["Apply", "f", 1], "u"]));
+r.success;         // ➔ false
+r.run({ u: 2 });   // ➔ 3, from the interpreter
+```
+
+The interpreter keeps first-class functions: function literals, closures,
+currying, partial application and function values.
 
 ### Tuple Expressions
 
@@ -13437,6 +14100,28 @@ console.log(x, y);
 
 This is particularly useful for parametric curves. Both `Tuple` and `List`
 expressions compile to arrays.
+
+### Dictionary Expressions
+
+A dictionary compiles to a JavaScript object literal, or a Python `dict`, with
+each value compiled. Each evaluation returns a new object:
+
+```js
+const f = compile(ce.box([
+  "Dictionary",
+  ["Tuple", "'x'", ["Cos", "t"]],
+  ["Tuple", "'y'", ["Sin", "t"]],
+]));
+console.log(f.code);
+// ➔ ({"x": Math.cos(_.t), "y": Math.sin(_.t)})
+console.log(f.run({ t: 0 }));
+// ➔ { x: 1, y: 0 }
+```
+
+The result has the same form as a `dictionary` input: a plain object whose
+own keys are the keys of the dictionary, including a key `__proto__`. A value
+whose type is `unknown` is not compiled. The GLSL, WGSL and interval targets
+have no dictionary value, so a dictionary does not compile on them.
 
 ### Control Structures
 
@@ -13469,11 +14154,51 @@ target's floating-point model, so it projects to `NaN`. See
 provably not numbers — strings, lists — answers the target's missing-object
 literal instead, `undefined` in JavaScript and `None` in Python, so that
 `IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
-type is unknown counts as a number. An `If` with no else-branch is
+type is unknown counts as a number. Under a list of conditions, a position
+that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
+never `undefined`, and a string arm is refused (the compilation falls back
+to the interpreter). An `If` with no else-branch is
 the one-clause `Which`: `If(c, t)` compiles on every target and returns
-`NaN` when `c` is false. An `If` whose branch is a statement — an
+`NaN` when `c` is false (`[NaN, NaN]` for a point). An `If` whose branch is a statement — an
 assignment, a loop — is a guard statement, not a value, and keeps its own
 rules (see the statement sections below).
+
+### Values That Are Absent
+
+An absent value — the `NaN` or `undefined` of an unmatched `Which`, or of a read
+past the end of a list (`At`, `First`, `Last`) — is guaranteed at three kinds
+of places in compiled code:
+
+- **where it is produced**: the producer gives `NaN` for a numeric result, a
+  point of `NaN` coordinates (`[NaN, NaN]`) for a point, and the target's absent
+  object (`undefined` in JavaScript, `None` in Python) otherwise;
+- **where it is moved without computation**: `At`, `First`, `Last`, `Rest`,
+  `Length`, `Reverse`, and the binding of a `Map` callback parameter keep the
+  hole in its position (`Length([1, Missing])` is 2 everywhere);
+- **where it is discharged**: `IsMissing`, `Coalesce` (`??`) and
+  `AssertPresent` (`?!`) give the interpreter's value for an absent operand,
+  whatever its spelling. A point whose coordinates are all `NaN` is absent for
+  them, also when its type is `tuple<real, real>`. A default parameter is not
+  a discharge: it fills only an argument that the call leaves out.
+
+Every other operator applied to an absent operand gives the target's own
+value, and nothing is promised about it or about anything computed from it:
+`undefined + 1` is `NaN`, `undefined > 0` is `false`, `undefined[0]` throws,
+and Python's `None + 1` is a `TypeError`. The interpreter keeps its own
+propagation (`Missing + 1` is `Missing`, `Missing > 0` is `False`), so a program
+that computes on an absent value before discharging it can give one value in
+the interpreter and another when compiled. Discharge first:
+
+```javascript
+ce.declare("S", "list<string>");
+ce.declare("n", "integer");
+
+// Guaranteed on every route: the absent value is discharged first.
+compile(ce.parse("\\mathrm{IsMissing}(S[n])")).run({ S: ["a"], n: 5 });
+// ➔ true
+compile(ce.parse("\\mathrm{Coalesce}(S[n], \"d\")")).run({ S: ["a"], n: 5 });
+// ➔ "d"
+```
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -13502,15 +14227,28 @@ console.log(f.run({ x: 1.0 }));
 `Loop` is imperative control flow, compiled for effect: bare `Loop(body)`
 compiles to a JavaScript `while (true) { ... }` loop, and `Loop(body,
 Element(...), ...)` compiles to plain `for`/`for-of` loops with no result
-collection — the compiled expression's value is `undefined`. `Break`,
-`Continue`, and `Return` compile to their JavaScript equivalents:
+collection. `Break`, `Continue`, and `Return` compile to their JavaScript
+equivalents.
+
+The value of a loop is `Nothing` (or the value of a `Break(v)`), and the
+compiled code has no form for it. So a loop whose value is used — the whole
+expression, the last statement of a block, the body of a function — does not
+compile, and `run()` uses the interpreter. This includes a search loop that
+ends with a `Return`, because it gives `Nothing` when no `Return` runs. A loop
+with no indexing set and no `Break`, which ends only through a `Return`, still
+compiles. Use the loop as a statement, and end the block with the value it
+should have:
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
 
-const f = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
-console.log(f.run());
-// ➔ undefined (Loop is evaluated for effect)
+const loop = compile("\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2");
+console.log(loop.success);
+// ➔ false (the value of the loop is used)
+
+const sum = compile("s \\coloneq 0; \\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} s \\coloneq s + i^2; s");
+console.log(sum.success, sum.run());
+// ➔ true 385
 ```
 
 #### `Comprehension`
@@ -13538,8 +14276,8 @@ ahead of the value that consumes it, so it can appear anywhere in an
 expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
 its enclosing loop body rather than out of it.
 
-A loop inside a **conditionally-evaluated branch** — an `If`, `When`, `Which` or
-`Match` arm — fails closed (`success: false`) instead. A shader conditional is
+A loop inside a **conditionally-evaluated branch** — an `If`, `Which` or `Match`
+arm — fails closed (`success: false`) instead. A shader conditional is
 an expression, not a statement, so there is no place to put the loop inside the
 branch; hoisting it out would run it whichever branch is selected, which changes
 the result whenever the branch draws from the random stream.
@@ -13580,6 +14318,59 @@ const f = compile("r^2 \\text{ where } r \\coloneq x^2 + y^2");
 console.log(f.run({ x: 3, y: 4 }));
 // ➔ 625
 ```
+
+An item of a `where` clause is a binding (`r \coloneq v`, or `r = v` with a
+symbol on the left) or a condition (any other relation). Each binding is a
+`Declare(r, "unknown", v)` statement of one `Block`, and the conditions wrap
+the body in a single-branch `If`, which gives `NaN` for a number when a
+condition is false, as a restriction `e\{c\}` does:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const g = compile("x^2 \\text{ where } a \\coloneq 2, x > a");
+console.log(g.run({ x: 3 }), g.run({ x: 1 }));
+// ➔ 9 NaN
+```
+
+The serializer writes such a `Block`, and every single-branch `If`, with
+`where`: `ce.parse("x^2\\{x>0\\}+1").latex` is
+`x^2+1\text{ where }0\lt x`.
+
+A local has a value from its declaration: `Declare(x, type, v)`, or the first
+assignment of the name at the level of the block. A `Declare` with no value,
+a first assignment in a branch or in a loop body, and a read of a local before
+its declaration are static errors (`declaration-without-value`,
+`first-assignment-in-branch`, `read-before-declaration`), so the compilation
+declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
+the error `assignment-in-operand`. A later assignment must keep the type of the
+local, or it is the error `assignment-type-mismatch`.
+
+A compiled block writes only the locals that it declares, and the locals of an
+enclosing compiled block. A write to a symbol of the engine, to an input or to
+a `vars` name declines, because compiled code has no binding of the engine to
+change. Return the value and let the host assign it, or declare a local with a
+value and read the local:
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+const h = compile("m \\coloneq n + 1; 2m");
+console.log(h.run({ n: 1 }));
+// ➔ 4
+```
+
+A block with an assignment or a declaration compiles as a statement, as the
+body of a function, or as the compiled expression. As an operand it declines:
+`1 + Block(b ≔ x; 2b)` declines. A block whose last statement is an assignment
+has the value `Nothing`, so it declines where its value is used. End the block
+with the name.
+
+A `vars` entry is a value, the same at each read. A string entry is source
+text that the JavaScript code puts in at each read of the name: `x + 2x` with
+`vars: { x: 'q' }` is `q + 2 * q`. Use a plain read of a value (`'_.s'`, a
+name). An entry with an effect (`'nextValue()'`) runs once for each read, or
+not at all, and the result is then unspecified.
 
 ## Variable Names
 
@@ -13633,13 +14424,12 @@ complex-valued. This happens when:
 
 The detection is **static** — based on the expression's structure, not on
 runtime values. What happens to a radical of a real operand whose sign is not
-known depends on the compile [mode](#modes-auto-strict-complex). Under the
-default `auto` mode, `\sqrt{x}` is **promoted**: it is lowered through the
-complex kernel, so `compile("\\sqrt{x}").run({ x: -4 })` is `{ re: 0, im: 2 }`,
-as `evaluate()` gives, and `2` at `x = 4`. Under `mode: "strict"` the
-radical compiles to the real `Math.sqrt`, because `x` has no declared complex
-type, and the same call returns `NaN`. To get a complex result in every mode,
-make the expression explicitly complex, e.g. `\sqrt{x + 0i}`.
+known depends on the compile [mode](#modes-strict-complex). Under the
+default `strict` mode the radical compiles to the real `Math.sqrt`, because
+`x` has no declared complex type, so `compile("\\sqrt{x}").run({ x: -4 })` is
+`NaN`, and `2` at `x = 4`. Under `mode: "complex"`, `\sqrt{x}` is
+**promoted**: it is lowered through the complex kernel, and the same call
+returns `{ re: 0, im: 2 }`, as `evaluate()` gives.
 
 ### Result Format
 
@@ -13827,18 +14617,43 @@ shader targets, as in the interpreter. On Apple GPUs the built-ins `max`,
 `smoothstep` return 0, so the shader calls helpers that test the bit pattern
 of each operand.
 
+A helper costs more than the built-in. The shader calls the built-in
+`sin`, `cos`, `max`, `min` or `clamp` when the compiler can prove that the
+argument is finite in 32-bit floating point. The proof reads the declared
+types and ranges of the inputs, the declared result types and parameter
+ranges of the functions, the values that the calls of a function pass, the
+number literals and the operators of the expression. It does not read the
+body of a function to prove a call of it. To get the built-in, declare a
+range:
+
+- With `t` declared `real<-5.5..5.5>`, `\sin(10000(51.1\lfloor t\rfloor-3.9))`
+  calls the built-in `sin`: the range of `t` bounds the argument.
+- With `f(u) := \cos(u)/2` and no declared type, `\sin(f(x))` calls the
+  helper `_gpu_sin`. Declare `f` as `(real) -> real<-1..1>` to get the
+  built-in. A function whose value leaves its declared range gives an
+  undefined result.
+- With `x` declared `real<-1e15..1e15>` and `F(a) := \sin(a)`, the shader of
+  `F(x)` defines `_fn_F` with the built-in `sin(a)`: every call passes a
+  finite value. A call `F(e^y)` with `y` declared `real` makes it
+  `_gpu_sin(a)`, since `e^y` can overflow in 32-bit floating point.
+- With `G` declared `(real<-1..1>) -> real` and `G(a) := \sin(1000a)`,
+  `_fn_G` calls the built-in `sin(1000.0 * a)` for any argument. An argument
+  outside the declared range gives an undefined result.
+
 A `NaN` keeps its value through the other operations that were measured:
 addition, multiplication by a value that is not zero, `\tan`, `\sinh`,
 `\cosh`, `\tanh`, `\exp`, `\ln`, `\sqrt{}`, `\arcsin`, `\arccos`,
 `\arctan`, `\lfloor x \rfloor` and the other rounding functions, `\bmod`,
 `|x|`, `0/0` and `\infty - \infty`.
 
-Absence markers project the same way. `Missing` — what an unmatched `Which`,
-an else-less `If` and a false restriction `e\{c\}` return — is not a
-number, so the chained ternary ends in a literal `NaN` (see
+Absence markers project the same way. `Missing` — what an unmatched `Which`
+returns, and what an else-less `If` and a false restriction `e\{c\}` return
+for a value that is neither a number nor a point — is not a number, so the chained ternary ends in a literal `NaN` (see
 [`If` and `Which`](#if-and-which-conditionals)). The same value reaches `run()`
 when the expression was never compiled at all and fell back to
-interpretation: its `Missing` crosses the boundary as `NaN` too.
+interpretation: its `Missing` crosses the boundary as `NaN` too. What a
+further operator makes of that value is not specified; see
+[Values That Are Absent](#values-that-are-absent).
 
 **Type guards follow the finite-by-default lattice.** Every bare numeric type
 name denotes a **finite** value, so the guard a compiled parameter test emits
@@ -13855,7 +14670,7 @@ as a whole** and runs interpreted, rather than dispatching on a test that would
 disagree with `evaluate()`. This is the usual fail-closed posture for a
 construct the target cannot represent.
 
-### Modes: `auto`, `strict`, `complex`
+### Modes: `strict`, `complex`
 
 JavaScript has no complex number: a compiled value is a `number` or a
 `{ re, im }` object, and the compiler decides which **statically, per node**.
@@ -13864,130 +14679,134 @@ What a compile **mode** fixes is what a numeric binding whose static type is
 declared real) is shaped as — and what happens when a complex-shaped value
 reaches one:
 
-- **`strict`** — the shader targets' model, on every target: shape follows the
-  static type. A `complex`-typed value, a `Complex(…)` literal, `i`, and a
-  radical of a **provably** negative operand are complex-shaped; a wide
-  binding is real; nothing promotes (`√x` at `x = −1` is `NaN`, as
-  `Math.sqrt` gives); and a complex-shaped value meeting a wide binding —
-  `b(z)` for `b(x) := 2x` and `z: complex` — **fails closed** with a
-  `LaneMismatch` decline naming the binding to declare complex. This is
-  today's real-kernel codegen byte for byte, plus that decline class.
-- **`complex`** — a wide binding is complex, lifted at its use; unknown-sign
-  radicals promote; user functions are emitted once. Always sound, only
-  slower (~2.3× on affected chains).
-- **`auto`** (the default on `javascript` and `python`) — `strict` shapes plus
-  **promotion**: an unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style
-  powers (a non-integer number exponent of an unknown-sign base), lower
-  through the complex kernels so the compiled value matches `evaluate()`; and
-  if — and only if — a promoted or typed complex value reaches a wide binding,
-  the compilation is redone **once** in `complex` mode. Nothing else
-  escalates. Radicals whose operand is non-negative under the compiler's own
-  "wide is real" premise — `√(x² + y²)`, `√((x−a)² + (y−b)²)`, `√|x|`,
-  `ln(x²)` — keep the real kernel and cost nothing.
+- **`strict`** (the default on every target) — the shader targets' model, on
+  every target: the lane of a value follows its static type. A
+  `complex`-typed value, a `Complex(…)` literal, `i`, an operation whose
+  result type is complex, and a radical of a **provably** negative operand
+  are complex-shaped; everything else is real. Nothing promotes: an
+  operation whose exact value is complex on the real lane gives `NaN`
+  (`√x` at `x = −1` is `NaN`, as `Math.sqrt` gives). A complex-shaped value
+  meeting a wide binding — `b(z)` for `b(x) := 2x` and `z: complex` —
+  **fails closed** with a `LaneMismatch` decline naming the binding to
+  declare complex. A binding typed `number` is real under `strict`: the
+  value you give for it must be real. A complex value there gives an
+  unspecified result. With `L: list<tuple<number, real>>` at
+  `[(1 + i, 2)]` and `hr = (p: tuple<real, real>) ↦ p[1] + p[2]`,
+  `hr(L[1])` compiled under `strict` gives the string `"[object Object]2"`;
+  under `mode: 'complex'` it gives `{ re: 3, im: 1 }`, the value of
+  `evaluate()`. To pass complex values, compile with `mode: 'complex'` or
+  declare the binding `complex`.
+- **`complex`** — a wide binding is complex, lifted at its use; an
+  unknown-sign `Sqrt`/`Ln`/`Log`, and `x^{0.3}`-style powers (a non-integer
+  exponent of an unknown-sign base), **promote**: they lower through the
+  complex kernels, so the compiled value matches `evaluate()`. User
+  functions are emitted once. Always sound, only slower (~2.3× on affected
+  chains). A kernel whose value is real still returns a plain `number`: a
+  `{ re, im }` object comes back only when the imaginary part is not zero
+  (`(√x)²` at `x = −4` is the number `-4`).
 
-```mermaid
-flowchart TD
-  c["compile(expr), mode 'auto'"] --> s["compile with strict shapes, plus promotion:<br/>an unknown-sign sqrt, ln, log or non-integer power<br/>lowers through the complex kernels"]
-  s --> reach{"a promoted or complex-typed value<br/>reaches a wide binding?"}
-  reach -- no --> done["result.mode = 'strict'<br/>result.promoted says whether a head was promoted"]
-  reach -- yes --> again["recompile once in complex mode:<br/>wide bindings are complex, lifted at their use"]
-  again --> done2["result.mode = 'complex'<br/>result.escalation holds the LaneMismatch<br/>diagnostic of the strict attempt"]
-```
+The `auto` mode of version 0.177.0 and earlier (the former default: `strict`
+plus promotion, and a redo in `complex` mode after a lane mismatch) is
+removed. `compile(expr, { mode: 'auto' })` declines with the diagnostic code
+`'unsupported-mode'`; use `mode: 'complex'`, which gives the values `auto`
+gave.
+
+| Input                                       | Default (`strict`)            | `mode: 'complex'`  |
+| ------------------------------------------- | ----------------------------- | ------------------ |
+| `Sqrt(x)`, `x: real`, at `x = -4`           | `NaN`                         | `{ re: 0, im: 2 }` |
+| `Sqrt(x)^2`, `x: real`, at `x = -4`         | `NaN`                         | `-4`               |
+| `x + 2i`, `x: real`, at `x = 1`             | `{ re: 1, im: 2 }`            | `{ re: 1, im: 2 }` |
+| `compile(e, { mode: 'auto' })`              | `unsupported-mode` decline    |                    |
 
 The special functions whose value is complex for some real operands —
 `HurwitzZeta`, `LerchPhi`, `PolyLog`, `EllipticK`, the complete `EllipticE`,
-`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `auto` and
-`complex` the same way. The complex kernel is used where the operand facts do
-not prove the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`,
-`m ≤ 1` for the elliptic integrals), so compiled `LambertW(x)` at `x = −1` is
-`{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled `LerchPhi(3, 2, 1)`
-is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The GLSL and WGSL
-targets have no complex lane for these heads and decline a provably complex
-value. `Arcsec` and `Arccsc` of a real operand of unknown magnitude are typed
-`complex | infinity | nan`, so with `x` declared `real` the compiled
-`Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }`.
+`Hypergeometric2F1`, `LambertW` and `Gamma` — promote under `complex` the
+same way. The complex kernel is used where the operand facts do not prove
+the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`, `m ≤ 1` for
+the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
+`x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
+`LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
+GLSL and WGSL targets have no complex lane for these heads and decline a
+provably complex value. `Arcsec` and `Arccsc` of a real operand of unknown
+magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
+the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` in every
+mode.
 
 ```live
 // import { ComputeEngine, compile } from '@cortex-js/compute-engine';
 
 const ce = new ComputeEngine();
+ce.declare("t", "real");
 ce.parse("z(t) \\coloneq \\sqrt{t-1}").evaluate();
 
 // Interpreted — promotes to complex, then |·| brings it back to a real
-ce.assign("t", 0.3);
-console.log(ce.parse("|z(t)/2 - 1|").N().toString());          // 1.08397416943394
+console.log(ce.parse("|z(t)/2 - 1|").subs({ t: 0.3 }).N().toString());  // 1.08397416943394
 
-// Compiled, by default (`auto`) — the same value; the radical was PROMOTED
-const r = compile(ce.parse("|z(t)/2 - 1|"));
-console.log(r.run({ t: 0.3 }), r.mode, r.promoted);              // 1.08397416943394 "strict" true
+// Compiled with `mode: 'complex'` — the same value
+const r = compile(ce.parse("|z(t)/2 - 1|"), { mode: "complex" });
+console.log(r.run({ t: 0.3 }), r.mode);                          // 1.08397416943394 "complex"
 
-// `strict` — today's real kernel, NaN
-console.log(compile(ce.parse("|z(t)/2 - 1|"), { mode: "strict" }).run({ t: 0.3 }));  // NaN
+// Compiled by default (`strict`) — the real kernel, NaN
+console.log(compile(ce.parse("|z(t)/2 - 1|")).run({ t: 0.3 }));  // NaN
 ```
 
-Every result reports what was used, so a consumer can tell "this row would
-not be real on the shader lane" without guessing:
+Every result reports what was used:
 
-- `result.mode` — `'strict'` or `'complex'`, the discipline the code was
-  compiled under (`auto` reports the attempt that produced the code);
-- `result.promoted` — whether a promotable head was lowered through a complex
-  kernel; a compile-time fact decided from the source, so the same source
-  always reports the same flag;
-- `result.escalation` — under `auto`, the `LaneMismatch` diagnostic of the
-  strict attempt when the compilation was redone in complex mode
-  (`boundary`, a user-legible `binding` such as "the parameter `x` of `b`",
-  and the offending `value`);
+- `result.mode` — `'strict'`, `'complex'` or `'bigint'`, the mode the code
+  was compiled under (the requested mode, `'strict'` when none was
+  requested). It is not a test of the shape of a value: `x + 2i` compiled
+  under `strict` returns `{ re, im }`. Test a returned value with
+  `typeof v === 'number'`;
 - `result.diagnostic` — on any decline, the structured form of `error`
-  (`code`, `kind: 'capability' | 'correctness'`, `message`, and the
-  lane-mismatch payload above).
+  (`code`, `kind: 'capability' | 'correctness'`, `message`, and for a lane
+  mismatch its `boundary` and a user-legible `binding` such as "the
+  parameter `x` of `b`").
 
 Ordering comparisons and the real-only heads (`Floor`, `Mod`, `Max`, `Erf`,
 …) over a value that **may** be complex — a `complex`-typed symbol, a promoted
-radical — compile under `auto` and `complex` with a **runtime rule**: the
-operand is bound once, and the comparison is `false` / the head `NaN` when the
-value's imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`,
-`false` at `z = i`; `y > √x` compiles and is `false` where `x < 0`). A
-**statically** non-real operand of a real-only head (`Floor(2i)`) has no
-compiled value and is a compile-time decline in every mode; a statically
-non-real operand of an ordering comparison (`i < 2`) folds to `false`, the
-interpreter's answer (a value with no order decides false, user decision of
-2026-10-21), while `i < x` with `x` free declines; `strict` declines every complex
-operand of such a head, as before.
+radical — compile under `complex` with a **runtime rule**: the operand is
+bound once, and the comparison is `false` / the head `NaN` when the value's
+imaginary part is not exactly zero (`z < 2` is `true` at `z = 1`, `false` at
+`z = i`; `y > √x` is `false` where `x < 0`). A **statically** non-real
+operand of a real-only head (`Floor(2i)`) has no compiled value and is a
+compile-time decline in every mode; a statically non-real operand of an
+ordering comparison (`i < 2`) folds to `false`, the interpreter's answer (a
+value with no order decides false, user decision of 2026-10-21), while
+`i < x` with `x` free declines; `strict` declines every complex operand of
+such a head.
 
 The single most effective lever is not a mode: **declare the narrowest type
 you can.** A symbol declared `real` is never a wide binding — `2a + 1`,
-`b(a)`, `a < 3` stay on the real kernel in every setting (its unknown-sign
-radical still promotes under `auto`, because promotion is about sign, not
-wideness); a symbol declared `complex` is complex-shaped in every setting and
+`b(a)`, `a < 3` stay on the real kernel in every mode (its unknown-sign
+radical still promotes under `complex`, because promotion is about sign, not
+wideness); a symbol declared `complex` is complex-shaped in every mode and
 never a mismatch.
 
 A function's declared result is read the same way. A function declared
 `(real) -> real` whose body holds an unknown-sign radical or logarithm compiles
-its body on the real kernel in every mode, with `promoted: false`, and gives
-`NaN` outside the real domain. A body that is complex because of a
-complex-typed operand still declines.
+its body on the real kernel in every mode, and gives `NaN` outside the real
+domain. A body that is complex because of a complex-typed operand still
+declines.
 
 ```javascript
 ce.declare('p', { signature: '(real) -> real' });
 ce.assign('p', ce.parse('k \\mapsto \\sin(2.4k)\\sqrt{(k-0.5)/16}'));
 ce.declare('k', 'real');
-const r = compile(ce.parse('p(k)'));
+const r = compile(ce.parse('p(k)'), { mode: 'complex' });
 r.preamble;
 // ➔ "const _fn_p = (k) => Math.sin(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5));"
-r.promoted;
-// ➔ false
 r.run({ k: 0.1 });
 // ➔ NaN
 ```
 
-Under `auto` on the JavaScript target, a user function called from a `Sum`,
-`Product` or comprehension whose index has literal integer bounds is compiled
-once more for the range of that index when the range proves the sign of such a
-head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare `p(t)` promotes
-the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
+Under `complex` on the JavaScript target, a user function called from a
+`Sum`, `Product` or comprehension whose index has literal integer bounds is
+compiled once more for the range of that index when the range proves the
+sign of such a head. With `p := k ↦ 1.45 √((k − 0.5)/16) cos(2.4k)`, a bare
+`p(t)` promotes the radical, but `\sum_{k=1}^{16} p(k) x` compiles the copy
 `_fn_p_integer_1___ = (k) => 1.45 * Math.cos(2.4 * k) * Math.sqrt(0.0625 * (k + -0.5))`
-on the real kernel, with `promoted: false`. A copy is made only when it removes
-a promoted head, so a function with no such head keeps one definition.
+on the real kernel. A copy is made only when it removes a promoted head, so
+a function with no such head keeps one definition.
 
 `mode` is per compilation, on `CompileTarget` (the target
 default) or on `compile()`'s options; a mode a target does not offer
@@ -13996,9 +14815,8 @@ shader targets and `interval-js` offer `strict` only.
 
 > **Removed:** the `complexPromotion` option is gone, and a call that still
 > passes it gets no warning. `complexPromotion: true` used to select
-> `mode: 'complex'`; such a call now compiles in the default `auto` mode,
-> which promotes an unknown-sign radical but does not lift every wide binding
-> to complex. Pass `mode: 'complex'` to keep the old behavior.
+> `mode: 'complex'`; such a call now compiles in the default `strict` mode.
+> Pass `mode: 'complex'` to keep the old behavior.
 
 ## Custom Operators
 
@@ -14369,8 +15187,8 @@ same 8,192-byte guarantee as function variables. Nor does a `const` array,
 whose constructor is guaranteed only 2,047 elements. A read that would copy
 more than 8,192 bytes and cannot read in place (for example a `vars`
 mapping to a struct field, `u.S`) declines, with a message that names
-`'storage-buffer'`. So does a body that writes such an input, because it
-reads and writes a local copy of it. A storage buffer is the recommended form for a long
+`'storage-buffer'`. A body that writes an input declines on every target,
+because compiled code writes only its own locals. A storage buffer is the recommended form for a long
 list. A shorter list keeps the copy, which is valid wherever you declare it.
 
 ### WGSL Field Functions for Compute Shaders
@@ -14788,6 +15606,20 @@ console.log(value);
 
 The function accepts an object where keys are variable names and values are
 `Interval` objects with `lo` and `hi` properties.
+
+A lambda expression compiles to a function of its arguments, as on the
+`javascript` target (`calling: 'lambda'`). Each argument is a number (a point
+interval) or an `Interval`:
+
+```javascript
+const g = compile("(x, y) \\mapsto x^2 + y", { to: 'interval-js' });
+g.run({ lo: 1, hi: 2 }, 0.5);
+// → { kind: 'interval', value: { lo: 1.5, hi: 4.5 } }
+```
+
+Such a function takes only its arguments, so a lambda whose body reads another
+variable (`x \mapsto a x`) does not compile (`success: false`), and it has no
+`broadcast()`.
 
 #### Result Types
 
@@ -16805,6 +17637,25 @@ result — so every operand is evaluated. Chained comparisons are conjunctions
 of their adjacent pairs and short-circuit too: in `Less(a, b, c)` (`a < b < c`)
 the operand `c` is not evaluated once `a < b` is `False`.
 
+### Absent and undefined values
+
+Logic in the Compute Engine has two values. A comparison is `True` or
+`False`. A comparison with an operand that has no value — `NaN`, the absent
+value `Missing`, a pole such as `1/0`, or a complex number in an ordered
+comparison — is `False`. `NotEqual` is the negation of `Equal`, so it is
+`True` there. A connective reads an absent operand as `False`, and an `If` or
+a `Which` whose condition is absent takes its next branch:
+
+```js example
+ce.expr(['Greater', 'Missing', 0]).evaluate();          // → "False"
+ce.expr(['Not', ['Greater', 'Missing', 0]]).evaluate();  // → "True"
+ce.expr(['NotEqual', 'Missing', 0]).evaluate();          // → "True"
+ce.expr(['If', 'Missing', 1, 2]).evaluate();             // → 2
+```
+
+A comparison of free symbols, such as `x < 1` with no value for `x`, is not
+decided: it stays unevaluated.
+
 ## First-Order Logic
 
 First-Order Logic extends propositional logic with quantifiers and predicates,
@@ -17424,6 +18275,34 @@ console.log(M.toString());  // → [[1, 2, 3], [4, 5, 6]]
 ce.parse('\\begin{pmatrix} 1 & 2 & 3 \\\\ 4 & 5 & 6 \\end{pmatrix}');
 ```
 
+**Matrices of symbols.** A cell can be a symbol with no value. A symbol
+with no type, or a symbol whose type is a number type, is read as a number
+cell, so the list is a matrix and the matrix operations apply to it:
+
+```js example
+const S = ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]);
+S.type.toString();                            // → matrix<2x2>
+ce.expr(['Trace', S]).evaluate().toString();  // → a + d
+```
+
+A symbol whose type can hold a list (a `matrix`, a `tensor`, `number | tensor`)
+can be a matrix itself. Then the list can be a block matrix, so it is not
+typed as a matrix, and `Trace`, `Determinant` and `Inverse` of it stay
+unevaluated. A symbol gets such a type when it is declared with it, or when it is
+first used as the operand of a matrix operation: `Determinant(a)` gives `a`
+the type `matrix`, and `Trace(a)` gives it the type `number | tensor`
+(`Trace` also accepts a scalar and a tensor of any rank).
+
+```js example
+ce.expr(['Determinant', 'a']);
+ce.expr('a').type.toString();   // → matrix
+ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
+// → list<list<unknown>>
+```
+
+To use a symbol both as a matrix and as a cell of a matrix, give the two uses
+different names.
+
 ### Tensors
 
 Higher-dimensional arrays (tensors) use deeper nesting:
@@ -17639,6 +18518,13 @@ ce.expr(['Trace', ['List',
   ['List', 7, 8, 9]
 ]]).evaluate();
 // → 15  (1 + 5 + 9)
+
+// Symbolic trace
+ce.expr(['Trace', ['List',
+  ['List', 'a', 'b'],
+  ['List', 'c', 'd']
+]]).evaluate();
+// → a + d
 ```
 
 **LaTeX:** Use `\operatorname{tr}` or `\mathrm{tr}`:
@@ -19701,21 +20587,6 @@ readonly NaN: Expression;
 
 <MemberCard>
 
-##### ComputeEngine.Indeterminate {#indeterminate-1}
-
-```ts
-readonly Indeterminate: Expression;
-```
-
-The exact answer to an indeterminate form such as `0/0`: a number with
-no value. Its double value is `NaN`, but it is a different value from
-`NaN`, which is the result of a floating-point computation that failed.
-Its numeric approximation (`.N()`) is `NaN`.
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ComputeEngine.PositiveInfinity {#positiveinfinity-2}
 
 ```ts
@@ -20176,11 +21047,33 @@ OLDEST makes the state before the next-younger one unreachable.
 ##### ComputeEngine.declareProtocol() {#declareprotocol-1}
 
 ```ts
-declareProtocol(name, members): void
+declareProtocol(name, members, options?): void
 ```
 
 Declare a protocol (Appendix A "Host API"). Throws on error, including
 on re-declaration — the Epsil statement route replaces instead (P5).
+
+`options.extends` lists the PARENTS of the protocol, protocols that must
+already be declared:
+
+```js
+ce.declareProtocol('PartialOrder', {
+  functions: { compare: '(self: Self, other: Self) -> integer' },
+});
+ce.declareProtocol('LinearOrder', {}, { extends: ['PartialOrder'] });
+```
+
+A type that conforms to `LinearOrder` then conforms to `PartialOrder`
+too: a conformance to a protocol registers a conformance to each of its
+ancestors that the type does not already conform to, and the
+implementation given to `declareProtocolImplementation` may implement
+the members of every ancestor. A protocol may not declare a member that
+one of its ancestors declares (`protocol-member-inherited`), and two
+parents whose ancestors declare the same member name cannot be extended
+together (`protocol-extends-member-conflict`). An `extends` value that is
+not an array of strings, or that lists a name twice, throws
+`invalid-protocol-declaration`; a name that is not a declared protocol
+throws `protocol-unknown`.
 
 ####### name
 
@@ -20189,6 +21082,12 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 ####### members
 
 [`ProtocolMembersInput`](#protocolmembersinput)
+
+####### options?
+
+####### extends?
+
+readonly `string`[]
 
 </MemberCard>
 
@@ -21543,6 +22442,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -21626,6 +22526,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -23395,7 +24296,7 @@ broadcast lowering, so it can override how a built-in operator compiles
 relational operator). It does NOT override the structural / control-flow
 heads (`Sequence`, `Sum`, `Product`, `Function`, `Declare`, `Assign`,
 `Return`, `Break`, `Continue`, `Loop`, `Comprehension`, `If`, `Which`,
-`When`, `Match`, `Block`), which have their own bespoke lowering; a handler
+`Match`, `Block`), which have their own bespoke lowering; a handler
 declared on one of those heads is ignored.
 
 ```ts
@@ -24029,6 +24930,8 @@ type OperandStructure =
      name: string;
      annotated: Type;
      rest: boolean;
+     optional: boolean;
+     default: ParameterDefault;
     }>;
   body: OperandStructure;
  }
@@ -24117,7 +25020,7 @@ free?: true;
 ```
 
 Present (`true`) when the symbol is free: it has no value, it is
-not a constant, not `Undefined` and not a pattern wildcard (a name
+not a constant and not a pattern wildcard (a name
 that starts with `_`), and a scope of the current context other
 than the system scope binds it, but not as a parameter of a
 function literal, a local of a `Block` or the variable of a binder
@@ -24205,6 +25108,8 @@ Derive this call through Apply rather than resolving head by name.
      `name`: `string`;
      `annotated`: [`Type`](#type-3);
      `rest`: `boolean`;
+     `optional`: `boolean`;
+     `default`: [`ParameterDefault`](#parameterdefault);
     \}\>;
   `body`: [`OperandStructure`](#operandstructure);
  \}
@@ -24216,6 +25121,8 @@ parameters: ReadonlyArray<{
   name: string;
   annotated: Type;
   rest: boolean;
+  optional: boolean;
+  default: ParameterDefault;
 }>;
 ```
 
@@ -24224,7 +25131,11 @@ parameter (`(a, ...rest) => …`): it is always the last entry, it
 takes no annotation, and it binds a tuple of every argument from its
 own position onwards rather than occupying one positional slot. A
 consumer reading arity must therefore treat the entries before it as
-the required count and admit any number after.
+the required count and admit any number after. `optional` marks a
+parameter with a default value (`(x, k = 2) => x * k`), and
+`default` is that value: a call may leave the parameter out, and
+the parameter then receives its default. The parameters with a
+default come after the required ones.
 
 \{
   `kind`: `"tuple"`;
@@ -24855,7 +25766,7 @@ isCollection?: (collection) => boolean;
 ```
 
 Optional predicate for operators whose collection-ness depends on their
-operands, e.g. `When(value, cond)`, which is a collection exactly when
+operands, e.g. `If(cond, value)`, which is a collection exactly when
 `value` is one.
 
 Returning `false` reports the expression as a scalar, as if it had no
@@ -24902,6 +25813,31 @@ Set it on lazy operators that evaluate a function per element (`Map`,
 Leave it off structural reindexers (`Take`, `Reverse`, `Zip`, …), which
 re-serve their source's elements cheaply — when the source is itself a
 flagged instance, the source's own memo already absorbs the cost.
+
+Default: `false`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BaseCollectionHandlers.callsCallbackOnRead? {#callscallbackonread}
+
+```ts
+callsCallbackOnRead?: boolean;
+```
+
+Set on a lazy operator that calls a function operand when its elements
+are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, `Fill`,
+…). An instance created during a function call keeps the evaluation
+context of that call, and each read of the instance runs in it, so that
+a name that the callback reads by its binding in the context (the symbol
+default `d` of a parameter `(x, k = d) => x * k`) has the value it had in
+the call, also when the instance is read after the call has returned
+(`boxed-expression/lazy-view-context.ts`).
+
+Leave it off an operator that calls its function operand when it is
+evaluated (`Reduce`, `Sort`), and off an operator with no function
+operand.
 
 Default: `false`
 
@@ -25497,20 +26433,26 @@ of two enclosures is the enclosure of the larger ends
 
 <MemberCard>
 
-##### ArithmeticDefinition.isExact()? {#isexact-1}
+##### ArithmeticDefinition.~~isExact()?~~ {#isexact-1}
 
 ```ts
 isExact(value): boolean
 ```
 
-Whether the value `value` of this kind is exact, for the rule that an
-inexact operand turns an `Indeterminate` answer into `NaN`
-(`Max(x, Indeterminate)` is `NaN` when `x` is inexact). Absent: a value
+Whether the value `value` of this kind is exact. Absent: a value
 of the kind is exact. A measurement is never exact.
+
+The engine does not read this hook now. It is kept for compatibility
+with kind definitions that declare it.
 
 ####### value
 
 [`Expression`](#expression-5)
+
+###### Deprecated
+
+The engine does not read it: an exact form with no value
+gives `NaN`, whether its operands are exact or not.
 
 </MemberCard>
 
@@ -26037,6 +26979,8 @@ type LambdaDefinition = {
   parameters: ReadonlyArray<{
      name: string;
      type: Type | undefined;
+     optional: boolean;
+     default: ParameterDefault;
     }>;
   body: Expression;
 };
@@ -26313,6 +27257,19 @@ The eager producer's element count — see the `elementCount` contract on
 
 <MemberCard>
 
+##### BoxedOperatorDefinition.elementAt? {#elementat}
+
+```ts
+elementAt?: (expr, index) => Expression | undefined;
+```
+
+The eager producer's element read — see the `elementAt` contract on
+[OperatorDefinition](#operatordefinition).
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedOperatorDefinition.inferOperandTypes? {#inferoperandtypes}
 
 ```ts
@@ -26477,7 +27434,7 @@ non-variadic signature.
 refusesAbsentOperandAt(i): boolean
 ```
 
-True when an absent scalar operand (`Missing`, `Undefined`) at position
+True when an absent scalar operand (`Missing`) at position
 `i` is refused at evaluation with an `incompatible-type` error naming the
 parameter's type: a declared `reject`, or the default for an operator
 with no absence behavior of its own whose parameter at `i` excludes
@@ -26502,7 +27459,7 @@ threadsConditionalsAt(i): boolean
 
 True if the `threadsConditionals` flag of
 [OperatorDefinitionFlags](#operatordefinitionflags) selects operand position `i`: a
-conditional value (`When`, `Which`) there moves out of the application at
+conditional value (a restriction, `Which`) there moves out of the application at
 evaluation. A broadcastable operator threads every position whatever this
 answers.
 
@@ -28708,7 +29665,11 @@ prettify: boolean;
 
 If true, prettify the LaTeX output.
 
-For example, render `\frac{a}{b}\frac{c}{d}` as `\frac{ac}{bd}`
+For example, render `x\cdot y^{-1}` as `\frac{x}{y}`, and
+`\frac{1}{a}\cdot\frac{1}{b}` as `\frac{1}{ab}`. A product whose only
+denominators are those of quotients with a numerator other than 1 keeps
+its factors, so that it reads back as the same expression:
+`90\frac{x}{y}` stays `90\times\frac{x}{y}`.
 
 #### SerializeLatexOptions.materialization
 
@@ -28960,10 +29921,12 @@ type ResolvedSerializeLatexOptions = Omit<SerializeLatexOptions,
   | "indexStyle"
   | "readsAsPointList"
   | "readsAsCardinality"
-  | "readsAsMatrixPowerBase"> & {
+  | "readsAsMatrixPowerBase"
+  | "readsAsFunctionSymbol"> & {
   readsAsPointList: ((operands) => boolean | undefined) | undefined;
   readsAsCardinality: ((operand) => boolean | undefined) | undefined;
   readsAsMatrixPowerBase: ((base) => boolean | undefined) | undefined;
+  readsAsFunctionSymbol: ((name) => boolean | undefined) | undefined;
   applyFunctionStyle: (expr, level) => DelimiterScale;
   groupStyle: (expr, level) => DelimiterScale;
   rootStyle: (expr, level) => RootStyle;
@@ -30841,6 +31804,7 @@ type OperatorDefinition = Partial<BaseDefinition> & Partial<OperatorDefinitionFl
   arithmetic: ArithmeticDefinition;
   canEnumerate: (expr) => boolean | undefined;
   elementCount: (expr) => number | undefined;
+  elementAt: (expr, index) => Expression | undefined;
   inferOperandTypes: (ops, requirement) => 
      | ReadonlyArray<
      | Type
@@ -30880,6 +31844,35 @@ return type.
 
 If a `type` handler is provided, the return type of the function should
 be a subtype of the return type in the signature.
+
+**Default values.** An optional parameter can have a default value,
+written after its type: `(x: number, factor: number = 2) -> number`.
+A parameter with a default is optional (it is not also marked `?`).
+The parameters with a default come after the required parameters and
+before the optional parameters without a default.
+
+A default is a number (a finite number, `NaN`, `+oo` or `-oo`), a
+string, `true` or `false`, a symbol, the empty list `[]` or the empty
+dictionary `{}`. A symbol default is the symbol itself, not its value
+when the operator is declared: `over: set = Integers`,
+`mode: symbol<Auto> | symbol<Manual> = Auto`. The symbol need not be
+declared. For another value, declare a constant and give its name.
+
+When the operator is declared, each default is checked against the
+type of its parameter, and the declaration throws if it does not fit:
+a number, a string, a boolean, `[]` or `{}` must match the type, a
+declared symbol must be a valid argument at that parameter, and for a
+parameter typed with literal symbol types the symbol must be one of
+them. A default is refused in an overloaded signature (an intersection
+of signatures), on a parameter whose type mentions a type variable, and
+anywhere other than the parameters of the top-level signature (for
+example in the type of a parameter that is itself a function).
+
+A call that leaves out a parameter with a default receives the default
+when it is canonicalized: `Scaled(3)` is the same expression as
+`Scaled(3, 2)`, and the `evaluate` handler, the `type` handler and the
+compiler see two operands. The default is inserted only when every
+required parameter has an argument. The signature prints the default.
 
 #### OperatorDefinition.inferredSignature?
 
@@ -31139,7 +32132,7 @@ or a re-mapped `Add`/`Multiply`/`Power`/relational operator).
 It does NOT override the structural / control-flow heads, which have
 their own bespoke lowering: `Sequence`, `Sum`, `Product`, `Function`,
 `Declare`, `Assign`, `Return`, `Break`, `Continue`, `Loop`,
-`Comprehension`, `If`, `When`, `Match`, `Block`. A handler
+`Comprehension`, `If`, `Match`, `Block`. A handler
 declared on one of those heads is ignored.
 
 Exception: `Which` IS overridable (it has no binding structure — its
@@ -31406,6 +32399,30 @@ Contract, mirroring `canEnumerate`:
 
 Consulted only when the definition has no `collection.count` handler —
 a declared `count` owns the answer, including its `undefined`.
+
+#### OperatorDefinition.elementAt?
+
+```ts
+elementAt?: (expr, index) => Expression | undefined;
+```
+
+For an operator that RETURNS a collection but has no `collection`
+handlers: the element at the 1-based position `index` of the
+collection that `evaluate()` would produce, built from the operands
+with no evaluation. `PointX(L)` at `k` is `PointX(L.at(k))`.
+
+The `at()` twin of elementCount. Contract:
+
+- Called only for a valid, pure expression whose `count` is known, with
+  `1 ≤ index ≤ count`.
+- MUST NOT evaluate the expression. The element it returns can be
+  unevaluated, and its evaluation MUST equal
+  `expr.evaluate().at(index)`: `at()` returns that evaluation.
+- Anything not cheaply knowable must report `undefined` (decline):
+  `at()` then evaluates the expression and reads the element of the
+  result.
+
+Consulted only when the definition has no `collection.at` handler.
 
 #### OperatorDefinition.inferOperandTypes?
 
@@ -31776,6 +32793,8 @@ type ConformanceRecord = {
     };
   pending: boolean;
   _pendingReason: string;
+  _via: string;
+  _derived: true;
   declaredByStatement: boolean;
 };
 ```
@@ -31818,6 +32837,7 @@ wrong body for another.
 type ProtocolRecord = {
   name: string;
   members: Record<string, ProtocolMember>;
+  extends: string[];
   conformances: ConformanceRecord[];
   declaredByStatement: boolean;
   _sumConformances: SumConformanceRecord[];
@@ -32072,21 +33092,6 @@ ImaginaryUnit
 ```ts
 readonly NaN: Expression;
 ```
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.Indeterminate {#indeterminate}
-
-```ts
-readonly Indeterminate: Expression;
-```
-
-The exact answer to an indeterminate form such as `0/0`: a number with
-no value. Its double value is `NaN`, but it is a different value from
-`NaN`, which is the result of a floating-point computation that failed.
-Its numeric approximation (`.N()`) is `NaN`.
 
 </MemberCard>
 
@@ -32552,11 +33557,33 @@ OLDEST makes the state before the next-younger one unreachable.
 ##### IComputeEngine.declareProtocol() {#declareprotocol}
 
 ```ts
-declareProtocol(name, members): void
+declareProtocol(name, members, options?): void
 ```
 
 Declare a protocol (Appendix A "Host API"). Throws on error, including
 on re-declaration — the Epsil statement route replaces instead (P5).
+
+`options.extends` lists the PARENTS of the protocol, protocols that must
+already be declared:
+
+```js
+ce.declareProtocol('PartialOrder', {
+  functions: { compare: '(self: Self, other: Self) -> integer' },
+});
+ce.declareProtocol('LinearOrder', {}, { extends: ['PartialOrder'] });
+```
+
+A type that conforms to `LinearOrder` then conforms to `PartialOrder`
+too: a conformance to a protocol registers a conformance to each of its
+ancestors that the type does not already conform to, and the
+implementation given to `declareProtocolImplementation` may implement
+the members of every ancestor. A protocol may not declare a member that
+one of its ancestors declares (`protocol-member-inherited`), and two
+parents whose ancestors declare the same member name cannot be extended
+together (`protocol-extends-member-conflict`). An `extends` value that is
+not an array of strings, or that lists a name twice, throws
+`invalid-protocol-declaration`; a name that is not a declared protocol
+throws `protocol-unknown`.
 
 ####### name
 
@@ -32565,6 +33592,12 @@ on re-declaration — the Epsil statement route replaces instead (P5).
 ####### members
 
 [`ProtocolMembersInput`](#protocolmembersinput)
+
+####### options?
+
+####### extends?
+
+readonly `string`[]
 
 </MemberCard>
 
@@ -33919,6 +34952,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -34002,6 +35036,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `arithmetic`: [`ArithmeticDefinition`](#arithmeticdefinition);
   `canEnumerate`: (`expr`) => `boolean` \| `undefined`;
   `elementCount`: (`expr`) => `number` \| `undefined`;
+  `elementAt`: (`expr`, `index`) => [`Expression`](#expression-5) \| `undefined`;
   `inferOperandTypes`: (`ops`, `requirement`) => 
      \| readonly (
      \| [`Type`](#type-3)
@@ -35060,38 +36095,14 @@ readonly isNaN: boolean | undefined;
 ```
 
 If true, the value of this expression is a number with no value: either
-`NaN` or `Indeterminate`.
+`NaN`.
 
 `NaN` ("Not a Number", from the floating point format standard IEEE-754)
-is the result of a floating-point computation with no value, such as
-`0.0/0.0`, and the marker of an absent numeric operand. `Indeterminate`
-is the result of an exact form with no value, such as `0/0`. Both report
-`isNaN === true`; `isIndeterminate` tells them apart.
+is the result of a computation with no value, such as `0.0/0.0` or
+`0/0`, and the marker of an absent numeric operand.
 
 Note that if `isNaN` is true, `isNumber` is also true (yes, `NaN` is a
 number).
-
-</MemberCard>
-
-<MemberCard>
-
-##### Expression.isIndeterminate {#isindeterminate}
-
-```ts
-readonly isIndeterminate: boolean;
-```
-
-If true, this expression is the `Indeterminate` number literal
-(`ce.Indeterminate`): the exact answer to an indeterminate form such as
-`0/0`, a number with no value.
-
-Its double value is `NaN`, so `isNaN` is also true. It differs from the
-`NaN` literal, which is the result of a floating-point computation that
-failed: the two are different values (`isSame` is false between them).
-A numeric approximation (`.N()`) of `Indeterminate` is `NaN`.
-
-`false` for every other expression, including an unevaluated expression
-whose value would be `Indeterminate`.
 
 </MemberCard>
 
@@ -36187,11 +37198,12 @@ When the value has no
 closed form (`Series(e^{1/x}, x, 0, 3)`), the `EvaluateAt` stays
 unevaluated. The value of a `Series` at a point keeps its remainder:
 `Series(sin x, x, 0, 3)` with `x` replaced by `1/2` evaluates to
-`23/48 + BigO(1/32)`, and with `x` replaced by `0` to `BigO(0)`. A
-value that keeps a `BigO` term is `NaN` under `.N()` (the remainder has
-no numeric value): wrap the series in `Normal` to drop the remainder,
-before or after the substitution. `Normal(Series(sin x, x, 0, 3))` with
-`x` replaced by `0.5` evaluates to `0.479…` under `.N()`.
+`23/48 + BigO(1/32)`, and with `x` replaced by `0` to `BigO(0)`. Under
+`.N()` the remainder stays a `BigO` term and the other terms are
+approximated: the first value is `0.479… + BigO(0.03125)`. Wrap the
+series in `Normal` to drop the remainder, before or after the
+substitution. `Normal(Series(sin x, x, 0, 3))` with `x` replaced by
+`0.5` evaluates to `0.479…` under `.N()`.
 
 The substitution does not avoid variable capture: a replacement that
 contains a name that a binder binds is inserted as it is, and the
@@ -36639,7 +37651,7 @@ Notes:
 getInterval(symbol): IntervalBounds | undefined
 ```
 
-For an expression representing a domain restriction (a `When` whose
+For an expression representing a domain restriction (a restriction whose
 condition is a comparison or `And` of comparisons over `symbol`, or
 a bare comparison expression), return the lower/upper bounds for
 `symbol`. Returns `undefined` if no bounds can be extracted.
@@ -36648,9 +37660,9 @@ Supported shapes:
 - Bare comparisons: `a < x`, `x < b`, etc.
 - Chained comparisons: `a < x < b` (parsed as `Less(a, x, b)`)
 - `And(c1, c2, ...)` where each `ci` is a supported shape
-- `When(e, cond)` — operates on `cond`
-- `Multiply(f, When(...), ...)` — the Desmos parse shape for
-  `f(x)\{a < x < b\}`; bounds from each `When` factor are merged
+- `If(cond, e)` — operates on `cond`
+- `Multiply(f, If(...), ...)` — the Desmos parse shape for
+  `f(x)\{a < x < b\}`; bounds from each restriction factor are merged
 
 `lowerStrict`/`upperStrict` are `true` for strict (`<`, `>`) bounds
 and `false` for non-strict (`≤`, `≥`).
@@ -40185,12 +41197,50 @@ release cycle and normalizes each to the name it denotes
 
 <MemberCard>
 
+### ParameterDefault {#parameterdefault}
+
+```ts
+type ParameterDefault = 
+  | {
+  kind: "value";
+  value: number | string | boolean;
+ }
+  | {
+  kind: "symbol";
+  name: string;
+ }
+  | {
+  kind: "empty-list";
+ }
+  | {
+  kind: "empty-dictionary";
+};
+```
+
+The default value of an optional function parameter, written after the
+parameter type in a signature: `(x: number, factor: number = 2) -> number`.
+
+- `value`: a number that a JavaScript `number` holds (a finite number,
+  `NaN`, `+oo` or `-oo`), a string, or a boolean.
+- `symbol`: a symbol, stored by name. The symbol itself is the default;
+  it is not evaluated when the signature is parsed.
+- `empty-list` and `empty-dictionary`: `[]` and `{}`.
+
+A default is part of the type: the serializer prints it, so two signatures
+that differ only by a default have different identity keys. Subtyping and
+matching ignore it, as they ignore the parameter name.
+
+</MemberCard>
+
+<MemberCard>
+
 ### NamedElement {#namedelement}
 
 ```ts
 type NamedElement = {
   name: string;
   type: Type;
+  default: ParameterDefault;
 };
 ```
 
@@ -40825,6 +41875,14 @@ spelling that round-trips through serialization. See {@link EffectSet}.)
            | <name> "..." <type>
 
 <optional_argument> ::= <argument> "?"
+           | <argument> "=" <default_value>
+
+<default_value> ::= <value> | <identifier> | "[" "]" | "{" "}"
+
+(An argument with a default value is optional; it is not combined with
+`?`. The arguments with a default come before the optional arguments
+without one. A default is not allowed on a rest argument, nor in a tuple
+type. See {@link ParameterDefault}.)
 
 <optional_arguments> ::= <optional_argument> ("," <optional_argument>)*
 
@@ -40949,30 +42007,6 @@ object identity is not a reliable test.
 
 </MemberCard>
 
-<MemberCard>
-
-### INDETERMINATE\_VALUE {#indeterminate_value}
-
-```ts
-const INDETERMINATE_VALUE: Readonly<{
-  indeterminate: true;
-}>;
-```
-
-The value carried by the type of the `Indeterminate` literal: the exact
-answer to an indeterminate form (such as `0/0`), a number with no value.
-Its double value is `NaN`, like the IEEE `NaN` literal, but the two are
-DIFFERENT values: `NaN` is the result of a floating-point failure and
-`Indeterminate` the result of an exact computation. A JavaScript `NaN`
-cannot tell them apart, so this frozen tagged object is the value of the
-`Indeterminate` value type. It widens to `nan`, like the `NaN` value
-type. Test for it with [`isIndeterminateValue`](#isindeterminatevalue), which reads the
-TAG, for the reason given for [`COMPLEX_INFINITY_VALUE`](#complex_infinity_value).
-
-Provenance: `docs/plans/2026-09-28-indeterminate-value.md`.
-
-</MemberCard>
-
 ----
 
 <MemberCard>
@@ -40985,24 +42019,6 @@ function isComplexInfinityValue(v): v is Readonly<{ complexInfinity: true }>
 
 True if `v` is the [`COMPLEX_INFINITY_VALUE`](#complex_infinity_value) sentinel, i.e. the
 value of the `~oo` value-literal type. Reads the tag, never the identity.
-
-##### v
-
-`unknown`
-
-</MemberCard>
-
-<MemberCard>
-
-### isIndeterminateValue() {#isindeterminatevalue}
-
-```ts
-function isIndeterminateValue(v): v is Readonly<{ indeterminate: true }>
-```
-
-True if `v` is the [`INDETERMINATE_VALUE`](#indeterminate_value) sentinel, i.e. the
-value of the `Indeterminate` value-literal type. Reads the tag, never the
-identity.
 
 ##### v
 
@@ -41172,6 +42188,8 @@ arithmetic on infinite operands.
 
 **An indeterminate form** evaluates to `NaN`: $0/0$, $\infty - \infty$ and
 $\infty \times 0$ have no value that the surrounding expression could rely on.
+The symbol `Indeterminate` (`\operatorname{Indeterminate}` in LaTeX) is
+read as `NaN`.
 
 ```json example
 ["Divide", 1, 0]
@@ -41383,6 +42401,14 @@ Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `
 
 When `simplify()` is called on a `Sum` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
 
+A bound that is not an integer gets no closed form, and the operator stays
+symbolic. This is a bound such as `2.5`, a bound that holds a symbol declared
+with a type that is not an integer type (for example `real`), or a bound whose
+symbols are all declared and whose type is not an integer type (`n/2` with `n`
+declared `integer`). The enumeration rounds such a bound down, and a closed
+form would not. An undeclared symbol is a generic value, and its bound gets the
+closed form.
+
 | Pattern | Simplifies to | Name |
 | :------ | :------------ | :--- |
 | $$\sum_{n=1}^{b} c$$ | $$b \cdot c$$ | Constant body |
@@ -41407,7 +42433,8 @@ When `simplify()` is called on a `Sum` expression with symbolic bounds, the foll
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `0`
+- Empty range (upper < lower): returns `0`, or a vector of `0` when the
+  body is a vector of a known length (`[0, 0, 0]` for `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 - Nested sums: inner sums are simplified first, enabling cascading simplification
 
@@ -41437,8 +42464,8 @@ body whose denominator, as written, is zero at no integer index of the domain.
 A pole there keeps the sum symbolic.
 
 For a **symbolic** ratio $r$, the families with a convergence region return a
-`When`-guarded value recording it — for example
-$\sum k x^k \to \frac{x}{(1-x)^2} \; \{\|x\| < 1\}$.
+restriction `["If", condition, value]` that records it — for example
+$\sum k x^k \to \frac{x}{(1-x)^2}\text{ where }|x| < 1$.
 
 A series whose divergence the engine can certify evaluates to its infinity,
 under `evaluate()` and `.N()`: $\sum_{n=1}^{\infty} \frac{1}{n}$ and
@@ -41519,6 +42546,14 @@ See the `Sum` documentation above for details on supported collection types.
 
 When `simplify()` is called on a `Product` expression with symbolic bounds, the following closed-form formulas are applied when applicable:
 
+A bound that is not an integer gets no closed form, and the operator stays
+symbolic. This is a bound such as `2.5`, a bound that holds a symbol declared
+with a type that is not an integer type (for example `real`), or a bound whose
+symbols are all declared and whose type is not an integer type (`n/2` with `n`
+declared `integer`). The enumeration rounds such a bound down, and a closed
+form would not. An undeclared symbol is a generic value, and its bound gets the
+closed form.
+
 | Pattern | Simplifies to | Name |
 | :------ | :------------ | :--- |
 | $$\prod_{n=1}^{b} c$$ | $$c^b$$ | Constant body |
@@ -41533,7 +42568,8 @@ When `simplify()` is called on a `Product` expression with symbolic bounds, the 
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `1`
+- Empty range (upper < lower): returns `1`, or a vector of `1` when the
+  body is a vector of a known length (`[1, 1, 1]` for `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
 The Wallis-like product is also given its closed form by `evaluate()`, for any
@@ -41654,7 +42690,7 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 step: the value is rounded to a multiple of the step instead of an integer.
 `Floor(x, step)` is the greatest multiple of the step that is at most `x`,
 whatever the sign of the step, `Round(x, step)` is the nearest multiple, and
-a zero step gives `Indeterminate`. To round to `n` decimal places, use the
+a zero step gives `NaN`. To round to `n` decimal places, use the
 step `10^-n`: `Round(3.14159, 1/100)` is `157/50`.
 
 ```json example
@@ -42241,6 +43277,18 @@ So a piecewise whose condition compares such a value takes its next branch:
 `\{1/0 > 0: 1, 0\}` is `0`. `NotEqual` is not affected (`1/0 \ne 0` is
 `True`), and a comparison with a free symbol stays unevaluated. Signed
 infinities are ordered as usual (`0 < \infty` is `True`).
+
+A comparison is always `True` or `False`. The absent value `Missing` is
+read like `NaN`: `["Greater", "Missing", 0]` is `False`, `["Less", 0,
+"Missing", 1]` is `False`, and `["NotEqual", "Missing", 0]` is `True`. A
+comparison of two lists with an absent element is `False`.
+
+Any other operator applied to the absent value gives `Missing`:
+`["Add", "Missing", 2]` and `["Sin", "Missing"]` are `Missing`, and
+`["Add", ["List", 1, "Missing"], 1]` is `["List", 2, "Missing"]`. `Sum`,
+`Product`, `Max` and `Mean` of a list with a `Missing` datum are `Missing` (an
+error datum still gives the error). Read the
+absent value with `IsMissing` or `Coalesce` before computing on it.
 
 The three tiers of equality — `Same` (syntactic), `Equal` (same value) and
 `IdenticallyEqual` (same value for every value of the free variables) — are
@@ -43489,8 +44537,7 @@ unevaluated under `evaluate()` and `N()`.
 
 A definite integral whose integrand has a pole inside the interval has no
 finite value. When the integrand changes sign across the pole, the result is
-`Indeterminate` (`NaN` under `.N()`): `\int_{-1}^1 \frac{1}{t}\,dt` is
-`Indeterminate`. When the integrand keeps one sign, the result is `+∞` or
+`NaN`: `\int_{-1}^1 \frac{1}{t}\,dt` is `NaN`. When the integrand keeps one sign, the result is `+∞` or
 `−∞`, also for a pole at a bound: `\int_0^1 t^{-2}\,dt` is `+∞`. When the
 position of a pole depends on a free symbol, as in `\int_0^4 (y-a)^{-2}\,dy`,
 the integral stays unevaluated unless the declared type of the symbol or an
@@ -43703,7 +44750,7 @@ ce.parse('\\int_{0}^{2\\pi} \\frac{1}{2+\\cos x} dx').evaluate()
 ```
 
 `.N()` uses the exact value. A pole on the path of the integral gives `+∞`,
-`−∞` or `Indeterminate`:
+`−∞` or `NaN`:
 
 ```javascript
 ce.parse('\\int_{-\\infty}^{\\infty} \\frac{1}{x^2} dx').evaluate()
@@ -43751,7 +44798,7 @@ The supported integrands are rational functions, entire numerators, products
 of $\sin$ or $\cos$ of a real affine argument in the denominator, and
 $P(z)·e^{c/(z-a)}$ with an essential singularity. An integrand whose poles
 cannot be certified exactly stays unevaluated, and a pole on the contour
-gives `Indeterminate`. Each call has a step budget, so the point where it
+gives `NaN`. Each call has a step budget, so the point where it
 gives up does not depend on the machine.
 
 
@@ -44044,13 +45091,20 @@ series, of order no larger than _u_. It is produced by `Series` and is
 
 <Latex flow="column" value="O\left(x^7\right)"/>
 
-Because the remainder is not a concrete value, a numeric approximation
-(`expr.N()`) of any expression that contains a `BigO` term is `NaN`:
+A numeric approximation (`expr.N()`) keeps a `BigO` term: its operand is
+approximated, and the other terms of a series are approximated. The result
+is a series with floating-point coefficients, as in Mathematica. Use `Normal`
+to drop the remainder and get a polynomial.
 
 ```json example
 ["BigO", ["Power", "x", 7]]
 // evaluate ➔ ["BigO", ["Power", "x", 7]]
-// .N()     ➔ NaN
+// .N()     ➔ ["BigO", ["Power", "x", 7]]
+```
+
+```javascript
+ce.parse('\\operatorname{Series}(\\sin x)').N().latex
+// → x-0.166\,666\,666\,666\,666\,666\,667x^3+0.008\,333\,333\,333\,333\,333\,333\,33x^5+O\left(x^7\right)
 ```
 
 `BigO` serializes to LaTeX as `O\left(u\right)`. It is **parsed** from
@@ -44590,7 +45644,7 @@ Some of the eager collections include:
 
 - **Sequence**: a sequence is a list but it is handled differently in the
   Compute Engine. It is used to splice elements into an expression where an element
-  is expected. The `Nothing` symbol is a synonym for the empty sequence.
+  is expected. The empty sequence `["Sequence"]` splices to no element.
   
 - [**Set**](#set): non-indexed collections of unique elements. The elements in a set are
   not accessed by index, they are enumerated. A set can contain an infinite number
@@ -44708,13 +45762,20 @@ is expected, the elements of the sequence are spliced into the expression.
 // ➔ ["List", 1, 2, 3, 4]
 ```
 
-The `Nothing` symbol is a synonym for the empty sequence `["Sequence"]`.
-When the `Nothing` symbol is used in a context where an element is expected, it is ignored.
+The empty sequence `["Sequence"]` splices to no element:
 
+```json example
+["List", 1, ["Sequence"], 2]
+// ➔ ["List", 1, 2]
+```
+
+The `Nothing` symbol is not an empty sequence. It is the value of an empty
+block or of a statement with no value, and a collection keeps it as an
+element:
 
 ```json example
 ["List", 1, "Nothing", 2]
-// ➔ ["List", 1, 2]
+// ➔ ["List", 1, "Nothing", 2]     (three elements)
 ```
 
 </FunctionDefinition>
@@ -44826,7 +45887,7 @@ See also the **Linear Algebra** section for operations on vectors, matrices and 
 | MathJSON                        | LaTeX                              |
 | :------------------------------ | :--------------------------------- |
 | `["List", "x", "y", 7, 11]`     | $$ \lbrack x, y, 7, 11\rbrack $$ |
-| `["List", "x", "Nothing", "y"]` | $$ \lbrack x,,y\rbrack $$        |
+| `["List", "x", "Nothing", "y"]` | $$ \lbrack x, \mathrm{Nothing}, y\rbrack $$ |
 
 </FunctionDefinition>
 
@@ -45373,7 +46434,9 @@ than `xs`, the iteration stops at the end of the mask.
 A single index that falls outside the collection — including the index `0`,
 since indexing is 1-based — is not an error. `At` answers an **absence marker**,
 and the marker is drawn from the element type: a numeric collection answers
-`NaN`, any other collection answers `Missing`.
+`NaN`, a collection of points answers a point whose coordinates are all `NaN`,
+and any other collection answers `Missing`. `First` and `Last` of an empty collection are out of
+range too.
 
 ```js
 ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
@@ -45381,21 +46444,40 @@ ce.expr(['At', ['List', 5, 2, 10, 18], 99]).evaluate().print();
 
 ce.expr(['At', ['List', "'a'", "'b'"], 99]).evaluate().print();
 // ➔ "Missing"
+
+ce.expr(['At', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]], 5]).evaluate().print();
+// ➔ (NaN, NaN)
 ```
 
-The marker is part of the static type of the access, because the engine cannot
-in general know that an index is in range:
+The marker is not part of the static type of the access. The engine cannot in
+general know that an index is in range, and the type describes the values that
+are present, as `NaN` is outside `real`:
 
 ```js
-ce.expr(['At', ['List', 5, 2, 10, 18], 99]).type;
-// ➔ "integer | nan"
+ce.expr(['At', ['List', 5, 2, 10, 18], 'n']).type;
+// ➔ "integer"
 
-ce.expr(['At', ['List', "'a'", "'b'"], 99]).type;
-// ➔ "missing | string"
+ce.expr(['At', ['List', "'a'", "'b'"], 'n']).type;
+// ➔ "string"
 ```
 
-For a numeric collection the union often collapses on its own, since `nan` is
-already part of `number`: indexing a `list<number>` has type `number`.
+When the index is a literal that the engine can prove to be out of range, the
+type is the type of the marker alone: `At([5, 2, 10, 18], 99)` has type `nan`
+and `At(["a", "b"], 99)` has type `missing`.
+
+Read an absent value with `IsMissing`, or replace it with `Coalesce`, before
+computing on it:
+
+```js
+ce.expr(['Coalesce', ['At', ['List', "'a'", "'b'"], 99], "'none'"]).evaluate().print();
+// ➔ "none"
+```
+
+`IsMissing`, `Coalesce` and `AssertPresent` read a point whose coordinates are
+all `NaN` as absent, as they read `NaN` and `Missing`: with the list of points
+`ps` equal to `[(1, 2)]`, `IsMissing(At(ps, 5))` is `True`,
+`Coalesce(At(ps, 9), (0, 0))` is `(0, 0)`, and `AssertPresent(At(ps, 5))` is an
+`expected-present` error. The `x` coordinate of an absent point is `NaN`.
 
 #### Filtering with a Condition
 
@@ -45768,18 +46850,16 @@ with any step, use [`At`](#at) with a collection of indexes.
 // ➔ ["List", 10, 18]
 ```
 
-<Signature name="Slice" returns="list | nothing">_xs_:indexed_collection, _span_:range | nothing</Signature>
-
-A `Nothing` span passes through as `Nothing`. This arm exists so that a span
-produced by [`RangeOf`](#rangeof) — which answers `Nothing` when the needle is
-absent — can be sliced without a test in between:
+An absent span gives `Missing`, as every operator over `Missing` does. So a
+span produced by [`RangeOf`](#rangeof), which answers `Missing` when the
+needle is absent, can be sliced without a test in between:
 
 ```json example
 ["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 5]]]
 // ➔ ["List", 7, 5]
 
 ["Slice", ["List", 9, 7, 5, 3], ["RangeOf", ["List", 9, 7, 5, 3], ["List", 1, 2]]]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 </FunctionDefinition>
@@ -46159,6 +47239,10 @@ ce.expr(['Length', ['Range', 1, 'PositiveInfinity']]).evaluate().print();
 For collections, `Length` and [`Count`](#count) produce the same result;
 `Count` is restricted to collection arguments by its signature.
 
+`Length(Missing)`, and `Length` of a restricted list whose condition is
+`False`, are `Missing`. A list that holds `Missing` keeps its length:
+`Length([1, Missing])` is `2`.
+
 </FunctionDefinition>
 
 
@@ -46290,6 +47374,20 @@ Returns `True` if the collection contains the given value, `False` otherwise. Th
 // ➔ "False"
 ```
 
+The comparison is structural, not by value. A symbol with no value is a
+different expression from a number, even when the symbol could hold that
+number. With `a` and `b` declared `integer` and no value, `Contains` answers
+`False`. To leave the answer open until the symbols have values, use
+[`Element`](/compute-engine/reference/sets/), which stays unevaluated:
+
+```json example
+["Contains", ["List", "a", "b"], 3]
+// ➔ "False"
+
+["Element", 3, ["List", "a", "b"]]
+// ➔ ["Element", 3, ["List", "a", "b"]]
+```
+
 `Contains` tests for **one element**. To test for a contiguous run of several
 elements — a sublist, or a substring — use
 [`ContainsSequence`](#containssequence).
@@ -46325,11 +47423,11 @@ several elements — a sublist, or a substring — use [`RangeOf`](#rangeof).
 
 <FunctionDefinition name="RangeOf">
 
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
 
 The **span** of the first occurrence of _needle_ as a contiguous subsequence
-of _xs_, as a 1-based inclusive [`range`](#range), or `Nothing` when the
+of _xs_, as a 1-based inclusive [`range`](#range), or `Missing` when the
 needle does not occur.
 
 ```json example
@@ -46337,7 +47435,7 @@ needle does not occur.
 // ➔ ["Range", 2, 3]
 
 ["RangeOf", ["List", 9, 7, 5, 3], ["List", 7, 3]]
-// ➔ "Nothing"        (7 and 3 are not adjacent)
+// ➔ "Missing"        (7 and 3 are not adjacent)
 ```
 
 `RangeOf` and its three companions [`ContainsSequence`](#containssequence),
@@ -46361,14 +47459,14 @@ The optional _from_ is the index to start searching at (default 1). The
 returned span is always in the **original** collection's indexes, so finding
 the next occurrence is `RangeOf(xs, needle, Last(r) + 1)` for non-overlapping
 matches (or `First(r) + 1` to allow overlaps), and finding all of them is that
-loop run until it answers `Nothing`.
+loop run until it answers `Missing`.
 
 Domain rules:
 
 | Case | Result |
 | :--- | :--- |
-| Needle absent | `Nothing` |
-| _from_ past the end of _xs_ | `Nothing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
+| Needle absent | `Missing` |
+| _from_ past the end of _xs_ | `Missing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
 | _from_ less than 1, or not an integer | An error value |
 | Empty needle | An error value — an empty span is not representable (`["Range", 1, 0]` is the *descending* range `[1, 0]`, not an empty one) |
 | Infinite or unknown-length subject or needle | The expression stays symbolic — searching one would not terminate when the needle is absent |
@@ -46381,8 +47479,9 @@ The span composes with [`Slice`](#slice): when the needle is found,
 // ➔ ["List", 7, 5]
 ```
 
-`Slice` also accepts the `Nothing` that a failed search answers, and passes it
-through, so the two compose without a test in between.
+`Slice` gives `Missing` for the `Missing` that a failed search answers, so the
+two compose without a test in between. Use `Coalesce` or `IsMissing` to test
+the result.
 
 On a **string** the elements are characters, so the search is character-wise
 and the span is in character indexes; that case, including the grapheme
@@ -46400,7 +47499,7 @@ guarantees it gives, is documented in the
 <Signature name="ContainsSequence" returns="boolean">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
 
 Whether _needle_ occurs in _xs_ as a contiguous subsequence. For a non-empty
-needle this is [`RangeOf`](#rangeof) not answering `Nothing`.
+needle this is [`RangeOf`](#rangeof) not answering `Missing`.
 
 ```json example
 ["ContainsSequence", ["List", 1, 2, 3], ["List", 2, 3]]
@@ -46459,13 +47558,21 @@ Returns the 1-based index of the first element in the collection that satisfies 
 <FunctionDefinition name="Find">
 <Signature name="Find">_xs_: indexed_collection, _predicate_:function</Signature>
 
-Returns the first element in the collection that satisfies the predicate, or `Nothing` if none found.
+Returns the first element in the collection that satisfies the predicate.
+When no element satisfies it, `Find` returns the absent value of the domain
+of the elements, the value of a read out of range of the same collection:
+`NaN` for numbers, a point whose coordinates are all `NaN` for points, and
+`Missing` otherwise. Use `Coalesce` to give a default.
 
 ```json example
 ["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 9]]
 // ➔ 10
 ["Find", ["List", 5, 2, 10, 18], ["Greater", "_", 100]]
-// ➔ "Nothing"
+// ➔ "NaN"
+["Find", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]], ["Greater", ["First", "_"], 9]]
+// ➔ ["Tuple", "NaN", "NaN"]
+["Find", ["List", {str: "a"}, {str: "b"}], ["Equal", "_", {str: "z"}]]
+// ➔ "Missing"
 ```
 </FunctionDefinition>
 
@@ -46730,18 +47837,23 @@ callback, use a tuple-pattern parameter, `["Function", body, ["Tuple",
 An element that _f_ cannot accept is kept as an error cell. This holds for
 every spelling of the callback: a function literal, a named operator or a
 comprehension give the same cells. An absent element (`Missing`) under a
-numeric function gives `NaN`; under a text function such as `ToUpperCase` it
-gives the `incompatible-type` error.
+numeric function gives `Missing`; under a text function such as `ToUpperCase` it
+gives the `incompatible-type` error. A function with a parameter declared as a
+number or a point gives `Missing` for an absent element, without running its
+body.
 
 ```json example
 ["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, -4, "'banana'", 81]]
 // ➔ ["List", 4, ["Complex", 0, 2], ["Error", ["ErrorCode", "'incompatible-type'", ...], "'banana'"], 9]
 
 ["Map", ["Function", ["Sqrt", "x"], "x"], ["List", 16, "Missing", 81]]
-// ➔ ["List", 4, "NaN", 9]
+// ➔ ["List", 4, "Missing", 9]
 
 ["Map", "ToUpperCase", ["List", "'a'", "Missing"]]
 // ➔ ["List", "'A'", ["Error", ["ErrorCode", "'incompatible-type'", ...], "Missing"]]
+
+["Map", ["Function", ["Greater", "x", 0], ["Typed", "x", "'integer'"]], ["List", 1, "Missing"]]
+// ➔ ["List", "True", "Missing"]
 ```
 
 </FunctionDefinition>
@@ -47864,7 +48976,16 @@ variables defined in the `["Block"]` expression are not accessible outside of
 the `["Block"]` expression.
 
 The value of the `["Block"]` expression is the value of the last expression
-`expr-n`.
+`expr-n`. When the last expression is an `["Assign"]` or a `["Declare"]`, the
+value of the block is `Nothing`: end the block with the name.
+
+```json example
+["Block", ["Assign", "b", 2]]
+// ➔ Nothing
+
+["Block", ["Assign", "b", 2], "b"]
+// ➔ 2
+```
 
 If one of the expression in the block is a `["Return"]` expression, a
 `["Break"]` expression or a `["Continue"]` expression, no more expressions are
@@ -47876,6 +48997,29 @@ body — can read the enclosing block's variables, and assigning to a variable
 declared in an enclosing block updates that binding. A `["Declare"]` in the
 inner block instead introduces a new variable that shadows the outer one for
 the duration of the inner block.
+
+A local always has a value when it is read. These rules make that so, and each
+form that breaks one is a static error in the canonical form:
+
+- A declaration has a value: `["Declare", "x", "integer", 5]`, or the first
+  `["Assign", "x", 5]` of the name at the level of the block. A `["Declare"]`
+  with no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`) is the
+  error `declaration-without-value`, and a later `["Assign"]` does not repair
+  it. One exception: a `["Declare"]` of a function type with no value is valid
+  when a function definition of the same name is in the same block.
+- The first assignment of a name must not be in a branch of an `["If"]` or a
+  `["Which"]`, in the body of a `["Loop"]`, or in a case of a `["Match"]`. It
+  is the error `first-assignment-in-branch`. Assign a value to the name before
+  the branch. A name that is already declared is not a first assignment: the
+  assignment writes that name.
+- A local is not read before its declaration. It is the error
+  `read-before-declaration`.
+- An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]`
+  and `["Assign", "t", ["Assign", "u", 1]]` are the error
+  `assignment-in-operand`. Write `["Block", ["Assign", "a", 2], ["f", "a"]]`.
+- A later assignment keeps the type of the local: its declared type, or the
+  type of its first value (a number can become another number). Another type
+  is the error `assignment-type-mismatch`.
 
 ```json example
 ["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
@@ -47889,6 +49033,7 @@ the duration of the inner block.
 `Block` is sequential: a later assignment observes changes made by every
 earlier expression. A source language with simultaneous action tuples must
 therefore snapshot all right-hand sides before committing any left-hand side.
+The names `a` and `b` below are declared with a value before the block.
 
 For example, if `(a → 1, b → a + 1)` means that `b` reads the value of `a`
 from before the tuple, translate it as:
@@ -47907,8 +49052,7 @@ then does not matter because no temporary depends on a newly assigned value.
 
 ```json example
 ["Block",
-  ["Declare", "counter", "integer"],
-  ["Assign", "counter", 0],
+  ["Declare", "counter", "integer", 0],
   ["Loop",
     ["Block",
       ["If", ["Not", ["Less", "counter", 5]], ["Break"]],
@@ -47932,17 +49076,35 @@ then does not matter because no temporary depends on a newly assigned value.
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`. Without an else-branch there is nothing to select when
-`condition` is `False`, and the value is the `Missing` marker.
+`condition` is `False`, and the value is the absent value of `expr-1`: `NaN`
+for a number, a point whose coordinates are all `NaN` for a point, and the
+`Missing` marker for any other value. The type of the expression is the type
+of `expr-1`.
 
 ```json example
 ["If", "False", 5]
+// ➔ NaN
+
+["If", "False", ["Tuple", 1, 2]]
+// ➔ (NaN, NaN)
+
+["If", "False", "'a'"]
 // ➔ Missing
 ```
+
+A single-branch `If` is the parse of the restriction `expr\{cond\}` and of a
+`where` condition. It is written with `where`: `["If", ["Greater", "x", 0],
+["Square", "x"]]` is `x^2\text{ where }0\lt x`.
 
 <Signature name="If">_condition_, _expr-1_, _expr-2_</Signature>
 
 If the value of `condition` is the symbol `True`, the value of the `["If"]`
 expression is `expr-1`, otherwise `expr-2`.
+
+A condition with no value is `False`: the absent value `Missing`, and a
+comparison with an operand that has no value (`NaN`, `Missing`, `1/0`).
+`["If", "Missing", 1, 2]` and `["If", ["Greater", "Missing", 0], 1, 2]` are
+`2`. A `Which` reads its conditions the same way.
 
 Only the selected branch is evaluated. The branch that is not selected is
 **dead code**: if it contains an error, that error never reaches the value.
@@ -48049,99 +49211,110 @@ gives the value of that position. The rules:
   `incompatible-dimensions` error, as for `["Add"]`:
   `["If", ["Less", "L", 3], ["List", 10, 20], 0]` is
   `Error("incompatible-dimensions", "3 vs 2")`.
-- **A position that no clause selects** holds `NaN` when every expression is a
-  number, and `Missing` otherwise: `["If", ["Less", "L", 3], "L"]` is
-  `[1, NaN, NaN]`, and `["If", ["Less", "L", 3], "'small'"]` is
-  `["small", Missing, Missing]`.
-- **A position whose condition is `Missing`** holds an error, because an
-  absent condition cannot select: `["If", ["List", "True", "Missing", "False"],
-  1, 0]` is `[1, Error(…), 0]`. Use `["Coalesce"]` or `["IsMissing"]` on the
-  condition first.
+- **All expressions have one kind of element**: numbers, or points
+  (`["Tuple", x, y]`). A number beside a point is an error. Other values
+  are accepted. A position that no clause selects is `False` for a relation
+  (a region is not drawn there) and a color with `NaN` channels for a color:
+  `["If", ["List", "True", "False"], ["Greater", "x", 0]]` is
+  `[0 < x, False]`, and `["If", ["List", "True", "False"], ["Rgb", 1, 0, 0]]`
+  is `[Rgb(1, 0, 0), Rgb(NaN, NaN, NaN)]`. For any other value it is
+  `Missing`.
+- **A position that no clause selects** holds `NaN` for a number, and a point
+  whose coordinates are `NaN` for a point:
+  `["If", ["Less", "L", 3], "L"]` is `[1, NaN, NaN]`, and
+  `["If", ["List", "True", "False"], ["Tuple", 1, 2]]` is
+  `[(1, 2), (NaN, NaN)]`. A plot skips a `NaN` point. A number cell or a point cell is never
+  `Missing`.
 - **Only the selected expressions are evaluated**, each one once.
 
-The condition can be a list of lists, such as the comparison of a matrix with
-a number. The selection then applies at every level: with `M` equal to
-`[[1, 2], [3, 4]]`, `["If", ["Less", "M", 3], "M", 0]` is `[[1, 2], [0, 0]]`.
-An expression with fewer levels than the condition is refused, as `["Add"]`
-refuses it: `["If", ["Less", "M", 3], ["List", 10, 20], 0]` is
-`Error("incompatible-dimensions", "2x2 vs 2")`. An expression with more
-levels than the condition is taken whole at each position:
-`["If", ["List", "True", "False"], ["List", ["List", 1], ["List", 2]], 0]` is
-`[[1], 0]`.
+These are errors, found from the types before any evaluation (an
+`incompatible-type` error, or `incompatible-dimensions` for two lengths):
+
+- a condition that is a list of lists, such as the comparison of a matrix
+  with a number: with `M` equal to `[[1, 2], [3, 4]]`,
+  `["If", ["Less", "M", 3], "M", 0]` is an error;
+- a condition with a `Missing` element:
+  `["If", ["List", "True", "Missing", "False"], 1, 0]` is an error;
+- an expression whose elements are lists:
+  `["If", ["List", "True", "False"], ["List", ["List", 1], ["List", 2]], 0]`
+  is an error;
+- a string, or a list of strings, under a list of conditions, because a
+  string has no value for a position that is not selected:
+  `["If", ["Less", "L", 3], "'small'"]` is an error;
+- a set under a list of conditions.
+
+A relation, such as `["Greater", "x", 0]`, is accepted under a list of
+conditions: it is the region of a plot restricted at each position.
 
 A condition that is a single `True` or `False` keeps the ordinary behavior,
-even when an expression is a list: `["If", "True", "L", 0]` is `L`.
+even when an expression is a list: `["If", "True", "L", 0]` is `L`, and
+`["If", "False", ["List", 10, 20, 30]]` is `Missing`. A list is selected
+element by element only when the condition is a list.
 
 </FunctionDefinition>
 
-<FunctionDefinition name="When">
+### Restriction
 
-<Signature name="When">_expr_, _condition_</Signature>
-
-Returns the value of `expr` when `condition` evaluates to `True`, and
-`Missing` — the absent-value marker, the same value a `Which` with no
-matching clause and an `If` with no else-branch give — when `condition`
-evaluates to `False`. When `condition` cannot be determined, the
-expression holds unevaluated.
-
-The type of a `When` expression admits the absent case: `When(5, x > 0)`
-has type `integer | missing`, and a list that holds a restricted element has
-type `list<integer | missing>`. Only a restriction whose condition is the
-literal `True` keeps the bare type of `expr`. A consumer that tests
-`type.matches("number")` must set the `missing` member aside first, as it
-must for a `Which` with no default clause.
-
-`["When"]` is the AST head produced by **restriction-brace** syntax:
-`expr\{cond\}` parses to `["When", expr, cond]`. It is also useful directly
-for masking values where a predicate does not hold. The braces may be
-separated from the base expression by spacing commands
-(`(1-t)^2(1+2t)\ \{t\ge0\}\{t\le1\}` attaches both restrictions).
+A single-branch `["If", condition, expr]` is a **restriction**: the value of
+`expr` where `condition` is `True`, and the absent value of `expr` where it is
+`False` (`NaN` for a number, a point of `NaN` coordinates for a point,
+`Missing` for any other value). It is the parse of
+`expr\{condition\}` and of `expr \text{ where } condition`. When `condition`
+cannot be determined, the restriction stays unevaluated.
 
 ```json example
-["When", ["Square", "x"], ["Greater", "x", 0]]
-// Evaluates to x^2 when x > 0, Missing otherwise.
+["If", ["Greater", "x", 0], ["Square", "x"]]
+// Evaluates to x^2 when x > 0, NaN when x ≤ 0.
 ```
 
-**Stacked restrictions canonicalize** to a single `When` with an `And`
-predicate:
+The type of a restriction is the type of `expr`. The absent value is outside
+that type, as `NaN` is outside `real`: `["If", ["Greater", "x", 0], 5]` has
+the type `integer`.
 
-```json example
-["When", ["When", "x", ["Greater", "x", 0]], ["Less", "x", 10]]
-// Canonicalizes to:
-["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]
-```
+Stacked restriction braces parse to one `If` whose condition is an `And`, in
+the order written: `x\{x>0\}\{x<10\}` is
+`["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]`.
 
-Downstream simplification, interval intersection, and compilation operate on
-the canonical form, so source variants (stacked braces or a single brace
-with `\wedge`) are interchangeable.
+Up to version 0.177.0 a restriction was the operator `["When", expr,
+condition]`. `["When"]` is removed: in a MathJSON document it is now an
+unknown operator, which does not evaluate. Write `["If", condition, expr]`
+instead (the operands are in the other order).
 
-#### When the Arguments Are Lists
+#### A Restriction of a Collection
 
 When `expr` is a list and `condition` is a single condition, the whole list
 is the value: the result is the list when the condition is `True`, and
 `Missing` when it is `False`.
 
 ```json example
-["When", ["List", 10, 20, 30], "True"]
+["If", "True", ["List", 10, 20, 30]]
 // ➔ ["List", 10, 20, 30]
 
-["When", ["List", 10, 20, 30], "False"]
+["If", "False", ["List", 10, 20, 30]]
 // ➔ "Missing"
 ```
+
+An operation that applies to each element of the list applies to the whole
+restricted list: the condition stays on the outside. With `t` free,
+`\sin([1,2,3]\{0<t\})` evaluates to
+`["If", ["Less", 0, "t"], ["List", ["Sin", 1], ["Sin", 2], ["Sin", 3]]]`,
+which presents as a list of three elements. When `t` is `-1`, it evaluates to
+`Missing`, as `[1,2,3]\{0<t\}` and `2[1,2,3]\{0<t\}` do. `Length` of a false
+restricted list is `Missing` too. `First` of a false restricted list of points
+is the point `(NaN, NaN)`, while the restricted list itself is `Missing`.
 
 When `condition` is a **list of conditions** (a mask), `expr` is paired with
 the conditions position by position, and the result is a list with one cell
 for each pair. A cell is the element when its condition is `True`. When its
-condition is `False`, the cell is the absence marker of the element: `NaN`
-for a number, and `Missing` for any other value, such as a point or a
-string.
+condition is `False`, the cell is `NaN` for a number, and a point whose
+coordinates are `NaN` for a point.
 
 ```json example
-["When", ["List", 10, 20, 30], ["List", "True", "False", "True"]]
+["If", ["List", "True", "False", "True"], ["List", 10, 20, 30]]
 // ➔ ["List", 10, "NaN", 30]
 
-["When", ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]], ["List", "True", "False"]]
-// ➔ ["List", ["Tuple", 1, 2], "Missing"]
+["If", ["List", "True", "False"], ["List", ["Tuple", 1, 2], ["Tuple", 3, 4]]]
+// ➔ ["List", ["Tuple", 1, 2], ["Tuple", "NaN", "NaN"]]
 ```
 
 The list of conditions is usually a comparison over the list itself. With
@@ -48150,7 +49323,7 @@ the restriction-brace syntax:
 <Latex value="\lbrack 10, 20, 30 \rbrack\{\lbrack 10, 20, 30 \rbrack > 15\}"/>
 
 ```json example
-["When", ["List", 10, 20, 30], ["Greater", ["List", 10, 20, 30], 15]]
+["If", ["Greater", ["List", 10, 20, 30], 15], ["List", 10, 20, 30]]
 // ➔ ["List", "NaN", 20, 30]
 ```
 
@@ -48158,33 +49331,28 @@ The result keeps the positions of the elements: a masked element is not
 removed. To remove the elements that do not satisfy a condition, use
 [`Filter`](/compute-engine/reference/collections/#filter).
 
-**What is paired.** An ordered collection is paired element by element: a
-list, a vector, a matrix (each cell is a row), a range, and a lazy
-collection such as a `Map` over a range. A finite `Set` is paired in its
-iteration order. A value that is not a collection is **one value**, repeated
-in each cell. A tuple and a string are also one value: a point
-`["Tuple", 1, 2]` is not split into its coordinates.
+**What is paired.** An ordered collection of numbers or points is paired
+element by element: a list, a vector, a range, and a lazy collection such as
+a `Map` over a range. A number or a point is **one value**, repeated in each
+cell: a point `["Tuple", 1, 2]` is not split into its coordinates. A matrix
+(a list of lists), a set and a string are errors under a list of conditions.
 
 ```json example
-["When", 5, ["List", "True", "False"]]
+["If", ["List", "True", "False"], 5]
 // ➔ ["List", 5, "NaN"]
 
-["When", ["Tuple", 1, 2], ["List", "True", "False"]]
-// ➔ ["List", ["Tuple", 1, 2], "Missing"]
-
-["When", {str: "hi"}, ["List", "True", "False"]]
-// ➔ ["List", "hi", "Missing"]
+["If", ["List", "True", "False"], ["Tuple", 1, 2]]
+// ➔ ["List", ["Tuple", 1, 2], ["Tuple", "NaN", "NaN"]]
 ```
 
-**Different lengths.** The result has the length of the shorter of the two
-operands.
+**Different lengths.** When the types give both lengths and they differ, the
+restriction is an `incompatible-dimensions` error, as for `["Add"]`. When a
+length is known only from the value, the result has the length of the shorter
+of the two operands.
 
 ```json example
-["When", ["List", 10, 20, 30], ["List", "True", "False"]]
-// ➔ ["List", 10, "NaN"]
-
-["When", ["List", 10, 20], ["List", "True", "False", "True"]]
-// ➔ ["List", 10, "NaN"]
+["If", ["List", "True", "False"], ["List", 10, 20, 30]]
+// ➔ Error("incompatible-dimensions", "2 vs 3")
 ```
 
 **A collection that is infinite or of unknown length.** The collection is
@@ -48192,7 +49360,7 @@ paired with the conditions over the length of the list of conditions. Only
 the elements that are necessary are read.
 
 ```json example
-["When", ["Range", 1, "PositiveInfinity"], ["List", "True", "False", "True"]]
+["If", ["List", "True", "False", "True"], ["Range", 1, "PositiveInfinity"]]
 // ➔ ["List", 1, "NaN", 3]
 ```
 
@@ -48203,8 +49371,8 @@ a list and has no value. The restriction evaluates when the elements can be
 read.
 
 ```json example
-["When", ["Range", 1, "n"], ["List", "True", "False"]]
-// ➔ ["When", ["Range", 1, "n"], ["List", "True", "False"]]
+["If", ["List", "True", "False"], ["Range", 1, "n"]]
+// ➔ ["If", ["List", "True", "False"], ["Range", 1, "n"]]
 // After n is assigned the value 5:
 // ➔ ["List", 1, "NaN"]
 ```
@@ -48214,31 +49382,27 @@ determined stays a restriction of that one element. The other cells are
 evaluated.
 
 ```json example
-["When", ["List", 10, 20], ["List", "True", "c"]]
-// ➔ ["List", 10, ["When", 20, "c"]]
+["If", ["List", "True", ["Less", 0, "t"]], ["List", 10, 20]]
+// ➔ ["List", 10, ["If", ["Less", 0, "t"], 20]]
 ```
 
-**Types.** The type of a restriction with a list of conditions is a list
-whose elements admit the absent case. For a collection of numbers the type
-is `list<number>`, because a masked number is `NaN`, which is a `number`.
-For other elements the type is `list<T | missing>`: a restriction of a list
-of points has the type `list<tuple<number, number> | missing>`. This is the
-type for every ordered collection, also when the collection is declared as
-`indexed_collection<T>` and its length is not known.
+**Types.** The type of a restriction with a list of conditions is a list of
+the element type, found from the types of the operands: `list<number>` for
+numbers, because a masked number is `NaN`, and `list<tuple<number, number>>`
+for points, because a masked point is a point of `NaN` coordinates.
 
 A symbol whose declared type admits both one value and a list of values,
 such as `tuple<number, number> | list<tuple<number, number>>` (a point or a
 list of points), is paired according to the value it holds: a point is one
 value, and a list of points is paired element by element.
 
-When compiled, `When(e, cond)` emits a ternary whose masked branch is the
-absence marker of the value's domain: `(cond ? e : NaN)` for a number, on
-every target, and on JavaScript `(cond ? e : undefined)` for a value that is
-provably not a number, such as a string, so that a compiled `IsMissing`
-agrees with the interpreter. This makes `When` suitable for plot-domain
-masking.
-
-</FunctionDefinition>
+When compiled, a restriction with one condition emits a ternary whose masked
+branch is the absent value of the value's domain: `(cond ? e : NaN)` for a
+number, on every target. On JavaScript, a restriction with a list of
+conditions gives `NaN` for a masked number and `[NaN, NaN]` for a masked
+point: with `V` equal to `[-1, 2]`,
+`["If", ["Greater", "V", 0], ["Tuple", 1, 2]]` runs to
+`[[NaN, NaN], [1, 2]]`.
 
 <nav className="hidden">
 ### Match
@@ -48468,6 +49632,19 @@ Inside `body`:
 
 Bound names do not leak into the enclosing scope.
 
+A name that the body assigns must be declared with a value before the loop.
+The first assignment of a name in the body is the error
+`first-assignment-in-branch`. End the enclosing block with the name to use the
+result:
+
+```json example
+["Block",
+  ["Assign", "s", 0],
+  ["Loop", ["Assign", "s", ["Add", "s", "i"]], ["Element", "i", ["Range", 1, 4]]],
+  "s"]
+// ➔ 10
+```
+
 <ReadMore path="/compute-engine/reference/collections/#comprehension" >
 To build a **list** from a per-combination computation, use
 **`Comprehension`** instead (or **`Map`** / **`Filter`** for the
@@ -48587,22 +49764,24 @@ A trailing `\{cond\}` after an expression masks the value by a predicate:
 f(x)\left\{0 < x < 2\right\}
 ```
 
-Parses to `["When", ["f", "x"], ["Less", 0, "x", 2]]`.
+Parses to `["If", ["Less", 0, "x", 2], ["f", "x"]]`, a
+[restriction](#restriction).
 
 When the condition is `True`, the expression evaluates to its left operand;
-when `False`, it evaluates to `Missing`. This is distinct from a set
-literal (standalone `\{1, 2, 3\}` continues to parse as a `Set`); the
-disambiguation is positional — trailing braces after a complete expression
-attach as a `When` restriction.
+when `False`, it evaluates to the absent value (`NaN` for a number,
+a point of `NaN` coordinates for a point, `Missing` otherwise). This is distinct from a set literal (standalone
+`\{1, 2, 3\}` continues to parse as a `Set`); the disambiguation is
+positional: trailing braces after a complete expression are a restriction.
 
-Stacked restrictions chain and canonicalize:
+Stacked restrictions merge into one condition, in the order written:
 
 ```latex
 x\left\{x > 0\right\}\left\{x < 10\right\}
 ```
 
-Parses to `["When", "x", ["And", ["Greater", "x", 0], ["Less", "x", 10]]]`.
-The serializer round-trips this canonical form back to stacked braces.
+Parses to `["If", ["And", ["Less", 0, "x"], ["Less", "x", 10]], "x"]`.
+The serializer writes a restriction with `where`, never with braces:
+`x\text{ where }0\lt x, x\lt10`, which parses back to the same expression.
 
 ### Semicolon Blocks
 
@@ -48610,10 +49789,11 @@ Semicolons (`;` or `\;`) act as statement separators to build `Block`
 expressions:
 
 ```latex
-x \coloneq 3;\; x^2 + 1
+x \coloneq 3; x^2 + 1
 ```
 
-Parses to `["Block", ["Declare", "x"], ["Assign", "x", 3], ["Add", ["Power", "x", 2], 1]]`.
+Parses to `["Block", ["Declare", "x", "'unknown'", 3], ["Add", ["Power", "x", 2], 1]]`.
+The first assignment of a name is its declaration, with a value.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
 Read more about **compiling** control structures to JavaScript.
@@ -48702,14 +49882,19 @@ value other than themselves.
 | :---------- | :--------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | `All`       | All the possible values apply                                                                                                                                                      |
 | `None`      | None of the possible values apply                                                                                                                                                  |
-| `Nothing`   | An **optional** expression is not present. Used in sparse list to indicate skipped elements.                                                                                       |
-| `Undefined` | The result is not defined.<br/>Note that for numbers, the equivalent is `NaN` (Not a Number) |
-
-<Latex value="\lbrack 2, ,3 \rbrack "/>
+| `Nothing`   | The value of an empty block or of a statement with no value. A collection keeps it as an element, and an operator that needs a value gives an `incompatible-type` error for it. |
 
 ```json example
 ["List", 2, "Nothing", 3]
+// ➔ ["List", 2, "Nothing", 3]     (three elements)
+
+["Add", 1, "Nothing"]
+// ➔ an incompatible-type error
 ```
+
+An empty slot in LaTeX, such as `\lbrack 2, ,3 \rbrack`, is a parse error:
+the slot holds `["Error", "'missing'"]`. A trailing comma, `\lbrack 1, 2, \rbrack`,
+is dropped.
 
 
 ## Declaring, Assigning and Assuming
@@ -48728,19 +49913,26 @@ that a variable is positive.
 </nav>
 <FunctionDefinition name="Declare">
 
-<Signature name="Declare">_symbol_, _type_</Signature>
-
 <Signature name="Declare">_symbol_, _type_, _value_</Signature>
 
 <Signature name="Declare">_symbol_, _attributes_</Signature>
 
-Declare a new symbol in the current scope, and optionally set its type and
-value.
+Declare a new symbol in the current scope, with a type and a value.
 
-If a _value_ is provided, `Declare` evaluates to that value; otherwise it
-evaluates to `Nothing`. If the symbol already has a definition in the current
-scope, evaluating the expression **throws** an error (it does not return an
-error value).
+A declaration has a value. `Declare` evaluates to that value. A `Declare` with
+no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`, or an
+_attributes_ dictionary with no `value` key) is the error
+`declaration-without-value`, and an `["Assign"]` after it does not repair it.
+Write `["Declare", "x", "integer", 5]`. One exception: a `Declare` of a
+function type with no value is valid when a function definition of the same
+name is in the same block (it gives the signature of that function). To
+declare a symbol with a type and no value, use `ce.declare()`.
+
+In a block, a second `["Declare"]` of a name that the block already declares
+is the error `variable-redeclaration`:
+`["Block", ["Declare", "m", "integer", 3], ["Declare", "m", "integer", 4], "m"]`
+evaluates to that error. At the top level, a second `["Declare"]` of a name
+replaces its definition.
 
 This is equivalent to `let` in JavaScript or `var` in Python.
 
@@ -48766,6 +49958,10 @@ dictionary.
 
 **To change the value of an existing (non-constant) symbol**, use an
 `["Assign"]` expression.
+
+In a `["Block"]`, a `Declare` is a statement. A block whose last statement is
+a `Declare` has the value `Nothing`. A local cannot be read before its
+declaration (`read-before-declaration`).
 
 `Declare` is not a [pure function](/compute-engine/guides/expressions#pure-expressions)
 since it changes the state of the Compute Engine.
@@ -48888,7 +50084,19 @@ value is compatible with the type of the symbol: once set, the type of
 a symbol cannot be changed.
 
 If there is no definition for the symbol, add a new definition in the
-current scope, and use the `value` to infer the type of the symbol.
+current scope, and use the `value` to infer the type of the symbol. In a
+`["Block"]`, this first assignment of a name is its declaration, and it must
+be at the level of the block. In a branch of an `["If"]` or a `["Which"]`, in
+the body of a `["Loop"]` or in a case of a `["Match"]`, it is the error
+`first-assignment-in-branch`: assign a value to the name before the branch.
+
+A later assignment to a local keeps its type: the declared type, or the type
+of the first value (a number can become another number). A value of another
+type is the error `assignment-type-mismatch`.
+
+An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]` and
+`["Assign", "t", ["Assign", "u", 1]]` are the error `assignment-in-operand`.
+A block whose last statement is an `Assign` has the value `Nothing`.
 
 This is equivalent to `=` in many programming languages.
 
@@ -48997,13 +50205,12 @@ rules, `HoldValues` is how you keep an assigned symbol symbolic through a
 `Simplify` on the operator surface — e.g. `["HoldValues", ["Simplify", ["Abs", "w"]]]`
 with `w := 5` is `|w|`, not `5`.
 
-**Granular alternative.** To shield a single symbol with a specific type rather
-than blanket-shielding, compose `Block` and `Declare`: declaring the symbol
-afresh in a local scope shadows the outer value for the block's duration.
+**Granular alternative.** To shield a single symbol rather than every assigned
+symbol, name it in the second argument.
 
 ```json example
 // With w := 5
-["Block", ["Declare", "w", "'real'"], ["Simplify", ["Abs", "w"]]]
+["HoldValues", ["Simplify", ["Abs", "w"]], "w"]
 // ➔ ["Abs", "w"]
 ```
 
@@ -49784,6 +50991,10 @@ Evaluate to a numerical approximation of the expression.
 // ➔ 3.141592653589793
 ```
 
+The value of an exact rational is a float, so a rational is typed as a real:
+`["N", ["Rational", 1, 3]]` has the type `real<0.33..0.34>`. An integer stays
+an integer: `["N", 5]` has the type `integer`.
+
 <Signature name="N">_expression_, _precision_</Signature>
 
 Evaluate to a numerical approximation with the given number of significant
@@ -49997,10 +51208,10 @@ Evaluate to a new symbol made of a concatenation of the arguments.
 ```
 
 The symbol is not declared, it remains a free variable. To declare the symbol
-use `Declare`.
+use `Declare` with a value.
 
 ```json example
-["Declare", ["Symbol", "x", 2], "real"]
+["Declare", ["Symbol", "x", 2], "real", 0]
 ```
 
 </FunctionDefinition>
@@ -50271,7 +51482,9 @@ Read more about adding new definitions to the Compute Engine.
 
 A **function literal** is a first-class function value, defined using a
 `["Function"]` expression. It can be passed as an argument to other functions, 
-returned from a function, or assigned to a variable.
+returned from a function, or assigned to a variable. Compiled code calls a
+function only when it can see the function where the call is written (see
+[Function Values](/compute-engine/guides/compiling/#function-values)).
 
 The `["Function"]` expression takes a body and a list of parameters.
 
@@ -50307,6 +51520,48 @@ as opposed to the two-parameter `(p, q) => p + q`.
 // ➔ ["List", 3, 7]
 ```
 
+A parameter can have a **default value**. Write it as
+`["Optional", parameter, default]`, where `parameter` is a name or a
+`["Typed", name, type]`. In Epsil, write `(x, k = 2) => k * x` or
+`(x, k: number = 2) => k * x`. A parameter with a default value must come
+after the required parameters. A call with only the required arguments is a
+complete call, not a partial application:
+
+```json example
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3]
+// ➔ 6
+```
+
+The default fills only an argument that the call leaves out. An absent value
+supplied at that position (`Missing`, or `NaN`) is passed to the body as the
+argument. To replace an absent argument, write `Coalesce` in the call:
+
+```json example
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3, "Missing"]
+// ➔ Missing
+
+["Apply",
+  ["Function", ["Multiply", "k", "x"], "x", ["Optional", ["Typed", "k", "'number'"], 2]],
+  3, ["Coalesce", "Missing", 2]]
+// ➔ 6
+```
+
+The type of this literal is `(x: unknown, k: number = 2) -> number`. A
+default is a constant: a number, a boolean, a string, `[]`, `{}`, or a
+constant symbol. The accepted values are the same as in a signature (see
+[Default Values](/compute-engine/guides/types/#default-values)). The default
+is bound where the function is declared: a call that leaves out the argument
+receives it as if the call had written it. A default that names a variable,
+such as `["Optional", "k", "n"]` with `n` a variable, is the error
+`expected-a-literal-default`. A function literal with a rest parameter cannot
+have a default. The form
+`["Typed", "k", "'number?'"]` is not accepted for a parameter: it is the error
+`invalid-parameter-annotation`.
+
 An argument that is not a tuple of that shape yields the same
 `incompatible-type` error value a destructuring `["Declare", ["Tuple", …], …]`
 produces. Function literals with a tuple-pattern parameter are interpreted;
@@ -50315,7 +51570,9 @@ names.
 
 The examples in this section define functions as a simple expression, but 
 function literals can include more complex control structures, including blocks,
-local variables, loops and conditionals. 
+local variables, loops and conditionals. A local of a block is declared with a
+value, and an assignment is a statement of the block (see
+[Control Structures](/compute-engine/reference/control-structures/#sequential-control-structure)). 
 
 For example, here's a simple "clamp" function, using a `["Block"]` expression.
 
@@ -50603,8 +51860,7 @@ definition is visible to the function:
 
 ```json example
 ["Block",
-  ["Declare", "a", "integer"],
-  ["Assign", "a", 10],
+  ["Declare", "a", "integer", 10],
   ["Assign", "f", ["Function", ["Add", "a", "_"], "_"]],
   ["Assign", "a", 20],
   ["f", 1]
@@ -50616,19 +51872,17 @@ A variable of the same name declared in **another** scope is a different
 binding, which the function does not read:
 
 ```json example
-["Block"
+["Block",
   ["Assign", "f",
     ["Block",
-      ["Declare", "a", "integer"],
-      ["Assign", "a", 10],
+      ["Declare", "a", "integer", 10],
       ["Function", ["Add", "a", "_"], "_"]
     ]
-  ]
-  ["Declare", "a", "integer"],
-  ["Assign", "a", 100]
+  ],
+  ["Declare", "a", "integer", 100],
   ["f", 1]
 ]
-// ➔ 1 + 10
+// ➔ 11
 ```
 
 The inner `a`, assigned `10`, is the binding the function captured. The
@@ -50691,6 +51945,22 @@ The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
 against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
 
+A call with `Missing` at a parameter declared as a number or a point gives
+`Missing`, and the body does not run. A default value does not change this: a
+default fills only an argument that the call leaves out. A `NaN` at a numeric
+parameter, and a point of `NaN`
+coordinates at a point parameter, are accepted: the body runs with them.
+
+```json example
+["Apply", ["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]], "Missing"]
+// ➔ Missing
+
+["Map",
+  ["Function", ["Greater", "x", 0], ["Typed", "x", "'integer'"]],
+  ["List", 1, "Missing"]]
+// ➔ ["List", "True", "Missing"]
+```
+
 **Return type**. To ascribe a return type, wrap the body in a `Typed`
 expression:
 
@@ -50706,6 +51976,10 @@ and the body `n / 2`, `g(4)` is `2` and `g(5)` is an `incompatible-type`
 error. A symbolic value, `Missing`, `Nothing`, `NaN` and an error value pass
 unchanged, and a real float passes under `integer` or `rational`, so `.N()`
 of such a function gives the float. Compiled code does not make this check.
+A literal assigned to a symbol declared with a signature takes the declared
+result as its return type, and is refused when the type of its body has no
+value in common with that result (see
+[Typed Function Literals](/compute-engine/guides/types/#typed-function-literals)).
 Canonicalization moves the ascription **inside** the body `Block`,
 wrapping its last statement, so the canonical form of the example above is:
 
@@ -50809,6 +52083,11 @@ function of the remaining ones.
 
 A function literal applied to more arguments than it declares evaluates to an
 `unexpected-argument` error.
+
+Compiled code does not build a function value. A partial application or a
+curried call, such as the second example above with `u` in place of `2`,
+does not compile, and the interpreter evaluates it instead (see
+[Function Values](/compute-engine/guides/compiling/#function-values)).
 
 With LaTeX, the `\lhd` and `\rhd` commands can be used to apply a function to a single
 argument on the left or right respectively.
@@ -50933,7 +52212,7 @@ free in its result, so `subs()` of that variable produces an `EvaluateAt`:
 at 3, `["EvaluateAt", ["Function", ["D", ["Power", "x", 2], "x"], "x"], 3]`,
 which evaluates to `6`. A value with no closed form stays an unevaluated
 `EvaluateAt`. The value of a series at a point keeps its `BigO` remainder,
-which is `NaN` under `.N()`: wrap the series in `Normal` to drop it.
+also under `.N()`: wrap the series in `Normal` to drop it.
 
 </FunctionDefinition>
 
@@ -51469,7 +52748,7 @@ This function can also be applied to any collection.
 
 Only elements with the same head as the collection are flattened.
 Matrices have a head of `List`, so only other `List` elements
-are flattened.
+(and a `Range`, which is a list) are flattened.
 
 ```json example
 ["Flatten", ["List", ["List", 5, 2, 10, 18], ["List", 1, 2, 3]]]
@@ -51498,6 +52777,27 @@ without it, the collection is flattened completely.
 ```json example
 ["Flatten", ["List", ["List", 1, ["List", 2]], ["List", 3]], 1]
 // ➔ ["List", 1, ["List", 2], 3]
+```
+
+**Tuples are leaves**: a tuple element stays whole, at any depth, so a point
+stays a point.
+
+```json example
+["Flatten", ["List", ["Tuple", 1, 2], ["List", 3, ["Tuple", 4, 5]]]]
+// ➔ ["List", ["Tuple", 1, 2], 3, ["Tuple", 4, 5]]
+```
+
+**Type**: when the type of the collection shows which elements are lists,
+the result is a list of the type of the elements that stay. When the type does
+not show it (an element of type `any`, a depth that is not a number literal),
+the result is a `list`.
+
+```js example
+ce.declare("xs", "list<list<list<integer>>>");
+ce.box(["Flatten", "xs"]).type.toString();
+// ➔ "list<integer>"
+ce.box(["Flatten", "xs", 1]).type.toString();
+// ➔ "list<list<integer>>"
 ```
 
 `Flatten` is similar to the APL `,` Ravel operator or `numpy.ravel`
@@ -58049,10 +59349,10 @@ comparison is between whole characters.
 
 ```json example
 ["RangeOf", {str: "x́y"}, {str: "x"}]
-// ➔ "Nothing"       — the subject's characters are [x́, y], and x ≠ x́
+// ➔ "Missing"       — the subject's characters are [x́, y], and x ≠ x́
 
 ["RangeOf", {str: "👨‍👩‍👧"}, {str: "👩"}]
-// ➔ "Nothing"       — the subject is ONE character (a ZWJ family cluster)
+// ➔ "Missing"       — the subject is ONE character (a ZWJ family cluster)
 
 ["RangeOf", {str: "ée"}, {str: "e"}]
 // ➔ ["Range", 2, 2] — the leading `e` is inside the `é` cluster
@@ -58068,12 +59368,12 @@ a match in all three.)
 
 <FunctionDefinition name="RangeOf">
 
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
-<Signature name="RangeOf" returns="range | nothing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
+<Signature name="RangeOf" returns="range | missing">_xs_:indexed_collection, _needle_:indexed_collection, _from_:integer</Signature>
 
 The **span** of the first occurrence of _needle_ as a contiguous subsequence
 of _xs_, as a 1-based inclusive index [`range`](/compute-engine/reference/collections/#range),
-or `Nothing` when the needle does not occur.
+or `Missing` when the needle does not occur.
 
 ```json example
 ["RangeOf", {str: "hello world"}, {str: "o w"}]
@@ -58083,7 +59383,7 @@ or `Nothing` when the needle does not occur.
 // ➔ ["Range", 2, 2]
 
 ["RangeOf", {str: "abc"}, {str: "z"}]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 A span rather than a start index, because a span feeds slicing and
@@ -58098,7 +59398,7 @@ The optional _from_ is the index to start searching at (default 1). The
 returned span is always in the **original** subject's indices, so scanning for
 the next occurrence is `RangeOf(xs, needle, Last(r) + 1)` for non-overlapping
 matches (or `First(r) + 1` to allow overlaps), and finding every occurrence is
-that loop run until it answers `Nothing`:
+that loop run until it answers `Missing`:
 
 ```json example
 ["RangeOf", {str: "abcabc"}, {str: "bc"}]
@@ -58108,15 +59408,15 @@ that loop run until it answers `Nothing`:
 // ➔ ["Range", 5, 6]
 
 ["RangeOf", {str: "abcabc"}, {str: "bc"}, 6]
-// ➔ "Nothing"
+// ➔ "Missing"
 ```
 
 Domain rules, chosen to make that loop terminate cleanly:
 
 | Case | Result |
 | :--- | :--- |
-| Needle absent | `Nothing` |
-| _from_ past the end of _xs_ | `Nothing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
+| Needle absent | `Missing` |
+| _from_ past the end of _xs_ | `Missing` — never an error, since a match at the very end legitimately produces `Length(xs) + 1` |
 | _from_ less than 1, or not an integer | An error value |
 | Empty needle | An error value — an empty span is not representable (`["Range", 1, 0]` is the *descending* range `[1, 0]`, not an empty one) |
 | Infinite or unknown-length subject or needle | The expression stays symbolic |
@@ -58162,7 +59462,7 @@ search.
 <Signature name="ContainsSequence" returns="boolean">_xs_:indexed_collection, _needle_:indexed_collection</Signature>
 
 Whether _needle_ occurs in _xs_ as a contiguous subsequence. For a non-empty
-needle this is `RangeOf(xs, needle)` not being `Nothing`.
+needle this is `RangeOf(xs, needle)` not being `Missing`.
 
 ```json example
 ["ContainsSequence", {str: "abc"}, {str: "bc"}]
@@ -59101,20 +60401,33 @@ Read more about formatting of **matrices** and **vectors**
 
 ---
 
-# Permutation Groups
+# Group Theory
 
 Source: https://mathlive.io/compute-engine/reference/group-theory/
 
-# Permutation Groups
+# Group Theory
 
-The optional group-theory library provides exact finite permutation computations.
-It includes permutation arithmetic, groups described by generators, orbits,
-transversals, membership, orders, point stabilizers, and subgroup relationships.
-It is a native Compute Engine implementation; it does not require a GAP runtime.
+The optional group-theory library adds exact permutation, finite-group, exact
+matrix, and polycyclic computations to the Compute Engine. It is a native
+Compute Engine implementation; it does not require a GAP runtime. This page
+describes its operators and how their values are represented. The
+[capability and benchmark ledger](https://github.com/cortex-js/compute-engine/blob/main/benchmarks/group-theory.md)
+describes the algorithms, measurements, and resource policies in more detail.
+
+In the release after 0.177.0, the group operators of release 0.172.0 that
+started with `Permutation` were renamed to `Group` names:
+`PermutationGroupOrder` is now `GroupOrder`, `PermutationGroupContains` is
+`GroupContains`, `PermutationIsSubgroup` is `GroupIsSubgroup`,
+`PermutationIsNormal` is `GroupIsNormal`, `PermutationGroupIsAbelian` is
+`GroupIsAbelian`, `PermutationGroupElements` is `GroupElements`,
+`PermutationGroupGenerators` is `GroupGenerators`, `PermutationGroupEqual` is
+`GroupEqual`, `PermutationGroupIdentity` is `GroupIdentity`, and
+`PermutationSubgroupIndex` is `GroupIndex`. The new names also accept matrix
+groups.
 
 ## Loading the library
 
-```ts
+```javascript
 import { ComputeEngine } from '@cortex-js/compute-engine';
 import {
   loadGroupTheory,
@@ -59125,211 +60438,569 @@ import {
 const ce = new ComputeEngine();
 const options: GroupTheoryLoadOptions = { maxChainWork: 50_000_000 };
 const report: GroupTheoryLoadReport = loadGroupTheory(ce, options);
+report.operatorCount; // 162
 
-const group = ce.expr([
+const s3 = ce.expr([
   'PermutationGroup',
-  ['List',
-    ['Permutation', ['List', 2, 1]],
-    ['Permutation', ['List', 2, 3, 1]],
-  ],
+  ['List', ['Permutation', ['List', 2, 3, 1]], ['Permutation', ['List', 2, 1]]],
   ['PermutationAction', 3],
-]);
-ce.function('PermutationGroupOrder', [group]).evaluate(); // 6
+]).evaluate();
+
+ce.expr(['GroupOrder', s3.json]).evaluate().json; // 6
+ce.expr(['GroupIsAbelian', s3.json]).evaluate().json; // 'False'
+ce.expr(['PermutationOrbit', s3.json, 1]).evaluate().json; // ['List', 1, 2, 3]
 ```
 
-The loader is synchronous. Loading the same engine again with equal effective
-options returns the registration report without replacing its definitions.
-Changing options on an already-loaded engine throws an error. A fresh engine
-can use different ceilings. The default library does not register these operators.
+Loading is synchronous. Repeating the call with the same effective options is
+idempotent. Different options on an already-loaded engine, invalid ceilings, or
+conflicting operator names cause the loader to throw. Loading returns a
+`GroupTheoryLoadReport` with `operatorCount`. Group operators are absent from
+the default library until loaded.
 
-## Values and multiplication
+MathJSON lists start with `List`; tuples start with `Tuple`. The same operators
+are callable from Epsil using ordinary function calls and list literals after
+loading the library into that engine. Boolean results serialize as `True` and
+`False`. An optional mathematical result serializes as `Nothing` when absent.
 
-`Permutation([2, 3, 1])` maps 1 to 2, 2 to 3, and 3 to 1. Its image list must
-contain each integer from 1 through the list length exactly once. Points beyond
-the list are fixed. Trailing fixed points are removed: `Permutation([2, 1, 3])`
-and `Permutation([2, 1])` are the same value. The identity is `Permutation([])`.
+## Values and domains
 
-`PermutationAction(n)` explicitly declares the points 1 through n, including
-fixed points. Degree zero is allowed. Every generator must fit inside the action.
-A group with no generators is the trivial group on that action.
+| Type                 | Meaning                                                                                                                                                                          |
+| -------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `Permutation`        | A finite-support bijection, encoded by the images of points `1..n`. Trailing fixed points are removed; `Permutation([])` is the identity.                                        |
+| `PermutationAction`  | The declared point set `1..degree`. Degree zero is allowed.                                                                                                                      |
+| `PermutationGroup`   | A list of permutation generators and a declared action. An empty generator list gives the trivial group in that action.                                                          |
+| `GroupMatrix`        | An exact square matrix over the rationals (characteristic `0`) or a prime field (characteristic `p`). Matrix values may be singular; matrix-group generators must be invertible. |
+| `MatrixGroup`        | Dimension, characteristic, and invertible generators. Empty generators still retain the field and dimension.                                                                     |
+| `GroupDescriptor`    | The union `PermutationGroup \| MatrixGroup`.                                                                                                                                     |
+| `GroupElement`       | The union `Permutation \| GroupMatrix`. Membership and domain compatibility are checked by the operation using it.                                                               |
+| `GroupHomomorphism`  | Source and target descriptors, with complete element/image pairs.                                                                                                                |
+| `GroupQuotientValue` | Source group, normal kernel, and a verified surjective projection onto the quotient representation.                                                                              |
+| `GroupPcSequence`    | An ambient descriptor and a validated polycyclic generating sequence in it. An induced sequence can represent a proper subgroup of that ambient group.                           |
+| `PcGroup`            | A checked collected presentation of a finite polycyclic group, independent of enumeration.                                                                                       |
+| `PcElement`          | A canonical coordinate vector bound to a `PcGroup` presentation.                                                                                                                 |
 
-Products use a **right action**: applying `PermutationCompose(a, b)` means
-applying a first, then b. Thus i^(ab) = (i^a)^b. In particular:
+Group descriptors retain generators, not a canonical name for the subgroup. Use
+`GroupEqual(G,H)` for group equality; structural equality of expressions is not
+a substitute. Two permutation groups must use the same action degree for group
+relations. Matrix domains must have the same dimension and field. The library
+does not silently identify permutation and matrix representations or isomorphic
+groups with different domains. Explicit homomorphisms can connect different
+representations.
 
-- `PermutationConjugate(a, b)` is b⁻¹ab.
-- `PermutationCommutator(a, b)` is a⁻¹b⁻¹ab.
-- `PermutationPower(a, k)` accepts exact positive, zero, and negative integers.
+Products use right actions: `PermutationCompose(a,b)` applies `a` and then `b`.
+Conjugation is `x^g = g^-1 x g`, and `[x,y] = x^-1 y^-1 x y`. Matrices act on
+row vectors by right multiplication. Permutation points, generator word labels,
+and finite polycyclic positions are one-based. Only an imported multiplication
+table uses zero-based element indices, with identity at index zero.
 
-Use these named operators for ordered multiplication. Generic arithmetic does
-not currently express the noncommutative permutation product.
+For example, `Permutation([2, 3, 1])` maps 1 to 2, 2 to 3, and 3 to 1.
+`Permutation([2, 1, 3])` and `Permutation([2, 1])` are the same value, and
+`PermutationCompose(Permutation([2, 1, 3]), Permutation([1, 3, 2]))` is
+`Permutation([3, 1, 2])`. Use the named operators for these products:
+`Multiply` of two permutations is an `incompatible-type` error.
 
-A group value preserves its action and ordered generator list, including
-repetitions. Two different descriptions can generate the same subgroup.
-Use `PermutationGroupEqual(G, H)` for mathematical subgroup equality;
-expression equality compares the descriptions. Groups on different actions
-are incompatible, even if they are abstractly isomorphic.
+`PermutationTransversal(G, p)` returns pairs `(q, t)` where `t` maps `p` to `q`.
+With the right action, these `t` are representatives of the right cosets of the
+stabilizer of `p`. They depend on the order of the generators, and they are not
+always the shortest words.
 
-## Operators
+`PcGroup` and `PcElement` are separate from `GroupDescriptor` and
+`GroupElement`. Use the `Pc*` operators for collected presentations. General
+structural queries such as `GroupCenter` do not yet dispatch to this
+representation.
 
-The examples below use Epsil call syntax after loading the library into its engine.
-The same names are available as MathJSON heads.
+## Options and execution limits
 
-| Operation | Result |
-| :--- | :--- |
-| `Permutation(images)` | A checked permutation |
-| `PermutationAction(n)` | A finite action |
-| `PermutationCompose(a, b)` | The ordered product ab |
-| `PermutationInverse(a)` | The inverse of a |
-| `PermutationApply(a, point, action)` | The image of a point |
-| `PermutationInAction(a, action)` | a, after checking that it fits the action |
-| `PermutationCycles(a)` | Nontrivial disjoint cycles, starting at their least point |
-| `PermutationOrder(a)` | Exact element order |
-| `PermutationPower(a, k)` | The exact integer power |
-| `PermutationConjugate(a, b)` | b⁻¹ab |
-| `PermutationCommutator(a, b)` | a⁻¹b⁻¹ab |
-| `PermutationGroup(generators, action)` | A group description |
-| `PermutationGroupGenerators(G)` | The supplied generators |
-| `PermutationGroupIdentity(G)` | The identity permutation |
-| `PermutationGroupElements(G)` | Complete bounded enumeration |
-| `PermutationGroupOrder(G)` | Exact group order |
-| `PermutationGroupContains(G, a)` | Whether a belongs to G |
-| `PermutationOrbit(G, point)` | The point orbit |
-| `PermutationOrbits(G)` | The full orbit partition, including fixed points |
-| `PermutationTransversal(G, point)` | Pairs (image, representative) |
-| `PermutationPointStabilizer(G, point)` | The subgroup fixing the point |
-| `PermutationIsSubgroup(G, H)` | Whether H is a subgroup of G |
-| `PermutationSubgroupIndex(G, H)` | The exact index [G:H] |
-| `PermutationGroupEqual(G, H)` | Whether G and H are the same subgroup |
-| `PermutationIsNormal(G, H)` | Whether H is normal in G |
-| `PermutationGroupIsAbelian(G)` | Whether every pair of group elements commutes |
+Where supported, the last argument is `options: dictionary<integer>?`. In
+MathJSON this is a dictionary value, for example:
 
-Each transversal representative t maps the requested point to its paired image.
-Under the right-action convention, these are representatives of right cosets of
-the point stabilizer. Representatives depend on generator order and need not be
-shortest words or canonical choices.
+```javascript
+ce.expr([
+  'GroupElements', s3.json,
+  { dict: { maxElements: 6, maxProducts: 12 } },
+]).evaluate();
+```
 
-`PermutationSubgroupIndex` reports an error when H is not a subgroup.
-Subgroup, equality, and normality predicates return false when the mathematical
-condition fails; resource exhaustion is always an error, never false.
+An omitted option uses the installed ceiling. A call can lower a ceiling, not
+raise it. Options control execution and are never stored as mathematical data in
+a group or map. The accepted keys depend on the algorithm and representation:
 
-## Resource limits and cancellation
+| Query family                                                                                                                                                        | Per-call keys                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupOrder`, `GroupContains`, `GroupIsSubgroup`, `GroupIndex`, `GroupEqual`, `GroupIsNormal`, `GroupIsAbelian` on permutation groups; `PermutationPointStabilizer` | `maxWork`, `maxLevels`, `maxOrbitPoints`, `maxOrbitEdges`, `maxStoredImages`; generic group queries also accept `maxElements` and `maxPoints` |
+| `GroupElements` on permutation groups                                                                                                                               | `maxElements`, `maxProducts`, `maxImageWork`, `maxStoredImages`                                                                               |
+| `PermutationOrbit`, `PermutationOrbits`                                                                                                                             | `maxPoints`, `maxEdges`                                                                                                                       |
+| `PermutationTransversal`                                                                                                                                            | `maxPoints`, `maxEdges`, `maxProducts`, `maxImageWork`, `maxStoredImages`                                                                     |
+| Bounded finite-group, map, matrix, finite polycyclic, and section operations                                                                                        | `maxElements`, `maxWork`, `maxPoints`; only limits relevant to the operation affect its algorithm                                             |
+| Collected `PcGroup`, `PcElement`, and `Pc*` operations                                                                                                              | `maxWork`                                                                                                                                     |
 
-Order and membership use incremental Schreier–Sims, without enumerating all
-elements. Orbit trees retain parent and generator indices; transversal
-permutations are reconstructed as needed and kept in a bounded cache.
-A bounded per-engine session reuses completed chains across group queries.
+Permutation element operations and the three permutation constructors have no
+per-call options. `GroupGenerators` and `GroupIdentity` read a permutation
+descriptor directly; they do not build a chain or enumerate elements. Their
+generic signatures accept and validate the finite options for both
+representations. For the generic permutation chain queries, `maxElements` and
+`maxPoints` are accepted finite-model controls but do not cause table or action
+enumeration. Their effective `maxWork` is bounded by both `maxFiniteWork` and
+`maxChainWork`. `PermutationPointStabilizer` retains its chain-only options.
 
-Enumeration is intended for small groups. It returns only a complete list:
-reaching a limit does not return a partial answer.
+Loader settings are supplied to `loadGroupTheory(ce, settings)`:
 
-Loader options set resource ceilings:
+| Loader setting               |    Default |     Maximum |
+| ---------------------------- | ---------: | ----------: |
+| `maxDegree`                  |    100,000 |     100,000 |
+| `maxGenerators`              |      1,024 |       1,024 |
+| `maxGeneratorImages`         |  1,000,000 |   1,000,000 |
+| `maxClosureElements`         |     10,000 |      10,000 |
+| `maxClosureProducts`         |    100,000 |     100,000 |
+| `maxClosureImageWork`        |  5,000,000 |   5,000,000 |
+| `maxClosureStoredImages`     |  1,000,000 |   1,000,000 |
+| `maxOrbitPoints`             |    100,000 |     100,000 |
+| `maxOrbitEdges`              |  1,000,000 |   1,000,000 |
+| `maxTransversalProducts`     |    100,000 |     100,000 |
+| `maxTransversalImageWork`    |  5,000,000 |   5,000,000 |
+| `maxTransversalStoredImages` |  1,000,000 |   1,000,000 |
+| `maxChainWork`               | 50,000,000 |  50,000,000 |
+| `maxChainLevels`             |        256 |         256 |
+| `maxChainOrbitPoints`        |    100,000 |     100,000 |
+| `maxChainOrbitEdges`         |  1,000,000 |  50,000,000 |
+| `maxChainStoredImages`       |  1,000,000 | 100,000,000 |
+| `maxFiniteElements`          |        256 |         256 |
+| `maxFiniteWork`              | 50,000,000 |  50,000,000 |
+| `maxMatrixActionPoints`      |    100,000 |     100,000 |
 
-| Option | Default |
-| :--- | ---: |
-| `maxDegree` | 100,000 |
-| `maxGenerators` | 1,024 |
-| `maxGeneratorImages` | 1,000,000 |
-| `maxClosureElements` | 10,000 |
-| `maxClosureProducts` | 100,000 |
-| `maxClosureImageWork` | 5,000,000 |
-| `maxClosureStoredImages` | 1,000,000 |
-| `maxOrbitPoints` | 100,000 |
-| `maxOrbitEdges` | 1,000,000 |
-| `maxTransversalProducts` | 100,000 |
-| `maxTransversalImageWork` | 5,000,000 |
-| `maxTransversalStoredImages` | 1,000,000 |
-| `maxChainWork` | 50,000,000 |
-| `maxChainLevels` | 256 |
-| `maxChainOrbitPoints` | 100,000 |
-| `maxChainOrbitEdges` | 1,000,000 |
-| `maxChainStoredImages` | 1,000,000 |
+Element-count ceilings are at least one; other ceilings can be zero. Values must
+be safe integers within their kernel range. The finite table bound applies when
+the selected algorithm constructs a complete group model. Permutation chain
+queries, faithful finite-field matrix actions, and collected presentation
+arithmetic can handle orders larger than 256. Permutation `GroupElements` uses
+its separate closure bounds. A bounded structural operation can still fail on a
+group whose order was computed successfully.
 
-Limits are nonnegative safe integers; closure needs at least one element slot.
-Most loader options cannot exceed the defaults. Two chain limits can be
-increased: `maxChainOrbitEdges` up to 50,000,000 and `maxChainStoredImages` up
-to 100,000,000. `maxOrbitEdges` applies only to the orbit and transversal
-queries; the stabilizer chain uses `maxChainOrbitEdges`.
+Further fixed bounds include 4,096 enumerated subgroups, 4,096 automorphisms,
+one million expanded homomorphism output units per query, matrix dimension 32,
+and form computations in dimension at most eight. Collected presentations have
+rank at most 64 and at most one million logical coefficient slots including
+collection scratch space. Matrix coefficients and collected presentation scalar
+inputs have 4,096-bit bounds; some intermediate matrix elimination integers have
+a separate larger bound. The collected group order is an exact product and may
+exceed the scalar-input bit bound. Large exact results can encounter these
+limits before the logical work budget runs out.
+
+A limit error is not `False`, `Nothing`, an infinite order, or a partial list.
+For example, a rational matrix group's closure exceeding `maxElements` does not
+prove that the group is infinite. Ordinary invalid data and exhausted budgets
+produce error expressions such as `incompatible-type`,
+`incompatible-permutation-action`, `group-work-limit`,
+`finite-group-element-limit`, `subgroup-count-limit`,
+`automorphism-count-limit`, or `group-map-output-limit`. Permutation algorithms
+also report their specific `permutation-closure-*`, `permutation-orbit-*`, and
+`permutation-chain-*` limits. Engine cancellation propagates. Unresolved valid
+symbolic operands remain symbolic; nested errors are preserved.
 
 For example, the order of the symmetric group on 200 points, generated by
-`Permutation([2, 1])` and a 200-cycle, reaches
-`permutation-chain-orbit-edge-limit` with the default limits. With
-`maxChainOrbitEdges: 20_000_000` it returns 200! in about 0.2 s.
+`Permutation([2, 1])` and a 200-cycle, gives the error
+`permutation-chain-orbit-edge-limit` with the default settings. After
+`loadGroupTheory(ce, { maxChainOrbitEdges: 20_000_000 })` on a new engine, the
+same query returns 200!.
 
-Expensive queries accept a named `options` dictionary to lower their loader
-ceilings. For example:
+Work counts are deterministic operation budgets, not milliseconds. The library
+keeps a bounded cache of completed stabilizer chains for each engine, and
+reuses them across queries on the same group. Limits are not part of the
+mathematical value of a group.
 
-```text
-let G = PermutationGroup([Permutation([2, 1]), Permutation([2, 3, 1])], PermutationAction(3))
-PermutationGroupOrder(G, options: {maxWork -> 1000000})
-PermutationGroupElements(G, options: {maxElements -> 6, maxProducts -> 12})
-PermutationOrbit(G, 1, options: {maxPoints -> 3, maxEdges -> 6})
-```
+## Cancellation
 
-Chain queries accept `maxWork`, `maxLevels`, `maxOrbitPoints`,
-`maxOrbitEdges`, and `maxStoredImages`. Enumeration accepts `maxElements`,
-`maxProducts`, `maxImageWork`, and `maxStoredImages`. Orbit queries accept
-`maxPoints` and `maxEdges`; transversals additionally accept `maxProducts`,
-`maxImageWork`, and `maxStoredImages`. Abelian checks accept the chain options.
-
-Work counts are deterministic operation budgets, not milliseconds. Chain work
-includes image-array widths for products and inverses. Chain storage accounts
-for retained generator images, tree entries, and cached transversals; discarded
-rebuilds are not accumulated. Limits are not part of mathematical value identity.
-A warm cache does not let a query bypass a lower work or storage ceiling.
-
-Engine deadline and cancellation checks propagate through the kernels. A
-cancellation is never converted into a mathematical answer. Diagnostic certificate verification is a test oracle and does not run
-on ordinary queries.
+Long loops check the engine deadline, so a time limit set by the host also
+stops a group query. A cancellation is thrown again to the caller. It never
+becomes a mathematical answer or an error expression.
 
 ## Diagnostics
 
-Ordinary operand-type and arity errors use the engine's shared diagnostics,
-including `incompatible-type`, `missing`, and `unexpected-argument`.
+Errors are returned as `Error` expressions, for example
+`["Error", "'duplicate-permutation-image'"]` for `Permutation([1, 1])`. Operand
+type and arity errors use the shared engine diagnostics, such as
+`incompatible-type`. An options argument that is not a dictionary is also an
+`incompatible-type` error.
 
 An operand that is not known yet does not cause an error: a symbol with no
 value, or a call that contains one, leaves the query unevaluated. For example,
 `PermutationOrder(PermutationInverse(x))` stays unevaluated until `x` has a
 permutation value.
 
-Mathematical input errors include:
+Errors in the input data include:
 
-| Code | Meaning |
-| :--- | :--- |
-| `invalid-permutation-image` | An image is not an integer in the required range |
-| `duplicate-permutation-image` | The image list is not a bijection |
-| `invalid-permutation-action-degree` | The action degree is not a nonnegative safe integer |
-| `permutation-outside-action` | A permutation moves a point outside the action |
-| `point-outside-permutation-action` | The requested point is not in the action |
-| `incompatible-permutation-actions` | The groups have different action degrees |
-| `not-a-permutation-subgroup` | An index was requested for a group that is not a subgroup |
-| `permutation-exponent-limit` | An exact exponent exceeds the supported bit length |
-| `unknown-permutation-option` | The named option is not supported by that query |
-| `invalid-permutation-options` | Options must be a dictionary |
-| `permutation-option-exceeds-limit` | A per-call option exceeds the loader ceiling |
+| Code                                | Meaning                                                                                  |
+| :---------------------------------- | :--------------------------------------------------------------------------------------- |
+| `invalid-permutation-image`         | An image is not an integer in the required range                                        |
+| `duplicate-permutation-image`       | The image list is not a bijection                                                        |
+| `invalid-permutation-action-degree` | The action degree is not a nonnegative safe integer                                      |
+| `permutation-outside-action`        | A permutation moves a point outside the action                                           |
+| `point-outside-permutation-action`  | The requested point is not in the action                                                 |
+| `incompatible-permutation-actions`  | Two permutation groups in a stabilizer-chain query have different action degrees         |
+| `incompatible-permutation-action`   | Two permutation groups in a finite-group query have different action degrees             |
+| `not-a-permutation-subgroup`        | `GroupIndex` on permutation groups, when the second group is not a subgroup of the first |
+| `not-a-subgroup`                    | A finite-group or matrix query needs a subgroup, and the second group is not one         |
+| `permutation-exponent-limit`        | An exact exponent is too large                                                           |
+| `unknown-permutation-option`        | A permutation query does not accept the named option                                     |
+| `unknown-group-option`              | A finite-group, matrix or polycyclic query does not accept the named option              |
+| `permutation-option-exceeds-limit`  | A per-call option of a permutation query is above the loader ceiling                     |
+| `group-option-exceeds-limit`        | A per-call option of a finite-group query is above the loader ceiling                    |
 
-All `permutation-…-limit` exhaustion codes share the same interpretation:
-the computation exceeded a resource bound and produced no answer. They include
-degree and generator bounds, closure element/product/image/storage bounds,
-orbit point/edge bounds, transversal product/image/storage bounds, and chain
-work/level/orbit/storage/generator bounds. Use a smaller input, a more suitable
-query, or an increased loader ceiling where supported. An
-`invalid-permutation-…-limit` code instead means the supplied limit configuration
-is outside its supported range.
+Every code that ends in `-limit` and starts with `permutation-`, `group-`,
+`finite-group-`, `subgroup-` or `automorphism-` means that the computation
+exceeded a resource bound and gave no answer. Use a smaller input, a more
+suitable query, or a larger loader setting where the maximum allows it. A
+predicate never returns `False` because a limit was reached.
 
-A malformed permutation inside a group preserves its original diagnostic, such
-as `duplicate-permutation-image`. These optional-library codes are documented
-here rather than added to the core Epsil diagnostic table.
+`loadGroupTheory()` throws, instead of returning an error expression, when a
+setting is outside its range. For example, `maxChainWork: 60_000_000` throws a
+`PermutationInputError` with the code `invalid-permutation-chain-work-limit`.
+
+## Quotient and representation examples
+
+A quotient carries its projection; its group value is not itself the source
+group or a list of cosets:
+
+```javascript
+const r = ['Permutation', ['List', 2, 3, 4, 1]];
+const r2 = ['Permutation', ['List', 3, 4, 1, 2]];
+const c4 = ce.expr([
+  'PermutationGroup', ['List', r], ['PermutationAction', 4],
+]).evaluate();
+const c2 = ce.expr([
+  'PermutationGroup', ['List', r2], ['PermutationAction', 4],
+]).evaluate();
+const quotient = ce.expr(['GroupQuotient', c4.json, c2.json]).evaluate();
+const projection = ce.expr(['GroupQuotientProjection', quotient.json]).evaluate();
+const quotientGroup = ce.expr(['GroupQuotientGroup', quotient.json]).evaluate();
+ce.expr(['GroupOrder', quotientGroup.json]).evaluate().json; // 2
+ce.expr(['GroupOrder', ['GroupHomomorphismKernel', projection.json]])
+  .evaluate().json; // 2
+```
+
+The quotient is returned in a regular permutation representation. A lift is a
+chosen source representative satisfying `projection(lift(q)) = q`; it need not
+preserve multiplication. Maps serialize complete pairs, so their meaning does
+not depend on an internal enumeration order. `GroupHomomorphismCompose(f,g)`
+applies `f` first and then `g`; the intermediate groups must match as actual
+groups in compatible domains, though their generator lists can differ.
+
+Exact rational matrices use characteristic zero:
+
+```javascript
+const rotation = ['GroupMatrix', 0, ['List', ['List', 0, -1], ['List', 1, 0]]];
+const matrixGroup = ['MatrixGroup', 2, 0, ['List', rotation]];
+ce.expr(['GroupOrder', matrixGroup]).evaluate().json; // 4
+ce.expr(['GroupMatrixDeterminant', rotation]).evaluate().json; // 1
+ce.expr(['GroupOrder', ['GeneralLinearGroup', 2, 3]]).evaluate().json; // 48
+```
+
+Prime-field matrices reduce rational entries modulo `p`; denominators must be
+nonzero in that field. Supported prime characteristics are at most 65,521. This
+is not an extension-field implementation of `GF(p^k)`. Invariant bilinear forms
+are matrices `B` satisfying `g B g^T = B`. Quadratic forms use upper-triangular
+coefficient matrices for `q(v) = sum(i<=j, B[i,j] v[i] v[j])`, including
+characteristic two. Returned bases may contain singular matrices.
+
+A vector or projective action returns `(permutationGroup, points, faithful)`.
+The permutation point numbered `i` refers to entry `i` of the returned point
+list (one-based). The full vector action is faithful. The projective action
+normalizes nonzero vectors to represent lines; it has a possible scalar kernel.
+Its faithfulness marker is `True` over F2 and `Nothing` over other prime fields
+when the subgroup's scalar kernel has not been determined. Do not use the order
+of that projective image as the matrix group's order without a kernel argument.
+
+## Polycyclic coordinates and collected presentations
+
+A finite sequence `P = GroupPcSequence(G,[g1,...,gr])` uses normal forms
+`g1^e1 ... gr^er`, with `0 <= ei < relativeOrder[i]`. It describes a strict
+subnormal cyclic series. `GroupPcgs(G)` computes one for a finite solvable group
+and returns `Nothing` when the complete computation proves nonsolvability. The
+finite sequence and its coordinate dictionary use the bounded finite model.
+
+`GroupPcPresentation(P)` converts a finite sequence into checked collected
+relations. It preserves the order of the coordinate positions and relative
+orders. After conversion, `Pc*` arithmetic no longer enumerates the group:
+
+```javascript
+const sequence = ce.expr(['GroupPcSequence', c4.json, ['List', r]]).evaluate();
+const presentation = ce.expr(['GroupPcPresentation', sequence.json]).evaluate();
+const x = ['PcElement', presentation.json, ['List', 1]];
+ce.expr(['PcCoordinates', ['PcPower', x, 4]]).evaluate().json; // ['List', 0]
+```
+
+The constructor is
+`PcGroup(relativeOrders, powers, conjugates, inverseConjugates)`. All four lists
+run from the first generator to the last. For generator `gi` of relative order
+`mi`, `powers[i]` is the tail coordinate vector for `gi^mi`, of length `r-i-1`
+when indexing the input arrays from zero. Row `conjugates[i]` contains one such
+vector for each later generator `gj`, representing `gi^-1 gj gi`.
+`inverseConjugates[i]` similarly represents `gi gj gi^-1`. Each row has `r-i-1`
+vectors, each of length `r-i-1`. The last power vector and the last two
+conjugation rows are empty.
+
+Relative orders are integers at least two. Four empty lists give the trivial
+group. The constructor verifies the power and conjugation consistency conditions
+and rejects inconsistent relations; it does not complete arbitrary
+presentations. `PcElement` accepts canonical coordinates in range, not arbitrary
+unreduced words. `PcPower` accepts signed integer exponents. Arithmetic requires
+the same mathematical presentation; an isomorphism to a different presentation
+is not inferred.
+
+```javascript
+const hugeCyclic = [
+  'PcGroup', ['List', 1000000000000],
+  ['List', ['List']], ['List', ['List']], ['List', ['List']],
+];
+ce.expr(['PcGroupOrder', hugeCyclic]).evaluate().json; // 1000000000000
+ce.expr(['PcCoordinates', ['PcPower', ['PcElement', hugeCyclic, ['List', 42]], 3]])
+  .evaluate().json; // ['List', 126]
+```
+
+Finite PC sifting by a subgroup `H` preserves the right coset `Hx` and yields
+identity exactly for membership. It is distinct from choosing the least
+coordinate representative of `Hx`. Section operations take a numerator `H` and a
+denominator `N` normal in `H`, within the parent finite sequence. Section
+coordinates can include relative-order-one positions. Linear actions require a
+nontrivial elementary abelian section whose returned coordinates form a
+prime-field vector basis; affine actions use homogeneous row coordinates.
+
+## Operator tables
+
+The following tables show the mathematical signatures. To keep them readable,
+the trailing `options: dictionary<integer>?` argument is omitted wherever it is
+registered; the options section above identifies each family. `nothing` is the
+optional result type whose value is `Nothing`. Names and argument types follow
+the installed operators. In descriptions, `G` is the first group argument, `H`
+the second, and `K` the third unless otherwise stated.
+
+### Permutation values and point actions
+
+| Operator                     | Signature                                                                        | Meaning                                                                                           |
+| ---------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| `Permutation`                | `(list<integer>) -> Permutation`                                                 | Construct from a bijective image list. Fixed trailing points are omitted in the normalized value. |
+| `PermutationAction`          | `(integer) -> PermutationAction`                                                 | Construct the point domain 1 through the supplied degree.                                         |
+| `PermutationGroup`           | `(list<Permutation>, PermutationAction) -> PermutationGroup`                     | Construct a generator descriptor in the supplied action; every generator must fit the action.     |
+| `PermutationCompose`         | `(Permutation, Permutation) -> Permutation`                                      | Product a b, applying a first and then b.                                                         |
+| `PermutationInverse`         | `(Permutation) -> Permutation`                                                   | Inverse permutation.                                                                              |
+| `PermutationPower`           | `(Permutation, integer) -> Permutation`                                          | Signed integer power.                                                                             |
+| `PermutationOrder`           | `(Permutation) -> integer`                                                       | Exact order of an element, computed from its cycles.                                              |
+| `PermutationCycles`          | `(Permutation) -> list<list<integer>>`                                           | Disjoint nontrivial cycles; fixed points are omitted.                                             |
+| `PermutationConjugate`       | `(Permutation, Permutation) -> Permutation`                                      | For arguments (x,g), return g^-1 x g.                                                             |
+| `PermutationCommutator`      | `(Permutation, Permutation) -> Permutation`                                      | For arguments (x,y), return x^-1 y^-1 x y.                                                        |
+| `PermutationInAction`        | `(Permutation, PermutationAction) -> Permutation`                                | Check that the permutation fits the action and return the same mathematical permutation.          |
+| `PermutationApply`           | `(Permutation, integer, PermutationAction) -> integer`                           | Image of the supplied point in the supplied action.                                               |
+| `PermutationOrbit`           | `(group: PermutationGroup, point: integer) -> list<integer>`                     | Orbit of one point, including that point.                                                         |
+| `PermutationOrbits`          | `(group: PermutationGroup) -> list<list<integer>>`                               | Partition the whole declared action, including singleton fixed-point orbits.                      |
+| `PermutationTransversal`     | `(group: PermutationGroup, point: integer) -> list<tuple<integer, Permutation>>` | Pairs (point,t) with t taking the supplied base point to that point.                              |
+| `PermutationPointStabilizer` | `(group: PermutationGroup, point: integer) -> PermutationGroup`                  | Subgroup fixing the supplied point, computed with a stabilizer chain.                             |
+
+### Basic group queries and construction
+
+| Operator                  | Signature                                                  | Meaning                                                                                                                                       |
+| ------------------------- | ---------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupFromTable`          | `(list<list<integer>>) -> PermutationGroup`                | Import a square table indexed 0..n-1 with identity 0, verify the group laws, and return its faithful right regular permutation group.         |
+| `GroupGenerators`         | `(GroupDescriptor) -> list<GroupElement>`                  | Validated generators of the descriptor, preserving their supplied order; not a minimum generating set.                                        |
+| `GroupIdentity`           | `(GroupDescriptor) -> GroupElement`                        | Identity element in the descriptor representation.                                                                                            |
+| `GroupElements`           | `(GroupDescriptor) -> list<GroupElement>`                  | Complete list, identity first. Permutation inputs use the separate closure API; matrix inputs use the bounded finite model.                   |
+| `GroupOrder`              | `(GroupDescriptor) -> integer`                             | Exact order. Uses a stabilizer chain for permutations, a feasible faithful vector action for prime-field matrices, or bounded matrix closure. |
+| `GroupContains`           | `(GroupDescriptor, GroupElement) -> boolean`               | Whether the compatible element belongs to G.                                                                                                  |
+| `GroupIsSubgroup`         | `(GroupDescriptor, GroupDescriptor) -> boolean`            | Whether H is contained in G; the parent is the first argument.                                                                                |
+| `GroupIndex`              | `(GroupDescriptor, GroupDescriptor) -> integer`            | Index [G:H]; H must be a subgroup of G.                                                                                                       |
+| `GroupEqual`              | `(GroupDescriptor, GroupDescriptor) -> boolean`            | Equality of the generated subgroups in a common domain.                                                                                       |
+| `GroupIsNormal`           | `(GroupDescriptor, GroupDescriptor) -> boolean`            | Whether H is normal in G.                                                                                                                     |
+| `GroupIsSubnormal`        | `(GroupDescriptor, GroupDescriptor) -> boolean`            | Whether H is subnormal in G.                                                                                                                  |
+| `GroupIsCharacteristic`   | `(GroupDescriptor, GroupDescriptor) -> boolean`            | Whether every automorphism of G preserves H. Structural shortcuts compare actual subgroups; otherwise a bounded automorphism search is used.  |
+| `GroupIsConjugate`        | `(GroupDescriptor, GroupElement, GroupElement) -> boolean` | Whether the two supplied elements of G are conjugate by an element of G.                                                                      |
+| `GroupIntersection`       | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Intersection G intersect H in their common domain.                                                                                            |
+| `GroupJoin`               | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Subgroup generated by G and H.                                                                                                                |
+| `GroupCentralizer`        | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Elements of G commuting with all of H. H need not be contained in G, but both must share a domain.                                            |
+| `GroupNormalizer`         | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Elements of G normalizing H. H need not be contained in G, but both must share a domain.                                                      |
+| `GroupNormalClosure`      | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Smallest normal subgroup of G containing H; requires H contained in G.                                                                        |
+| `GroupCore`               | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Largest normal subgroup of G contained in H; requires H contained in G.                                                                       |
+| `GroupCommutatorSubgroup` | `(GroupDescriptor, GroupDescriptor) -> GroupDescriptor`    | Subgroup generated by all [g,h] with g in G and h in H.                                                                                       |
+
+### Finite structure and invariants
+
+| Operator                            | Signature                                                        | Meaning                                                                                                                  |
+| ----------------------------------- | ---------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------ |
+| `GroupIsAbelian`                    | `(GroupDescriptor) -> boolean`                                   | Whether all group elements commute; permutation inputs retain the specialized chain implementation.                      |
+| `GroupIsCyclic`                     | `(GroupDescriptor) -> boolean`                                   | Whether one element generates G. The trivial group is cyclic.                                                            |
+| `GroupIsSolvable`                   | `(GroupDescriptor) -> boolean`                                   | Whether the derived series terminates at the identity.                                                                   |
+| `GroupIsNilpotent`                  | `(GroupDescriptor) -> boolean`                                   | Whether G is nilpotent; prime-power and abelian cases use direct structural tests.                                       |
+| `GroupIsPerfect`                    | `(GroupDescriptor) -> boolean`                                   | Whether the derived subgroup equals G.                                                                                   |
+| `GroupIsSimple`                     | `(GroupDescriptor) -> boolean`                                   | Whether G is nontrivial and has no nontrivial proper normal subgroup.                                                    |
+| `GroupIsElementaryAbelian`          | `(GroupDescriptor) -> boolean`                                   | Whether G is elementary abelian; the trivial group returns True.                                                         |
+| `GroupIsPGroup`                     | `(GroupDescriptor) -> boolean`                                   | Whether the order is a prime power; the trivial group returns True. No prime argument is supplied.                       |
+| `GroupIsSupersolvable`              | `(GroupDescriptor) -> boolean`                                   | Whether G has a normal series with prime cyclic factors.                                                                 |
+| `GroupExponent`                     | `(GroupDescriptor) -> integer`                                   | Least common multiple of element orders.                                                                                 |
+| `GroupNilpotencyClass`              | `(GroupDescriptor) -> integer \| nothing`                        | Nilpotency class, 0 for the trivial group, or Nothing when G is not nilpotent.                                           |
+| `GroupPrime`                        | `(GroupDescriptor) -> integer \| nothing`                        | Prime dividing a nontrivial prime-power order; Nothing for the trivial group or a mixed-prime order.                     |
+| `GroupCenter`                       | `(GroupDescriptor) -> GroupDescriptor`                           | Center Z(G).                                                                                                             |
+| `GroupDerivedSubgroup`              | `(GroupDescriptor) -> GroupDescriptor`                           | Derived subgroup [G,G].                                                                                                  |
+| `GroupFrattiniSubgroup`             | `(GroupDescriptor) -> GroupDescriptor`                           | Intersection of maximal subgroups. Prime-power and abelian groups use algebraic formulas.                                |
+| `GroupFittingSubgroup`              | `(GroupDescriptor) -> GroupDescriptor`                           | Largest nilpotent normal subgroup.                                                                                       |
+| `GroupSolvableRadical`              | `(GroupDescriptor) -> GroupDescriptor`                           | Largest solvable normal subgroup.                                                                                        |
+| `GroupSocle`                        | `(GroupDescriptor) -> GroupDescriptor`                           | Subgroup generated by the minimal nontrivial normal subgroups.                                                           |
+| `GroupAbelianInvariants`            | `(GroupDescriptor) -> list<integer>`                             | Sorted primary cyclic factor orders of the abelianization G/[G,G], not a divisibility-chain invariant-factor convention. |
+| `GroupMinimalGenerators`            | `(GroupDescriptor) -> list<GroupElement>`                        | A generating tuple of minimum length; the general fallback is bounded and potentially expensive.                         |
+| `GroupIndependentAbelianGenerators` | `(GroupDescriptor) -> list<GroupElement>`                        | Generators of primary cyclic direct factors. Requires G abelian.                                                         |
+| `GroupEulerianFunction`             | `(GroupDescriptor, integer) -> integer`                          | Number of ordered generating tuples of the supplied nonnegative length, allowing repeated elements.                      |
+| `GroupCommutatorLength`             | `(GroupDescriptor, GroupElement) -> integer \| nothing`          | Least number of commutator factors for the element; Nothing outside the derived subgroup.                                |
+| `GroupFactorization`                | `(GroupDescriptor, GroupElement) -> list<integer> \| nothing`    | A shortest positive word in the descriptor generators, as one-based generator labels. Identity has the empty word.       |
+| `GroupNthRoots`                     | `(GroupDescriptor, GroupElement, integer) -> list<GroupElement>` | All elements y of G satisfying y^n = x, for arguments (G,x,n).                                                           |
+
+### Subgroup lists, series, cosets, and prime subgroups
+
+| Operator                         | Signature                                                                         | Meaning                                                                                                                          |
+| -------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupSubgroups`                 | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Complete subgroup lattice, including the identity subgroup and G.                                                                |
+| `GroupNormalSubgroups`           | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | All normal subgroups of G.                                                                                                       |
+| `GroupMaximalSubgroups`          | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | All maximal proper subgroups of G.                                                                                               |
+| `GroupSubgroupConjugacyClasses`  | `(GroupDescriptor) -> list<list<GroupDescriptor>>`                                | Subgroups partitioned into conjugacy classes under G.                                                                            |
+| `GroupConjugacyClasses`          | `(GroupDescriptor) -> list<list<GroupElement>>`                                   | Elements partitioned into conjugacy classes under G.                                                                             |
+| `GroupRationalClasses`           | `(GroupDescriptor) -> list<list<GroupElement>>`                                   | Classes generated by conjugacy and taking powers coprime to the element order.                                                   |
+| `GroupDerivedSeries`             | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Descending derived series, stopping when stable. A nonsolvable result need not end at identity.                                  |
+| `GroupLowerCentralSeries`        | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Descending lower central series, stopping when stable. A nonnilpotent result need not end at identity.                           |
+| `GroupUpperCentralSeries`        | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Ascending upper central series, starting at identity and stopping when stable.                                                   |
+| `GroupCompositionSeries`         | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Descending series with simple factors, including G and identity.                                                                 |
+| `GroupChiefSeries`               | `(GroupDescriptor) -> list<GroupDescriptor>`                                      | Descending series of subgroups normal in G with no normal subgroup between successive terms.                                     |
+| `GroupRightCosets`               | `(GroupDescriptor, GroupDescriptor) -> list<list<GroupElement>>`                  | Complete element lists of right cosets Hx in G; H must be a subgroup of G.                                                       |
+| `GroupRightTransversal`          | `(GroupDescriptor, GroupDescriptor) -> list<GroupElement>`                        | One representative of each right coset Hx in G.                                                                                  |
+| `GroupDoubleCosets`              | `(GroupDescriptor, GroupDescriptor, GroupDescriptor) -> list<list<GroupElement>>` | Element lists of HxK in G, for arguments (G,H,K).                                                                                |
+| `GroupComplementRepresentatives` | `(GroupDescriptor, GroupDescriptor) -> list<GroupDescriptor>`                     | One G-conjugacy representative for each complement of the supplied normal subgroup H; empty if none exist.                       |
+| `GroupSylowSubgroup`             | `(GroupDescriptor, integer) -> GroupDescriptor`                                   | One Sylow p-subgroup, for arguments (G,p). p must be prime.                                                                      |
+| `GroupPCore`                     | `(GroupDescriptor, integer) -> GroupDescriptor`                                   | Largest normal p-subgroup of G.                                                                                                  |
+| `GroupHallSubgroups`             | `(GroupDescriptor, list<integer>) -> list<GroupDescriptor>`                       | All Hall subgroups for the supplied list of primes. A finite nilpotent group has exactly one; other groups use a bounded search. |
+| `GroupPCentralSeries`            | `(GroupDescriptor, integer) -> list<GroupDescriptor>`                             | Descending lower exponent-p central series, P_(i+1) = [P_i,G] P_i^p; requires a p-group.                                         |
+| `GroupOmega`                     | `(GroupDescriptor, integer, integer) -> GroupDescriptor`                          | For (G,p,k), subgroup generated by elements killed by p^k; requires a p-group and nonnegative k.                                 |
+| `GroupAgemo`                     | `(GroupDescriptor, integer, integer) -> GroupDescriptor`                          | For (G,p,k), subgroup generated by p^k-th powers; requires a p-group and nonnegative k.                                          |
+
+### Homomorphisms and quotients
+
+| Operator                     | Signature                                                                                          | Meaning                                                                                                                                    |
+| ---------------------------- | -------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `GroupHomomorphism`          | `(GroupDescriptor, GroupDescriptor, list<tuple<GroupElement, GroupElement>>) -> GroupHomomorphism` | Validate a complete list of (sourceElement,targetElement) pairs, covering every source element exactly once and preserving all products.   |
+| `GroupHomomorphismByImages`  | `(GroupDescriptor, GroupDescriptor, list<GroupElement>, list<GroupElement>) -> GroupHomomorphism`  | For (source,target,generators,images), verify that generators generate the source and that their proposed images extend to a homomorphism. |
+| `GroupHomomorphismApply`     | `(GroupHomomorphism, GroupElement) -> GroupElement`                                                | Apply a map to a source element.                                                                                                           |
+| `GroupHomomorphismSource`    | `(GroupHomomorphism) -> GroupDescriptor`                                                           | Source descriptor.                                                                                                                         |
+| `GroupHomomorphismTarget`    | `(GroupHomomorphism) -> GroupDescriptor`                                                           | Target descriptor, which may be larger than the image.                                                                                     |
+| `GroupHomomorphismKernel`    | `(GroupHomomorphism) -> GroupDescriptor`                                                           | Kernel as a subgroup in the source representation.                                                                                         |
+| `GroupHomomorphismImage`     | `(GroupHomomorphism) -> GroupDescriptor`                                                           | Image as a subgroup in the target representation.                                                                                          |
+| `GroupHomomorphismImageOf`   | `(GroupHomomorphism, GroupDescriptor) -> GroupDescriptor`                                          | Image of the supplied source subgroup.                                                                                                     |
+| `GroupHomomorphismPreimage`  | `(GroupHomomorphism, GroupDescriptor) -> GroupDescriptor`                                          | Full inverse image of a target subgroup, including the kernel.                                                                             |
+| `GroupHomomorphismPreimages` | `(GroupHomomorphism, GroupElement) -> list<GroupElement>`                                          | All source elements mapping to the supplied target element; empty if it is outside the image.                                              |
+| `GroupHomomorphismInverse`   | `(GroupHomomorphism) -> GroupHomomorphism`                                                         | Inverse map; requires a bijective homomorphism.                                                                                            |
+| `GroupHomomorphismCompose`   | `(GroupHomomorphism, GroupHomomorphism) -> GroupHomomorphism`                                      | For (f,g), apply f and then g. Intermediate domains must match as groups.                                                                  |
+| `GroupAutomorphisms`         | `(GroupDescriptor) -> list<GroupHomomorphism>`                                                     | Complete bounded list of automorphisms, each with explicit source and target. Rendering also has a total output bound.                     |
+| `GroupQuotient`              | `(GroupDescriptor, GroupDescriptor) -> GroupQuotientValue`                                         | Construct G/H with H normal in G; returns a quotient value carrying its projection.                                                        |
+| `GroupQuotientValue`         | `(GroupDescriptor, GroupDescriptor, GroupHomomorphism) -> GroupQuotientValue`                      | Validate (source,kernel,projection): the projection must be surjective with exactly the declared normal kernel.                            |
+| `GroupQuotientGroup`         | `(GroupQuotientValue) -> GroupDescriptor`                                                          | The target group of the quotient projection.                                                                                               |
+| `GroupQuotientProjection`    | `(GroupQuotientValue) -> GroupHomomorphism`                                                        | Verified homomorphism from the numerator onto the quotient group.                                                                          |
+| `GroupQuotientLift`          | `(GroupQuotientValue, GroupElement) -> GroupElement`                                               | Choose a numerator element projecting to the supplied quotient element. This section is not asserted to be a homomorphism.                 |
+
+### Exact matrices and matrix groups
+
+| Operator                             | Signature                                                                           | Meaning                                                                                                                               |
+| ------------------------------------ | ----------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupMatrix`                        | `(integer, list<list<rational>>) -> GroupMatrix`                                    | Construct from (characteristic,rows). Rows must be square and exact rational entries; normalization uses Q or the prime field.        |
+| `MatrixGroup`                        | `(integer, integer, list<GroupMatrix>) -> MatrixGroup`                              | Construct from (dimension,characteristic,generators); all generators must be invertible in that domain.                               |
+| `GroupMatrixMultiply`                | `(GroupMatrix, GroupMatrix) -> GroupMatrix`                                         | Product of two matrices in the same field and dimension.                                                                              |
+| `GroupMatrixInverse`                 | `(GroupMatrix) -> GroupMatrix`                                                      | Inverse of a nonsingular matrix.                                                                                                      |
+| `GroupMatrixTranspose`               | `(GroupMatrix) -> GroupMatrix`                                                      | Transpose matrix.                                                                                                                     |
+| `GroupMatrixPower`                   | `(GroupMatrix, integer) -> GroupMatrix`                                             | Signed integer power; negative exponents require an invertible matrix.                                                                |
+| `GroupMatrixDeterminant`             | `(GroupMatrix) -> rational`                                                         | Exact determinant in the matrix field.                                                                                                |
+| `MatrixGroupDimension`               | `(MatrixGroup) -> integer`                                                          | Dimension of the representation.                                                                                                      |
+| `MatrixGroupCharacteristic`          | `(MatrixGroup) -> integer`                                                          | 0 for Q, otherwise the prime field characteristic.                                                                                    |
+| `MatrixGroupOrder`                   | `(MatrixGroup) -> integer`                                                          | Matrix-specific order query; GroupOrder is the representation-independent spelling.                                                   |
+| `MatrixGroupElements`                | `(MatrixGroup) -> list<GroupMatrix>`                                                | Bounded complete matrix closure; GroupElements also accepts a matrix group.                                                           |
+| `MatrixGroupPcgs`                    | `(MatrixGroup) -> GroupPcSequence \| nothing`                                       | Compute a finite polycyclic sequence, or Nothing for a proved nonsolvable group; GroupPcgs also accepts matrix groups.                |
+| `MatrixGroupTranspose`               | `(MatrixGroup) -> MatrixGroup`                                                      | Group generated by transposes of the supplied generators.                                                                             |
+| `MatrixGroupIsSubgroupSL`            | `(MatrixGroup) -> boolean`                                                          | Whether every generator has determinant one.                                                                                          |
+| `MatrixGroupIsIntegral`              | `(MatrixGroup) -> boolean`                                                          | Whether the rational group lies in GL(n,Z): integer generator entries and determinant +1 or -1. Returns False for prime-field groups. |
+| `MatrixGroupInvariantBilinearForms`  | `(MatrixGroup) -> list<GroupMatrix>`                                                | Basis of matrices B satisfying g B g^T = B for every generator; basis matrices can be singular.                                       |
+| `MatrixGroupInvariantQuadraticForms` | `(MatrixGroup) -> list<GroupMatrix>`                                                | Basis of invariant quadratic forms, encoded as upper-triangular coefficient matrices.                                                 |
+| `MatrixGroupVectorAction`            | `(MatrixGroup) -> tuple<PermutationGroup, list<list<integer>>, boolean \| nothing>` | Full finite-field vector action; returns (permutationGroup,pointVectors,True).                                                        |
+| `MatrixGroupProjectiveAction`        | `(MatrixGroup) -> tuple<PermutationGroup, list<list<integer>>, boolean \| nothing>` | Action on one-dimensional subspaces; returns normalized point representatives and a faithfulness marker.                              |
+| `GeneralLinearGroup`                 | `(integer, integer) -> MatrixGroup`                                                 | Natural GL(d,p), for arguments (dimension,prime).                                                                                     |
+| `SpecialLinearGroup`                 | `(integer, integer) -> MatrixGroup`                                                 | Natural SL(d,p), for arguments (dimension,prime).                                                                                     |
+| `MatrixGroupIsNaturalGL`             | `(MatrixGroup) -> boolean`                                                          | Whether this prime-field subgroup is the whole natural GL(d,p), using a certified order.                                              |
+| `MatrixGroupIsNaturalSL`             | `(MatrixGroup) -> boolean`                                                          | Whether this prime-field subgroup is the whole natural SL(d,p), checking determinant one and certified order.                         |
+| `MatrixGroupOrderByAction`           | `(MatrixGroup) -> integer`                                                          | Order through the faithful full vector action; requires a prime field and feasible action bounds.                                     |
+| `MatrixGroupInvariantLattice`        | `(MatrixGroup) -> GroupMatrix`                                                      | A row basis of an invariant rational lattice for a group whose finite closure completes. Requires characteristic zero.                |
+
+### Finite polycyclic sequences
+
+| Operator                        | Signature                                                                                      | Meaning                                                                                                                                                                |
+| ------------------------------- | ---------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupPcgs`                     | `(GroupDescriptor) -> GroupPcSequence \| nothing`                                              | Compute a polycyclic sequence of a bounded finite solvable group, or Nothing when nonsolvable.                                                                         |
+| `GroupPcSequence`               | `(GroupDescriptor, list<GroupElement>) -> GroupPcSequence`                                     | Validate the supplied sequence in an ambient group; each retained factor must be nontrivial cyclic and subnormal.                                                      |
+| `GroupPcPresentation`           | `(GroupPcSequence) -> PcGroup`                                                                 | Convert a finite sequence to a checked collected PcGroup, preserving coordinate positions and relative orders.                                                         |
+| `GroupPcRelativeOrders`         | `(GroupPcSequence) -> list<integer>`                                                           | Relative orders of the sequence generators.                                                                                                                            |
+| `GroupPcSeries`                 | `(GroupPcSequence) -> list<GroupDescriptor>`                                                   | Tail subgroups, including the generated subgroup and identity.                                                                                                         |
+| `GroupPcExponents`              | `(GroupPcSequence, GroupElement) -> list<integer>`                                             | Canonical coordinate vector of an element represented by the sequence.                                                                                                 |
+| `GroupPcElement`                | `(GroupPcSequence, list<integer>) -> GroupElement`                                             | Evaluate a canonical coordinate vector; coordinates must be in their relative-order ranges.                                                                            |
+| `GroupPcLinearCombination`      | `(GroupPcSequence, list<integer>) -> GroupElement`                                             | Evaluate the ordered generator product with arbitrary signed integer exponents.                                                                                        |
+| `GroupPcDepth`                  | `(GroupPcSequence, GroupElement) -> integer`                                                   | One-based position of the first nonzero coordinate, or rank+1 for identity.                                                                                            |
+| `GroupPcLeadingExponent`        | `(GroupPcSequence, GroupElement) -> integer`                                                   | First nonzero coordinate, or 0 for identity.                                                                                                                           |
+| `GroupPcRelativeOrder`          | `(GroupPcSequence, GroupElement) -> integer`                                                   | Order of the element modulo the next tail at its depth; 1 for identity.                                                                                                |
+| `GroupPcHead`                   | `(GroupPcSequence, GroupElement, integer) -> GroupElement`                                     | For (P,x,d), retain only coordinates at positions strictly before d.                                                                                                   |
+| `GroupPcReduced`                | `(GroupPcSequence, GroupElement, GroupElement) -> GroupElement`                                | For (P,x,y), remove the leading coordinate of x by left multiplication by powers of y^-1; requires equal nonidentity depth and a solvable leading-coordinate equation. |
+| `GroupPcRelativePowerExponents` | `(GroupPcSequence, integer) -> list<integer>`                                                  | For (P,i), coordinates of gi raised to its relative order. i is one-based.                                                                                             |
+| `GroupPcConjugateExponents`     | `(GroupPcSequence, integer, integer) -> list<integer>`                                         | For (P,i,j), coordinates of gi^-1 gj gi. The conjugating generator is the first position.                                                                              |
+| `GroupPcCommutatorExponents`    | `(GroupPcSequence, integer, integer) -> list<integer>`                                         | For (P,i,j), coordinates of [gi,gj] = gi^-1 gj^-1 gi gj.                                                                                                               |
+| `GroupInducedPcSequence`        | `(GroupPcSequence, GroupDescriptor) -> GroupPcSequence`                                        | Sequence of the supplied subgroup induced by the parent sequence and its tails.                                                                                        |
+| `GroupPcSift`                   | `(GroupPcSequence, GroupDescriptor, GroupElement) -> GroupElement`                             | For (P,H,x), a residue in Hx; identity exactly when x belongs to H.                                                                                                    |
+| `GroupPcCanonicalElement`       | `(GroupPcSequence, GroupDescriptor, GroupElement) -> GroupElement`                             | For (P,H,x), representative of Hx with the least parent coordinate vector.                                                                                             |
+| `GroupPcgsBySeries`             | `(GroupDescriptor, list<GroupDescriptor>) -> nothing \| tuple<GroupPcSequence, list<integer>>` | Refine a descending subnormal series ending at identity; returns (sequence,oneBasedTailBoundaries), or Nothing if a required factor is not solvable.                   |
+| `GroupPcOrbit`                  | `(GroupPcSequence, integer) -> tuple<list<integer>, list<GroupElement>, GroupPcSequence>`      | For a permutation-backed sequence and point, returns (orbitPoints,representativeElements,stabilizerSequence).                                                          |
+| `GroupPcStabilizer`             | `(GroupPcSequence, integer) -> GroupPcSequence`                                                | Sequence for the point stabilizer; requires a permutation-backed sequence.                                                                                             |
+
+### Finite polycyclic sections and actions
+
+| Operator                      | Signature                                                                                        | Meaning                                                                                                                                                                 |
+| ----------------------------- | ------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `GroupModuloPcRelativeOrders` | `(GroupPcSequence, GroupDescriptor, GroupDescriptor) -> list<integer>`                           | For (P,H,N), relative orders of the quotient coordinates for H/N. N must be normal in H.                                                                                |
+| `GroupModuloPcExponents`      | `(GroupPcSequence, GroupDescriptor, GroupDescriptor, GroupElement) -> list<integer>`             | For (P,H,N,x), coordinates of xN, with x in H.                                                                                                                          |
+| `GroupModuloPcElement`        | `(GroupPcSequence, GroupDescriptor, GroupDescriptor, list<integer>) -> GroupElement`             | For (P,H,N,coordinates), choose a lift in H of the represented coset.                                                                                                   |
+| `GroupPcLinearAction`         | `(GroupPcSequence, GroupDescriptor, GroupDescriptor, GroupElement) -> GroupMatrix`               | For (P,H,N,x), row-action matrix of conjugation by x on H/N. x must normalize both H and N; section coordinates must form a nontrivial elementary abelian vector basis. |
+| `GroupPcAffineAction`         | `(GroupPcSequence, GroupDescriptor, GroupDescriptor, GroupElement, GroupElement) -> GroupMatrix` | For (P,H,N,x,t), homogeneous row-action matrix for v -> v A + b, where A comes from conjugation by x and b is the coordinate vector of tN.                              |
+
+### Collected polycyclic presentations
+
+| Operator           | Signature                                                                                               | Meaning                                                                                                                                                     |
+| ------------------ | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `PcGroup`          | `(list<integer>, list<list<integer>>, list<list<list<integer>>>, list<list<list<integer>>>) -> PcGroup` | Construct and validate relative orders, power tails, forward conjugation tails, and inverse conjugation tails. No complete element enumeration is required. |
+| `PcElement`        | `(PcGroup, list<integer>) -> PcElement`                                                                 | Bind canonical in-range bigint coordinates to a presentation.                                                                                               |
+| `PcGroupOrder`     | `(PcGroup) -> integer`                                                                                  | Exact product of relative orders.                                                                                                                           |
+| `PcRelativeOrders` | `(PcGroup) -> list<integer>`                                                                            | Relative orders in presentation order.                                                                                                                      |
+| `PcIdentity`       | `(PcGroup) -> PcElement`                                                                                | Identity element with all coordinates zero.                                                                                                                 |
+| `PcGenerators`     | `(PcGroup) -> list<PcElement>`                                                                          | Standard generators with one unit coordinate, in presentation order.                                                                                        |
+| `PcCoordinates`    | `(PcElement) -> list<integer>`                                                                          | Canonical coordinates of a collected element.                                                                                                               |
+| `PcMultiply`       | `(PcElement, PcElement) -> PcElement`                                                                   | Multiply elements in the same presentation.                                                                                                                 |
+| `PcInverse`        | `(PcElement) -> PcElement`                                                                              | Inverse within the presentation.                                                                                                                            |
+| `PcPower`          | `(PcElement, integer) -> PcElement`                                                                     | Signed integer power within the presentation.                                                                                                               |
 
 ## Scope and references
 
-Finite-table groups, matrix groups, homomorphisms, quotients, and polycyclic
-representations are separate extensions. They are not part of this module.
+The only package export is the entry point
+`@cortex-js/compute-engine/group-theory`. The kernel modules under
+`src/compute-engine/group-theory` are not part of the supported API.
+
+General structural operations can still require exponential subgroup or
+automorphism searches. Collected presentations currently provide arithmetic, not
+the full general structural API; infinite relative orders and arbitrary
+presentation completion are not supported. Prime-power extension fields and
+general infinite matrix-group algorithms are also outside this interface. See
+the [capability ledger](https://github.com/cortex-js/compute-engine/blob/main/benchmarks/group-theory.md)
+for measured workloads and the distinction between implemented bounded
+algorithms and future representation or scalability work.
 
 For mathematical background, see the GAP reference manual,
 [chapter 39: Groups](https://docs.gap-system.org/doc/ref/chap39.html) and
 [chapter 43: Permutation Groups](https://docs.gap-system.org/doc/ref/chap43.html).
-The implementation follows standard permutation-group algorithms and Compute
-Engine conventions; it does not parse GAP programs or embed GAP code.
+The implementation uses standard algorithms and Compute Engine conventions; it
+does not parse GAP programs or embed GAP code.
 
 ---
 
