@@ -1165,6 +1165,8 @@ property.
 | `unexpected-argument`          | too many arguments provided                                                                                      |
 | `expected-argument`            | not enough arguments provided                                                                                    |
 | `expected-expression`          | an expression was expected inside an enclosure (parentheses)                                                     |
+| `assignment-to-list-element`   | `d["x"] := v` with a string index, `L[k] := v` in a `let` statement or a `where` item, and `n_{k} := v` outside a block are not supported; `L[k] := v` alone is `L := ReplaceAt(L, k, v)`, and gives this error at evaluation when `L` has no value |
+| `assignment-to-library-function` | `a+b := v`, `\sin(x) := v` and `N_n := v` are not supported: the assignment would replace a function of a library; declare the name first with `ce.declare()` to replace it |
 | `expected-set-builder-separator` | a set builder `\{x \| …\}` uses a bar as the separator; write `\mid` or `:` instead                            |
 | `unexpected-command`           | the command is unknown, or not applicable in the current parsing context                                         |
 | `unexpected-token`             | the character does not apply to the current parsing context                                                      |
@@ -5999,9 +6001,22 @@ ce.parse('F_n := F_{n-1} + F_{n-2}').evaluate();
 ce.parse('F_{10}').evaluate();  // → 55
 
 // Factorial via LaTeX
-ce.parse('D_0 := 1').evaluate();
-ce.parse('D_n := n \\cdot D_{n-1}').evaluate();
-ce.parse('D_{5}').evaluate();  // → 120
+ce.parse('T_0 := 1').evaluate();
+ce.parse('T_n := n \\cdot T_{n-1}').evaluate();
+ce.parse('T_{5}').evaluate();  // → 120
+```
+
+**Library names:** The name of the sequence cannot be the name of a library
+function, such as `N`, `D` or `\Gamma`. The recurrence
+`N_n := N_{n-1} + 1` is the syntax error `assignment-to-library-function`,
+because the sequence would replace the function `N` for the whole engine. Use
+another letter, or declare the name first:
+
+```js
+ce.declare('N', 'unknown');
+ce.parse('N_0 := 1').evaluate();
+ce.parse('N_n := N_{n-1} + 1').evaluate();
+ce.parse('N_{3}').evaluate();  // → 4
 ```
 
 **Order independence:** Base cases and recurrence can be defined in any order.
@@ -6800,7 +6815,22 @@ console.log(ce.parse("a + b \\keyword{where} a \\coloneq 1, b \\coloneq 2").json
 Each binding declares its name with a value. A binding is a statement, so it
 cannot be an operand: `f(a \coloneq 2)` is the error `assignment-in-operand`,
 and `a \coloneq b \coloneq 1` is the syntax error `chained-assignment`. Write
-two statements instead.
+two statements instead. A binding declares a new name, so a list element is not
+a binding: `L[k] \coloneq 5` in a `where` item is the syntax error
+`assignment-to-list-element`.
+
+A target that is a function of a library, such as `a + b \coloneq 5`,
+`\sin(x) \coloneq 5` or `N(x) \coloneq x + 1`, is the syntax error
+`assignment-to-library-function`: the assignment would change every later use of
+the function. To replace a library function, declare the name first, with
+`ce.declare('N', 'function')`. A value that is not a function is a variable:
+`N \coloneq 5` gives `5`.
+
+A subscript on a library function is the same error when the assignment would
+define the function or a sequence with its name: `N_n \coloneq n + 1` and the
+recurrence `N_n \coloneq N_{n-1} + 1`. A term of a sequence alone
+(`N_0 \coloneq 1`) stays valid, and so does a local with such a name in a block:
+`N_n \coloneq 5; N_n + 1` gives `6`.
 
 ### Loops
 
@@ -6831,6 +6861,49 @@ branch. A use of a name before its declaration is the error
 `read-before-declaration`. A later assignment must keep the type of the local
 (a number can become another number, not a string); otherwise it is the error
 `assignment-type-mismatch`.
+
+An assignment to a list element, `L[k] \coloneq v`, gives the list a new value
+with the element replaced: it is `Assign(L, ReplaceAt(L, k, v))`. It does not
+declare a local, so it changes the list that is in scope:
+
+```live
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L").json);
+// ➔ ["Block", ["Declare", "L", "'unknown'", ["List", 10, 20, 30]],
+//             ["Assign", "L", ["ReplaceAt", "L", 2, 5]],
+//             "L"]
+
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L").evaluate().json);
+// ➔ ["List", 10, 5, 30]
+```
+
+A matrix element is `M[j, i] \coloneq v` or `M[j][i] \coloneq v`, which is
+`Assign(M, ReplaceAt(M, j, i, v))`. Lists have value semantics: after
+`A \coloneq L`, the assignment `L[1] \coloneq 5` does not change `A`. A string
+index (`d["x"] \coloneq 5`) is the syntax error `assignment-to-list-element`,
+because `ReplaceAt` refuses a string index, and a list that is a function of a
+library (`N[1] \coloneq 5`) is the syntax error `assignment-to-library-function`.
+
+A write that cannot give a list is an error, and the variable keeps its value.
+An index that is zero, not an integer or past the end is the error
+`out-of-range`:
+
+```live
+console.log(ce.parse("L \\coloneq [10, 20, 30]; L[5] \\coloneq 1; L").evaluate().json);
+// ➔ ["Error", ["ErrorCode", "'out-of-range'", "'an index in 1..3 or -3..-1'", "'5'"]]
+```
+
+A variable with no value as the target is the error
+`assignment-to-list-element`, and a number as the target is the error
+`incompatible-type` that `ReplaceAt` gives. A string or a tuple is written as
+`ReplaceAt` writes it, and gives a list. An index with no
+numeric value (`L[k] \coloneq 5` with `k` unknown) leaves the write
+unevaluated, and `L` holds it.
+
+The subscript spelling of an element is not an assignment to the list: in a
+block, `n_{1} \coloneq 7` declares the local `n_1`, also when `n` is a list,
+and `n_{1}[1] \coloneq 9` changes that local. Outside a block,
+`n_{1} \coloneq 7` is the syntax error `assignment-to-list-element`: write
+`n[1] \coloneq 7` to change the list `n`.
 
 <ReadMore path="/compute-engine/reference/control-structures/" >
 Read more about the **control structure** operators.
@@ -9466,12 +9539,18 @@ ce.assign("bump", ce.box(["Function",
   ["Block", ["Assign", "counter", ["Add", "counter", 1]], "n"], "n"]));
 ```
 
-The same refusal applies when the function is the `value` of a declaration in
-the global scope: `ce.declare("f", { type: "(number) -> number", value })`, or
-`{ value }` with no type, whether `value` is a boxed expression, MathJSON,
-LaTeX or a function that returns one. A literal that states its own effects
+The same refusal applies when the function is the `value` of a declaration, in
+any scope, including a scope from `ce.pushScope()`:
+`ce.declare("f", { type: "(number) -> number", value })`, or `{ value }` with no
+type, whether `value` is a boxed expression, MathJSON, LaTeX or a function that
+returns one. A literal that states its own effects
 (`(number) scope -> number` on the literal) is accepted when its body keeps to
 them.
+
+A `Declare` statement, which is also a top-level `let` or `const` in Epsil,
+gives an `incompatible-type` error value for such a literal when the literal is
+written in the statement and the binding is in the global scope or in a scope
+from `ce.pushScope()`. A local of a `Block` or of a function body is not refused.
 
 An **anonymous** literal is not gated — it has no annotation surface, and its
 arrow carries the inferred `scope` honestly — so a factory that returns a
@@ -9588,6 +9667,33 @@ boolean, or a list or tuple of these): with `g` declared
 an error pass unchanged; a real float passes under `integer` or `rational`.
 Compiled code does not make this check. Assigning a typed literal to a symbol
 gives that symbol the annotated signature, including the return type.
+
+A function assigned to a symbol declared with a signature checks each argument
+against the declared parameter type when it is called. When an argument has no
+value yet and its type does not decide the check, the call stays unevaluated,
+and a later evaluation checks the value:
+
+```js
+ce.declare("h", "(integer) -> integer");
+ce.assign("h", ce.box(["Function", ["Multiply", 2, "k"], "k"]));
+
+const call = ce.box(["h", "m"]).evaluate();
+call.json;                 // ➔ ["h", "m"]
+ce.assign("m", 1.5);
+call.evaluate();           // ➔ incompatible-type error
+```
+
+The same rule applies to a parameter annotated on the literal, with
+`["Typed", "k", "'integer'"]` as the parameter. A literal applied directly, or
+given as a callback, stays as an inert `Apply` of the literal.
+
+Declare the argument to apply the body: with `n` declared `integer`, `h(n)` gives
+`2n`. At a parameter that admits every real number (`real`, `number`), the body
+is also applied to a symbol with no declared type: with `f` declared
+`(real) -> real` and the body `x^2`, `f(x)` gives `x^2`. A later value outside
+the parameter type is not checked in that result. An expression whose type does
+not fit the parameter stays: `f(x + 1)` stays while `x` has neither a declared
+nor an inferred type, because the type of `x + 1` is then `number`.
 
 When a function literal is assigned to a symbol declared with a signature,
 the declared result is ascribed to the body. A body whose inferred type is
@@ -12546,6 +12652,43 @@ When a `Divide` expression has a denominator already in factored form (a product
 <ReadMore path="/compute-engine/reference/arithmetic/" > Read more about
 <strong>Polynomial Arithmetic</strong> <Icon name="chevron-right-bold" /></ReadMore>
 
+## Sums and Products with a Symbolic Bound
+
+`simplify()` gives the closed form of a sum or a product whose upper bound is a
+symbol, as in Mathematica:
+
+```live
+ce.parse('\\sum_{k=1}^n 3').simplify().latex;
+// ➔ "3n"
+
+ce.parse('\\prod_{k=1}^n 3').simplify().latex;
+// ➔ "3^{n}"
+
+ce.parse('\\sum_{k=1}^n k').simplify().latex;
+// ➔ "\frac{n^2+n}{2}"
+```
+
+The closed form is the value of the sum when \\(n\\) is an integer and
+\\( n \ge 0 \\). For another value it can differ from `evaluate()`, which gives
+\\(0\\) for the empty sum of a reversed range, and rounds a bound that is not an
+integer down:
+
+```live
+const sum = ce.parse('\\sum_{k=1}^n 3');
+sum.subs({ n: -4 }).evaluate().json;
+// ➔ 0
+sum.simplify().subs({ n: -4 }).evaluate().json;
+// ➔ -12
+
+sum.subs({ n: 2.5 }).evaluate().json;
+// ➔ 6
+sum.simplify().subs({ n: 2.5 }).evaluate().json;
+// ➔ 7.5
+```
+
+If \\(n\\) can be negative or not an integer, do not simplify the sum. A bound
+that is a number is decided: \\( \sum_\{k=1\}^\{-4\} 3 \\) simplifies to \\(0\\).
+
 ## Undefined Points and Lists
 
 `simplify()` can remove the points where an expression has no value. For
@@ -13574,6 +13717,35 @@ The two standalone runtimes have the same batch forms:
 carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
 `javascript` result does.
 
+### Limiting Loops: `iterationBudget`
+
+A compiled `Loop` has no time check, so a loop that does not end stops the page
+that runs it, also under `ce.withTimeLimit()`. When you run a document that you
+did not write, set a limit when you compile it:
+
+```js
+const expr = ce.box(['Block', ['Assign', 'k', 0],
+  ['Loop', ['Assign', 'k', ['Add', 'k', 1]]], 'k']);
+const { run } = compile(expr, { iterationBudget: 1e6 });
+run({}); // throws a CancellationError, cause 'iteration-limit-exceeded'
+```
+
+Each iteration of a `Loop` adds one to one total for a call of the compiled
+code, including nested loops and loops in the bodies of user functions. The next
+call starts at 0. The limit is a count and not a time, so it stops at the same
+pass on every machine. To get a time limit, measure the cost of a pass.
+
+- `javascript` and `interval-js` throw. Stored code that you run with
+  `createJavaScriptRuntime()` or `createIntervalRuntime()` keeps the limit.
+- `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
+  cell. Each cell has its own count, so a batch costs up to cells × budget.
+- `python` declines a program with a `Loop` when the option is set.
+- `glsl` and `wgsl` do not change: the bounds of a shader loop are known when the
+  shader is compiled.
+- A `Sum` or `Product` over the budget gives `NaN` and does not throw.
+
+Without the option, the compiled code has no check.
+
 ### Constant Folding
 
 A **pure** subexpression with no free variables is evaluated at compile time
@@ -13672,7 +13844,10 @@ three things happened:
 | ``Unknown operator `X` ``                                     | No operator definition for `X` at all — a typo, or a symbol never declared as a function   |
 
 `CompilationResult.unsupported` lists the same heads declaratively, so a caller
-can branch on the condition without parsing the message.
+can branch on the condition without parsing the message. The list is empty when
+`success` is `true`. A name that the expression binds (a local function, a
+parameter of a function literal, an index) is never in the list: when a call of
+such a name declines, only the message names it.
 
 ### Inputs With No Type and Values With No Settled Shape
 
@@ -13711,6 +13886,11 @@ parameter of a function is not an input, so `t ↦ 2t` compiles.
   shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
   is a union of shapes (`real | list<real>`) compiles with one body per
   member.
+- Arithmetic over a symbol declared `any` or `value`, on the `javascript`,
+  `python` and `interval-js` targets. Such a symbol can hold a number or a list.
+  `(t: any) ↦ 2t` declines, and `unsupported` holds `t`. With the fallback, the
+  interpreter gives `[2, 4]` for `[1, 2]`. Declare the shape, such as `real` or
+  `list<real>`, to compile it.
 - A function literal that assigns a name of an enclosing scope (a callback, a
   stored function, a user function that the code calls).
   `Block(p ≔ 0; Filter(L, u ↦ Block(p ≔ 5, u > 1)); p)` declines. The root of
@@ -14250,6 +14430,47 @@ const sum = compile("s \\coloneq 0; \\keyword{for} i \\keyword{from} 1 \\keyword
 console.log(sum.success, sum.run());
 // ➔ true 385
 ```
+
+On JavaScript, a loop that updates a block local with `xs = ReplaceAt(xs, i, v)`
+copies the list once, at the first update, and then writes it in place. This is
+not possible when the list has another name or is used in a way that could see
+a write, for example `ys = xs` in the loop or a function literal that reads
+`xs`. Each pass of the loop then copies the whole list, and the result reports
+it in `warnings`, with the code `'copying-list-update'` and the name of the
+local in `binding`. The code does not change. An update that is not in a loop,
+which copies once, is not reported; nor is the Python target, which always
+copies a block local.
+
+```live
+// import { compile } from '@cortex-js/compute-engine';
+
+ce.declare('L', 'list<real>');
+const double = ['Assign', 'xs',
+  ['ReplaceAt', 'xs', 'i', ['Multiply', 2, ['At', 'xs', 'i']]]];
+const loop = ['Loop', double, ['Element', 'i', ['Range', 1, ['Length', 'L']]]];
+
+const inPlace = compile(ce.box(['Block',
+  ['Declare', 'xs', "'list<real>'", 'L'], loop, 'xs']));
+console.log(inPlace.run({ L: [1, 2, 3] }), inPlace.warnings);
+// ➔ [2, 4, 6] undefined
+
+const copying = compile(ce.box(['Block',
+  ['Declare', 'xs', "'list<real>'", 'L'],
+  ['Declare', 'f', "'function'", ['Function', ['Sum', 'xs']]],
+  loop, ['f']]));
+console.log(copying.run({ L: [1, 2, 3] }));
+// ➔ 12
+console.log(copying.warnings.map((w) => [w.code, w.binding]));
+// ➔ [["copying-list-update", "xs"]]
+```
+
+On GLSL and WGSL, `Break` and `Continue` compile as a statement of a `Loop`
+body, alone or as the branch of an `If` with no else. So
+`If(a > 3, Break())` in the body gives `if (3.0 < a) { break; }`, and a formula
+can stop as soon as its value is known. Any other position declines: an `If`
+with an else branch, a `Break` with a value, a jump in a value, a jump in a
+`Match` case, and a jump with no enclosing `Loop`. A `Return` in a loop on these
+targets also declines.
 
 #### `Comprehension`
 
@@ -21156,7 +21377,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
 parses one.
 
 ####### type
@@ -21988,7 +22209,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### ComputeEngine.type() {#type-12}
+##### ComputeEngine.type() {#type-11}
 
 ```ts
 type(type): BoxedType
@@ -26862,47 +27083,6 @@ Release resources owned by this definition when its scope is disposed.
 
 <MemberCard>
 
-### BindingSite {#bindingsite}
-
-```ts
-type BindingSite = {
-  path: readonly number[];
-  type: TypeString;
-  clauseLocal: boolean;
-};
-```
-
-A located binding site: where, inside an operator expression, one of that
-operator's **bound variables** sits, and how to declare it.
-
-</MemberCard>
-
-<MemberCard>
-
-### BindingSiteSelector {#bindingsiteselector}
-
-```ts
-type BindingSiteSelector = (ops, phase) => readonly BindingSite[];
-```
-
-Locate an operator's binding sites among its operands.
-
-Used as the value of the `scoped` flag of [OperatorDefinitionFlags](#operatordefinitionflags) to
-declare that an operator is a *binder*: the framework mints the operator's
-scope, declares each site's symbol in it before the `canonical` handler
-runs, and rebinds the sites (and same-named occurrences elsewhere in the
-expression) to that scope afterwards. This is what makes the parse,
-`ce.box()` and `ce.function()` routes agree about which binding a bound
-variable denotes.
-
-`phase: 'pre'` runs on the RAW operands, before the `canonical` handler; it
-may return fewer sites than `'post'` — return nothing rather than guess.
-`phase: 'post'` runs on the handler's RESULT operands and is authoritative.
-
-</MemberCard>
-
-<MemberCard>
-
 ### BroadcastExemption {#broadcastexemption}
 
 ```ts
@@ -26925,12 +27105,122 @@ each label.
 
 <MemberCard>
 
+### OperandRole {#operandrole}
+
+```ts
+type OperandRole = 
+  | {
+  kind: "value";
+ }
+  | {
+  kind: "held";
+ }
+  | {
+  kind: "statement";
+ }
+  | {
+  kind: "raw";
+ }
+  | {
+  kind: "opaque";
+ }
+  | {
+  kind: "bound";
+  type: TypeString;
+ }
+  | {
+  kind: "clause";
+  type: TypeString;
+};
+```
+
+The role of one operand of an operator, as the `operands` handler of
+[OperatorDefinitionFlags](#operatordefinitionflags) declares it. The role says how the operand
+is canonicalized and whether it is evaluated before the `evaluate` handler
+of the operator runs.
+
+- `value`: the operand is a value, and an `Assign` or a `Declare` there is
+  an error. In an operator that is not `lazy`, the operand is
+  canonicalized, checked against the signature, and evaluated before the
+  `evaluate` handler runs; this is the default role of such an operator.
+  In a `lazy` operator, the handlers receive the operand as written and
+  canonicalize and evaluate it themselves; only a bare `N` or `D` there is
+  read as a variable, not as the library operator.
+- `held`: the operand is a value that the `evaluate` handler receives as
+  its canonicalization left it, not evaluated, so that the handler can
+  read it as written (`Fibonacci(10^6)` in `Mod(Fibonacci(10^6), p)`) and
+  evaluate it itself when it needs its value. Otherwise the operand is a
+  `value`: it is canonicalized and checked against the signature, the
+  type and the validity of the application read it, an `Assign` or a
+  `Declare` there is an error, and a literal list there is broadcast, each
+  element held. An operand that only its evaluation makes a list is held
+  whole. Valid only on an operator that is not `lazy`: a `lazy` operator
+  canonicalizes none of its operands, and its handlers receive every
+  operand unevaluated (`raw`).
+- `statement`: the operand is a statement that the operator runs, zero,
+  one or several times (the body of a loop, a branch of a conditional). An
+  `Assign` or a `Declare` there is valid. The operand is not evaluated
+  before the `evaluate` handler runs: the handler evaluates it when and as
+  often as it needs to. The engine canonicalizes the operand as a branch,
+  except in a `lazy` operator with a `canonical` handler, which receives
+  it as written and canonicalizes it itself. In a branch, a first
+  assignment of a name that no enclosing scope declares is the error
+  `first-assignment-in-branch`, an assignment of a declared name writes
+  that name, and a bare `Break` or `Continue` symbol is an error.
+- `raw`: the operand is kept as written, not canonicalized and not
+  evaluated. The default of a `lazy` operator. Valid only on a `lazy`
+  operator.
+- `opaque`: the operand is kept as written, and an `Assign` or a `Declare`
+  in it is valid (the expression of `Hold` and of `Error`). Valid only on a
+  `lazy` operator.
+- `bound`: the operand is a bound variable of the operator, a symbol
+  that the operator declares in its own scope (the variable of `D(f, x)`,
+  the expansion variable of `Series`), with the type `type` (`unknown`
+  when it is left out). A symbol held in a `Hold` is a bound variable
+  too; any other operand declares nothing. The variable remains a free
+  variable of the expression, as for `D`: the value of `D(x^2, x)` is a
+  function of `x`. The operand is not evaluated before the `evaluate`
+  handler runs; it is kept as written in a `lazy` operator, and
+  canonicalized in the scope of the operator otherwise.
+- `clause`: the operand is an indexing set whose index is a bound
+  variable of the operator: `Limits(k, 1, 10)`, `Element(k, S)` (a
+  tuple pattern `Element(Tuple(p, q), S)` binds each of its names), a
+  tuple `Tuple(k, 1, 10)` or `Triple(k, 1, 10)`, a set `Set(k, 1, 10)`,
+  a parenthesized tuple of the LaTeX parser, or a symbol, also held.
+  `type` is the type of the index of a range-shaped clause. When `type`
+  is `integer` and the bounds are integer literals, the index has the
+  ranged type (`integer<1..10>` for `Limits(k, 1, 10)`); any other
+  `type` is used as given. The index of an `Element` clause does not
+  take `type`: it is `integer<a..b>` for a range `Range(a, b)` with
+  integer literal bounds, and otherwise an inferred `unknown` that a
+  `canonical` handler can narrow from the collection. The index is not a
+  free variable of the expression. It is visible in its own clause, in
+  the later clauses and in the operands before the first clause (the
+  body), not in an earlier clause. Consecutive `clause` operands are read as the clauses of
+  `Sum`, with the flat spelling: in `Sum(body, k, 1, 10)` the operands
+  after the symbol `k` are its bounds, not indexes. An operand that holds
+  no index declares nothing. The operand is not evaluated before the
+  `evaluate` handler runs, and is canonicalized as a `bound` operand is.
+
+An operator whose `operands` handler gives a `bound` or a `clause` role
+is a **binder**: it has its own scope, as with `scoped: true`, and the
+engine declares each bound variable in that scope before it canonicalizes
+the other operands, so that the parse, `ce.box()` and `ce.function()`
+routes bind the same variable. The engine finds that the operator is a
+binder when it is declared (see the `operands` handler of
+[OperatorDefinitionFlags](#operatordefinitionflags)).
+
+</MemberCard>
+
+<MemberCard>
+
 ### OperatorDefinitionFlags {#operatordefinitionflags}
 
 ```ts
 type OperatorDefinitionFlags = {
   lazy: boolean;
-  scoped: boolean | BindingSiteSelector;
+  operands: (ops) => ReadonlyArray<OperandRole>;
+  scoped: boolean;
   broadcastable: boolean;
   broadcastExemptions: ReadonlyArray<BroadcastExemption>;
   threadsConditionals: boolean | number[];
@@ -27012,23 +27302,9 @@ operator.
 scoped: boolean;
 ```
 
-Normalized from the declaration's `scoped` flag: `true` when the operator
-creates a lexical scope, whether it was declared `true` or as a
-binding-site selector.
-
-</MemberCard>
-
-<MemberCard>
-
-##### BoxedOperatorDefinition.bindingSites? {#bindingsites}
-
-```ts
-bindingSites?: BindingSiteSelector;
-```
-
-The binding-site selector of the declaration's `scoped` flag, when one
-was given. `undefined` for `scoped: true` (a scope with no syntactic
-bound variables) and for an unscoped operator.
+`true` when the operator creates a lexical scope: it was declared
+`scoped: true`, or it is a binder, whose `operands` handler gives a
+`bound` or a `clause` role.
 
 </MemberCard>
 
@@ -27166,7 +27442,7 @@ re-parsing or textually inlining its source.
 
 <MemberCard>
 
-##### BoxedOperatorDefinition.type? {#type-9}
+##### BoxedOperatorDefinition.type? {#type-8}
 
 ```ts
 type?: OperatorTypeHandlerOnTypes;
@@ -27466,6 +27742,30 @@ answers.
 ####### i
 
 `number`
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedOperatorDefinition.operandRoles() {#operandroles}
+
+```ts
+operandRoles(ops): 
+  | readonly ("value" | "raw" | "opaque" | "held" | "statement" | "bound" | "clause")[]
+  | undefined
+```
+
+The kind of the role of each operand of `ops`, the operands of an
+application of this operator, as the `operands` handler of
+[OperatorDefinitionFlags](#operatordefinitionflags) declares them, with the default role
+(`value`, or `raw` for a `lazy` operator) for a position that the
+handler leaves out. One entry per operand. `undefined` when the
+definition has no `operands` handler: every operand then has the
+default role.
+
+####### ops
+
+readonly [`Expression`](#expression-5)[]
 
 </MemberCard>
 
@@ -28927,6 +29227,25 @@ Returns `undefined` if `id` is undeclared. A declared symbol always gets
 a record — declaration *presence* is the `!== undefined` check, distinct
 from type knowledge: a symbol declared with an `unknown` type still
 resolves (with `type.isUnknown` true).
+
+####### id
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### Parser.isLibraryFunction() {#islibraryfunction}
+
+```ts
+isLibraryFunction(id): boolean
+```
+
+Whether `id` is a function of a library of the engine, so that a LaTeX
+assignment cannot define it. A parameter of a function that the parser is
+reading, and the name of that function, are not the library function. A
+parser with no engine gives `false`.
 
 ####### id
 
@@ -33666,7 +33985,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
 parses one.
 
 ####### type
@@ -34498,7 +34817,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### IComputeEngine.type() {#type-11}
+##### IComputeEngine.type() {#type-10}
 
 ```ts
 type(type): BoxedType
@@ -38737,7 +39056,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### Expression.type {#type-13}
+##### Expression.type {#type-12}
 
 ```ts
 get type(): BoxedType
@@ -42433,10 +42752,20 @@ closed form.
 | $$\sum_{n=1}^{b} c \cdot f(n)$$ | $$c \cdot \sum_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `0`, or a vector of `0` when the
-  body is a vector of a known length (`[0, 0, 0]` for `vector<real^3>`)
+- Empty range (upper < lower, with number bounds): returns `0`, or a vector of
+  `0` when the body is a vector of a known length (`[0, 0, 0]` for
+  `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 - Nested sums: inner sums are simplified first, enabling cascading simplification
+
+A closed form with a symbolic upper bound is the generic answer, as in
+Mathematica. It applies with no proof that the range is not reversed, and it
+gives the value of the sum when the upper bound is an integer that is at least
+the lower bound minus 1. For another value it can differ from `evaluate()`:
+`\sum_{k=1}^n 3` simplifies to `3n`, which is `-12` at `n = -4` where the sum is
+the empty sum `0`, and `7.5` at `n = 2.5` where the sum is `6`. If the bound can
+have such a value, do not simplify the sum. `Product` works in the same way:
+`\prod_{k=1}^n 3` simplifies to `3^n`.
 
 #### Infinite Series
 
@@ -42568,8 +42897,9 @@ closed form.
 | $$\prod_{n=1}^{b} c \cdot f(n)$$ | $$c^b \cdot \prod_{n=1}^{b} f(n)$$ | Factor out constant |
 
 Edge cases:
-- Empty range (upper < lower): returns `1`, or a vector of `1` when the
-  body is a vector of a known length (`[1, 1, 1]` for `vector<real^3>`)
+- Empty range (upper < lower, with number bounds): returns `1`, or a vector of
+  `1` when the body is a vector of a known length (`[1, 1, 1]` for
+  `vector<real^3>`)
 - Single iteration (upper = lower): substitutes the bound value and returns the body
 
 The Wallis-like product is also given its closed form by `evaluate()`, for any
@@ -48389,6 +48719,8 @@ string:
 
 <Signature name="ReplaceAt" returns="collection">_collection_, _index_:integer, _value_:any</Signature>
 
+<Signature name="ReplaceAt" returns="collection">_collection_, ..._indexes_:integer, _value_:any</Signature>
+
 Return a new collection with the element at the 1-based `index` replaced by
 `value`. Negative indices count from the end (`-1` is the last element).
 
@@ -48400,8 +48732,30 @@ Return a new collection with the element at the 1-based `index` replaced by
 // ➔ ["List", 1, 2, 99]
 ```
 
+With more than one position, as `At` takes them, the last operand is the value
+and each position selects one level of a nested collection:
+
+```json example
+["ReplaceAt", ["List", ["List", 1, 2], ["List", 3, 4]], 2, 1, 9]
+// ➔ ["List", ["List", 1, 2], ["List", 9, 4]]
+
+["ReplaceAt", ["List", ["List", 1, 2], ["List", 3, 4]], -1, -1, 9]
+// ➔ ["List", ["List", 1, 2], ["List", 3, 9]]
+```
+
 Collections are immutable; the input is not modified. An out-of-range or
-symbolic index leaves the expression unevaluated.
+symbolic index, at any level, leaves the expression unevaluated. More positions
+than the collection has levels give an `incompatible-type` error.
+
+A write does not change the length of a list: when the value fits the element
+type, the result has the type of the operand, so `ReplaceAt` over a `vector<3>`
+is a `vector<3>`. Otherwise the element type widens to include the value, and
+the result type has no length.
+
+The form with more than one position compiles to JavaScript only, and only when
+the type of the collection shows a list at each level it writes: a
+`list<list<number>>` or a `matrix` compiles, and a `list<any>` or a list that
+can hold a string or `Missing` as a row does not.
 
 </FunctionDefinition>
 
@@ -49204,7 +49558,10 @@ gives the value of that position. The rules:
 - **An expression that is a list gives its element at the position**; an
   expression that is not a list gives its own value at every position. In the
   second example, position 1 takes element 1 of `L`, and the other positions
-  take `0`.
+  take `0`. When a selected expression has the type of a list but its elements
+  cannot be read yet, the selection stays symbolic: with `foo` undeclared,
+  `["Which", ["Less", "L", 2], ["foo", "L"], "True", 0]` stays
+  `["Which", ["List", "True", "False", "False"], ["foo", ["List", 1, 3, 5]], "True", 0]`.
 - **A condition that is not a list applies to every position**:
   `["Which", ["List", "True", "False"], 1, "True", 3]` is `[1, 3]`.
 - **Every list must have the length of the condition**, else the value is an
@@ -51341,6 +51698,21 @@ Complex subscripts (containing operators, commas, or parentheses) create
 | `a_{n+1}` | `["Subscript", "a", ["Add", "n", 1]]` | Expression subscript |
 | `a_{n,m}` | `["Subscript", "a", ["Sequence", "n", "m"]]` | Multi-index |
 | `A_{(n+1)}` | `["Subscript", "A", ["Add", "n", 1]]` | Parentheses indicate expression |
+| `A_{(n)}` | `["Subscript", "A", ["Delimiter", "n"]]` | The index is the value of `n`, not the name `n` |
+| `A_{n+0}` | `["Subscript", "A", ["Delimiter", "n"]]` | The canonical form of the index is the symbol `n` |
+| `A_{(3)}` | `A_3` | The canonical form of the index is a number |
+
+The index is in canonical form, so a free `i` is the imaginary unit:
+`A_{i+1}` holds `["Complex", 1, 1]`. Declare `i` to use it as a variable.
+
+`A_{(n)}` keeps its parentheses because `["Subscript", "A", "n"]` is the
+compound symbol `A_n`. The two forms have different values in a sum:
+`\sum_{n=1}^{3} A_{(n)}` gives `A_1+A_2+A_3`, and `\sum_{n=1}^{3} A_{n}` gives
+`3A_{n}`. When you read the index of this form with `.op2`, you get
+`Delimiter(n)`, and its value is the value of `n`.
+
+A product index is written in parentheses, `A_{(mn)}`, because `A_{mn}` is the
+compound symbol `A_mn`.
 
 These `Subscript` expressions can be used in arithmetic operations:
 
@@ -51944,6 +52316,19 @@ is normalized to a string).
 The literal then types as a **named signature** — the example above has type
 `(x: integer) -> integer` — and, in strict mode, its arguments are checked
 against the declared types when the function is applied (see [`Typed`](/compute-engine/reference/core/#typed)).
+
+An argument with no value yet, whose type does not show that it fits, leaves
+the application unevaluated, and a later evaluation checks the value. At a
+parameter that admits every real number, the body is applied to a symbol with no
+declared type.
+
+```json example
+["Apply", ["Function", ["Add", "x", 1], ["Typed", "x", "'integer'"]], "m"]
+// ➔ ["Apply", ["Function", ["Block", ["Add", "x", 1]], ["Typed", "x", "'integer'"]], "m"]
+
+["Apply", ["Function", ["Power", "x", 2], ["Typed", "x", "'real'"]], "y"]
+// ➔ ["Power", "y", 2]
+```
 
 A call with `Missing` at a parameter declared as a number or a point gives
 `Missing`, and the body does not run. A default value does not change this: a

@@ -315,6 +315,23 @@ Calls made with the same `ComputeEngine` share its top-level declarations,
 which is useful for notebook cells and other stateful sessions. Create a fresh
 engine when you want an isolated program.
 
+To check a program without running it, for example after each edit in an
+editor, use `checkEpsil`. It gives the parse errors and the static type errors
+that `executeEpsil` reports before it runs a statement. It assigns no value,
+defines no function and declares no type on the engine, so it is safe on a
+shared engine, and a type that the engine already knows is not an error:
+
+```js
+import { ComputeEngine, checkEpsil } from "@cortex-js/compute-engine/epsil";
+
+const ce = new ComputeEngine();
+const { diagnostics } = checkEpsil(ce, 'let b = "x" + 1');
+console.log(diagnostics[0].message[0]); // static-type-error
+```
+
+An error that only a run finds, such as a division by zero in a loop, is not in
+these diagnostics.
+
 ## Where to Go Next
 
 <ReadMore path="/tour/">
@@ -2312,7 +2329,7 @@ let double = x => 2x
 | `enumerate(xs)` | `zip(1..length(xs), xs)` |
 | `xs.index(v)` | `indexOf(xs, v)` |
 | `xs + ys`, `xs.append(v)` | `join(xs, ys)`, `append(xs, v)` — both return a **new** collection |
-| `xs[2] = 9` | *(no element assignment)* — rebuild with `map`/`join` |
+| `xs[2] = 9` | `xs[2] = 9` — a rebinding, `xs = replaceAt(xs, 2, 9)`: another name that holds the old list keeps it |
 | `d.keys()`, `d.values()` | `keys(d)`, `values(d)` |
 | `dict(zip(ks, vs))` | `dictionaryFrom(zip(ks, vs))` |
 | `collections.Counter(xs)` | `tally(xs)` → a `(values, counts)` pair |
@@ -3402,6 +3419,19 @@ That call evaluates to `Error(ErrorCode("incompatible-type", "real",
 at the call site. Without the annotation the string would have flowed into the
 division and come back as something symbolic and mystifying.
 
+An argument with no value yet is checked when it gets one. While its type does
+not show that it fits, the call stays unevaluated:
+
+```epsil
+function twice(k: integer) { 2*k }
+let r = twice(m)   // twice(m)
+m = 1.5
+r                  // Error(ErrorCode("incompatible-type", "integer", "1.5"), …)
+```
+
+At a parameter typed `real` or `number`, the body is applied to a name with no
+type and no value: with `function f(x: real) { x^2 }`, `f(x)` gives `x^2`.
+
 A **return** annotation (`-> real`) is a different kind of thing: it is
 recorded in the function's signature and shown by `about`, but the current
 runtime does not reject a returned value for disagreeing with it. Write it for
@@ -3540,7 +3570,7 @@ Named functions may also declare their **effects**, between the parameter list
 and the return type:
 
 ```epsil
-function roll(n: integer) random -> integer { random(n) }
+function roll(n: integer) random -> integer { random(1..n) }
 ```
 
 Effect labels are part of the function type. See
@@ -4591,6 +4621,21 @@ function bump() scope { n = n + 1; n }
 // ➔ [1, 2, 2]
 ```
 
+The same rule holds for an anonymous function that a top-level `let` or
+`const` names: the type states the effect. Without `scope` in the type, the
+statement gives an `incompatible-type` error and declares nothing:
+
+```epsil
+let n = 0
+let bump: () scope -> number = () => do { n = n + 1; n }
+[bump(), bump(), n]
+// ➔ [1, 2, 2]
+```
+
+A `let` in a block does not need the specifier, and neither does a `let` whose
+value is computed, such as the closure that a call returns
+(`let c1 = counter()`).
+
 Reassigning a symbol that was declared `const` produces an
 [error value](/evaluation/#errors-are-values), not a parse error or a
 thrown exception:
@@ -5579,6 +5624,22 @@ the left side is shaped exactly like a destructuring pattern (bare names, `_`,
 nested tuples), so a genuine tuple equation with computed components —
 `(x + 1, y) = t` — stays silent.
 
+**A body that is only `name = value` is a warning when nothing reads its value.**
+The body of a `match` case, of a conditional branch or of a lambda is not a
+statement, so its `=` compares, and the variable keeps its value:
+
+```epsil
+let a = 0
+match 1 { 1 => a = 2 }
+a
+```
+
+Write `1 => do { a = 2 }` to assign, or `1 => a == 2` if the comparison was
+meant. A body whose value is read (`let r = match k { 1 => a = 2 }`, a lambda
+passed to `map`), and an equation of a free name, of a constant, of a parameter
+or of a pattern variable stay silent. See
+[`equation-not-assignment`](/errors/#equation-not-assignment).
+
 **An assignment in a condition is a warning.** `:=` is unconditional, so it
 reaches a condition where a bare `=` no longer can — and Epsil has no
 `if init; cond` form, so the assigned value *is* the test:
@@ -5652,23 +5713,37 @@ Epsil keeps apart two things many languages blur together:
 
 Everything below follows from those two sentences.
 
-**There is no in-place modification.** A collection cannot be updated
-element by element:
+**There is no in-place modification.** An assignment to an element,
+`xs[2] = 9`, does not change the list: it builds a new list and rebinds the
+name, as `xs = replaceAt(xs, 2, 9)` does. Another name that holds the old
+list keeps it:
 
 ```epsil
 let xs = [1, 2, 3]
+let ys = xs
 xs[2] = 9
-// ➔ Error(ErrorCode("incompatible-type", "symbol", "integer | nan"), At("xs", 2))
+[xs, ys]
+// ➔ [[1, 9, 3], [1, 2, 3]]
 ```
 
-Build the value you want and rebind the name:
+So the target must be a name that the program can assign: with
+`const xs = [1, 2, 3]`, `xs[2] = 9` is the error `constant-assignment`. An
+element of a nested list has the same form, `m[2][1] = 9` or `m[2, 1] = 9`,
+which rebinds `m`.
 
-```epsil
-let xs = [1, 2, 3]
-xs = join([xs[1]], [9], [xs[3]])
-xs
-// ➔ [1, 9, 3]
-```
+A write that cannot give a list is an error, and the name keeps its value. A
+position past the end, zero or not an integer is the error `out-of-range`
+(`xs[5] = 9` when `xs` has three elements); the length of a string is its
+number of characters. A target with no value is the error
+`assignment-to-list-element`, and a target that is a number is the error
+`incompatible-type` that `replaceAt` gives. A string and
+a tuple are written as `replaceAt` writes them, and give a list: with
+`s = "abc"`, `s[1] = "z"` gives the list of characters `["z", "b", "c"]`. A
+string position (`xs["a"] = 9`) is the error `assignment-to-list-element`,
+reported before the program runs, because `replaceAt` takes only an integer
+position. A
+position that is a name with no value (`xs[k] = 9` with `k` unknown) leaves
+the write unevaluated, and `xs` holds it.
 
 Operators never modify what you hand them — `append`, `sort`, `join`,
 `map`, `filter` all return a **new** collection:
@@ -5910,9 +5985,10 @@ really about the source, not the computation — a gated host pragma, or an
 Because only the **last** statement's value is the program's result, an error
 value produced by an earlier statement would otherwise vanish silently. Each
 *non-final* statement that evaluates to an error value therefore also emits
-a `runtime-error` diagnostic — for example an indexed assignment
-(`xs[2] = 9`, which is rejected: element assignment is not supported), or
-reassigning a library constant such as `Pi`. A problem that the static check
+a `runtime-error` diagnostic — for example an assignment to an element past
+the end of a list (`xs[5] = 9` when `xs` has three elements), or reassigning
+a library constant such as
+`Pi`. A problem that the static check
 already reported before the program ran, such as reassigning a `const` of the
 same program, is not reported a second time.
 
@@ -6196,7 +6272,7 @@ A definition can state the effects that calling it may perform. The specifier
 sits after the parameter list and before the return arrow:
 
 ```epsil
-function roll(n) random -> integer { random(n) }
+function roll(n) random -> integer { random(1..n) }
 ```
 
 The ten effect labels are `console`, `entropy`, `environment`, `fs_read`,
@@ -6214,7 +6290,7 @@ in which case its declared result is `unknown`. In the math form, a written
 effect specifier must be followed by a return arrow:
 
 ```epsil
-roll(n) random -> integer = random(n)
+roll(n) random -> integer = random(1..n)
 ```
 
 See [Effect Specifiers](https://mathlive.io/compute-engine/guides/types/#effect-specifiers) for
@@ -8800,6 +8876,14 @@ The check reads the subject's type from its annotation — a parameter (`functio
 
 No warning does not make the `match` total. A `boolean` subject that stays symbolic (an undecided comparison) is neither `true` nor `false`, and a declared name with no value (`let u: light` without an initializer) is not one of its constructors; both reach no case even when every alternative is covered. A final `_` case handles them.
 
+## `equation-not-assignment`
+
+In expression position `=` is an equation, and only a statement assigns. So in `let a = 0; match 1 { 1 => a = 2 }; a` the case body compares `a` with `2`, nothing reads the result, and `a` stays `0`.
+
+Write `1 => do { a = 2 }` to assign, or `1 => a == 2` if the comparison was meant. The same applies to `{ a = 2 }` as a body, which is a set that holds an equation. In a function, a body that writes a variable also needs the `scope` effect when the function has a name: `let f: (number) scope -> nothing = x => do { a = 2 }`.
+
+The warning applies to the whole body of a `match` case, of a branch of a conditional expression and of a function, when the left side is a variable that the program declares, other than a constant, and nothing reads the value of the body. The body of a function counts as unread when each read of the function's name is a call whose value is discarded. A body whose value is read (`let r = match k { 1 => a = 2 }`, a lambda passed to `map` or `solve`, the last statement of the program) and an equation of a free name, of a constant, of a parameter or of a pattern variable get no warning. It is a warning: the program still runs.
+
 ## `symbol-expected`
 
 A name was required at this position — after `let` or `const`, as a `for` loop's variable, as a function's or parameter's name — but something else was found there (`let = 42`).
@@ -8860,6 +8944,14 @@ A `let` or a `const` declares a name without a value: `let x: integer`. A declar
 
 The first assignment of a name is in a branch of an `if`, in a branch of a `match` or in the body of a loop. In `if c { t = 1 }; t`, the name `t` has no value when `c` is false. A first assignment declares a local only at the own level of a block that is not in a branch or a loop body. Declare the name with a value before the branch, `let t = 0; if c { t = 1 }; t`, or with a `let` in the branch when the name is a local of the branch only.
 
+## `assignment-to-list-element`
+
+An assignment to a list element, `xs[i] = v`, gives `xs` a new list with the element replaced, as `xs = replaceAt(xs, i, v)` does. This error is a write that cannot give a list, and the variable keeps its value.
+
+The target is a name with no value (`ys[1] = 9` with `ys` not declared). The position is a string (`xs["a"] = 1`): `replaceAt` takes only an integer position, and `epsil check` reports this before anything runs.
+
+A string and a tuple are written as `replaceAt` writes them, and give a list: with `s = "abc"`, `s[1] = "z"` gives the list of characters `["z", "b", "c"]`. A position past the end, zero or not an integer is the error `out-of-range`; the length of a string is its number of characters. A target that is a number, or a position that selects a number (`xs[1, 1] = 5` when `xs` is a flat list), is the error `incompatible-type` of `replaceAt`.
+
 ## `assignment-in-operand`
 
 An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`.
@@ -8874,7 +8966,7 @@ A value was assigned to a constant: a name bound by `const`, or a constant of th
 
 `epsil check` reports an assignment to a `const` of the same program (at any depth, and each name of a destructuring `const`) before anything runs, wherever the assignment is: at the top level, in a block, a loop body or a function body. The run does not report it a second time. A function defined before a `const` of the same block is included, because the `const` of a block is declared when the block starts: an assignment in the function writes the constant when the call comes after the `const`. A function defined before a top-level `const` does not write it: an assignment in a function body to a name that no enclosing scope declares when the function is defined makes a local of the body. A constant that the check cannot see — one declared by an earlier program on the same engine, or a library constant — is reported when the assignment runs, as a `runtime-error` with this code.
 
-To change the value, declare the name with `let` instead of `const`. To hold a second value, choose another name, or declare a local that shadows the constant: `let c = 2` in a function body or a block makes a new binding, and an assignment to it is valid. An indexed assignment such as `c[1] = 2` is not an assignment to `c`, and is reported with another error.
+To change the value, declare the name with `let` instead of `const`. To hold a second value, choose another name, or declare a local that shadows the constant: `let c = 2` in a function body or a block makes a new binding, and an assignment to it is valid. An indexed assignment such as `c[1] = 2` is the rebinding `c = replaceAt(c, 1, 2)`, so it is an assignment to `c` too, and gives this error.
 
 A host that calls `ce.assign()` on a constant gets a thrown error with the same message, whose `code` property is `constant-assignment`.
 
@@ -9277,7 +9369,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `realNumbers` | `RealNumbers` | constant `set<real>` | The set of all finite real numbers. |
 | `reduce` | `Reduce` | `(collection<T>, reducer: (unknown, T) any -> unknown, initial: value?) -> value where T` | Reduce (fold) a collection to a single value by repeatedly applying a binary function, with an optional initial value. |
 | `repeat` | `Repeat` | `(value: any, count: integer?) -> list` | Produce a sequence by repeating a single value. |
-| `replaceAt` | `ReplaceAt` | `(indexed_collection<T>, integer, T) -> list<T> where T: any` | Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`. |
+| `replaceAt` | `ReplaceAt` | `((indexed_collection<T>, integer, T) -> list<T> where T: any) & ((indexed_collection<any>, integer, integer, any+) -> list<any>)` | Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`. |
 | `residueClass` | `ResidueClass` | `(any, any) -> residue` | An element of ℤ/nℤ: the class of the integer `k` modulo `n`. |
 | `rest` | `Rest` | `((T) -> T where T: string) & ((indexed_collection<T>) -> list<T> where T: any)` | Return the collection without the first element. |
 | `reverse` | `Reverse` | `((T) -> T where T: string) & ((T) -> T where T: list) & ((indexed_collection<T>) -> list<T> where T: any)` | Reverse the order of the elements of an indexed collection. |
@@ -11687,7 +11779,7 @@ Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at 
 `(expression+) -> unknown`
 
 `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. A last clause with the condition `True` is the default. Only the selected expression is evaluated.
-Element-wise selection: when a condition is a flat list of booleans (`L < 3` with `L` a list), the selection is made at each position, as `numpy.select` does, and the value is a list. At each position, the first clause whose condition is `True` there gives the value: an expression that is a list gives its element at that position, any other expression gives its own value. With `L = [1, 3, 5]`, `Which(L < 2, 10, L < 4, L, True, 0)` is `[10, 3, 0]`.
+Element-wise selection: when a condition is a flat list of booleans (`L < 3` with `L` a list), the selection is made at each position, as `numpy.select` does, and the value is a list. At each position, the first clause whose condition is `True` there gives the value: an expression that is a list gives its element at that position, any other expression gives its own value. With `L = [1, 3, 5]`, `Which(L < 2, 10, L < 4, L, True, 0)` is `[10, 3, 0]`. A selected expression whose type is a list and whose elements cannot be read yet (`foo(L)` with `foo` undeclared) keeps the `Which` symbolic.
   - A condition that is not a list applies to every position.
   - Every expression is a number, a point, or a flat list of numbers or of points with the length of the condition, and all have one kind. A nested list, a list of another length, a string and a list of strings are static errors, as is a condition that is a nested list or holds a `Missing` cell. A relation (a boolean) is accepted.
   - A position that no clause selects holds `NaN` for a number, a point whose coordinates are `NaN` for a point, and `Missing` for a boolean.
@@ -13306,15 +13398,22 @@ repeat(0, 3)
 
 ### replaceAt
 
-MathJSON `ReplaceAt` · `(indexed_collection<T>, integer, T) -> list<T> where T: any`
+MathJSON `ReplaceAt` · `((indexed_collection<T>, integer, T) -> list<T> where T: any) & ((indexed_collection<any>, integer, integer, any+) -> list<any>)`
 
 Return a copy of the indexed collection with the element at the 1-based `index` replaced by `value`.
 
 A negative index counts from the end. An out-of-range, zero, or non-integer index leaves the expression unevaluated.
 
+With more than one position, as `At` takes them, the last operand is the value, and each position selects one level of a nested collection (e.g., a matrix).
+
 ```epsil
 replaceAt([1, 2, 3], 2, 20)
 // ➔ [1,20,3]
+```
+
+```epsil
+replaceAt([[1, 2], [3, 4]], 2, 1, 9)
+// ➔ [[1,2],[9,4]]
 ```
 
 ### residueClass
@@ -16453,7 +16552,7 @@ category.
 
 MathJSON `BigO` · `(value) -> number`
 
-Landau big-O remainder term. Inert; any numeric approximation (.N()) of an expression containing it is NaN.
+Landau big-O remainder term. Inert; a numeric approximation (.N()) keeps the term and approximates its operand. Strip it with Normal.
 
 ### circleContour
 
@@ -19795,7 +19894,7 @@ actually happens → write instead:**
 | `len(xs)` | Inert + did-you-mean | `length(xs)` |
 | `s[0]` / `len(s)` on a string | Works — a string is a collection of its characters (grapheme clusters), 1-based | `s[1]`, `length(s)` |
 | `"a" + "b"` | Error values inside an `Add` | `"\(a) and \(b)"` interpolation, or `join(a, b)` |
-| `xs[2] = 9` | Runtime error value — no element assignment; collections are immutable values | Rebuild: `map`; in a loop, `listFrom(join(xs, [v]))` |
+| `xs[2] = 9` | Works, as a rebinding: `xs = replaceAt(xs, 2, 9)`. Collections are immutable values, so another name that holds the old list keeps it | *(nothing to change)* |
 | `and` / `or` / `not` | Parse diagnostics (reserved words) | `&&`, `\|\|`, `!` |
 | `x**0.5` habits: `x^1/2` | Parses as `(x^1)/2` — precedence, not a root | `sqrt(x)` or `x^(1/2)` |
 | `math.floor`, `np.mean` | No modules/namespaces | Everything is global: `floor`, `mean`, `sin`, … |
@@ -20583,13 +20682,13 @@ An effect specifier is folded into a full function-type string carried by a
 `Typed` node around the body:
 
 ```epsil
-function roll(n) random -> integer { random(n) }
+function roll(n) random -> integer { random(1..n) }
 ```
 
 ```json
 ["DefineFunction", "roll",
   ["Function",
-    ["Typed", ["Block", ["Random", "n"]],
+    ["Typed", ["Block", ["Random", ["Range", 1, "n"]]],
       {"str": "(n: unknown) random -> integer"}],
     "n"]]
 ```

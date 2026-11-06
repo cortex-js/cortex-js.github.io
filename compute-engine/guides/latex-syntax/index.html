@@ -21,8 +21,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.5e2c4708.css">
-<script src="/assets/js/runtime~main.117978ce.js" defer="defer"></script>
-<script src="/assets/js/main.8bef10a6.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.92749703.js" defer="defer"></script>
+<script src="/assets/js/main.1a40a0b6.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -226,7 +226,20 @@ those operators, but what any other operator makes of it (<code>Missing + 1</cod
 <p>Each binding declares its name with a value. A binding is a statement, so it
 cannot be an operand: <code>f(a \coloneq 2)</code> is the error <code>assignment-in-operand</code>,
 and <code>a \coloneq b \coloneq 1</code> is the syntax error <code>chained-assignment</code>. Write
-two statements instead.</p>
+two statements instead. A binding declares a new name, so a list element is not
+a binding: <code>L[k] \coloneq 5</code> in a <code>where</code> item is the syntax error
+<code>assignment-to-list-element</code>.</p>
+<p>A target that is a function of a library, such as <code>a + b \coloneq 5</code>,
+<code>\sin(x) \coloneq 5</code> or <code>N(x) \coloneq x + 1</code>, is the syntax error
+<code>assignment-to-library-function</code>: the assignment would change every later use of
+the function. To replace a library function, declare the name first, with
+<code>ce.declare(&#x27;N&#x27;, &#x27;function&#x27;)</code>. A value that is not a function is a variable:
+<code>N \coloneq 5</code> gives <code>5</code>.</p>
+<p>A subscript on a library function is the same error when the assignment would
+define the function or a sequence with its name: <code>N_n \coloneq n + 1</code> and the
+recurrence <code>N_n \coloneq N_{n-1} + 1</code>. A term of a sequence alone
+(<code>N_0 \coloneq 1</code>) stays valid, and so does a local with such a name in a block:
+<code>N_n \coloneq 5; N_n + 1</code> gives <code>6</code>.</p>
 <h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="loops">Loops<a href="#loops" class="hash-link" aria-label="Direct link to Loops" title="Direct link to Loops" translate="no">​</a></h3>
 <p>Use the <code>for</code>, <code>from</code>, <code>to</code>, and <code>do</code> keywords:</p>
 <code-playground><div slot="javascript">console.log(ce.parse(&quot;\\keyword{for} i \\keyword{from} 1 \\keyword{to} 10 \\keyword{do} i^2&quot;).json);
@@ -248,6 +261,40 @@ branch. A use of a name before its declaration is the error
 <code>read-before-declaration</code>. A later assignment must keep the type of the local
 (a number can become another number, not a string); otherwise it is the error
 <code>assignment-type-mismatch</code>.</p>
+<p>An assignment to a list element, <code>L[k] \coloneq v</code>, gives the list a new value
+with the element replaced: it is <code>Assign(L, ReplaceAt(L, k, v))</code>. It does not
+declare a local, so it changes the list that is in scope:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L&quot;).json);
+<!-- -->// ➔ [&quot;Block&quot;, [&quot;Declare&quot;, &quot;L&quot;, &quot;&#x27;unknown&#x27;&quot;, [&quot;List&quot;, 10, 20, 30]],
+<!-- -->//             [&quot;Assign&quot;, &quot;L&quot;, [&quot;ReplaceAt&quot;, &quot;L&quot;, 2, 5]],
+<!-- -->//             &quot;L&quot;]
+<!-- -->
+<!-- -->console.log(ce.parse(&quot;L \\coloneq [10, 20, 30]; L[2] \\coloneq 5; L&quot;).evaluate().json);
+<!-- -->// ➔ [&quot;List&quot;, 10, 5, 30]
+</div></code-playground>
+<p>A matrix element is <code>M[j, i] \coloneq v</code> or <code>M[j][i] \coloneq v</code>, which is
+<code>Assign(M, ReplaceAt(M, j, i, v))</code>. Lists have value semantics: after
+<code>A \coloneq L</code>, the assignment <code>L[1] \coloneq 5</code> does not change <code>A</code>. A string
+index (<code>d[&quot;x&quot;] \coloneq 5</code>) is the syntax error <code>assignment-to-list-element</code>,
+because <code>ReplaceAt</code> refuses a string index, and a list that is a function of a
+library (<code>N[1] \coloneq 5</code>) is the syntax error <code>assignment-to-library-function</code>.</p>
+<p>A write that cannot give a list is an error, and the variable keeps its value.
+An index that is zero, not an integer or past the end is the error
+<code>out-of-range</code>:</p>
+<code-playground><div slot="javascript">console.log(ce.parse(&quot;L \\coloneq [10, 20, 30]; L[5] \\coloneq 1; L&quot;).evaluate().json);
+<!-- -->// ➔ [&quot;Error&quot;, [&quot;ErrorCode&quot;, &quot;&#x27;out-of-range&#x27;&quot;, &quot;&#x27;an index in 1..3 or -3..-1&#x27;&quot;, &quot;&#x27;5&#x27;&quot;]]
+</div></code-playground>
+<p>A variable with no value as the target is the error
+<code>assignment-to-list-element</code>, and a number as the target is the error
+<code>incompatible-type</code> that <code>ReplaceAt</code> gives. A string or a tuple is written as
+<code>ReplaceAt</code> writes it, and gives a list. An index with no
+numeric value (<code>L[k] \coloneq 5</code> with <code>k</code> unknown) leaves the write
+unevaluated, and <code>L</code> holds it.</p>
+<p>The subscript spelling of an element is not an assignment to the list: in a
+block, <code>n_{1} \coloneq 7</code> declares the local <code>n_1</code>, also when <code>n</code> is a list,
+and <code>n_{1}[1] \coloneq 9</code> changes that local. Outside a block,
+<code>n_{1} \coloneq 7</code> is the syntax error <code>assignment-to-list-element</code>: write
+<code>n[1] \coloneq 7</code> to change the list <code>n</code>.</p>
 <div class="readMore_KWn8"><a href="/compute-engine/reference/control-structures/"><p>Read more about the <strong>control structure</strong> operators.</p></a></div>
 <h2 class="anchor anchorTargetStickyNavbar_Vzrq" id="alternate-syntax">Alternate Syntax<a href="#alternate-syntax" class="hash-link" aria-label="Direct link to Alternate Syntax" title="Direct link to Alternate Syntax" translate="no">​</a></h2>
 <p>The parser accepts several alternate forms in addition to the preferred LaTeX

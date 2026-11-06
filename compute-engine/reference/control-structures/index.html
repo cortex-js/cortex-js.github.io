@@ -21,8 +21,8 @@
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.5e2c4708.css">
-<script src="/assets/js/runtime~main.117978ce.js" defer="defer"></script>
-<script src="/assets/js/main.8bef10a6.js" defer="defer"></script>
+<script src="/assets/js/runtime~main.92749703.js" defer="defer"></script>
+<script src="/assets/js/main.1a40a0b6.js" defer="defer"></script>
 </head>
 <body>
 <svg style="display: none;"><defs>
@@ -121,7 +121,10 @@ gives the value of that position. The rules:</p><ul>
 <li class=""><strong>An expression that is a list gives its element at the position</strong>; an
 expression that is not a list gives its own value at every position. In the
 second example, position 1 takes element 1 of <code>L</code>, and the other positions
-take <code>0</code>.</li>
+take <code>0</code>. When a selected expression has the type of a list but its elements
+cannot be read yet, the selection stays symbolic: with <code>foo</code> undeclared,
+<code>[&quot;Which&quot;, [&quot;Less&quot;, &quot;L&quot;, 2], [&quot;foo&quot;, &quot;L&quot;], &quot;True&quot;, 0]</code> stays
+<code>[&quot;Which&quot;, [&quot;List&quot;, &quot;True&quot;, &quot;False&quot;, &quot;False&quot;], [&quot;foo&quot;, [&quot;List&quot;, 1, 3, 5]], &quot;True&quot;, 0]</code>.</li>
 <li class=""><strong>A condition that is not a list applies to every position</strong>:
 <code>[&quot;Which&quot;, [&quot;List&quot;, &quot;True&quot;, &quot;False&quot;], 1, &quot;True&quot;, 3]</code> is <code>[1, 3]</code>.</li>
 <li class=""><strong>Every list must have the length of the condition</strong>, else the value is an

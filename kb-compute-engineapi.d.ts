@@ -778,7 +778,7 @@ export type StyledBlock = {
  * a host that stores code and runs it elsewhere can tell that the two ends
  * were built from different releases: compare the strings.
  */
-export declare const RUNTIME_VERSION = "0.180.0";
+export declare const RUNTIME_VERSION = "0.182.0";
 /**
  * The version of the interval library that compiled `interval-js` code calls
  * as `_IA`. An `interval-js` compilation result carries it as
@@ -787,7 +787,7 @@ export declare const RUNTIME_VERSION = "0.180.0";
  * from different releases: compare the strings. The placeholder is replaced
  * with the package version by the build (`scripts/build.sh`).
  */
-export declare const INTERVAL_RUNTIME_VERSION = "0.180.0";
+export declare const INTERVAL_RUNTIME_VERSION = "0.182.0";
 import { SignalOrigin } from './signals.js';
 export declare class Origin {
     url: string;
@@ -6393,6 +6393,28 @@ export declare class CancellationError<T = unknown> extends Error {
     });
 }
 /**
+ * The count of `Loop` passes that compiled code keeps when it is compiled with
+ * the `iterationBudget` option. The JavaScript runtime (`_SYS`) and the interval
+ * library (`_IA`) each hold one, so that every loop of a call adds to one total,
+ * including a loop in the body of a user function, whose definition can live
+ * outside the function that the host calls. The compiled code resets the total
+ * when a call starts, and calls `countLoopPass` at the start of each pass.
+ *
+ * The check is a count, not a time, so the same call stops at the same pass on
+ * every machine, and it reads no clock.
+ */
+export declare function makeLoopPassCounter(): {
+    countLoopPass: (budget: number) => void;
+    resetLoopPasses: () => void;
+};
+/**
+ * Whether `e` is a `CancellationError` with the cause
+ * `iteration-limit-exceeded`, which a compiled call throws over its
+ * `iterationBudget`. The test reads the name of the error, because each bundle
+ * has its own class. Another cancellation (a deadline, an abort) answers `false`.
+ */
+export declare function isIterationLimitCancellation(e: unknown): boolean;
+/**
  * Throw a `CancellationError` if `deadline` (an absolute timestamp in
  * milliseconds, or a `DeadlineFrame`, i.e. `engine._deadline` /
  * `engine._deadlineFrame`) has passed.
@@ -6729,7 +6751,7 @@ type OnlyFirst<F, S> = F & {
     [Key in keyof Omit<S, keyof F>]?: never;
 };
 export {};
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 export { compile } from './compute-engine/compilation/compile-expression.js';
 export { JavaScriptTarget } from './compute-engine/compilation/javascript-target.js';
 export { GPUShaderTarget } from './compute-engine/compilation/gpu-target.js';
@@ -7702,10 +7724,12 @@ export declare function isUnknownLengthBroadcast(x: Expression): boolean;
  * truncation. Zipping to the shortest operand silently dropped the tail of the
  * longer one (`Less([1,2,3],[2,2])` → `[True, False]`), which is the same data
  * loss whether it happens in the eager zip, in `broadcastOverIndexedCollections`,
- * or lazily inside the variadic `Map`. This is the single check all three
- * consult, so a shape cannot answer differently depending on which path it
+ * or lazily inside the variadic `Map`. All three use this comparison of
+ * counts, so a shape cannot answer differently depending on which path it
  * takes — the bug the first implementation shipped, where `Add(Filter(…), L)`
- * truncated while `Less` on the same shape errored.
+ * truncated while `Less` on the same shape errored. This check treats a tuple
+ * as a lift. A broadcast that gets its cells from `zip`, which reads a tuple by
+ * position, uses {@link zipLengthMismatch} instead.
  *
  * Participation is `isBroadcastableCollection`, so an INFINITE operand counts
  * too: `count` is `Infinity` there, which mismatches any finite length (the
@@ -7718,6 +7742,19 @@ export declare function isUnknownLengthBroadcast(x: Expression): boolean;
  * Returns the error expression, or `undefined` when the lengths agree.
  */
 export declare function broadcastLengthMismatch(ce: Expression['engine'], ops: ReadonlyArray<Expression>): Expression | undefined;
+/**
+ * The length check of a broadcast that gets its cells from {@link zip}, as a
+ * built-in operator does. {@link zip} reads a tuple by position, so a tuple
+ * beside a list supplies cells and its length counts: `Power((1, 2), [3, 4])`
+ * is `[1, 16]`, and `Power((1, 2), [3, 4, 5])` is `incompatible-dimensions`.
+ * {@link broadcastLengthMismatch} skips a tuple, which is correct only for a
+ * broadcast that repeats the tuple whole in each cell ({@link zipBroadcast}).
+ *
+ * A symbol with no value and a tuple type is not compared. {@link zip} does not
+ * read it by position, and its count can come from an inferred type, which the
+ * next assignment can replace.
+ */
+export declare function zipLengthMismatch(ce: Expression['engine'], ops: ReadonlyArray<Expression>): Expression | undefined;
 /**
  * A broadcast-eligible operand whose finiteness is **statically settled** —
  * either provably finite (`isFiniteCollection === true`, including the uncountable
@@ -8630,6 +8667,19 @@ export declare function isProvablyNumberOrNumberList(expr: Expression): boolean;
  * evaluation stops at the first deciding operand.
  */
 export declare function isCollectionShaped(x: Expression): boolean;
+/**
+ * True when `x` is a collection by its type and has no collection value yet
+ * (`L` or `L + 1` with `L: list<real>`). A zero times such an operand keeps the
+ * operand: `0·L` is a list of zeros of the length of `L`, and the length is
+ * known only when `L` has a value.
+ *
+ * `isUnresolvedCollectionOperand()` alone is too wide for this decision. It also
+ * accepts a type that only may hold a collection: `Sin(f(x))` with `f` undeclared
+ * has a union type with a list member, and is a scalar in almost every program.
+ * There a false positive of that test only holds a broadcast. Here it would stop
+ * `sin(f(x)) - sin(f(x))` from folding to `0`.
+ */
+export declare function isUnresolvedList(x: Expression): boolean;
 /**
  * Is this type a TUPLE, structurally — the bare `tuple` primitive or any
  * composite tuple, regardless of its slot types?
@@ -9886,6 +9936,13 @@ import { type ProvisionalDependent } from './boxed-expression/provisional-applic
 import type { Type } from '../common/type/types.js';
 type ValidateArgumentsFn = (ce: ComputeEngine, ops: ReadonlyArray<Expression>, signature: Type, lazy?: boolean, threadable?: boolean, freshlyInferred?: ReadonlySet<BoxedValueDefinition>) => ReadonlyArray<Expression> | null;
 export declare function _setValidateArguments(fn: ValidateArgumentsFn): void;
+type ArgumentUndecidedFn = (declared: Type, ops: ReadonlyArray<Expression>) => boolean;
+export declare function _setDeclaredArgumentUndecided(fn: ArgumentUndecidedFn): void;
+/** True when `result` is the inert application that `literal` itself answers
+ * for an argument whose type does not decide an annotation. An inner literal
+ * can answer such a node as the value of the body of `literal`: that is a
+ * value of `literal`, and the call of `literal` does not wait. */
+export declare function isUndecidedLiteralApplication(result: Expression | undefined, literal: Expression): boolean;
 /***
  * ### THEORY OF OPERATIONS
  *
@@ -10169,6 +10226,13 @@ export type ErrorArgPolicy = 'bubble' | 'bind';
 export type ApplyOptions = Partial<EvaluateOptions> & {
     holdArguments?: boolean;
     /**
+     * The application is one element of the map of a `broadcastable<T>` or a
+     * point-list parameter (`ApplyWhole`). An argument with no value does not
+     * make it wait (`docs/ERROR-MODEL.md`, "A symbolic argument whose type does
+     * not decide"): a length error of the mapped arguments needs the map to run.
+     */
+    mapElement?: boolean;
+    /**
      * Under `.N()`, the written arguments behind the (approximated) `args`,
      * one per argument position, `undefined` where there is none to record
      * (`exactArgumentSources`). The activation of a plain parameter records
@@ -10313,6 +10377,10 @@ export declare function compositionLiteral(fn: Expression, canonical?: boolean):
  * wrote it, `R(3, x, y)`, for a symbol bound to a literal), and otherwise an
  * inert `Apply` of the literal. A body that evaluates to an error value does
  * NOT decline: that error is the answer (`bodyResultValue`).
+ *
+ * An application that waits because the type of an argument does not decide an
+ * annotation of the literal (`isUndecidedLiteralApplication`) has the same
+ * answer: `declined` when the caller supplies one, otherwise the inert `Apply`.
  */
 export declare function apply(fn: Expression, args: ReadonlyArray<Expression>, options?: ApplyOptions, errorPolicy?: ErrorArgPolicy, declined?: Expression): Expression;
 /**
@@ -16771,6 +16839,10 @@ export type OperatorDefinitionFlags = {
      *   an absent operand is an `incompatible-type` error.
      * - A `Which` distributes over at most 16 combinations of branches;
      *   past that the application is given to the handler unchanged.
+     * - A `Which` that has a list of conditions selects at each position, so
+     *   its value is a list, and it does not distribute: when it cannot be
+     *   evaluated to a list, the handler receives it unchanged. With `foo`
+     *   undeclared, `Length(Which([True, False], foo(L), True, 0))` stays held.
      *
      * For example, with `t` free, `PointX(If(0 < t, (1, 2)))` is
      * `If(0 < t, 1)`, which is `1` when `t = 2` and `NaN` (the marker of the
@@ -20329,6 +20401,13 @@ export declare function freshIntervalValue(value: unknown): unknown;
  */
 export declare function runIntervalLambda(raw: (vars: unknown) => unknown, args: readonly unknown[]): unknown;
 /**
+ * Whether the error of a compiled call is a `CancellationError`: the limit of
+ * the `iterationBudget` option on a `Loop`. The answer "cannot bound this" does
+ * not apply to it, because the call stopped before it had an answer. The test
+ * reads the name of the error, because each bundle has its own class.
+ */
+export declare function isCancellationError(e: unknown): boolean;
+/**
  * Comparison and conditional interval operations
  *
  * @module interval/comparison
@@ -21146,6 +21225,8 @@ export { INTERVAL_RUNTIME_VERSION } from '../../common/runtime-versions.js';
  * interval arithmetic functions.
  */
 export declare const IntervalArithmetic: {
+    countLoopPass: (budget: number) => void;
+    resetLoopPasses: () => void;
     ok: typeof _ok;
     point: typeof _point;
     containsExtremum: typeof _containsExtremum;
@@ -31058,6 +31139,28 @@ export declare function sinhIntegral(x: number): number;
  * the module comment); it overflows to +∞ past |x| = 717.049.
  */
 export declare function coshIntegral(x: number): number;
+/**
+ * The smooth escape value of `z -> z^2 + c`, where `(zx, zy)` is the first
+ * iterate past the escape radius, at iteration `i` of at most `maxN`.
+ *
+ * The smoothing formula `n - log2(log2(|z|^2)) + 4` is continuous across
+ * iteration boundaries only when |z| is much larger than |c|. The escape test
+ * `|z|^2 > 4` stops too early for that: the count jumps by a median of 0.15 at
+ * each boundary. So the test still decides inside or outside, and this function
+ * then iterates further, for the smoothing only, until `|z|^2 > 65536`.
+ *
+ * The number of further iterations is bounded, because an orbit can stay above
+ * the escape radius forever when `|c| > 2` (for a Julia set with `c = -6`, the
+ * point `z = 3` is a fixed point). When the bound is reached, the value comes
+ * from the first iterate past the escape radius. The value jumps at the edge of
+ * that region, by about 10 counts: `Mandelbrot` at `c = -2.0000001` is 14.4
+ * counts, and at `c = -2.0000000001` it is 3. Only a deep zoom near `c = -2` or
+ * near a repelling fixed point reaches this edge.
+ *
+ * The GLSL and WGSL forms of this function are `_fractal_smooth` in
+ * `compilation/gpu-preambles.ts`.
+ */
+export declare function smoothEscape(zx: number, zy: number, cx: number, cy: number, i: number, maxN: number): number;
 import { BigDecimal } from '../../big-decimal/index.js';
 export declare function mean(values: Iterable<number>): number;
 export declare function bigMean(values: Iterable<BigDecimal>): BigDecimal;
@@ -33584,6 +33687,12 @@ export declare function centeredDiff8thOrder(f: (x: number) => number, x: number
  * "horizon" signal: `reliableLimitSamples` caps the rungs to the clean prefix
  * and Richardson extrapolation converges from those (γ still comes out
  * correct to ~1e-10 from the ≤ 8⁶-term rungs).
+ *
+ * A compiled `Sum` or `Product` gives that NaN itself. A compiled `Loop` has no
+ * value to replace, and throws a `CancellationError`, so the two callers of this
+ * budget (`numericLimitValue()` and `numericAt()`) read that error as NaN for a
+ * compiled sample. A host that sets the `iterationBudget` compile option itself
+ * gets the throw.
  */
 export declare const LIMIT_PROBE_ITERATION_BUDGET = 1000000;
 export declare function limit(f: (x: number) => number, x: number, dir?: number, deadline?: number | DeadlineFrame): number;
@@ -33763,6 +33872,37 @@ export declare function quadratureBeatsMonteCarlo(r: {
  * activations does not see.
  */
 export declare function insideQuadrature(): boolean;
+/**
+ * Whether the integrand of a quadrature is evaluated now only to measure how
+ * its value changes with the result of an inner integral
+ * (`measuredValueError`). The value is not a value of the integrand. A
+ * routine that would replace the result of its quadrature by another
+ * estimate that costs many evaluations (a Monte-Carlo estimate) must not do
+ * it then: that estimate does not follow the changed result, so it cannot
+ * give the change. It returns `NaN`, and the measure is then not used.
+ */
+export declare function insideReplay(): boolean;
+/**
+ * Run `run`, a routine that computes the integral over `[a, b]` with other
+ * work than a call of `adaptiveQuadrature` (a scan of the integrand, panels
+ * that it integrates itself), and that can call `adaptiveQuadrature`.
+ *
+ * Inside the integrand of a quadrature that collects the errors of its inner
+ * integrals, the result of the routine is recorded, with the sums of the
+ * errors and of the tolerances of the quadratures that it ran. During a
+ * replay of that evaluation of the integrand (`measuredValueError`), a
+ * routine that was called before the changed call does not run again: the
+ * recorded result is returned. Without this, each replay would repeat the
+ * work of the routine: the scan of `integrateSemiInfiniteOscillatory` for
+ * the changes of sign of an integrand that has none takes about 200 000
+ * evaluations.
+ *
+ * In any other place, the function only calls `run`.
+ */
+export declare function replayableQuadratures<T extends {
+    estimate: number;
+    error: number;
+} | null>(a: number, b: number, run: () => T): T;
 /** The result of `adaptiveQuadrature`. */
 type AdaptiveQuadratureResult = {
     estimate: number;
@@ -33783,6 +33923,11 @@ type AdaptiveQuadratureResult = {
      * must not sample the integrand (Monte Carlo), whose mean is then also
      * `NaN`. See `GaussKronrodOutcome` in `endpoint-quadrature.ts`. */
     nanRegion?: true;
+    /** Set only with `nestedErrors`: the integrand computed an integral with
+     * this function during at least one evaluation. A caller must not sample
+     * such an integrand with Monte Carlo, because each sample would run a
+     * quadrature. */
+    innerQuadrature?: true;
 };
 /**
  * Numerically approximate the definite integral of `f` from `a` to `b` using
@@ -33857,12 +34002,28 @@ export declare function adaptiveQuadrature(f: (x: number) => number, a: number, 
      * see `INTERIOR_SITE_DEPTH`). The recursive calls on the two halves
      * pass one less. */
     interiorSplits?: number;
-    /** When `true`, the integrand computes integrals of its own (with this
-     * function), and the reported error includes an estimate of the
-     * integral of their errors (see `withNestedErrors`). Without it, an
-     * error of the inner integrals that varies slowly with the variable is
-     * not in the reported error. The default is `false`. */
+    /** When `true`, the reported error includes an estimate of the integral
+     * of the errors of the integrals that the integrand computes with this
+     * function (see `withNestedErrors`). Without it, an error of the inner
+     * integrals that varies slowly with the variable is not in the reported
+     * error. An integrand that computes no integral gives the same result as
+     * with `false`. The default is `false`. */
     nestedErrors?: boolean;
+    /** With `nestedErrors`, a function that computes the value of `f` again
+     * at a point where `f` was evaluated, with the same calls of the inner
+     * integrals. The quadrature calls it, one or two times for each inner
+     * integral of a point, to measure how the value changes with each inner
+     * result (see `measuredValueError`). Without it, the error of a value is
+     * the larger of two assumed ones (see `withNestedErrors`), which is too
+     * large for an integrand that is a small factor times an inner integral.
+     *
+     * Give it only when a second evaluation has no effect that the caller
+     * can observe: an integrand that draws a random number or assigns a
+     * variable must not be evaluated again. It is `f` itself for such an
+     * integrand, unless `f` keeps its values in a cache (a second call of
+     * `f` would then call no inner integral) or records what its values
+     * were: the values of this function are not values of the integrand. */
+    replayIntegrand?: (x: number) => number;
 }): AdaptiveQuadratureResult;
 /**
  * True when the point `s` of `[lo, hi]` found by `interiorSingularPoint` is
@@ -34524,9 +34685,12 @@ export type WorkerToMainMessage = {
  * a name at the block's own level.
  *
  * Whether such a name is a local of the block is decided at
- * canonicalization and never changes after. Each run of the block gives the
- * name a new binding (`declareAssignmentLocals()`, `function-utils.ts`), and
- * the effect inference counts a write to it as confined (`withBlockLocals()`,
+ * canonicalization and never changes after. The repair of a definition
+ * (`repairWave()`, `function-utils.ts`) builds a function literal again from
+ * its raw operands, and keeps the decision (`withKeptAssignmentLocals()`).
+ * Each run of the block gives the name a new binding
+ * (`declareAssignmentLocals()`, `function-utils.ts`), and the effect inference
+ * counts a write to it as confined (`withBlockLocals()`,
  * `boxed-expression/effects-inference.ts`).
  *
  * The record is kept here, apart from the scope bindings, because a run of
@@ -34630,6 +34794,29 @@ export declare function recordAssignmentLocals(scope: object, names: readonly st
  * no block with this scope was canonicalized. */
 export declare function assignmentLocalsOf(scope: object): readonly string[] | undefined;
 /**
+ * Run `fn`, which builds a function literal again from its raw operands in
+ * `scope`, the scope that the literal is written in. `names` are the names
+ * that the blocks of the literal made assignment locals when it was first
+ * canonicalized.
+ *
+ * A binding of such a name that `scope` or an enclosing scope holds now was
+ * made after the literal was written, and does not make the name an outer
+ * variable of the literal. With `h = n ↦ { g := z ↦ 0; z ↦ g(z) + n }`
+ * followed by a global `g := t ↦ 9`, `g` stays a local of `h`, and `h` does
+ * not write the global.
+ *
+ * A binding in a scope inside the literal still counts: in
+ * `n ↦ { a := 1; m ↦ { a := 2 } }` the second assignment writes the local of
+ * the outer block, as it did the first time.
+ */
+export declare function withKeptAssignmentLocals<T>(names: ReadonlySet<string> | undefined, scope: object | undefined, fn: () => T): T;
+/**
+ * The scope where the search for a declaration of `name` stops, when
+ * {@link withKeptAssignmentLocals} keeps `name` as an assignment local, or
+ * `undefined` when the search goes through the whole scope chain.
+ */
+export declare function keptAssignmentLocalBoundary(name: string): object | undefined;
+/**
  * Record the assignment locals of the block scope `scope` that a binding of
  * an enclosing block would have taken, if a later statement of that block
  * had not declared it. Such an enclosing block is the top-level block of a
@@ -34638,7 +34825,9 @@ export declare function assignmentLocalsOf(scope: object): readonly string[] | u
  * top-level statement declares (`canonicalBlock()` in
  * `library/control-structures.ts`). In
  * `function g(k) { t = k + 1; t }; let t = 0`, `t` is such a local of the
- * body of `g`.
+ * body of `g`. The record also holds a local of a function literal that is
+ * built again, when an enclosing scope made a binding of the name after the
+ * literal was written ({@link withKeptAssignmentLocals}).
  *
  * The compiler reads the record (`withImplicitLocalDeclares()` in
  * `compilation/base-compiler.ts`): it declares such a name as a local of the
@@ -35733,16 +35922,38 @@ export declare function forgetHiddenBodyBindings(bodyScope: object): void;
  * share the entries.
  */
 export declare function innermostCallFrameBody(ce: ViewEngine): object | undefined;
+/** True while a type computation of `ce` runs. */
+export declare function inStaticTypingView(ce: ViewEngine): boolean;
+/**
+ * Record that a read outside a type computation of `ce` found a value in
+ * another binding with the name of a parameter whose own binding is not
+ * reachable. A type computation reads no binding there (`bindingInContext()`,
+ * `binders.ts`), so the two can answer differently from now on. The record
+ * stays for the life of the engine: an answer of that read can stay in a cache
+ * of a node, whatever happens to the binding. This costs cache hits, not
+ * correctness: each later type computation of `ce` also skips the memos that
+ * test `staticViewDiverges()`. An engine that makes no such read does not pay.
+ */
+export declare function noteParameterReadByName(ce: ViewEngine): void;
 /**
  * Can a read in the static view answer something else than the same read
- * outside it? Only while a type computation of `ce` runs and an application
- * of a function literal by `ce` is in progress: the static view differs
- * only at the body scope of a literal that is being applied and at its
- * frame. An application suspended at an `await` counts too: its body scope
- * keeps the frame as parent and its bindings taken out, and a read of a
- * node of its body from any stack goes through them. A frame on the current
- * stack also counts. A cache that is not keyed on the type version keeps an
- * answer computed then under a key of its own.
+ * outside it? Only while a type computation of `ce` runs, and in one of two
+ * cases.
+ *
+ * - An application of a function literal by `ce` is in progress: the static
+ *   view differs at the body scope of a literal that is being applied and at
+ *   its frame. An application suspended at an `await` counts too: its body
+ *   scope keeps the frame as parent and its bindings taken out, and a read of
+ *   a node of its body from any stack goes through them. A frame on the
+ *   current stack also counts.
+ * - `ce` has read a parameter of a function literal by name
+ *   (`noteParameterReadByName()`). With `n := 2`, the sign of the body node
+ *   `n + 1` of `(n: real) ↦ Sqrt(n + 1)` is positive outside the view, and is
+ *   not known inside it. Read from the cache, that sign would type the literal
+ *   `(n: real) -> real`, where the result can be complex.
+ *
+ * A cache that is not keyed on the type version keeps an answer computed then
+ * under a key of its own.
  */
 export declare function staticViewDiverges(ce: ViewEngine): boolean;
 /**
@@ -38487,6 +38698,45 @@ export declare function isNonSquareMatrixPower(baseType: BoxedType, exponent: Ex
 export declare function isSquareMatrixPower(baseType: BoxedType, exponent: Expression): boolean | undefined;
 export declare function viewOfExpression(x: Expression): BroadcastOperandView;
 /**
+ * True when an EVALUATED argument of a user function has no concrete value
+ * and its type does not show that it fits the SCALAR parameter type that the
+ * author declared. The call then stays over its evaluated arguments, and a
+ * later evaluation checks the value (`declaredScalarConformance`).
+ *
+ * With `h` declared `(integer) -> integer` and assigned `k ↦ 2k`, and `m` a
+ * symbol with no value, `h(m)` stays `h(m)`. If the body was applied, the
+ * result `2m` would hold no trace of the parameter type, and after
+ * `m := 1.5` it would give `3`, where `h(1.5)` is an `incompatible-type`
+ * error.
+ *
+ * A type that the engine only inferred does not decide: `h(m)` itself infers
+ * `m: integer`, and an assignment widens that type. The argument `m` declared
+ * `integer` does decide, and the body is applied: `h(m)` gives `2m`.
+ *
+ * A symbol with no declared type stands for a real number, so at a parameter
+ * that admits every real number the body is applied to such a symbol, and to
+ * an expression whose type fits: with `f` declared `(real) -> real` and
+ * assigned `x ↦ x^2`, `f(x)` gives `x^2`, and `D(f(x), x)` gives `2x`. A later
+ * value outside the parameter type (`x := i`) is not checked in the result.
+ * An expression whose type does not fit stays: `f(x + i)` and `f(Sqrt(x))`.
+ *
+ * The test reads the type of the argument and not how the type was derived.
+ * A predicate is a boolean for every value of its symbols, so `p(x > 0)` at a
+ * `boolean` parameter applies the body. An expression over an inferred symbol
+ * with a numeric type stays at a narrower parameter, also when its value
+ * always fits: `h(Floor(q))` stays `h(Floor(q))`.
+ *
+ * A symbol with no value is itself a value of the type `symbol`, so at a
+ * parameter that admits it the body is applied: with
+ * `function f(s: symbol) { s }`, `f(q)` gives `q`, and the same holds for
+ * `Auto` at a parameter typed `symbol<Auto> | symbol<Manual>`.
+ *
+ * The same test applies to the parameter types that the author wrote on a
+ * function literal (`function h(k: integer) { 2*k }`), with `declared` the
+ * signature of the literal: `makeLambda`, `function-utils.ts`.
+ */
+export declare function declaredArgumentUndecided(declared: Type, ops: ReadonlyArray<Expression>): boolean;
+/**
  * An operand that has no collection value yet
  * (`isUnresolvedCollectionOperand`) and whose type can hold an indexed
  * collection, so that a later value can make a function with scalar
@@ -39231,6 +39481,11 @@ export declare function logarithmAtExceptionalPoint(ce: Expression['engine'], x:
 export declare function markDeclaredLocal(def: object): void;
 /** Whether the block-local binding `def` has a declared type. */
 export declare function isDeclaredLocal(def: object): boolean;
+/** Record that `def` binds a local, and return it: the declaration of `def`
+ * does not enforce the default-`!scope` ceiling. */
+export declare function markLocalBinding<T extends object>(def: T): T;
+/** Whether `def` was given to `markLocalBinding()`. */
+export declare function isLocalBinding(def: object): boolean;
 /**
  * Whether this is the first call for the block local `target`. The first
  * value that the canonicalization of a block records for a local is its
@@ -41944,6 +42199,10 @@ export declare const FLAT_MASK_TYPE: import("../types.js").Type;
  * cell to select.
  */
 export declare function isListCondition(cond: Expression | undefined): boolean;
+/** True when `x` is a `Which` that has a list of conditions
+ * (`isListCondition()`), so that it selects at each position and its value is
+ * a list. */
+export declare function isElementwiseWhich(x: Expression): boolean;
 /**
  * The comparison operators and the connectives. Each one is two-valued: it
  * answers `True` or `False`, also when an operand or a cell is absent (an
@@ -46998,6 +47257,25 @@ export declare function callableBindingInContext(ce: ComputeEngine, name: string
  * scope that has since been popped, or an unbound one), the innermost binding
  * by name answers, foreign activation included — what the name lookup
  * answered before.
+ *
+ * One exception: inside a type computation, a parameter of a function literal
+ * that is reachable from nowhere has no binding. The type of a literal is read
+ * after the scope of its body was left, and the parameter has a value only
+ * in a call. A binding of the same name is another variable: with
+ * `n := [1, 2]`, the operand `n` of `n ↦ n + 1` does not hold a list, so the
+ * literal is typed `(n) -> number`, not `(n) -> list<number>`.
+ *
+ * A local of a block (a `Declare` statement or a first assignment) has the
+ * same exception: the type of a block is read after the scope of the block
+ * was left, and the local has a value only in a run of the block. With
+ * `n := [1, 2]`, the operand `n` of `Block(Declare(n, "real", 2), n + 1)`
+ * does not hold a list, so the block is typed `real`, not `list<real>`. The
+ * binding that a run of the block made for the local is the same variable,
+ * and a type computation in the run reads it
+ * (`isOutsideBindingOfBlockLocal()`). In a call of a function literal whose
+ * body is the block, a type computation reads the binding that the
+ * canonicalization made, which has no value (`staticBindingIn()`,
+ * `static-typing-view.ts`).
  */
 export declare function valueDefinitionInContext(ce: ComputeEngine, name: string, own: BoxedBaseDefinition | undefined): BoxedValueDefinition | undefined;
 /**
@@ -51609,6 +51887,13 @@ export declare class Product {
     asExpression(options?: {
         numericApproximation: boolean;
     }): Expression;
+    /**
+     * The product with a zero coefficient, when a term is a list with no value
+     * yet (`L: list<real>`); `undefined` otherwise. `0·L` and `0·(L + 1)` are
+     * lists of zeros of the length of `L`, not the scalar `0`, and the length is
+     * known only when `L` has a value.
+     */
+    private zeroTimesLists;
     /** The product, expressed as a numerator and denominator */
     asNumeratorDenominator(): [Expression, Expression];
     asRationalExpression(): Expression;
@@ -54945,6 +55230,30 @@ export declare function errorValue(expr: Expression | undefined | null, frame?: 
  * RETURNED error, not the ones this walk happens to cross.
  */
 export declare function potentialErrorValue(expr: Expression): Expression | undefined;
+/**
+ * The error that `errorValue()` would give for `expr` if each node for which
+ * `errorOf` gives an error were replaced by that error, or `undefined`.
+ *
+ * `expr` is a valid tree. A node of it can stand for an error that the tree
+ * does not hold yet: a call that was valid when it was boxed and that the
+ * same boxing refuses now. The caller finds, with this function, whether
+ * such an error would be the value of `expr`, without building the tree
+ * that holds the error.
+ *
+ * The walk is the walk that `errorValue()` makes (`firstEmbeddedError()`
+ * with selecting subtrees skipped), and the two must follow the same rule:
+ * the first such node in operand order, not below a collection literal
+ * (`COLLECTION_OPERATORS`) and not below a selecting operator
+ * (`defersErrorAbsorption()`), where the error can be in an operand that is
+ * not demanded. The error gets the breadcrumb frames from the node up to
+ * `expr`, innermost first.
+ *
+ * This walk cannot prune on `isValid`, so it visits each node of `expr`
+ * once: it uses an explicit stack, because a valid tree can be as deep as
+ * its input is long, and a shared subtree is visited only on the first path
+ * that reaches it. The answer for a subtree does not depend on the path.
+ */
+export declare function errorValueWhere(expr: Expression, errorOf: (node: Expression) => Expression | undefined): Expression | undefined;
 /** The `ErrorTrace` operand of an `Error` value, if it carries one. */
 export declare function errorTrace(err: Expression): (Expression & FunctionInterface) | undefined;
 /** The breadcrumb frames of an `Error` value, innermost (failure site) first. */
@@ -56397,12 +56706,19 @@ import type { BoxedOperatorDefinition, BoxedValueDefinition, Expression, IComput
  * `canonicalInvisibleOperator` too, so it is exactly as order-dependent. */
 export type ProvisionalDependent = BoxedOperatorDefinition | BoxedValueDefinition;
 /** What a `Function` literal needs to be re-derived: the raw operands it was
- * canonicalized from, the scope it was canonicalized in, and the symbols whose
- * juxtaposition reading was provisional. */
+ * canonicalized from, the scope it was canonicalized in, the symbols whose
+ * juxtaposition reading was provisional, and the names that the blocks of the
+ * literal made assignment locals (`noteAssignmentLocal()`). */
 export type ProvisionalLiteral = {
     ops: ReadonlyArray<Expression>;
     heads: ReadonlySet<string>;
     scope: Scope | undefined;
+    assignmentLocals?: ReadonlySet<string>;
+};
+/** What the canonicalization of one `Function` literal body noted. */
+export type ProvisionalCapture = {
+    heads?: Set<string>;
+    assignmentLocals?: Set<string>;
 };
 /** Start collecting the provisional readings made from here on. Must be paired
  * with `endProvisionalCapture()` in a `finally`. */
@@ -56411,7 +56727,7 @@ export declare function beginProvisionalCapture(): void;
  * also flow up to the enclosing frame, if any: a nested literal's provisional
  * reading is part of the enclosing literal's body, and re-deriving the outer
  * literal re-derives the inner one. */
-export declare function endProvisionalCapture(): ReadonlySet<string> | undefined;
+export declare function endProvisionalCapture(): ProvisionalCapture | undefined;
 /** True when a `Function` literal body is being canonicalized, so a note would
  * actually be collected. A hot-path guard for callers that would otherwise
  * compute the inputs of a noting call that is a no-op. */
@@ -56424,6 +56740,12 @@ export declare function isProvisionalHead(name: string): boolean;
 /** Record that `name` was read as a multiplication operand where an
  * application was also possible. */
 export declare function noteProvisionalApplication(name: string): void;
+/** Record that a block of the body that is canonicalized now made `name` an
+ * assignment local (`canonicalBlock()`, `library/control-structures.ts`). A
+ * re-derivation of the literal keeps this decision, also when a binding of
+ * `name` was made in an enclosing scope after the literal was written
+ * (`withKeptAssignmentLocals()`, `assignment-locals.ts`). */
+export declare function noteAssignmentLocal(name: string): void;
 /** Record that `name` was APPLIED while it had no definition (or only a
  * guessed one), so the argument-narrowing side-channel had nothing to read.
  * The same registry and the same repair as `noteProvisionalApplication`: the
@@ -58173,6 +58495,16 @@ export declare function kindValueIsNaN(x: Expression): boolean;
  * compatibility.
  */
 export declare function isInexactOperand(x: Expression): boolean;
+/**
+ * The operands to give to the canonical handler of `node`, built from `ops`.
+ *
+ * The `Subscript` handler reads a canonical symbol index as a value, and a
+ * written symbol index as the spelling of a name (`A_n`). A `Subscript` that is
+ * not canonical yet has a written index, although a structural or a partial form
+ * can have bound the symbol to its definition. So that index is passed as a raw
+ * symbol. Every other node keeps `ops`.
+ */
+export declare function operandsForCanonicalRebuild(node: Expression, ops: ReadonlyArray<Expression>): ReadonlyArray<Expression>;
 export declare function isFunction(expr: Expression | null | undefined, operator?: string): expr is Expression & FunctionInterface;
 /**
  * Are these the operands of a `Set` whose ORDER is not significant?
@@ -60541,11 +60873,14 @@ export declare function memoizedPartialDerivative(fn: Expression, source: Expres
 /**
  *
  * @param fn The function to differentiate, a function literal.
+ * @param bodyOverHole When `fn` is a function literal, its body from
+ * `literalBodyOverHoles()`: this body is differentiated in the hole `_`, and
+ * the result is in terms of the holes.
  *
  * @returns a function expression representing the derivative of `fn` with
  * respect to the variables in `degrees`.
  */
-export declare function derivative(fn: Expression, order: number): Expression | undefined;
+export declare function derivative(fn: Expression, order: number, bodyOverHole?: Expression): Expression | undefined;
 /**
  * Calculate the partial derivative of an expression with respect to a
  * variable, `v`.
@@ -60574,6 +60909,92 @@ export declare function derivative(fn: Expression, order: number): Expression | 
  * @returns The derivative expression, or `undefined` if unable to differentiate
  */
 export declare function differentiate(expr: Expression, v: string, depth?: number, trace?: DerivativeTrace): Expression | undefined;
+/**
+ * The body of the function literal `literal`, with the symbol named `holes[i]`
+ * in place of its parameter `i`, when a function that the body calls reads a
+ * free name equal to the name of a parameter. Otherwise `undefined`. The holes
+ * must be declared in the current scope.
+ *
+ * `differentiate()` expands the body of a called function and finds the
+ * variable by its name. A parameter of a literal is another variable than a
+ * free name of a called function, also when the two have the same name: with
+ * `a := 3` and `h := x ↦ a·x`, the literal `a ↦ h(a)` is `a ↦ 3a` when it is
+ * applied, and its derivative is `3`. Differentiated in `a`, the expanded body
+ * is `a·a`, and the derivative is `2a`. In terms of a hole, the expanded body
+ * is `a·_`, and the derivative in `_` is `a`, the name of the global. All the
+ * parameters are replaced: the derivative is made a function literal again,
+ * and a parameter other than the variable would bind a free `a` of its result
+ * too.
+ *
+ * The variable of `D` is not replaced: `D(h(k), x)` follows the name `x` into
+ * the body of `h` (`userFunctionBody()`).
+ *
+ * Also `undefined`, so that the caller differentiates in the parameter names,
+ * when a parameter is not a symbol or a typed symbol, or when the body cannot
+ * be reduced to one expression (`partialFromFunctionLiteral()`).
+ *
+ * The name of a parameter can still be written in the body after the
+ * replacement, because the body binds that name itself: the index of a `Sum`,
+ * or the variable of a nested `D`, which `subs()` keeps in
+ * `EvaluateAt(Function(D(…, a), a), _)`. Such a body is not differentiated in
+ * terms of holes. The result is `undefined` when no called function reads the
+ * name, and otherwise `'decline'`: no name separates the three variables, and
+ * the caller leaves the derivative unevaluated.
+ */
+export declare function literalBodyOverHoles(literal: Expression, holes: ReadonlyArray<string>): Expression | 'decline' | undefined;
+/**
+ * `body` with each parameter named in `map` replaced by its argument.
+ *
+ * When no call in `body` has a parameter as its operator, this is
+ * `body.subs(map)`. Otherwise, the body is walked once:
+ * - a parameter symbol is replaced by its argument, and the argument is not
+ *   walked: a call in an argument whose operator has the name of a
+ *   parameter (`f(x)` in `G(h, f(x))`, with `G := (f, a) ↦ f(a)`) is not
+ *   the parameter;
+ * - a call whose operator is a parameter is rebuilt from its replaced
+ *   operands: `f(a)` with the argument `h` for `f` is `h(k)`, and with a
+ *   function literal or any other expression `ℓ` for `f` it is
+ *   `Apply(ℓ, k)`. The call never keeps the name of the parameter, which
+ *   could name an unrelated function outside the literal.
+ * - any other node is rebuilt with its replaced operands and its own scope,
+ *   as `subs()` does, so that an index of a `Sum` in the body stays bound
+ *   to it. A node that is not canonical (a held operand, such as the index
+ *   of `Limits`) is substituted by `subs()`.
+ */
+export declare function substituteParameters(ce: Expression['engine'], body: Expression, map: Record<string, Expression>): Expression;
+/**
+ * The value of `block` as one expression: its last statement, with each
+ * local variable replaced by the value the statements before it assign.
+ * `Block(Declare(k), Assign(k, 2), k·x)` has the value `2x`.
+ *
+ * Returns `undefined` when the block is not a plain sequence of local
+ * declarations and assignments followed by an expression:
+ * - a statement other than `Declare(k)` (with no type and no initial value),
+ *   `Declare(k, type, value)` or `Assign(k, value)` before the last one;
+ * - an assignment to a name the block does not declare: it changes a variable
+ *   outside the block. When the caller gives `parameters`, a name that the
+ *   scope of the block binds and that is not a parameter is a local too: the
+ *   canonical form of a function literal declares a name with no other
+ *   binding in that scope, so `Block(c := 2, c·x)` changes no outer variable;
+ * - a value that does not have the written type of its declaration, or a new
+ *   value for a local declared with a written type: the substitution skips
+ *   the check that the evaluation of the block does;
+ * - a declaration of the differentiation variable `v` (it would shadow it);
+ * - a local name that is still in an expression after the substitution: a
+ *   local read before it is assigned, a name read before it is declared,
+ *   or a local function called by name (`subs()` replaces symbols, not the
+ *   name of a called function);
+ * - an assigned value that is not pure (`Random()`): substituting it into
+ *   each use would evaluate it more than once;
+ * - an assigned value other than a literal or a symbol that no later statement
+ *   reads outside an operand that its evaluation can skip: the substitution
+ *   drops the value, or moves it into a branch of `If`, and its evaluation can
+ *   give an error that stops the block (`c := AssertPresent(Missing); x`);
+ * - control flow or an assignment inside a value or the last statement;
+ * - a binder (the index of a `Sum`, the parameter of a function literal)
+ *   with the name of a local, which a substitution by name cannot handle.
+ */
+export declare function blockValue(ce: Expression['engine'], block: Expression, v?: string, parameters?: ReadonlyArray<string>): Expression | undefined;
 /**
  * Fu Algorithm for Trigonometric Simplification
  *
@@ -61875,11 +62296,9 @@ export declare class ComputeEngine implements IComputeEngine {
     /** See `IComputeEngine._cacheGeneration()`.
      * @internal */
     _cacheGeneration(): number;
-    /** The key of `_cacheGeneration()` outside the static view of a type
-     * computation, and the key outside it that `_staticViewKey` was minted
-     * for. */
-    private _staticViewAxis;
-    private _staticViewKey;
+    /** The key of `_cacheGeneration()` inside the static view of a type
+     * computation, for each key outside it. */
+    private readonly _staticViewKeys;
     /** `_cacheGeneration()` outside the static view of a type computation. */
     private _baseCacheGeneration;
     /** See `IComputeEngine._typeCacheGeneration()`.
@@ -63041,6 +63460,11 @@ export declare class ComputeEngine implements IComputeEngine {
      * (`ce.pushScope()`, a function parameter, a `Block` local) is allowed, and
      * so are the input spellings `e` and `i`, which no result carries by name.
      *
+     * A function value that writes outside itself must state the `scope` effect,
+     * in every scope: `ce.declare('f', { value: writer })` throws, also after
+     * `ce.pushScope()`, and `{ type: '() scope -> number', value: writer }` is
+     * accepted.
+     *
      * The third argument is the scope to declare in, or an options object
      * `{ scope?, extend? }` (see {@link DeclareOptions}).
      *
@@ -63436,6 +63860,22 @@ export declare class ComputeEngine implements IComputeEngine {
      */
     private _resolveSymbolFromScope;
     private _scopeResolution;
+    /**
+     * Whether a LaTeX assignment to `id` would replace a function of a library:
+     * `a + b := 5` would change the value of every later `1 + 2`.
+     *
+     * A definition that the host made in place of the library function
+     * (`ce.declare('D', 'function')`, `ce.declare('N', 'unknown')`, or
+     * `ce.declare('Sin', { … })`) is not the library function, so a LaTeX
+     * assignment can define it.
+     *
+     * A value whose type is not a function does not make the name the host's own.
+     * After `N := 5` or `N := y`, a later `N(x) := x + 1` would replace the library
+     * `N`, which `N(1/3)` calls after `N := 5`. Reading `[N, 1]` binds `N` to a
+     * shadow with no value and no type, and calls of `N` still reach the library:
+     * a parse must not change what a later assignment can do.
+     */
+    private _isLibraryFunction;
     /**
      * The symbols that appear in function-application syntax — `f(…)` — in
      * `latex` but are **not** defined as functions in the current scope, and so
@@ -66386,7 +66826,10 @@ export declare function userFunctionParamsAreScalar(engine: ComputeEngine, h: st
  * The type signature `t` gives positional parameter `i`: the required
  * parameters first, then the optional ones, then the variadic tail.
  * `undefined` when `t` is not a signature, or states no type at that
- * position.
+ * position. An overload set gives the type on which every option that has
+ * this parameter agrees, and `undefined` when they differ: position 1 of
+ * `ReplaceAt` is `integer` in both options, and its operand 2 is a value in
+ * one option and a position in the other.
  *
  * Shared by the ENGINE-defined route, which reads `t` from a definition
  * (`userFunctionParamType`), and the BLOCK-LOCAL route, which reads it from
@@ -68240,8 +68683,42 @@ import type { ElementBinder } from './compiler-types.js';
  *
  * Value-producing comprehensions are compiled by `compileComprehension`
  * (head `Comprehension`), not here.
+ *
+ * With the `iterationBudget` option, each pass of each of these loops first
+ * adds one to the total of the call (`loopPassCount`).
  */
 export declare function compileForLoop(args: ReadonlyArray<Expression>, target: CompileTarget<Expression>, node?: Expression): TargetSource;
+/**
+ * The expression that starts the total of a call again, or `''` when none of
+ * `sources`, the emitted code that runs in the call, counts a pass. So a
+ * compilation with an `iterationBudget` and with no `Loop` keeps the code that
+ * it had.
+ */
+export declare function loopPassResetCall(target: CompileTarget<Expression>, ...sources: ReadonlyArray<string>): string;
+/** `loopPassResetCall()` as a statement, for the start of a list of
+ * definitions. */
+export declare function loopPassReset(target: CompileTarget<Expression>, ...sources: ReadonlyArray<string>): string;
+/**
+ * The function that `code` gives, with `reset`, a `loopPassResetCall()`, as the
+ * first statement of each of its calls. The code of the function is not parsed:
+ * it can have a static map or a default fill around its body, so the reset goes
+ * in a function that calls it.
+ */
+export declare function resettingLoopPasses(reset: string, code: string): string;
+/**
+ * Decline a value that is a function, in code that counts `Loop` passes. Where
+ * such a function is not the `Function` literal at the root, the code has no
+ * place for a reset in each of its calls: the reset runs once, when the value
+ * is made. The calls would then share one total, and a valid call would throw.
+ */
+export declare function assertCountedValueIsNoFunction(value: Expression): void;
+/**
+ * The code of a direct target (`compile(expr, { target })`) with the reset of
+ * the pass count, when it counts passes. A direct result has no preamble of its
+ * own, so the reset is in `code`: before the expression, or in each call of a
+ * `Function` literal at the root.
+ */
+export declare function withDirectLoopPassReset(root: Expression, target: CompileTarget<Expression>, code: string): string;
 /**
  * Compile a `Comprehension` expression — a value-producing comprehension.
  * `Comprehension(body, Element(x, coll1), Element(y, coll2), …)` compiles to
@@ -68382,12 +68859,15 @@ export declare function reservedNameSpelling(names: ReadonlyArray<string>, targe
 export declare function compileElementLoops(elements: ReadonlyArray<Expression>, target: CompileTarget<Expression>, makeInner: (bodyTarget: CompileTarget<Expression>) => string, prelude?: string, 
 /** The clauses' binders when the caller has validated them already
  * (`compileComprehension` needs their names before it emits). */
-validated?: ReadonlyArray<ElementBinder>): string;
+validated?: ReadonlyArray<ElementBinder>, 
+/** The statement at the start of each iteration of each clause, before the
+ * guard of the clause (`loopPassCount`). */
+passCount?: string): string;
 /**
  * The emission half of `compileElementLoops`, run while the loop binders'
  * complex frame (if any) is pushed.
  */
-export declare function emitElementLoops(narrowedElements: ReadonlyArray<ElementBinder['clause']>, binders: ReadonlyArray<ElementBinder>, target: CompileTarget<Expression>, bodyTarget: CompileTarget<Expression>, makeInner: (bodyTarget: CompileTarget<Expression>) => string, prelude: string, needsWrap: boolean): string;
+export declare function emitElementLoops(narrowedElements: ReadonlyArray<ElementBinder['clause']>, binders: ReadonlyArray<ElementBinder>, target: CompileTarget<Expression>, bodyTarget: CompileTarget<Expression>, makeInner: (bodyTarget: CompileTarget<Expression>) => string, prelude: string, needsWrap: boolean, passCount?: string): string;
 /**
  * True when the loop source `source` is a `List`, `Tuple`, `Linspace` or
  * `Map`, written inline or held as the value of a symbol: a collection
@@ -68768,8 +69248,10 @@ export interface IntervalRuntime {
      * gives the `IntervalValue` that the result's own `run()` gives: inputs are
      * converted the same way, the answer is copied so that it shares nothing
      * with the hoisted constants, and an error inside the code answers
-     * `{ kind: 'entire' }`. For a result with `calling: 'lambda'` (a
-     * function-valued expression), it takes the arguments of the function
+     * `{ kind: 'entire' }`, but for the `CancellationError` of the
+     * `iterationBudget` limit, which is thrown. For a result with
+     * `calling: 'lambda'` (a function-valued expression), it takes the arguments
+     * of the function
      * instead, each converted as a variable of a vars object is.
      */
     load: (stored: StoredIntervalJavaScript) => (...args: unknown[]) => IntervalValue;
@@ -69886,12 +70368,24 @@ export declare const GPU_BESSELJ_PREAMBLE_WGSL = "\nfn _gpu_factorial(n: i32) ->
  * Smooth escape-time iteration for Mandelbrot and Julia sets.
  * Both functions return a normalized float in [0, 1] with smooth coloring
  * (log2(log2(|z|²)) formula) to avoid banding.
+ *
+ * The smoothing formula `n - log2(log2(|z|^2)) + 4` is continuous across
+ * iteration boundaries only when |z| is much larger than |c|. The escape test
+ * `|z|^2 > 4` stops too early for that: the count jumps by a median of 0.15 at
+ * each boundary. So the test still decides inside or outside, and `_fractal_smooth`
+ * then iterates further, for the smoothing only, until `|z|^2 > 65536`.
+ *
+ * The number of further iterations is bounded, because an orbit can stay above
+ * the escape radius forever when `|c| > 2` (for a Julia set with `c = -6`, the
+ * point `z = 3` is a fixed point). When the bound is reached, the value comes
+ * from the first iterate past the escape radius, and it jumps at the edge of
+ * that region (`numerics/fractal-smooth.ts`).
  */
-export declare const GPU_FRACTAL_PREAMBLE_GLSL = "\nfloat _fractal_mandelbrot(vec2 c, int maxIter) {\n  vec2 z = vec2(0.0, 0.0);\n  for (int i = 0; i < maxIter; i++) {\n    z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0)\n      return clamp((float(i) - log2(log2(dot(z, z))) + 4.0) / float(maxIter), 0.0, 1.0);\n  }\n  return 1.0;\n}\n\nfloat _fractal_julia(vec2 z, vec2 c, int maxIter) {\n  for (int i = 0; i < maxIter; i++) {\n    z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0)\n      return clamp((float(i) - log2(log2(dot(z, z))) + 4.0) / float(maxIter), 0.0, 1.0);\n  }\n  return 1.0;\n}\n";
+export declare const GPU_FRACTAL_PREAMBLE_GLSL = "\nfloat _fractal_smooth(vec2 z, vec2 c, int i, int maxIter) {\n  vec2 w = z;\n  int k = i;\n  for (int extra = 0; extra < 16 && dot(w, w) <= 65536.0; extra++) {\n    w = vec2(w.x*w.x - w.y*w.y + c.x, 2.0*w.x*w.y + c.y);\n    k++;\n  }\n  if (!(dot(w, w) > 65536.0)) {\n    w = z;\n    k = i;\n  }\n  return clamp((float(k) - log2(log2(dot(w, w))) + 4.0) / float(maxIter), 0.0, 1.0);\n}\n\nfloat _fractal_mandelbrot(vec2 c, int maxIter) {\n  vec2 z = vec2(0.0, 0.0);\n  for (int i = 0; i < maxIter; i++) {\n    z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0)\n      return _fractal_smooth(z, c, i, maxIter);\n  }\n  return 1.0;\n}\n\nfloat _fractal_julia(vec2 z, vec2 c, int maxIter) {\n  for (int i = 0; i < maxIter; i++) {\n    z = vec2(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0)\n      return _fractal_smooth(z, c, i, maxIter);\n  }\n  return 1.0;\n}\n";
 /**
  * Fractal preamble (WGSL syntax).
  */
-export declare const GPU_FRACTAL_PREAMBLE_WGSL = "\nfn _fractal_mandelbrot(c: vec2f, maxIter: i32) -> f32 {\n  var z = vec2f(0.0, 0.0);\n  for (var i: i32 = 0; i < maxIter; i++) {\n    z = vec2f(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0) {\n      return clamp((f32(i) - log2(log2(dot(z, z))) + 4.0) / f32(maxIter), 0.0, 1.0);\n    }\n  }\n  return 1.0;\n}\n\nfn _fractal_julia(z_in: vec2f, c: vec2f, maxIter: i32) -> f32 {\n  var z = z_in;\n  for (var i: i32 = 0; i < maxIter; i++) {\n    z = vec2f(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0) {\n      return clamp((f32(i) - log2(log2(dot(z, z))) + 4.0) / f32(maxIter), 0.0, 1.0);\n    }\n  }\n  return 1.0;\n}\n";
+export declare const GPU_FRACTAL_PREAMBLE_WGSL = "\nfn _fractal_smooth(z: vec2f, c: vec2f, i: i32, maxIter: i32) -> f32 {\n  var w = z;\n  var k = i;\n  for (var extra: i32 = 0; extra < 16 && dot(w, w) <= 65536.0; extra++) {\n    w = vec2f(w.x*w.x - w.y*w.y + c.x, 2.0*w.x*w.y + c.y);\n    k++;\n  }\n  if (!(dot(w, w) > 65536.0)) {\n    w = z;\n    k = i;\n  }\n  return clamp((f32(k) - log2(log2(dot(w, w))) + 4.0) / f32(maxIter), 0.0, 1.0);\n}\n\nfn _fractal_mandelbrot(c: vec2f, maxIter: i32) -> f32 {\n  var z = vec2f(0.0, 0.0);\n  for (var i: i32 = 0; i < maxIter; i++) {\n    z = vec2f(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0) {\n      return _fractal_smooth(z, c, i, maxIter);\n    }\n  }\n  return 1.0;\n}\n\nfn _fractal_julia(z_in: vec2f, c: vec2f, maxIter: i32) -> f32 {\n  var z = z_in;\n  for (var i: i32 = 0; i < maxIter; i++) {\n    z = vec2f(z.x*z.x - z.y*z.y + c.x, 2.0*z.x*z.y + c.y);\n    if (dot(z, z) > 4.0) {\n      return _fractal_smooth(z, c, i, maxIter);\n    }\n  }\n  return 1.0;\n}\n";
 /**
  * GPU GCD preamble (GLSL syntax).
  * Tolerant floating Euclidean algorithm: terminates when the remainder falls
@@ -72390,6 +72884,20 @@ export interface CompileTarget<Expr = unknown> {
      */
     bareStatementBlocks?: boolean;
     /**
+     * On a shader target, the nodes of the body of the innermost enclosing
+     * `Loop` that can emit a jump as a statement of that loop: each `Break` and
+     * `Continue` with no operand, and each `If` or `Which` with one clause, that
+     * is reached from the body through statement positions only
+     * (`gpuShaderLoopJumps()`).
+     *
+     * A `break` outside a loop is a shader compile error, and a jump in an
+     * operand has no statement to stand in. So a jump that is not in this set
+     * declines: in a value position, in the body of a user function, and when no
+     * `Loop` encloses it. Absent on every other target, and outside a shader
+     * `Loop`.
+     */
+    shaderLoopJumps?: ReadonlySet<Expr>;
+    /**
      * Statement-hoisting sink for a `bareStatementBlocks` target (GLSL/WGSL).
      *
      * A lowering that needs statements — the loop form of `Sum`/`Product` — can
@@ -72497,12 +73005,17 @@ export interface CompileTarget<Expr = unknown> {
      * loop whose iteration count would exceed the budget (including infinite
      * or `NaN` bounds) evaluates to `NaN` instead of running. Internal numeric
      * probes (the Richardson limit ladder) set this so a single compiled call
-     * stays cheap enough for the engine deadline to be honored between calls;
-     * it is never set on user-facing `compile()` paths, whose loops remain
-     * unguarded (zero overhead).
+     * stays cheap enough for the engine deadline to be honored between calls.
+     * The `compile()` option of the same name sets it for a host. A compilation
+     * with no budget has no check at all (zero overhead).
      *
      * It also caps (floors, then truncates to) the `PointList` zip length on the
      * JavaScript target — a capped point list is truncated, not `NaN`-poisoned.
+     *
+     * On the JavaScript and `interval-js` targets it also limits the passes of a
+     * `Loop` in one call of the compiled code (`loopPassCount()`,
+     * `docs/COMPILATION-MODEL.md`, "A limit on `Loop` passes"). The Python target
+     * declines a `Loop` when it is set.
      */
     iterationBudget?: number;
     /**
@@ -73869,6 +74382,30 @@ export interface CompilationOptions<Expr = unknown> {
      * truncates to) the `PointList` zip length on the JavaScript target — a
      * capped point list is truncated, not `NaN`-poisoned. See
      * `CompileTarget.iterationBudget`.
+     *
+     * It also limits a `Loop` on the JavaScript and `interval-js` targets. Each
+     * iteration of a `Loop` adds one to one total for a call of the compiled
+     * code, including nested loops and the loops in the bodies of user functions.
+     * Over the budget, the code throws a `CancellationError` with the cause
+     * `'iteration-limit-exceeded'`: a `Loop` has no value to replace with `NaN`.
+     * The limit is a count, not a time.
+     *
+     * `broadcast()` gives `NaN` for such a cell, as for any error of a cell, and
+     * only the slice form counts the failures: a synchronous `broadcast()` gives
+     * the `NaN` with no report. The budget applies to each cell, so a batch costs
+     * up to the number of cells times the budget.
+     *
+     * Code that counts passes and whose value is a function, other than a
+     * `Function` literal at the root, declines. Its calls would share one total.
+     *
+     * The Python target declines a program with a `Loop` when this option is set.
+     * The GLSL and WGSL targets do not change: a `Loop` there has bounds that are
+     * known at compile time. Without the option, the code of a `Loop` has no
+     * check.
+     *
+     * ```ts
+     * const { run } = compile(expr, { iterationBudget: 1e6 });
+     * ```
      */
     iterationBudget?: number;
     /**
@@ -74658,6 +75195,12 @@ export type CompilationResult<T extends string = string, R = DefaultRunnerResult
      * (including its `success: false` fallback) and on successful direct-target
      * compiles (where it is `[]`).
      *
+     * The list of a result with `success: true` is always empty. A name that
+     * the expression binds (a local function, a parameter of a function
+     * literal, an index) is never in the list: when a call of such a name
+     * declines (`(f) ↦ f(2)` calls a function value, which compiled code does
+     * not do), the `error` and the `diagnostic` name it.
+     *
      * On a decline, the interpreter fallback also adds to this list the names
      * of the inputs whose static type is `unknown` or `any` (diagnostic code
      * `'untyped-input'`), also when another reason declines first, so that the
@@ -74714,14 +75257,15 @@ export type CompilationResult<T extends string = string, R = DefaultRunnerResult
      */
     storageBuffers?: StorageBufferLayout[];
     /**
-     * Shader targets only. Facts about a SUCCESSFUL compilation that the caller
-     * may need to decide whether to use the code, with the same shape as
-     * `diagnostic` (which is set on a decline only). Nothing was withdrawn: the
-     * code is complete. `kind: 'correctness'` here means that a value the code
-     * computes can differ from the exact value.
+     * Facts about a SUCCESSFUL compilation that the caller may need to decide
+     * whether to use the code, with the same shape as `diagnostic` (which is
+     * set on a decline only). Nothing was withdrawn: the code is complete.
+     * `kind: 'correctness'` here means that a value the code computes can
+     * differ from the exact value.
      *
-     * Today one code: `'float32-unsafe-argument'`. The code has a `Mod` or
-     * `Fract` operand in which a constant of magnitude 1000 or more multiplies
+     * On the shader targets, one code: `'float32-unsafe-argument'`. The code
+     * has a `Mod` or `Fract` operand in which a constant of magnitude 1000 or
+     * more multiplies
      * a trigonometric call, with no exact form (see `float32Bounds`), so its
      * float32 value can have no relation to the exact value: a sine hash such
      * as `fract(43758.5453·sin(12.9898·x))` draws noise of a different pattern
@@ -74734,6 +75278,17 @@ export type CompilationResult<T extends string = string, R = DefaultRunnerResult
      *
      * The `compileFunction` and `compileShader` routes return a string, so
      * they emit the same code with no warning and no `float32Bounds`.
+     *
+     * On the `javascript` target, one code: `'copying-list-update'`, with
+     * `kind: 'capability'`. A block local updated with
+     * `xs = ReplaceAt(xs, …)` in the body of a `Loop` keeps the copying form,
+     * so each pass of the loop copies the whole list: the list has another
+     * name, is used in a way that could see a write in place, or is a local of
+     * the body of an enclosing loop, which is never written in place. `binding` is
+     * the name of the local and `value` the first such update, as `toString()`
+     * writes it. One entry for each such local of each block. An update that is
+     * not in a loop copies once and is not reported. The emitted code is the
+     * same with or without the warning.
      *
      * Absent when there is nothing to report.
      */
@@ -79032,15 +79587,22 @@ export declare const NAMED_LOWERING_HEADS: ReadonlySet<string>;
  */
 export declare const BINARY_INFIX_VALUE_OPERATORS: ReadonlySet<string>;
 /**
- * The heads whose JavaScript code is an infix operator, or a scalar kernel,
- * that gives a wrong value for an array operand: `[1, 2] + [3, 4]` is the
- * string `"1,23,4"`, `[1, 2] * [3, 4]` is `NaN`, `[1, 2] < 3` is `false`
- * where the interpreter gives `[True, True]`, and `[1, 2] = [1, 2]` is
- * `false`. The JavaScript target declines these heads, and every other
- * head whose definition is `broadcastable` (`Sin`, `Sqrt`, `Abs`, …), over
- * an operand declared `any` or `value`, whose value can be a list
- * (`assertNoDeclaredTopOperands()`, `compile-admission.ts`): the scalar
- * kernel of such a head gives `NaN` for an array (`Math.sin([1, 2])`).
+ * The heads whose scalar code gives a wrong value for a list operand. In
+ * JavaScript, `[1, 2] + [3, 4]` is the string `"1,23,4"`, `[1, 2] * [3, 4]` is
+ * `NaN`, `[1, 2] < 3` is `false` where the interpreter gives `[True, True]`,
+ * and `[1, 2] = [1, 2]` is `false`. In Python, `[1, 2] + [3, 4]` is
+ * `[1, 2, 3, 4]`, and `2 * [1, 2]` is `[1, 2, 1, 2]`. `Max` and `Min` with one
+ * scalar operand are that operand, where the interpreter reduces a list:
+ * `Max(p)` with `p = [1, 5]` is 5.
+ *
+ * The JavaScript, Python and `interval-js` targets decline these heads, and
+ * every other head whose definition is `broadcastable` (`Sin`, `Sqrt`, `Abs`,
+ * …), over an operand declared `any` or `value`, whose value can be a list
+ * (`assertNoDeclaredTopOperands()`, `compile-admission.ts`). On JavaScript, the
+ * scalar kernel of such a head gives `NaN` for an array (`Math.sin([1, 2])`).
+ * On Python, `np.sin` accepts a list and gives the correct values as an array;
+ * it declines too, because compiled code settles the shape of each value at
+ * compile time.
  */
 export declare const DECLARED_TOP_DECLINE_HEADS: ReadonlySet<string>;
 /**
@@ -80509,7 +81071,7 @@ import { correlation, covariance, populationCovariance } from '../numerics/stati
 import { rangeCount } from '../numerics/range-count.js';
 import type { RoundingTies } from '../types-definitions.js';
 import { type RandomSeedFrame } from '../numerics/random.js';
-import { type DeadlineFrame } from '../../common/interruptible.js';
+import { makeLoopPassCounter, type DeadlineFrame } from '../../common/interruptible.js';
 import { type BroadcastBatchBody, type BroadcastSlice } from './broadcast.js';
 import type { BroadcastAsyncOptions, BroadcastAsyncResult, BroadcastInputs, BroadcastOptions, CompiledColor, ComplexResult, StoredBatchBody, StoredEntryPlan } from './types.js';
 import type { KernelPool } from '../kernel-pool-types.js';
@@ -81455,10 +82017,13 @@ export declare const SYS_HELPERS: {
     atPoint: (arr: unknown, i: unknown, n: number) => unknown;
     atPointNoWrap: (arr: unknown, i: unknown, n: number) => unknown;
     replaceAt: (arr: unknown, i: unknown, v: unknown) => unknown[];
+    replaceAtPath: (arr: unknown, ...rest: unknown[]) => unknown[];
     deleteAt: (arr: unknown, i: unknown) => unknown;
     insert: (arr: unknown, i: unknown, v: unknown) => unknown[];
     replaceAtInPlace: (x: unknown, ...updates: unknown[]) => unknown[];
+    replaceAtPathInPlace: (x: unknown, levels: number, ...updates: unknown[]) => unknown[];
     ownedCopy: (x: unknown) => unknown;
+    ownedCopyLevels: (x: unknown, levels: number) => unknown;
     atNumeric: (arr: unknown, i: number | unknown[], elementType: string) => number | unknown[];
     atChecked: (arr: ArrayLike<number>, i: unknown) => number | unknown[];
     atNoWrap: (arr: unknown, i: unknown) => unknown;
@@ -81760,7 +82325,7 @@ export type LazyStreamSysHelpers = {
     takeWhileIter: (it: Iterable<unknown>, p: (x: unknown) => unknown) => unknown[];
     listRecursion: (op: string, args: unknown[], step: (...args: unknown[]) => unknown) => unknown;
 };
-export type SysHelpers = typeof SYS_HELPERS & RandomSysHelpers & LazyStreamSysHelpers;
+export type SysHelpers = typeof SYS_HELPERS & RandomSysHelpers & LazyStreamSysHelpers & ReturnType<typeof makeLoopPassCounter>;
 /**
  * The state the engine-bound helpers of `_SYS` read each time they run, never
  * when the code is compiled. The engine passes its own (`ce._liveRandom`,
@@ -82556,15 +83121,34 @@ export declare function analyzeReferences(expr: Expression, target: CompileTarge
  */
 export declare function isNamesTarget(t: Expression): boolean;
 /**
- * Attach `freeSymbols` / `unsupported` (from `analyzeReferences`) and the
- * mode report (`mode`) to a compilation result, returning the
- * same object. Used by the built-in targets to make every result carry its
- * declarative reference analysis and the discipline it was compiled under.
+ * Attach `freeSymbols` and `freeSymbolTypes` (from `analyzeReferences`),
+ * `unsupported` and the mode report (`mode`) to a compilation result,
+ * returning the same object. Used by the built-in targets to make every
+ * result carry its declarative reference analysis and the discipline it
+ * was compiled under.
  *
  * The report is the one frozen when the outermost compilation ended
  * (`modeReport`): `mode` is the mode the code was compiled under.
+ *
+ * `unsupported` is empty for a compilation that produced code. The
+ * compiler throws for an operator that the target does not lower, so no
+ * such operator is in the expression. The list that `analyzeReferences()`
+ * gives is not used for such a result: it is a static walk that does not
+ * follow every rule of the compiler, and it named operators that were
+ * lowered. The program `function f(x) { x + 1 }` then `f(2)` compiles to
+ * `let f = ((x) => x + 1)` on JavaScript, and the walk gave
+ * `["DefineFunction", "f"]`: it reads the definition as an operator with
+ * no lowering, and it does not know that `f` is a local function.
+ *
+ * A declined result keeps the list of the walk. The interval target passes
+ * one here: `compileToIntervalTarget()` returns `success: false` for an
+ * operator with no interval kernel, and does not throw. Every other
+ * decline gets the list of the walk in `buildInterpreterFallback()`. On a
+ * decline the list can name `DefineFunction` beside the operator that
+ * caused the decline.
  */
 export declare function withReferences<R extends {
+    success?: boolean;
     freeSymbols?: string[];
     unsupported?: string[];
     mode?: 'strict' | 'complex' | 'bigint';
@@ -83218,6 +83802,7 @@ export declare function compileExprRestriction(args: ReadonlyArray<Expression>, 
 export declare function compileExprAssertPresent(h: string, args: ReadonlyArray<Expression>, target: CompileTarget<Expression>): TargetSource | undefined;
 import type { Expression } from '../global-types.js';
 import type { Type } from '../../common/type/types.js';
+import type { CompileDiagnostic, CompileTarget } from './types.js';
 /**
  * For the step of a fold, `(acc, x) => body`, the operand arrays of the
  * `ReplaceAt` chains that can update the accumulator in place, or `undefined`
@@ -83267,12 +83852,15 @@ export declare function inPlaceUpdateChains(step: Expression): ReadonlyArray<Exp
  *   in the list must be one of these: the target of an `Assign` or a
  *   `Declare` that is a statement, the innermost list operand of a chain
  *   assigned to `name`, the first operand of a read in
- *   `NON_RETAINING_READS`, or a statement by itself. A statement of the list
- *   gives its value to nothing but the block, and nothing in the block runs
- *   after its last statement. A mention anywhere else, in particular in a
- *   function literal, which can be called after an update, keeps the copying
- *   form for every update of the local. A nested scope that binds the same
- *   name is counted as such a mention, which can only keep a copy that is
+ *   `NON_RETAINING_READS`, the first operand of a `ReplaceAt` with one position
+ *   that is not such a chain, or a statement by itself. That `ReplaceAt` keeps
+ *   the copying form and gives a new outer array, which shares only rows with
+ *   the local, and a write with one position does not change a row. A statement
+ *   of the list gives its value to nothing but the block, and nothing in the
+ *   block runs after its last statement. A mention anywhere else, in particular
+ *   in a function literal, which can be called after an update, keeps the
+ *   copying form for every update of the local. A nested scope that binds the
+ *   same name is counted as such a mention, which can only keep a copy that is
  *   not needed.
  *
  * The emitted code is in `OWNED_LOCAL_UPDATE_OPS`.
@@ -83280,6 +83868,19 @@ export declare function inPlaceUpdateChains(step: Expression): ReadonlyArray<Exp
  * The indexes and values of a chain may read `name`: the emitted code
  * computes them before the first write, as for a fold
  * (`inPlaceUpdateChains`). Requested in issue #386 (CE-329).
+ *
+ * A write with more than one position (`m = ReplaceAt(m, j, i, v)`) also
+ * writes the rows in place, so a row must not be visible to anything else.
+ * Two further conditions apply. Every chain of the local has the same number
+ * of positions: the emitted code copies that number of levels at the first
+ * update, and a write with fewer positions could store a row that the block
+ * does not own, which a later write would change. And a read may not hand out
+ * a row: `NON_RETAINING_READS` holds `At(m, j)` and `First(m)`, which give a
+ * row to whatever reads them, and the array that a copying `ReplaceAt` gives
+ * shares rows with `m`. The only reads allowed are the first operand of
+ * `Length`, `Count` or `IsEmpty` with no other operand, and of an `At` with
+ * one numeric position for each level written, which reads an element below
+ * every array the block writes. Any other mention keeps the copying form.
  */
 export declare function ownedLocalUpdateChains(stmts: ReadonlyArray<Expression>, name: string): ReadonlyArray<Expression>[] | undefined;
 /**
@@ -83293,10 +83894,45 @@ export declare function ownedLocalUpdateChains(stmts: ReadonlyArray<Expression>,
  *
  *     (_tv1 = _SYS.replaceAtInPlace(xs === _tv1 ? xs : (_tv1 = _SYS.ownedCopy(xs)), i, v))
  *
+ * A chain with two positions copies two levels and writes both of them:
+ *
+ *     (_tv1 = _SYS.replaceAtPathInPlace(m === _tv1 ? m : (_tv1 = _SYS.ownedCopyLevels(m, 2)), 2, j, i, v))
+ *
  * If the compiler passes a different array, the update keeps the copying
  * form, which is slower but correct.
  */
 export declare const OWNED_LOCAL_UPDATE_OPS: WeakMap<readonly Expression[], string>;
+/**
+ * For a local `name` of the statement list `stmts` of a block, the first
+ * statement `name = ReplaceAt(name, …)` (a chain of `ReplaceAt` whose
+ * innermost list operand is `name`) that is inside the body of a `Loop` of
+ * the list, or `undefined` when there is none.
+ *
+ * The block lowering (`compileBlock`) calls it for a local whose updates
+ * keep the copying form (`ownedLocalUpdateChains` gives `undefined`): each
+ * pass of such a loop then copies the whole list. A copy that is not in a
+ * loop is made once, and is not reported. The loop-body lowering
+ * (`compileLoopBody`) writes no local in place, and calls it for each local
+ * of the body.
+ *
+ * The walk does not enter a function literal, whose body runs when the
+ * function is called, not as part of the loop, nor a nested block that
+ * binds `name`, which is another local. Each node is visited once for each
+ * value of "inside a loop", as an expression can share subtrees.
+ */
+export declare function copyingUpdateInLoop(stmts: ReadonlyArray<Expression>, name: string): Expression | undefined;
+/**
+ * Record a warning for the compilation that `target` belongs to: the
+ * statement `update`, which assigns a `ReplaceAt` of the local `name` to
+ * `name` in a loop, copies the list on each pass. The warning is recorded
+ * once for each update node, as a block can be compiled more than once in
+ * one compilation. Two blocks with the same text are two nodes, and each
+ * gets its warning.
+ */
+export declare function noteCopyingUpdateInLoop(target: CompileTarget<Expression>, name: string, update: Expression): void;
+/** The warnings that `noteCopyingUpdateInLoop` recorded for the compilation
+ * that `target` belongs to. */
+export declare function copyingUpdateWarnings(target: CompileTarget<Expression>): CompileDiagnostic[];
 /**
  * Fail closed when the seed of a fold does not fit the type the step's first
  * parameter was given. A parameter without an
@@ -85386,9 +86022,9 @@ export declare function exactRationalDivisor(x: Expression): {
  * for a consumer that declares every parameter `any`. A call of a user
  * function typed `any` and a `broadcastable<T>` type keep their reading.
  *
- * The JavaScript target declines an arithmetic site over such a symbol
- * (`assertNoDeclaredTopOperands()`, `compile-admission.ts`), because its
- * value can be a list.
+ * The JavaScript, Python and `interval-js` targets decline an arithmetic site
+ * over such a symbol (`assertNoDeclaredTopOperands()`, `compile-admission.ts`),
+ * because its value can be a list.
  *
  * `_target` is the target that compiles `e`, when it is not the target of
  * the call site in progress. The answer does not depend on it: the shape of
@@ -86315,7 +86951,9 @@ export declare function compileExprCapturedBody(engine: ComputeEngine, h: string
 /**
  * The element-wise JavaScript broadcast of a `broadcastable` head over list
  * operands. A case of `compileExpr`: it returns the code, or `undefined` when
- * `compileExpr` continues with its next case.
+ * `compileExpr` continues with its next case. On the JavaScript, Python and
+ * `interval-js` targets, it first declines an operand declared `any` or
+ * `value` (`declineElementwiseOverDeclaredTop()`).
  */
 export declare function compileExprElementwiseBroadcast(engine: ComputeEngine, h: string, args: ReadonlyArray<Expression>, prec: number, target: CompileTarget<Expression>, node: Expression | undefined): TargetSource | undefined;
 /**
@@ -86769,13 +87407,18 @@ node?: Expression): TargetSource;
  * the clause before it, with a statement sink of its own, so a statement
  * it hoists runs only when that clause is reached.
  *
- * The form is taken only when a branch or a condition assigns a variable
- * (outside a function literal, whose body is not run here) and no operand
- * contains a `Return`, `Break` or `Continue`: those keep the gates of the
- * expression form. A condition must be a scalar boolean, because an `if`
- * statement takes a `bool`. A condition that is not `true` (a comparison
- * with a NaN operand gives `false`) runs the next clause, as the
- * expression form selects its `else` operand.
+ * The form is taken when a branch or a condition assigns a variable (outside
+ * a function literal, whose body is not run here) and no operand contains a
+ * `Return`, `Break` or `Continue`. It is also taken, on both languages, for a
+ * selection with one clause that is a statement of a `Loop` body and holds a
+ * `Break` or a `Continue` (`CompileTarget.shaderLoopJumps`): a ternary cannot
+ * hold a jump. Any other selection with a jump, and any selection with a
+ * `Return`, keeps the expression form, which declines it. An `If` whose else
+ * branch is `Nothing` has no else: that branch does nothing in statement
+ * position. A condition must be a scalar boolean, because an `if` statement
+ * takes a `bool`. A condition that is not `true` (a comparison with a NaN
+ * operand gives `false`) runs the next clause, as the expression form selects
+ * its `else` operand.
  */
 export declare function shaderSelectionStatement(stmt: Expression, target: CompileTarget<Expression>): string | undefined;
 /**
@@ -91474,6 +92117,8 @@ interface IntervalKindEntry {
  */
 export declare class ComputeEngineIntervalFunction extends Function {
     IA: {
+        countLoopPass: (budget: number) => void;
+        resetLoopPasses: () => void;
         ok: typeof import("../interval/util.js").ok;
         point: typeof import("../interval/util.js").point;
         containsExtremum: typeof import("../interval/util.js").containsExtremum;
@@ -92700,6 +93345,26 @@ import { type MatchStatementClause } from './base-compiler.js';
  * user identifier.
  */
 export declare function gpuAssertReturnPlacement(subject: string, body: string, language: string): void;
+/**
+ * The nodes of `body`, the body of a shader `Loop`, that can emit a jump as a
+ * statement of that loop (`CompileTarget.shaderLoopJumps`).
+ *
+ * The search follows statement positions only: the statements of a `Block`,
+ * and the branch of an `If` or a `Which` with one clause (`If(c, t)`,
+ * `If(c, t, Nothing)`, `Which(c, t)`). It does not enter a nested `Loop`, which
+ * owns its jumps and makes this set for its own body.
+ *
+ * A selection with a second clause is left out, so `If(c, Break(), n ≔ 1)`
+ * declines and the interpreter runs it. When the first branch always leaves the
+ * loop, a program can write the else branch as the statement after the `If`.
+ * `Which(True, t)` is left out too: its branch always runs, so it is not a
+ * condition.
+ *
+ * A `Break` with an operand is left out. The compiled `break` has no value, and
+ * the interpreter evaluates the operand before it leaves the loop, so an effect
+ * of `Break(f(k))` would be lost.
+ */
+export declare function gpuShaderLoopJumps(body: Expression): ReadonlySet<Expression>;
 /**
  * Fail closed when `code`, produced by an **expression-only** route, is
  * not a single expression of the target language.
@@ -98620,6 +99285,11 @@ export declare class _Parser implements Parser {
         inferred?: boolean;
     } | undefined;
     /**
+     * See {@link Parser.isLibraryFunction}: a parser-local binding shadows the
+     * library, as in `resolveSymbol()`.
+     */
+    isLibraryFunction(id: MathJsonSymbol): boolean;
+    /**
      * Whether `name` is claimed by a `kind: 'function'` dictionary entry's
      * `symbolTrigger` (`log`, `lcm`, `var`, …). Such a name owns its call
      * syntax — including any subscript, which its parser may bind as an
@@ -100409,6 +101079,15 @@ export type ParseLatexOptions = NumberFormat & {
      */
     onBoundVariable?: (name: string) => void;
     /**
+     * Internal hook that says whether a name is a function of a library of the
+     * engine. `ce.parse()` wires it. A parser with no engine has no library, and
+     * reads every assignment target as a definition. Not part of the public
+     * parsing surface.
+     *
+     * @internal
+     */
+    isLibraryFunction?: (symbol: MathJsonSymbol) => boolean;
+    /**
      * Controls how quantifier scope is determined when parsing expressions
      * like `\forall x. P(x) \rightarrow Q(x)`.
      *
@@ -100587,6 +101266,13 @@ export interface Parser {
         subscriptEvaluate?: boolean;
         inferred?: boolean;
     } | undefined;
+    /**
+     * Whether `id` is a function of a library of the engine, so that a LaTeX
+     * assignment cannot define it. A parameter of a function that the parser is
+     * reading, and the name of that function, are not the library function. A
+     * parser with no engine gives `false`.
+     */
+    isLibraryFunction(id: MathJsonSymbol): boolean;
     /**
      * Whether `name` is claimed by a `kind: 'function'` dictionary entry's
      * `symbolTrigger` (`log`, `lcm`, `var`, …). Such a name owns its call
@@ -102035,6 +102721,25 @@ export declare const DEFINITIONS_CALCULUS: LatexDictionary;
 import { MathJsonExpression } from '../../../math-json/types.js';
 import { LatexDictionary, Parser } from '../types.js';
 /**
+ * The logical connectives that bind more loosely than `:` and whose value is a
+ * boolean. `Proves`, `Entails` and `Satisfies` also bind more loosely, but they
+ * state a relation between formulas and do not give a condition.
+ */
+export declare const BRACE_GROUP_CONNECTIVES: ReadonlySet<string>;
+/**
+ * An item of a brace group, with its `:` moved out of its logical connectives
+ * (`BRACE_GROUP_CONNECTIVES`).
+ *
+ * `:` binds tighter than these connectives, which is right outside a brace
+ * group. Inside one, the `:` separates a whole condition from a whole value:
+ * `\{m = 1 \land z < 1: 2\}` is the condition `m = 1 \land z < 1` with the value
+ * 2, and it parses as `And(m = 1, Colon(z < 1, 2))`. In the same way,
+ * `\{x \in S: x > 0 \implies x > 1\}` has the condition `x > 0 \implies x > 1`,
+ * and it parses as `Implies(Colon(x \in S, x > 0), x > 1)`. An item with two `:`
+ * under one connective has no such reading, and it stays as it is.
+ */
+export declare function colonOverConnectives(expr: MathJsonExpression): MathJsonExpression;
+/**
  * Library constants that every engine declares with a numeric type. A
  * juxtaposition of one of these with a parenthesized group re-parses as a
  * product in any engine, so the serializer needs no explicit multiplication
@@ -102811,10 +103516,6 @@ export declare function reassignmentBaseSignature(signature: Type, validation: T
  * no return type and may annotate no parameter, yet IS an annotation: the
  * effects it states are the author's contract. */
 export declare function functionLiteralHasAnnotation(literal: Expression): boolean;
-/** Mark `def` as a definition that a `Declare` statement passes to
- * `ce.declare()`: the declaration does not enforce the default-`!scope`
- * ceiling. See `STATEMENT_DECLARATIONS`. */
-export declare function markStatementDeclaration<T extends object>(def: T): T;
 export declare function reconcileFunctionLiteralReturn(ce: IComputeEngine, literal: Expression, declaredType: Type, 
 /** The symbol that receives the literal, named by the error when the body
  * contradicts the declared result (`assertBodyResultNotDisjoint`). */
@@ -103181,7 +103882,7 @@ export declare function noteScopeDeclaration(scope: object): void;
 export declare function scopeChainDeclarationCount(scope: {
     parent: unknown;
 } | null | undefined): number;
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 import { ComputeEngine as ComputeEngineImpl } from './compute-engine/index.js';
 import type { IComputeEngine } from './compute-engine/types.js';
 /** The constructor (and statics) of {@link ComputeEngine}. */
@@ -103278,7 +103979,7 @@ export interface ComputeEngineGlobal {
     sym: typeof sym;
     compile: typeof compile;
 }
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 import { ComputeEngine as ComputeEngineImpl } from './compute-engine/index.js';
 import type { IComputeEngine } from './compute-engine/types.js';
 /** The constructor (and statics) of {@link ComputeEngine}. */
@@ -103436,6 +104137,35 @@ export declare function binderSitesOf(ce: ComputeEngine, node: MathJsonExpressio
  * program will run on (its bindings shadow the library). Returns `ast`.
  */
 export declare function resolveLibraryNames(ast: MathJsonExpression, source: string, ce: ComputeEngine): MathJsonExpression;
+import type { ComputeEngine } from '../compute-engine.js';
+import { type ParsingDiagnostic } from './diagnostics.js';
+import type { ExecuteEpsilOptions } from './execute-epsil.js';
+export interface CheckEpsilResult {
+    /** The parse diagnostics, and the `static-type-error` and
+     * `variable-redeclaration` diagnostics of the static pass. These are the
+     * diagnostics that `executeEpsil` reports before it runs a statement. A
+     * problem found only when a statement runs (a `runtime-error`) is not in
+     * this list. */
+    diagnostics: ParsingDiagnostic[];
+}
+/**
+ * Check an Epsil program against a compute engine without running it.
+ *
+ * The program is parsed as `executeEpsil` parses it: the engine's declared
+ * type names, protocol names and sum variants are known to the parser, so an
+ * annotation that names a type the host declared is not an error. The static
+ * pass then canonicalizes each statement in a scope of its own and rolls back
+ * the types and protocols that the program declares. So the check assigns no
+ * value, defines no function and declares no type on `ce`, and a host can run
+ * it on a shared engine, for example after each edit of a program.
+ *
+ * The static pass is skipped when the parse gives an error, because the tree
+ * of a program that does not parse is a guess.
+ *
+ * An expired time limit of `ce` (`ce.withTimeLimit()`) is thrown to the
+ * caller as a `CancellationError`.
+ */
+export declare function checkEpsil(ce: ComputeEngine, source: string, options?: ExecuteEpsilOptions): CheckEpsilResult;
 /**
  * The reserved words that are LITERALS: they cannot name a binding (the
  * verbatim `` `word` `` form still can). `true`/`false` are the boolean
@@ -104117,6 +104847,32 @@ export interface ExecuteEpsilResult {
      * are none. */
     valueNotes?: DiagnosticNote[];
 }
+/**
+ * Parse and execute an Epsil program against a compute engine.
+ *
+ * Flow (plan §1): parse → report canonicalization-time type errors (nothing
+ * runs; see `staticDiagnostics()`) → evaluate each top-level statement
+ * **sequentially in `ce`'s current scope** (so a notebook cell-chain's
+ * declarations persist — no scope is pushed around the whole program; engine
+ * `Block`/`Function` still scope themselves). The returned `value` is the last
+ * statement's evaluated value.
+ *
+ * Two invariants (`docs/principles.md`, plan §5):
+ *  - **Symbolic-by-default.** Evaluation uses the engine's exactness contract:
+ *    `ln(2)` stays symbolic; numeric approximation is explicit (`N(expr)`).
+ *  - **Errors are values.** A runtime problem becomes an `["Error", …]` value
+ *    captured into `value`; nothing throws to the host. *Parse* problems (and a
+ *    `#error` directive) go to `diagnostics`.
+ *
+ * `while`/`for` lower to the engine's imperative `Loop` (see `parser.ts`), so
+ * they evaluate as ordinary engine primitives — no special handling here.
+ */
+/** Every sum VARIANT the engine knows, mapped to the sum that declared it
+ * (`_sumOf`, recorded by `declareSumType`). Read through the resolver, which
+ * is the public window onto the engine-global type registry. */
+export declare function sumVariantNames(ce: ComputeEngine): Record<string, string>;
+/** A new batch id, for a run of `executeEpsil` or a check by `checkEpsil`. */
+export declare function nextEpsilBatchId(): number;
 export declare function executeEpsil(ce: ComputeEngine, source: string, options?: ExecuteEpsilOptions): ExecuteEpsilResult;
 /**
  * Parse and execute an Epsil program as `executeEpsil` does, with each
@@ -104154,7 +104910,7 @@ export declare function errorFrameChain(error: MathJsonExpression): string;
 /**
  * Diagnostic codes shared by the Epsil lexer, parser, and presentation layer.
  */
-export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'expression-nesting-limit' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'type-variables-unsupported' | 'empty-type-parameter-clause' | 'duplicate-type-parameter' | 'duplicate-type-parameter-clause' | 'generic-clause-unsupported' | 'hold-literal-parameter' | 'bind-requires-hold' | 'unexpected-definition-attribute' | 'duplicate-definition-attribute' | 'type-declaration-not-top-level' | 'type-redefinition' | 'object-type-not-inline' | 'protocol-redefinition' | 'function-redefinition' | 'absence-marker-binding' | 'variable-redeclaration' | 'protocol-declaration-not-top-level' | 'protocol-name-expected' | 'protocol-member-keyword-missing' | 'protocol-member-signature-expected' | 'protocol-extends-member-conflict' | 'protocol-implementation-pending' | 'protocol-in-type-position' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'static-type-error' | 'evaluation-canceled' | 'unknown-function' | 'print-not-available' | 'type-not-callable' | 'protocol-property-not-callable' | 'assign-in-condition' | 'chained-assignment' | 'destructuring-bare-equal' | 'control-outside-loop' | 'parameter-shadows-constant' | 'zero-index' | 'floor-division-comment' | 'latex-parsing-unavailable' | 'conditional-else-expected' | 'conditional-if-line-start' | 'match-case-arrow-expected' | 'match-case-separator' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'match-not-exhaustive' | 'if-let-equal-expected' | 'if-let-irrefutable' | 'while-let-equal-expected' | 'while-let-irrefutable' | 'type-pattern-unsupported' | 'range-pattern-bounds' | 'range-pattern-step' | 'range-pattern-empty' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'mapsto-arrow-expected' | 'mapsto-arrow-legacy' | 'parameter-name-mismatch' | 'pattern-binding-expected' | 'pattern-element-annotation' | 'default-value-invalid' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
+export type DiagnosticCode = 'asymmetric-operator-whitespace' | 'reserved-word' | 'binary-number-expected' | 'closing-bracket-expected' | 'decimal-number-expected' | 'dictionary-key-value-expected' | 'duplicate-dictionary-key' | 'eof-expected' | 'empty-verbatim-symbol' | 'end-of-comment-expected' | 'exponent-expected' | 'expression-expected' | 'expression-nesting-limit' | 'hexadecimal-number-expected' | 'invalid-symbol-name' | 'type-annotation-error' | 'type-variables-unsupported' | 'empty-type-parameter-clause' | 'duplicate-type-parameter' | 'duplicate-type-parameter-clause' | 'generic-clause-unsupported' | 'hold-literal-parameter' | 'bind-requires-hold' | 'unexpected-definition-attribute' | 'duplicate-definition-attribute' | 'type-declaration-not-top-level' | 'type-redefinition' | 'object-type-not-inline' | 'protocol-redefinition' | 'function-redefinition' | 'absence-marker-binding' | 'variable-redeclaration' | 'protocol-declaration-not-top-level' | 'protocol-name-expected' | 'protocol-member-keyword-missing' | 'protocol-member-signature-expected' | 'protocol-extends-member-conflict' | 'protocol-implementation-pending' | 'protocol-in-type-position' | 'host-pragma-disabled' | 'error-directive' | 'runtime-error' | 'static-type-error' | 'evaluation-canceled' | 'unknown-function' | 'print-not-available' | 'type-not-callable' | 'protocol-property-not-callable' | 'assign-in-condition' | 'chained-assignment' | 'assignment-to-list-element' | 'destructuring-bare-equal' | 'control-outside-loop' | 'parameter-shadows-constant' | 'zero-index' | 'floor-division-comment' | 'latex-parsing-unavailable' | 'conditional-else-expected' | 'conditional-if-line-start' | 'match-case-arrow-expected' | 'match-case-separator' | 'match-alternative-binding' | 'match-multiple-rest' | 'match-irrefutable-case' | 'match-not-exhaustive' | 'equation-not-assignment' | 'if-let-equal-expected' | 'if-let-irrefutable' | 'while-let-equal-expected' | 'while-let-irrefutable' | 'type-pattern-unsupported' | 'range-pattern-bounds' | 'range-pattern-step' | 'range-pattern-empty' | 'invalid-escape-sequence' | 'invalid-unicode-codepoint-string' | 'invalid-unicode-codepoint-value' | 'literal-expected' | 'multiline-string-expected' | 'multiline-whitespace-expected' | 'opening-bracket-expected' | 'primary-expected' | 'string-literal-opening-delimiter-expected' | 'string-literal-closing-delimiter-expected' | 'mapsto-arrow-expected' | 'mapsto-arrow-legacy' | 'parameter-name-mismatch' | 'pattern-binding-expected' | 'pattern-element-annotation' | 'default-value-invalid' | 'symbol-expected' | 'unbalanced-verbatim-symbol' | 'unexpected-symbol';
 export type DiagnosticMessage = DiagnosticCode | [DiagnosticCode, ...any];
 /**
  * The parser will attempt to continue parsing even when an error is
@@ -106244,6 +107000,27 @@ export declare class Parser {
     /** Record `node` in {@link infixRelations} when `def` is a relation. */
     private markInfixRelation;
     /**
+     * An assignment to a list element, `xs[i] = v`, is a rebinding of the list:
+     * `Assign(xs, ReplaceAt(xs, i, v))`. Lists have value semantics, so the
+     * assignment gives `xs` a new list, and another variable that holds the old
+     * list (`let a = xs` before) keeps it. A nested target, `m[j][i] = v`, and a
+     * target with several positions, `m[j, i] = v`, are the same rebinding with
+     * the positions in order: `Assign(m, ReplaceAt(m, j, i, v))`. As for any
+     * assignment, the target must be a variable that the program can assign: a
+     * `const` gives `constant-assignment`.
+     *
+     * A string position (`d["x"] = v`) is the parse diagnostic
+     * `assignment-to-list-element`, and the statement is `Nothing`, which
+     * changes no variable: `ReplaceAt` refuses a string position.
+     *
+     * Gives `null` for any other target: a symbol, and a `Field` path, which is
+     * a property store.
+     *
+     * The `xs` read by `ReplaceAt` has no source offsets: the source has one
+     * `xs`, and it is the target of the assignment.
+     */
+    private elementAssignment;
+    /**
      * A literal word is not an assignment target: `true = 5` would bind the
      * boolean literal, and `NaN = 1` a numeric one. This is the bare-target
      * position of the five-word rejection set — the other positions reject the
@@ -106566,20 +107343,22 @@ export { parseEpsil } from './epsil/parse-epsil.js';
 export { serializeEpsil } from './epsil/serialize-epsil.js';
 export { executeEpsil, executeEpsilAsync } from './epsil/execute-epsil.js';
 export { resolveLibraryNames } from './epsil/resolve-library-names.js';
+export { checkEpsil } from './epsil/check-epsil.js';
+export type { CheckEpsilResult } from './epsil/check-epsil.js';
 export { canonicalLibraryName, epsilLibraryNames, epsilNameOf, } from './epsil/library-names.js';
 export type { ExecuteEpsilOptions, ExecuteEpsilAsyncOptions, ExecuteEpsilResult, } from './epsil/execute-epsil.js';
 export type { CancellationCause } from './common/interruptible.js';
-export declare const version = "{{SDK_VERSION}}";
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
+export declare const version = "0.182.0";
 export { loadGroupTheory } from './compute-engine/library/group-theory.js';
 export type { GroupTheoryLoadOptions, GroupTheoryLoadReport, } from './compute-engine/library/group-theory.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 export { loadIdentities, FUNGRIM_CORE, } from './compute-engine/fungrim/loader.js';
 export type { IdentitiesLoadOptions, IdentitiesLoadReport, IdentitiesRuleData, IdentitiesGuardUndecidedHandler, FungrimLoadOptions, FungrimLoadReport, FungrimRuleData, FungrimGuardUndecidedHandler, FungrimManifest, FungrimShellDeclaration, FungrimRuleClass, FungrimRuleTarget, FungrimMathJson, CompiledFungrimRule, GuardSpec, } from './compute-engine/fungrim/types.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 export { loadIntegrationRules } from './compute-engine/rubi/loader.js';
 export type { IntegrationRulesLoadOptions, IntegrationRulesLoadReport, } from './compute-engine/rubi/loader.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 export type { Interval, IntervalResult, BoolInterval, } from './compute-engine/interval/types.js';
 export { ok, point, containsExtremum, unionResults, mergeDomainClip, isPoint, containsZero, isPositive, isNegative, isNonNegative, isNonPositive, width, midpoint, getValue, unwrap, unwrapOrPropagate, enclose, stripEnclosure, finiteOperand, } from './compute-engine/interval/util.js';
 export { add, sub, mul, div, negate, _mul, } from './compute-engine/interval/arithmetic.js';
@@ -106590,7 +107369,7 @@ export { IntervalArithmetic, INTERVAL_RUNTIME_VERSION, } from './compute-engine/
 export { INTERVAL_KIND, encodeIntervalResult, broadcastIntervals, type IntervalKindCode, } from './compute-engine/compilation/broadcast.js';
 export type { BroadcastInputs, BroadcastOptions, } from './compute-engine/compilation/types.js';
 export { createIntervalRuntime, type IntervalRuntime, type StoredIntervalJavaScript, } from './compute-engine/compilation/interval-runtime.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 /**
  * Entry point for `@cortex-js/compute-engine/latex-syntax`.
  *
@@ -106605,7 +107384,7 @@ export { LATEX_DICTIONARY, CORE_DICTIONARY, SYMBOLS_DICTIONARY, ALGEBRA_DICTIONA
 export type { LatexDictionaryEntry, LatexDictionary, SerializeLatexOptions, ParseLatexOptions, ApplicationContext, SymbolResolution, LatexString, Parser, Serializer, } from './compute-engine/latex-syntax/types.js';
 export type { ParseDiagnostic } from './compute-engine/types-kernel-serialization.js';
 export type { MathJsonExpression } from './math-json/types.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 /**
  * The following properties can be added to any MathJSON expression
  * to provide additional information about the expression.
@@ -106854,8 +107633,8 @@ export declare const EMOJIS: RegExp;
 export declare function validateSymbol(s: unknown): 'valid' | 'not-a-string' | 'empty-string' | 'expected-nfc' | 'unexpected-mixed-emoji' | 'unexpected-bidi-marker' | 'unexpected-script' | 'invalid-first-char' | 'invalid-char';
 export type { MathJsonExpression, MathJsonAttributes, MathJsonNumberObject, MathJsonSymbolObject, MathJsonStringObject, MathJsonFunctionObject, MathJsonDictionaryObject, MathJsonSymbol, } from './math-json/types.js';
 export { isSymbolObject, isStringObject, isFunctionObject, stringValue, operator, operand, symbol, mapArgs, dictionaryFromExpression, } from './math-json/utils.js';
-export declare const version = "0.180.0";
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
+export declare const version = "0.182.0";
 export { factorRationalPolynomial } from './compute-engine/polynomial/factor-rational.js';
 export type { RationalFactorOptions, RationalFactorization, RationalPolynomialFactor, } from './compute-engine/polynomial/factor-rational.js';
 export type { RationalCoefficient } from './compute-engine/polynomial/exact-field.js';
@@ -106881,7 +107660,7 @@ export { gcd as bigintGcd, lcm as bigintLcm, canonicalInteger as bigintCanonical
 export { gcd as bignumGcd, lcm as bignumLcm, factorial2 as bignumFactorial2, isInMachineRange, } from './compute-engine/numerics/numeric-bignum.js';
 export { gamma, gammaln, erfInv, erfc, erf, bigGammaln, bigGamma, bigDigamma, bigTrigamma, bigPolygamma, bigBeta, bigZeta, bigLambertW, digamma, trigamma, polygamma, beta, zeta, lambertW, besselJ, besselY, besselI, besselK, airyAi, airyBi, fresnelS, fresnelC, sinc, } from './compute-engine/numerics/special-functions.js';
 export { gamma as complexGamma, gammaln as complexGammaln, } from './compute-engine/numerics/numeric-complex.js';
-export declare const version = "{{SDK_VERSION}}";
+export declare const version = "0.182.0";
 export { createJavaScriptRuntime, RUNTIME_VERSION as runtimeVersion, } from './compute-engine/compilation/javascript-runtime.js';
 export type { JavaScriptRuntime, JavaScriptRuntimeOptions, RuntimeFrameInput, StoredJavaScript, } from './compute-engine/compilation/javascript-runtime.js';
 export type { RandomSeedFrame } from './compute-engine/numerics/random.js';
