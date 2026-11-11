@@ -1458,6 +1458,7 @@ through, so the failure site is still recoverable.
 console.log(ce.parse('\\ln(\\text{a}) + 2').evaluate().json);
 // ➔ ["Error",
 //      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      "'a'",
 //      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
 ```
 
@@ -1554,8 +1555,11 @@ To bind a symbol to a definition, the Compute Engine looks up the bindings table
 of the current scope. If the symbol is not found in the table, the parent 
 scope is searched, and so on until a definition is found.
 
-If no definition is found, the symbol is declared with a type of
-`unknown`, or a more specific type if the context allows it.
+If no definition is found, the symbol is not declared: it stays unbound, and
+it is bound again each time the expression is evaluated, so it reads a
+definition made later. Its type in the expression is the type that its uses
+there require (`number` for the `x` of `x + 1`), or `unknown`. `ce.infer()`
+declares such symbols with those types.
 
 ```mermaid
 flowchart TD
@@ -1563,7 +1567,7 @@ flowchart TD
   cur -- "not found" --> parent["enclosing scopes,<br/>innermost first"]
   parent -- "not found" --> global["global scope<br/>(user definitions)"]
   global -- "not found" --> system["system scope<br/>(the standard library)"]
-  system -- "not found" --> auto["declared with type unknown,<br/>or a more specific type<br/>if the context allows it"]
+  system -- "not found" --> auto["no definition: the symbol<br/>is bound when it is evaluated"]
   cur -- found --> def["definition record"]
   parent -- found --> def
   global -- found --> def
@@ -1613,6 +1617,44 @@ the free `a` resolves, the bound `x` does not.
 
 To use an assumption instead of a value (which *does* inform simplification and
 solving), use `ce.assume()` rather than `ce.assign()`.
+
+### Temporary Values
+
+`ce.withValues(values, fn)` gives symbols a value only while `fn` runs. When
+`fn` returns or throws, each symbol gets back its earlier value and type.
+While `fn` runs, every expression reads the values: an expression created
+before the call, an expression created inside `fn`, and the body of a stored
+function.
+
+```js
+ce.declare('a', 'real');
+const expr = ce.parse('a + 1');
+ce.withValues({ a: 3 }, () => expr.evaluate()).print();
+// ➔ 4
+expr.evaluate().print();
+// ➔ a + 1
+
+ce.parse('f(x) := x + a').evaluate();
+ce.withValues({ a: 1 }, () => ce.parse('f(2)').evaluate()).print();
+// ➔ 3
+```
+
+A value is checked as `ce.assign()` checks it: a value that the declared type
+of the symbol does not admit throws. The value `undefined` gives the symbol no
+value while `fn` runs, but a value that an assumption gives
+(`ce.assume(ce.parse('a = 3'))`) still applies. A constant, a symbol bound to a
+function definition, a value that is a function, and a value that `ce.assign()`
+refuses throw before any symbol gets a value.
+
+`ce.withValues()` can be called during an evaluation, for example in the
+`evaluate` handler of an operator.
+`fn` must be synchronous: the earlier values are put back when `fn` returns,
+before a promise that it returns settles.
+
+When putting back an earlier value fails, the error is thrown after every
+other value is put back. If `fn` threw too, `ce.withValues()` throws an
+`AggregateError`: its `errors` are the error of `fn` and the error of the
+restore, in this order, and its `cause` is the error of `fn`.
 
 ### Function Calls Are Bound Lexically
 
@@ -1877,6 +1919,26 @@ always `true` or `false`, never undetermined.
 (in canonical form) and never substitutes the value of a symbol. If `x` has
 been assigned the value `5`, `ce.symbol('x').isSame(5)` is `false` — one
 expression is a symbol, the other a number. Use `isEqual()` to compare values.
+
+Two symbols, or two function calls, with the same name are the same only when
+they denote the same definition. A call `Sqrt(y)` boxed before a user
+function `Sqrt` is declared in a scope is a call of the library square root; a
+call `Sqrt(y)` boxed in that scope is a call of the user function. The two are
+not `isSame`:
+
+```js
+const L = ce.box(['Sqrt', 'y']);
+ce.pushScope();
+ce.declare('Sqrt', 'function');
+ce.assign('Sqrt', ce.box(['Function', ['Add', 'x', 100], 'x']));
+const U = ce.box(['Sqrt', 'y']);
+console.log(L.isSame(U));
+// ➔ false
+ce.popScope();
+```
+
+Two calls of a library function are `isSame`, also when they come from two
+engines.
 
 - \\( x + x \\) and \\( 2x \\) are not structurally equal, one is a sum of two
   terms, the other a product
@@ -2430,6 +2492,26 @@ working precision, so `["Add", ["N", "Pi", 30], 1]` evaluates to
 `4.14159265358979323846`. The reference page for
 [`N`](/compute-engine/reference/core/#n) describes the precision and accuracy
 goals `["N", expr, ["List", p, a]]`.
+
+:::warning[Use one engine per program]
+The precision of the arbitrary-precision arithmetic is shared by every
+`ComputeEngine` instance in the program. Each time an engine is created, or
+the `precision` of an engine is set, that precision applies to all the
+engines. A program that creates two engines with different precisions gets
+the precision of the last write in both:
+
+```js
+const a = new ComputeEngine();
+a.precision = 60;
+const b = new ComputeEngine();
+b.precision = 21;
+a.parse('\\sqrt{2}').N().toString();
+// ➔ 1.4142135623730950488 (20 digits, not 60)
+```
+
+Use one engine per program, and change its `precision` when a computation
+needs more digits.
+:::
 
 
 ### Machine Precision
@@ -3377,9 +3459,10 @@ an expression.
 **To change the value or type of a symbol**, use the `value` and `type`
 properties of the symbol.
 
-A symbol does not have to be declared before it can be used. The type of a
-symbol will be inferred based on its usage or its value. If its type cannot be
-inferred, the type will be `unknown`.
+A symbol does not have to be declared before it can be used. The type of an
+undeclared symbol in an expression is the type that its use in that expression
+requires, and the type of a symbol with a value is inferred from its value.
+Otherwise the type is `unknown`.
 
 ```live show-line-numbers
 const n = ce.expr("n");
@@ -3509,30 +3592,65 @@ To limit either declaration to part of a computation, declare it inside a
 scope (see [Scope](#scope)); the constant is restored when the scope is
 exited.
 
-## Automatic Declaration
+## Undeclared Symbols
 
-An unknown symbol is automatically declared when it is first used in an
-expression.
-
-The symbol has a type of `unknown` and no value associated with it,
-so the symbol will be an **unknown**.
+Parsing or boxing an expression does not declare its symbols. A symbol with
+no definition has no value, so it is an **unknown**, and it is evaluated with
+the definition that the symbol has when the expression is evaluated.
 
 ```js
 const symbol = ce.expr("m"); // m for mystery
 console.log(symbol.type);
 // ➔ "unknown"
+console.log(ce.lookupDefinition("m"));
+// ➔ undefined
 
 ce.assign("m", 5);
 console.log(ce.symbol("m").type);
 // ➔ "integer"
 ```
 
-The inferred type is `integer`, not `"finite_integer"`: the numeric types are
-finite by default, so bare `integer` already promises a finite whole number.
+The inferred type is `integer`: the numeric types are finite by default, so
+`integer` promises a finite whole number.
 
-If the type of a symbol is inferred from its usage, the type can be 
-adjusted later as further information is provided. However, if the type is
-provided in the declaration, the type cannot be changed later.
+The type that the uses of a symbol require is kept with the expression. The
+`x` of `x + 1` has the type `number`, but the expression declares nothing, so
+another expression does not read that type:
+
+```js
+const expr = ce.parse("x + 1");
+console.log(expr.op1.type.toString());
+// ➔ "number"
+console.log(ce.box("x").type.toString());
+// ➔ "unknown"
+```
+
+**To declare the symbols of some expressions with the types that their uses
+require**, use `ce.infer()`. It declares each symbol that has no declared type
+in the scope where a declaration of the name would go, marked as inferred, and
+returns what it declared and what it skipped:
+
+```js
+const a = ce.parse("x + 1");
+const b = ce.parse("x > 1");
+ce.infer([a, b]);
+// ➔ { declared: [{ name: "x", type: number, … }], skipped: [] }
+console.log(ce.box("x").type.toString());
+// ➔ "number"
+```
+
+The order of the expressions does not change the result. A symbol whose uses
+conflict is not declared and is reported in `skipped`, with the reason
+`"conflict"`: in `x + 1` and `x(3)`, `x` is a number and a function. The
+other reasons are `"untyped"` (no use requires a type), `"defined"` (the
+symbol has a declared type) and `"out-of-scope"`.
+
+An expression reads a declaration made after it was created: after
+`ce.declare("x", "string")`, the `x` of `expr` above has the type `string`.
+
+An inferred type can be adjusted later as further information is provided.
+However, if the type is provided in the declaration, the type cannot be
+changed later.
 
 
 
@@ -3585,13 +3703,15 @@ When a symbol such as `Pi` or `Sin` is encountered in an expression, the
 Compute Engine will look up its definition in the set of known 
 symbols, including the Standard Library.
 
-### Automatic Declaration
+### Undeclared Symbols
 
 If a matching definition is found, it will be bound to the symbol and 
 used later to evaluate the expression.
 
-If no definition is found, an automatic declaration will be made of the
-symbol with a type `unknown` or a more specific type if the context allows it.
+If no definition is found, the symbol is not declared. It stays unbound
+until the expression is evaluated, and it reads the definition that the symbol
+has then. Its type in the expression is the type that its uses there require,
+or `unknown`. `ce.infer()` declares such symbols with those types.
 
 <ReadMore path="/compute-engine/guides/types" >
 Learn more about **types**.<Icon name="chevron-right-bold" />
@@ -3854,6 +3974,31 @@ ce.declare("double", { evaluate: (args) => args[0].mul(2) }, { extend: true });
 // or
 ce.declare("double", { evaluate: ([x]) => x.mul(2) }, { extend: true });
 ```
+
+**A handler must not evaluate the expression that contains its call**, for
+example an expression that your code keeps in a variable. The engine does not
+detect this, and the result is not specified. With `evaluateAsync()`, the
+promise never settles:
+
+```js
+let node;
+ce.declare("g", {
+  signature: "() -> integer",
+  pure: true,
+  evaluateAsync: async () => {
+    await node.evaluateAsync();   // Do not do this
+    return ce.number(5);
+  },
+});
+node = ce.box(["Reverse", ["List", 1, ["g"]]]);
+await node.evaluateAsync();
+// ➔ never settles
+```
+
+The nested call waits for the evaluation of `node` that is in progress, and
+that evaluation waits for the handler. When `g` is not declared `pure`, each
+nested call starts a new evaluation of `node`, which calls the handler again,
+without end.
 
 **A name is declared once per scope.** Declaring it again throws
 `The symbol "double" is already declared in this scope`. This also applies
@@ -4796,8 +4941,7 @@ its hooks for its values after the scope is popped, and a head of the same
 name declared in another scope with other hooks does not change the values
 of the first one. When a head is declared again without `arithmetic`, its
 values have no hooks any more; its kind type remains a kind type, so its
-values and symbols are still protected from the number rules. A checkpoint
-restore puts the kinds back as they were at the checkpoint.
+values and symbols are still protected from the number rules.
 
 #### Compiling a value of a kind
 
@@ -6410,8 +6554,7 @@ ce.box(["Sq", 3]).evaluate();  // ➔ 9
 Each library in `requires` must already be loaded. The call throws, and
 declares nothing, for a library name that is already loaded, a missing required
 library, a standard library, or a definition that is invalid, repeated, or
-already declared in the global scope. A checkpoint taken before the call
-(`ce.checkpoint()`) undoes it.
+already declared in the global scope.
 
 `ce.libraryOf(name)` returns the name of the library that defines `name`:
 `"trigonometry"` for `Sin`, the `name` of a loaded library for one of its
@@ -6571,7 +6714,7 @@ application: `(k)(x - 1)` is `k·(x - 1)`, `(a)(b)` is `a·b` and `(k)(x, y)` is
 `k·(x, y)`. Only a name that the library or a declaration defines as a function
 keeps the application reading: `(\sin)(x)` is `sin(x)`, and `(f)(3)` is `f(3)`
 when `f` is declared a function. A function type that the engine only inferred
-from an earlier `f(x)` does not count.
+(`ce.infer()` of an `f(x)`) does not count.
 
 ```js
 ce.parse('(k)(x-1)').json;  // ["Multiply", "k", ["Add", "x", -1]]
@@ -8396,7 +8539,11 @@ literal's tier instead (see [Literal Types Are Not Stored](#literal-types-are-no
 
 The type of a symbol can be declared explicitly, or it can be inferred from 
 the context in which it is used, such as the value that is assigned to it
-or the operation that is performed on it.
+or the operation that is performed on it. A type inferred from an operation
+belongs to the expression that holds the operation: parsing or boxing an
+expression declares no symbol. `ce.infer()` declares the symbols of some
+expressions with the types that their uses require (see
+[Type Inference](#type-inference)).
 
 **To explicitly declare the type of a symbol**, use the `ce.declare()` function.
 
@@ -8643,11 +8790,7 @@ whose *sign* is promised, which `infinity` does not — write
 `signed_infinity`. It is precisely the union of the two value types, and
 `+oo | -oo` is an equivalent spelling of the same type; a union
 containing both signed infinities prints under the name
-(`real | signed_infinity`). The former name for this pair,
-`non_finite_number`, is **retired**: that name was misleading, since
-$\tilde\infty$ and $\infty + i$ are non-finite numbers yet were not
-members. It is still accepted on input for one release cycle and
-normalizes to `signed_infinity`, but it is never printed.
+(`real | signed_infinity`).
 
 </div>
 
@@ -8655,22 +8798,6 @@ The extended real line — a real number that may be infinite — has no
 one-word name: write it out as `real | +oo | -oo`. Bare `real` does
 not admit $\pm\infty$, and `real | infinity` would also admit the unsigned
 $\tilde\infty$.
-
-:::warning **Deprecated: the `finite_` type names**
-
-The names `finite_number`, `finite_complex`, `finite_real`,
-`finite_rational` and `finite_integer` have been **retired**. The bare names
-above now carry those meanings, so each retired name denoted the same set of
-values as a bare one.
-
-For one release cycle the type parser still accepts them and normalizes each
-to its replacement — `finite_integer` to `integer`, `finite_rational` to
-`rational`, `finite_real` to `real`, `finite_complex` to `complex`, and
-`finite_number` to `complex` (since "any finite number" *is* the finite
-complex type). They are never produced by the engine, so a type you read back
-is always spelled with the bare name. Update your type strings before the
-aliases are removed.
-:::
 
 Numeric types can be constrained to a specific range within a lower and upper 
 bound
@@ -9048,12 +9175,24 @@ where `K1`, `K2`, ... are the keys and `T1`, `T2`, ... are the types of the valu
 For example: `record{red: integer, green: integer, blue: integer}` is a record that
 contains three elements with keys `red`, `green` and `blue`, and values of type `integer`.
 
+A record type is **closed**: a value of the type has exactly the keys that the
+type lists. A key that a value can leave out is an **optional field**, written
+with a `?` after its type: `record{red: integer, green: integer, alpha: real?}`.
+A read of an optional field that the value leaves out gives the absent value of
+the field type (`Missing`, or `NaN` for a numeric field). A read of a key that
+the type does not list is an `unknown-field` error.
+
 **Compatibility:**
-- A record type `A` matches a record type `B` when every field required by `B`
-  is present in `A` with a compatible type. Thus a record with more fields is a
-  subtype of one with fewer fields (width subtyping). The order of the keys
-  does not matter.
+- A record type `A` matches a record type `B` when every key of `A` is a key of
+  `B`, every key that `B` requires is also required by `A`, and each field type
+  of `A` is compatible with the field type of `B`. A record with more fields is
+  not a subtype of one with fewer fields: there is no width subtyping. The order
+  of the keys does not matter.
+- A record without an optional field, or with it, matches the record type with
+  the field optional: `record{a: integer}` and `record{a: integer, b: string}`
+  match `record{a: integer, b: string?}`.
 - A record is compatible with a dictionary `dictionary<T>` if each type `T1`, `T2`, ... is compatible with `T`.
+- A program that must accept other keys takes a `dictionary<T>`.
 
 
 ```js
@@ -9067,6 +9206,10 @@ ce.type("record{red: integer, green: integer}")
 
 ce.type("record{red: integer, green: integer, blue: integer}")
   .matches("record{red: integer, green: integer}");
+// ➔ false
+
+ce.type("record{red: integer, green: integer}")
+  .matches("record{red: integer, green: integer, blue: integer?}");
 // ➔ true
 
 ce.type("record{red: integer, green: integer, blue: integer}")
@@ -10436,12 +10579,17 @@ ce.box({ dict: { red: 1, green: 2 } }).type
 // ➔ true
 ```
 
-**Width subtyping** is supported for records, meaning that a record with more keys is
-compatible with a record with fewer keys.
+Record types are closed: a record with more keys is **not** compatible with a
+record type with fewer keys. A key that a value can leave out is declared as an
+optional field.
 
 ```js
 ce.box({ dict: { red: 1, green: 2, blue: 3 } }).type
   .matches("record{red: integer, green: integer}");
+// ➔ false
+
+ce.box({ dict: { red: 1, green: 2 } }).type
+  .matches("record{red: integer, green: integer, blue: integer?}");
 // ➔ true
 ```
 
@@ -10806,12 +10954,19 @@ ce.expr("n").type;
 ```
 
 When a symbol is used in a function expression, the expected type of the
-arguments is used to infer the type of the symbol.
+arguments is used to infer the type of the symbol in that expression. The
+expression declares nothing: a symbol boxed on its own keeps the type
+`unknown` until `ce.infer()` declares it.
 
 ```js
-ce.declare("n", "unknown");
 ce.declare("f", "(number) -> number");
-ce.expr(["f", "n"]);
+const expr = ce.expr(["f", "n"]);
+expr.op1.type;
+// ➔ "number"
+ce.expr("n").type;
+// ➔ "unknown"
+
+ce.infer([expr]);
 ce.expr("n").type;
 // ➔ "number"
 ```
@@ -10821,7 +10976,7 @@ assigning a value of a more specific type to the symbol or by using the
 symbol in a context that requires a more specific type.
 
 Use-driven refinement applies to symbols that do **not** hold a value: for
-a mathematical unknown, a use *declares* what the symbol must be. Once a
+a mathematical unknown, a use *requires* what the symbol must be. Once a
 symbol **has been assigned**, its type records what it actually holds —
 that is evidence, and a later use is a requirement *checked against* the
 evidence rather than a refinement of it:
@@ -10829,9 +10984,8 @@ evidence rather than a refinement of it:
 ```js
 ce.declare("k", "(integer) -> integer");
 
-// Valueless symbol: the use DECLARES its type
-ce.expr(["k", "n"]);
-ce.expr("n").type;         // ➔ "integer"
+// Valueless symbol: the use REQUIRES its type, in this expression
+ce.expr(["k", "n"]).op1.type;  // ➔ "integer"
 
 // Assigned symbol: the use CHECKS against the evidence
 ce.assign("x", 3.5);       // x: real (widened per the table above)
@@ -10861,13 +11015,14 @@ reports `expected integer, got number at x` as a **static** diagnostic,
 before anything runs. Assignment is last-write-wins: swapping the two
 assignments makes the program correct, and the check accepts it.
 
-Continuing the example above:
+`ce.infer()` combines the requirements of several expressions. Continuing
+the example of `f` above:
 
 ```js
 ce.declare("g", "(integer) -> number");
-ce.expr(["g", "n"]);
+ce.infer([ce.expr(["g", "n"])]);
 ce.expr("n").type;
-// ➔ "integer": "n" has been narrowed 
+// ➔ "integer": the inferred "n" has been narrowed
 //    from "number" to "integer"
 ```
 
@@ -10980,7 +11135,7 @@ Inference writes happen at these moments:
    value's type — widened per the table above — becomes the symbol's
    inferred type, and each later assignment re-infers.
 2. **Argument positions**: passing an `unknown`-typed symbol to a typed
-   parameter narrows the symbol to the parameter's type (see the `f(n)`
+   parameter requires the parameter's type of the symbol (see the `f(n)`
    examples above). This includes *forwarding* through user functions: in
    `g(c) = pick(c)` where `pick`'s own body indexes its parameter, the
    collection evidence inferred for `pick` propagates to `c`, so `g` binds
@@ -10993,10 +11148,10 @@ Inference writes happen at these moments:
    self-call that forwards a parameter unchanged, or passes a scalar, is no
    evidence, so `f(x) = x * 2` still broadcasts: `f([1, 2, 3])` is
    `[2, 4, 6]`. A type inferred as
-   a union by one use is narrowed again by a later use whose parameter admits
+   a union by one use is narrowed again by another use whose parameter admits
    only some of its members: `ToUpperCase(s)` infers `s` as
-   `character | string`, and a later `Sort(s)` narrows it to `string` instead
-   of refusing the call. A *declared* union is checked, not narrowed.
+   `character | string`, and a `Sort(s)` in the same expression narrows it to
+   `string` instead of refusing the call. A *declared* union is checked, not narrowed.
 3. **Function-literal bodies**: a bare (unannotated) lambda parameter starts
    as `unknown` and is narrowed by how the body *uses* it — indexing
    (`v[1]`) narrows it to a collection, arithmetic
@@ -11010,7 +11165,8 @@ Inference writes happen at these moments:
    type is the union of the read requirements. The inferred tuple is not
    enforced at application.
 4. **Uses of an element**: a use of an element taken out of a collection
-   refines the collection's *element* type. `xs[1] + 1` makes an undeclared
+   refines the collection's *element* type, in the expression that holds
+   the use. `xs[1] + 1` makes an undeclared
    `xs` an `indexed_collection<number>`, `xs["a"] + 1` a
    `dictionary<number>`, `First(xs) + 1` an `indexed_collection<number>`,
    and `k(xs[1])` with `k: (integer) -> integer` an
@@ -13229,7 +13385,7 @@ loads:
 
 | Entries loaded in the program | Targets of every engine |
 |---|---|
-| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `wgsl`, `python` |
+| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `python` |
 | `@cortex-js/compute-engine/core` only | `javascript`, `interval-js` |
 
 The `javascript` and `interval-js` targets are part of every engine: the engine
@@ -13717,6 +13873,133 @@ The two standalone runtimes have the same batch forms:
 carries `runtimeVersion`, `preambleOnce` and `preamblePerCall` for them, as a
 `javascript` result does.
 
+### Parallel Loops on Worker Threads: `runAsync()`
+
+A `parallel for` loop (`ParallelLoop` in MathJSON) says that its passes are
+independent. `run()` still runs them in order, on the calling thread.
+`runAsync(inputs, options)` runs the same program and sends each
+`parallel for` that can run on the pool to the workers of `ce.workers`: each
+worker gets one range of consecutive passes and adds the terms of its passes
+to zero, then the calling thread adds these sums to the accumulators, in the
+order of the ranges. The statements outside these loops run on the calling
+thread. `runAsync()` is on a `javascript` result called with an object of
+variables (the default `calling: 'expression'`).
+
+```javascript
+import { ComputeEngine, compile, createKernelPool } from '@cortex-js/compute-engine';
+
+const ce = new ComputeEngine();
+ce.workers = createKernelPool({
+  create: () => new Worker(new URL('./kernel-worker.js', import.meta.url), { type: 'module' }),
+  size: 3,
+});
+ce.declare('H', 'list<integer>');
+ce.declare('n', 'integer');
+
+// let L = H
+// parallel for k in 1..n { L[k % 3 + 1] += 1 }
+// L
+const count = compile(
+  ce.box([
+    'Block',
+    ['Assign', 'L', 'H'],
+    [
+      'ParallelLoop',
+      ['AddTo', ['At', 'L', ['Add', ['Mod', 'k', 3], 1]], 1],
+      ['Element', 'k', ['Range', 1, 'n']],
+    ],
+    'L',
+  ])
+);
+
+count.willParallelize(900_000);
+// ➔ true
+
+const L = await count.runAsync(
+  { H: [0, 0, 0], n: 900_000 },
+  { onLoop: (report) => console.log(report) }
+);
+// onLoop: { passes: 900000, route: 'pool' }
+// L ➔ [300000, 300000, 300000], the value of count.run(…)
+```
+
+The promise resolves to the value of `run(inputs)`, except for the order of
+the additions (below). The inputs are checked and the value converted as
+`run()` does. An error of the program rejects the promise; `runAsync()` never
+throws. The input list `H` is not changed. The calling thread is free only
+while the program waits for the workers, and the host must not change the
+values of `inputs` until the promise settles.
+
+**The options.**
+
+- `signal`: an `AbortSignal`. A signal that is already aborted rejects the
+  promise with `signal.reason` before any statement runs. An abort while the
+  program waits for the workers rejects it with `signal.reason`; the workers
+  that still run a range are terminated and replaced after the grace period of
+  the pool. An abort while the calling thread runs statements is seen at the
+  next loop that can run on the pool.
+- `minPasses`: the smallest count of passes that goes to the pool, a positive
+  integer. Default: 20 000. With `n: 1000`, the loop above runs on the calling
+  thread and `onLoop` receives
+  `{ passes: 1000, route: 'calling-thread', reason: 'below-threshold' }`;
+  with `minPasses: 100`, it runs on the pool.
+- `onLoop(report)`: called once for each run of a loop that can run on the
+  pool, with `{ passes, route, reason }`. `route` is `'pool'` or
+  `'calling-thread'`; `reason` says why the pool did not take the loop:
+  `'no-pool'` (`ce.workers` is not set), `'pool-unusable'` (the workers hold
+  another runtime version), `'below-threshold'`, `'too-large'` (the private
+  lists of all the workers would hold more than 16 million numbers together)
+  or `'pool-declined'` (a worker did not complete its range, and the calling
+  thread ran it again).
+
+`result.willParallelize(passes?)` is `true` when the program has a loop that
+can run on the pool (also inside a function that it calls), `ce.workers` is a
+usable pool, and `passes`, when it is given, is at least 20 000. It does not
+know the range of a loop and does not read `minPasses`:
+`count.willParallelize(1000)` is `false`, and without a pool
+`count.willParallelize()` is `false`.
+
+**When a loop runs in order.** A loop runs on the calling thread, with the
+code of `run()`, and does not call `onLoop`, unless:
+
+- its domain is a range (`1..n`), not a list;
+- each accumulator is a local variable of the function or block that holds
+  the loop, a number (`s += e`) or a list of numbers with one index
+  (`L[i] += e`), and the loop reads it nowhere else;
+- the body writes no other outer variable and does not leave the loop
+  (`break`, `return`);
+- the body reads only numbers, booleans, strings and lists or tuples of these
+  from outside, calls no function value, makes no random draw, and calls no
+  function of the `functions` or `operators` option;
+- the program is compiled in the default mode, with no `iterationBudget`;
+- the loop is a statement of the program or of a user function (also inside
+  an `if`, a `for` or a `while`), and the program calls that function as a
+  statement, as the value of a declaration or an assignment, or as its last
+  value. A call in an operand (`total(H, 4) + 1`), an argument
+  (`max(total(H, 4), 1)`), a callback (`map`) or `WithRandomSeed` runs the
+  loop in order. Write `let t = total(H, 4)`, then `t + 1`. When the program
+  uses a function in such a position, the loops of that function run in
+  order at all its calls.
+
+The rules, with an example for each, are in `docs/COMPILATION-MODEL.md` of the
+repository ("The worker pool and `parallel for`: `runAsync()`").
+
+**The values.** The pool adds the terms of each range to zero, then adds the
+sums in the order of the ranges, where `run()` adds each term in the order of
+the passes. An accumulator of integers whose value and partial sums stay
+within ±2^53 has the value of `run()`. An accumulator of real numbers can
+differ in the last bits, and the difference depends on the size of the pool:
+the sum of `1/k` for `k` in `1..1000000` gave `14.392726722864989` with
+`run()` and `14.392726722865703` with `runAsync()` on 3 workers. An element of
+a list accumulator that holds `-0` keeps `-0` when the sum of each range is
+exactly 0, where `run()` gives `+0` if a pass adds `+0` to it.
+
+**Errors.** When a worker does not complete its range (an error of a pass, a
+worker that fails), the calling thread runs that range again, and `onLoop`
+receives `reason: 'pool-declined'`. A range that fails there too rejects the
+promise with the error that `run()` throws. Each worker uses the engine's
+`iterationLimit`.
+
 ### Limiting Loops: `iterationBudget`
 
 A compiled `Loop` has no time check, so a loop that does not end stops the page
@@ -13740,11 +14023,374 @@ pass on every machine. To get a time limit, measure the cost of a pass.
 - `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
   cell. Each cell has its own count, so a batch costs up to cells × budget.
 - `python` declines a program with a `Loop` when the option is set.
-- `glsl` and `wgsl` do not change: the bounds of a shader loop are known when the
-  shader is compiled.
-- A `Sum` or `Product` over the budget gives `NaN` and does not throw.
+- `glsl` cannot throw: over the limit, the loops of the shader stop and the
+  value is `NaN`. On this target the limit also applies to `Sum` and
+  `Product`, and it is 10,000 passes when the option is not set (see "What
+  the GLSL Target Compiles: `canCompile()`").
+- A `Sum` or `Product` over the budget gives `NaN` and does not throw. On
+  `interval-js` it gives the `entire` interval.
 
 Without the option, the compiled code has no check.
+
+### The `numeric-kernel` Profile (Experimental)
+
+The option `profile: 'numeric-kernel'` compiles a numeric program with the
+structured compiler of the `javascript` target. It admits scalar
+arithmetic of reals, integers and complex numbers, `If` and the comparisons
+(`Less`, `LessEqual`, `Equal`, `NotEqual`),
+powers and roots of real numbers, powers of a complex base with a number
+literal exponent, `Sqrt`, `Ln`, `Log`, `Exp`, the
+trigonometric and hyperbolic functions and their inverses (`Sin`, `Cos`,
+`Tan`, `Cot`, `Sec`, `Csc`, `Sinh`, `Cosh`, `Tanh`, `Arcsin`, `Arccos`,
+`Arctan`, `Arctan2`, `Arsinh`, `Arcosh`, `Artanh`), `Abs`, `Sign`, `Gamma`,
+`Erf`, `Erfc`, `Digamma`, `Haversine`, `Conjugate`, `Min`, `Max`, `Floor`, `Ceil`,
+`Round`, `Mod`, captured numbers, function literals with typed parameters
+and local variables, `Loop` over an integer range with `Break` in a branch
+of an `If`, `Sum` and `Product` of a real or integer body over integer
+ranges (`Limits`), `Which` and an `If` with no else branch whose values are
+real or integer numbers, calls of user functions
+with or without a declared signature, and lists of numbers read with `At` and `Length`,
+made with a comprehension over a range and updated with `ReplaceAt`,
+list literals of numbers and tuples of reals.
+A block of statements can be the compiled expression itself: its free
+symbols are then the inputs. A power or a root of two number literals is
+written as the value that the ordinary compiler folds it to.
+
+A block can hold another block, and a block whose statements declare names
+with a value can be an operand. A local declared `unknown` with a value has
+the type of its value, and a first write to a new name of a block declares
+a local, as in the ordinary compiler. In the `strict` mode, a local function
+of the block (a `Declare` of a function literal, or `DefineFunction`) and a
+user function declared `function` are compiled once; a local function reads
+the names of the block at each call, as a closure does. A local function in
+a branch or a loop, a recursive one, a local function in the `complex` mode,
+and a local of a nested block with the name of an outer one decline:
+
+```js
+const o = compile(
+  ce.box(['Add',
+    ['Block', ['Declare', 'a', "'real'", ['Multiply', 3.7, 'x']],
+      ['Subtract', 'a', ['Floor', 'a']]],
+    1]),
+  { profile: 'numeric-kernel' }
+);
+o.code;          // ➔ "(() => { const _tv1 = 3.7 * _.x; return _tv1 + -Math.floor(_tv1) + 1; })()"
+o.run({ x: 1 }); // ➔ 1.7000000000000002
+
+const l = compile(
+  ce.box(['Block',
+    ['Assign', 'a', ['Multiply', 2, 'x']],
+    ['Declare', 'g', "'function'", ['Function', ['Add', 't', 'a'], 't']],
+    ['Assign', 'a', 10],
+    ['g', 3]]),
+  { profile: 'numeric-kernel' }
+);
+l.run({ x: 5 }); // ➔ 13
+```
+
+```js
+import { compile, canCompile } from '@cortex-js/compute-engine/compile';
+
+ce.declare('x', 'real');
+ce.declare('y', 'real');
+const r = compile(ce.box(['Add', ['Sin', 'x'], ['Multiply', 'x', 'y']]), {
+  profile: 'numeric-kernel',
+});
+r.code;      // ➔ "_.x * _.y + Math.sin(_.x)"
+r.profile;   // ➔ "numeric-kernel"
+r.pure;      // ➔ true
+r.shippable; // ➔ true
+r.run({ x: 0, y: 2 }); // ➔ 0
+
+const f = compile(
+  ce.box(['Function', ['Block', ['Multiply', 'a', ['Sqrt', 'a']]],
+    ['Typed', 'a', "'real'"]]),
+  { profile: 'numeric-kernel' }
+);
+f.code;      // ➔ "(a) => { return a * Math.sqrt(a); }"
+f.run(4);    // ➔ 8
+f.shippable; // ➔ true
+
+const b = compile(
+  ce.box(['Block', ['Declare', 'a', "'real'", ['Add', 'x', 1]],
+    ['Multiply', 'a', 'a']]),
+  { profile: 'numeric-kernel' }
+);
+b.code;          // ➔ "(() => { const _tv1 = _.x + 1; return _tv1 * _tv1; })()"
+b.run({ x: 2 }); // ➔ 9
+
+const g = compile(ce.box(['Exp', ['Multiply', 'ImaginaryUnit', 'x']]), {
+  profile: 'numeric-kernel',
+});
+g.code;          // ➔ "_SYS.cexp(({ re: 0, im: _.x }))"
+g.run({ x: 1 }); // ➔ { re: 0.5403023058681398, im: 0.8414709848078965 }
+```
+
+A product, a quotient or a power with a complex operand, and most functions
+of a complex operand, are written as the ordinary compiler writes them. A
+real operand of a product is not converted to a complex number, so
+`x·(a + bi)` is `x·a + x·b·i`, as in the ordinary compiler. Some forms
+decline: a power whose exponent is not a number literal (`z^x`), `Abs` of a
+complex operand that is not a name, and `Sinh`, `Cosh`, `Tanh` and `Exp` of
+a complex operand that reads `Pi`.
+
+A bound of a `Sum` or a `Product` is floored, as in the ordinary compiler;
+with an `iterationBudget`, a range of more terms than the budget gives
+`NaN`. A `Which` with no `True` clause gives `NaN` when no condition holds.
+A complex body of a `Sum` or a `Product`, and a complex value of a `Which`,
+decline:
+
+```js
+const s = compile(
+  ce.box(['Function', ['Block', ['Sum', ['Divide', 1, 'k'], ['Limits', 'k', 1, 'n']]],
+    ['Typed', 'n', "'integer'"]]),
+  { profile: 'numeric-kernel' }
+);
+s.run(4); // ➔ 2.083333333333333
+
+const w = compile(ce.box(['Which', ['Less', 'x', 0], 0, ['Less', 'x', 1], 'x']), {
+  profile: 'numeric-kernel',
+});
+w.code;          // ➔ "_.x < 0 ? 0 : _.x < 1 ? _.x : NaN"
+w.run({ x: 2 }); // ➔ NaN
+```
+
+A list of reals or of integers (an input, a parameter, a literal such as
+`[x, y, 1]`, or the result of a comprehension or of a user function) and a
+tuple of reals (`(x, y)`, an input or a parameter declared
+`tuple<real, real>`) are values of the program and can be its result, a
+JavaScript array. `Sum`, `Product`, `Max` and `Min` of one list or tuple
+fold its elements; `Max` and `Min` of an empty list are `NaN`. Arithmetic of
+a list and numbers applies to each element (`2·L + 1`). Two lists are
+combined only when their lengths are equal by construction, such as `L` and
+`2·L`: `L + M` of two inputs declines, because the ordinary compiler gives
+`NaN` for lists of different lengths. A comprehension can have a guard that
+does not draw, with bounds that are integer literals or a `Length`:
+
+```js
+ce.declare('L', 'list<real>');
+const e = compile(ce.box(['Add', ['Multiply', 2, 'L'], 1]), {
+  profile: 'numeric-kernel',
+});
+e.run({ L: [1, 2.5] }); // ➔ [3, 6]
+
+const m = compile(ce.box(['Max', 'L']), { profile: 'numeric-kernel' });
+m.run({ L: [1, 7, 3] }); // ➔ 7
+m.run({ L: [] });        // ➔ NaN
+
+const t = compile(
+  ce.box(['Function', ['Block', ['Tuple', ['Sum', 'P'], ['Product', 'P']]],
+    ['Typed', 'P', "'tuple<real, real>'"]]),
+  { profile: 'numeric-kernel' }
+);
+t.run([3, 4]); // ➔ [7, 12]
+
+const stones = compile(
+  ce.box(['Function',
+    ['Block', ['Comprehension', 'k',
+      ['Element', 'k', ['Range', 1, ['Length', 'B']], ['Equal', ['At', 'B', 'k'], 'p']]]],
+    ['Typed', 'B', "'list<integer>'"], ['Typed', 'p', "'integer'"]]),
+  { profile: 'numeric-kernel' }
+);
+stones.run([1, 0, 1, -1], 1); // ➔ [1, 3]
+```
+
+A list of lists, a list or a tuple of booleans or of complex numbers,
+`Power` or a function of a list (`L^2`, `sin(L)`), arithmetic on a tuple,
+`First`, `Last`, `Count` and a captured list decline. A fold that the
+ordinary compiler writes as a complex value declines too: the fold of an
+expression whose type is not real (`Sum(I/2.5)`), and in the `complex`
+mode the `Sum` or `Product` of a local list. So does a product or a
+quotient with the call of a user function that has a list argument, whose
+type admits a list and a number (`10·(2/f(L))`).
+
+The result reports two facts about the compiled program:
+
+- `pure`: two calls, with any arguments, give the same results whether they
+  run one after the other or at the same time in two workers, and a call
+  changes nothing that the host can observe. A list argument is only read.
+- `shippable`: the code can run on a worker of the kernel pool. Under the
+  profile, a function literal has this field too.
+
+Neither fact starts a parallel execution.
+
+The profile admits random draws: `Random()`, `Random` of an `Interval` or a
+`Range` whose bounds are number literals, `WithRandomSeed`, and calls of
+user functions whose body draws. The code draws the same numbers as the
+ordinary compiler, in the same order and the same number of times, and a
+compiled function called inside an interpreted `WithRandomSeed` draws from
+its frame. A draw makes the program not `pure`, unless it is inside a
+`WithRandomSeed`; a program that draws or seeds the random stream is not
+`shippable`. A draw in a comprehension declines, because the interpreter
+draws the elements of a comprehension when they are read. A program that
+draws more than once declines when one of its draws is in a complex value
+(`Random() + Sqrt(Random(Range(-2, 8, 2)))` in the `complex` mode), because
+the ordinary compiler evaluates a complex operand first. `RandomChoice`,
+`RandomSample`, `RandomShuffle` and `Random` of a domain with a variable
+decline too:
+
+```js
+const u = compile(ce.box(['Add', 'x', ['Random', ['Interval', -1, 1]]]), {
+  profile: 'numeric-kernel',
+});
+u.pure;      // ➔ false
+u.shippable; // ➔ false
+
+const s = compile(ce.box(['WithRandomSeed', 42, ['Add', 'x', ['Random']]]), {
+  profile: 'numeric-kernel',
+});
+s.pure;          // ➔ true
+s.shippable;     // ➔ false
+s.run({ x: 1 }); // ➔ 1.7367300395263547, at each call
+```
+
+A parameter or a free symbol with no declared type is a real number in the
+`strict` mode and a complex number in the `complex` mode. The result lists
+these names in `defaultedSymbols`, so that you can find a name you did not
+mean to leave undeclared. Declare a name that is a list, a boolean or an
+integer (a loop bound, an index), or call `ce.infer()` before `compile()`.
+
+`ce.infer()` declares each free symbol of the expressions you give it with
+the type that they require of it, and the profile reads that type as a
+declared type. So does a type that `ce.assume()` writes (`x > 0` gives `x`
+the type `real<0<..>`), and the type of a value assigned with `ce.assign()`.
+Boxing, evaluating or compiling an expression writes no type, so the type
+of a name does not depend on what you boxed before:
+
+```js
+ce.infer([ce.box(['Mod', 'v', 2])]); // `v` is real
+const k = compile(ce.box(['Sin', 'v']), {
+  profile: 'numeric-kernel',
+  mode: 'complex',
+});
+k.code;             // ➔ "Math.sin(_.v)"
+k.defaultedSymbols; // ➔ undefined
+```
+
+The same rule applies to a user function with no declared signature that
+the code calls: a parameter with no type is a real number in the `strict`
+mode and a complex number in the `complex` mode, and the result has the type
+of the body. A call with an argument of another type (a list, a boolean, a
+complex value in the `strict` mode) declines. `defaultedSymbols` lists the
+name of the function:
+
+```js
+ce.parse('f(t) := t^2 + 1').evaluate();
+const g = compile(ce.box(['Function', ['Block', ['f', 'x']], 'x']), {
+  profile: 'numeric-kernel',
+});
+g.defaultedSymbols; // ➔ ["x", "f"]
+g.run(3);           // ➔ 10
+```
+
+A name declared `number` (an input, a parameter, a parameter of a user
+function) has the type it has in the ordinary compiler: a real number in the
+`strict` mode, a complex number in the `complex` mode, where the code
+accepts a number or a complex value for an input or a parameter. A name
+declared a union of a real type with `nan` or `signed_infinity` is a real
+number in both modes. A user function declared with the result `number`
+returns the type of its body, and a name declared `number` whose value is a
+number is captured as that number. `defaultedSymbols` does not list these
+names, since their type is declared:
+
+```js
+ce.declare('w', 'number');
+const n = compile(ce.box(['Sin', 'w']), {
+  profile: 'numeric-kernel',
+  mode: 'complex',
+});
+n.code;                        // ➔ "_SYS.csin(_SYS.cplx(_.w))"
+n.run({ w: { re: 0, im: 1 } }); // ➔ { re: 0, im: 1.1752011936438014 }
+n.run({ w: 2 });               // ➔ 0.9092974268256817
+n.defaultedSymbols;            // ➔ undefined
+```
+
+A program outside the profile declines with the diagnostic code
+`outside-profile`. The diagnostic names the first node outside the profile:
+its head in `operator`, or a name in `binding`. The `fallback` option applies
+as for any other decline, and the ordinary compiler is never used for a part
+of the program.
+
+```js
+ce.declare('L', 'list<real>');
+const d = compile(ce.box(['RandomChoice', 'L', 2]), {
+  profile: 'numeric-kernel',
+});
+d.success;    // ➔ false
+d.diagnostic; // ➔ { code: "outside-profile", kind: "capability",
+              //     message: "Could not compile with the profile 'numeric-kernel': unsupported head RandomChoice",
+              //     operator: "RandomChoice", value: "RandomChoice(L, 2)" }
+```
+
+`canCompile()` answers for the profile with the same options: `ok: true`
+exactly when `compile()` gives code, with `pure` and `shippable`, and
+otherwise the diagnostic that `compile()` gives. It runs the whole
+compilation, so it costs as much as `compile()`.
+
+```js
+canCompile(ce.box(['Add', 'x', ['Sin', 'x']]), { profile: 'numeric-kernel' });
+// ➔ { ok: true, pure: true, shippable: true }
+```
+
+Under the profile:
+
+- `cse` and `constantFold` are ignored: the structured compiler does neither.
+- The modes are `strict` and `complex`.
+- The options `vars`, `functions`, `operators`, `imports` and `preamble`
+  give the code of the ordinary compiler. The functions of the host run the
+  same number of times, in the same order, on both compilers:
+  - A `vars` entry that reads the vars object under another name
+    (`u: '_.w'`) makes the name an input.
+  - Another source that is one operand (a name, a call, a member access, an
+    expression in parentheses: `t: 'next()'`) is read once at each
+    occurrence of the name. The result is then neither `pure` nor
+    `shippable`.
+  - A call of a `functions` entry, or of an `operators` entry whose operator
+    is a name, is a call of the host. It is `pure` only when the entry is
+    declared pure (`{ source, pure: true }`). The result is never
+    `shippable`, because a worker does not have the function.
+  - `imports` and `preamble` work as on the ordinary compiler. A preamble
+    that is not blank runs on every call, so the result is not `pure`.
+- `broadcast` is ignored: the result has no `batch`, and the values are those
+  of `broadcast: false`.
+- These decline with `outside-profile`, each with a message that names the
+  cause:
+  - the function form of `operators`, and an infix `operators` entry;
+  - an entry for an operator or a constant of the library
+    (`functions: { Sin: … }`);
+  - a `vars` source that is not one operand (`'Math.PI / 4'`);
+  - a read or a call of the host in the `complex` mode;
+  - a `functions` source that is not a name, a dotted path of names or a
+    function expression with a pure arithmetic body (`'_.getTransform()'`):
+    the ordinary compiler evaluates it before the arguments;
+  - a source with a line terminator or a comment;
+  - a `Sum` or a `Product` that calls a function declared pure (the
+    ordinary compiler skips such calls after a sum of `NaN`);
+  - `mode: 'bigint'`.
+- An empty object of `functions`, `operators` or `vars` is the same as an
+  absent option.
+
+```javascript
+ce.declare('x', 'real');
+ce.declare('f', '(real, real) -> real');
+const r = compile(ce.box(['Add', ['f', 'x', 1], 1]), {
+  profile: 'numeric-kernel',
+  functions: { f: { source: 'Math.hypot', pure: true } },
+});
+r.code;      // ➔ "(() => { const _tv1 = Math.hypot(_.x, 1); return _tv1 + 1; })()"
+r.pure;      // ➔ true
+r.shippable; // ➔ false
+r.run({ x: 3 }); // ➔ 4.16227766016838
+```
+- A program of more than 100,000 operations declines with
+  `outside-profile`, also one with no repeated subexpression (a sum of
+  30,000 terms `sin(x + c)`); the diagnostic names no node.
+- With another target than `javascript`, or in the `compile()` method of a
+  target object (`new JavaScriptTarget().compile(expr, { profile })`), the
+  option is an error, thrown whatever `fallback` says.
+
+The profile is experimental: the list of what it admits will grow, and its
+options can change.
 
 ### Constant Folding
 
@@ -13871,6 +14517,36 @@ Declare the input (`ce.declare('M', 'real')`). When the host can pass both
 shapes, declare a union such as `real | list<real>`: a union compiles. A
 parameter of a function is not an input, so `t ↦ 2t` compiles.
 
+An input with no declared type has the type that the compiled expression
+requires of it: in `x + 1`, `x` is a `number`, and `freeSymbolTypes` reports
+it. A type that only another expression requires is not used, because
+parsing an expression declares nothing. Declare the inputs, or call
+`ce.infer()` with the expressions that use them, before you compile:
+
+```javascript
+const a = ce.parse('x + 1');
+const b = ce.parse('x > 1');
+compile(b).success;   // ➔ false: `x > 1` requires no type of `x`
+ce.infer([a, b]);     // declares x: number
+compile(b).success;   // ➔ true
+```
+
+The result of an operation such as `subs()` does not carry the types that the
+operation required of a symbol that you made before it. Declare such a
+symbol before you compile the result:
+
+```javascript
+const q = ce.symbol('q0');
+const r = ce.parse('a \\cos(x)').subs({ a: q });
+compile(r).success;   // ➔ false: `q0` has no type
+ce.declare('q0', 'real');
+compile(r).success;   // ➔ true
+```
+
+A name of the library that an expression reads as a variable (`N` in
+`N + 1`) has no type until it is declared: `compile(ce.parse('N + 1'))`
+declines, and compiles after `ce.declare('N', 'real')`.
+
 **A value with no settled shape declines**, with `diagnostic.code`
 `'unsettled-shape'`, and `unsupported` holds the sub-expression:
 
@@ -13900,6 +14576,15 @@ parameter of a function is not an input, so `t ↦ 2t` compiles.
   `CS: list<real | tuple<real, real>>` and `f := t ↦ 2t`, `Map(f, CS)`
   declines, and `unsupported` holds `CS`. With the fallback, the interpreter
   gives `[2, [6, 8]]` for `CS = [1, [3, 4]]`.
+- An integer power of a list whose type admits both a matrix and a list of
+  points (a bare `list`, `list<unknown>`, `list<any>`), and the product of
+  such a list with another list. Compiled code holds a point as an array, so
+  `[[1, 2], [3, -4]]` can be a matrix, whose square is the matrix power, or
+  two points, whose square is the square of each coordinate. With
+  `p: list`, `p^2` declines, and `unsupported` holds `p`. With the fallback,
+  the interpreter gives `[[7, -6], [-9, 22]]` for `p = [[1, 2], [3, -4]]`.
+  Declare `p` as `list<list<real>>` (a matrix) or `list<tuple<real, real>>`
+  (points) to compile it. `p^{0.5}` and `3p` compile.
 - A node whose code a `compile` handler of its definition writes, when the
   static type of the node admits values of different shapes and code that no
   handler wrote reads its value. With `x: real` and `HostPair` declared with
@@ -13929,6 +14614,9 @@ and does not test it. So:
 - **Declare the type and the shape of each input that you will pass**:
   `ce.declare("x", "real")`, `ce.declare("L", "list<real>")`,
   `ce.declare("P", "tuple<real, real>")`. An input with no type declines.
+  An undeclared input has only the type that the compiled expression
+  requires of it; `ce.infer()` declares the types that several expressions
+  require.
 - **When an input can have two shapes**, compile one function for each
   shape, or declare the union (`real | tuple<real, real>`). One function for
   each shape has no run-time test. The union costs one test on each call,
@@ -13982,8 +14670,8 @@ scalar or a list, such as the result of a call whose return type is
   broadcasting, so scalar code would silently compute the wrong value.
   Function heads that lower to NumPy calls (`np.sin`, …) are unaffected —
   NumPy broadcasts natively.
-- **GLSL/WGSL**: such operands compile as scalar slots, unchanged — shader
-  targets have no dynamic lists.
+- **GLSL**: such operands compile as scalar slots, unchanged — the shader
+  target has no dynamic lists.
 
 ### Out-of-Domain Operands to String Operators
 
@@ -14175,7 +14863,7 @@ f.run(5);      // ➔ 5
 f.run(NaN);    // ➔ NaN
 ```
 
-Inside compiled code, every target (JavaScript, Python, GLSL, WGSL and
+Inside compiled code, every target (JavaScript, Python, GLSL and
 interval-js) adds the default value to each call that leaves the argument out
 when the expression is compiled. With
 `g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
@@ -14300,7 +14988,7 @@ console.log(f.run({ t: 0 }));
 
 The result has the same form as a `dictionary` input: a plain object whose
 own keys are the keys of the dictionary, including a key `__proto__`. A value
-whose type is `unknown` is not compiled. The GLSL, WGSL and interval targets
+whose type is `unknown` is not compiled. The GLSL and interval targets
 have no dictionary value, so a dictionary does not compile on them.
 
 ### Control Structures
@@ -14432,8 +15120,9 @@ console.log(sum.success, sum.run());
 ```
 
 On JavaScript, a loop that updates a block local with `xs = ReplaceAt(xs, i, v)`
-copies the list once, at the first update, and then writes it in place. This is
-not possible when the list has another name or is used in a way that could see
+copies the list once, at the first update, and then writes it in place. A result
+type on the function that holds the loop (`-> list<real>`) does not change
+this. This is not possible when the list has another name or is used in a way that could see
 a write, for example `ys = xs` in the loop or a function literal that reads
 `xs`. Each pass of the loop then copies the whole list, and the result reports
 it in `warnings`, with the code `'copying-list-update'` and the name of the
@@ -14464,13 +15153,21 @@ console.log(copying.warnings.map((w) => [w.code, w.binding]));
 // ➔ [["copying-list-update", "xs"]]
 ```
 
-On GLSL and WGSL, `Break` and `Continue` compile as a statement of a `Loop`
-body, alone or as the branch of an `If` with no else. So
+On GLSL, `Break` compiles as a statement of the body of a counted `Loop`,
+alone or as the branch of an `If` with no else. So
 `If(a > 3, Break())` in the body gives `if (3.0 < a) { break; }`, and a formula
 can stop as soon as its value is known. Any other position declines: an `If`
-with an else branch, a `Break` with a value, a jump in a value, a jump in a
-`Match` case, and a jump with no enclosing `Loop`. A `Return` in a loop on these
-targets also declines.
+with an else branch, a `Break` with a value, a jump in a value, and a jump with
+no enclosing `Loop`. `Continue` and `Return` decline on GLSL in every position.
+
+On `interval-js`, the condition of an `If` in a `Loop` body is compared with
+interval arithmetic, and a pass of the loop runs one branch only. When the
+input intervals decide the condition, the loop gives the value that the
+interpreter gives: with `x` declared `real`,
+`n ≔ 0; Loop(Block(n ≔ i; If(i > x, Break())), i ∈ 1..5); n + 1` gives
+`[4, 4]` for `x = 2` and for `x = [2.2, 2.8]`. When the condition is true at
+some points of an input interval and false at others, the pass where the loop
+stops is not known, and the result is `{ kind: 'entire' }` (`x = [1.5, 2.5]`).
 
 #### `Comprehension`
 
@@ -14485,32 +15182,32 @@ console.log(f.run());
 // ➔ [1, 4, 9, 16, 25]
 ```
 
-`Comprehension` is not compilable to GLSL or WGSL (shaders have no dynamic
-arrays). Imperative `Loop` is still compilable to GLSL/WGSL.
+On `glsl`, a comprehension over constant ranges is written out when the
+expression is compiled: `x^2 \keyword{for} x = [1...5]` compiles to
+`float[5](1.0, 4.0, 9.0, 16.0, 25.0)`. A comprehension whose range reads an
+input declines, because a shader has no array of a length known only at run
+time. A `Loop` over an integer range compiles to `glsl` in a block.
 
 #### Multi-statement constructs on the shader targets
 
-A shader has no expression-level loop or IIFE, so on GLSL and WGSL a `Sum` or
+A shader has no expression-level loop or IIFE, so on GLSL a `Sum` or
 `Product` with a symbolic bound is emitted as **statements** (with constant
 bounds it unrolls into an ordinary expression instead). Such a loop is hoisted
 ahead of the value that consumes it, so it can appear anywhere in an
-expression — `0.03\sum_{k=0}^{n}kx` compiles, and a nested sum is hoisted into
-its enclosing loop body rather than out of it.
+expression: with `n` declared `integer`, `0.03\sum_{k=0}^{n}kx` compiles, and
+a nested sum is hoisted into its enclosing loop body rather than out of it.
+A bound with no declared or inferred type declines (see "What the GLSL
+Target Compiles: `canCompile()`").
 
-A loop inside a **conditionally-evaluated branch** — an `If`, `Which` or `Match`
-arm — fails closed (`success: false`) instead. A shader conditional is
-an expression, not a statement, so there is no place to put the loop inside the
-branch; hoisting it out would run it whichever branch is selected, which changes
-the result whenever the branch draws from the random stream.
+A `Block`, with the `Loop` statements in it, is valid as the whole
+expression and as the body of a user function, and declines when used as a
+sub-expression.
 
-`Loop` and `Block` are not hoisted either — they remain valid only as a whole
-function body, and fail closed when used as a sub-expression.
-
-A shader has no dynamic array, so a literal `List`, `Tuple`, `PointList` or
-`Range` is written into the shader as a constant array constructor. The `glsl`
-and `wgsl` targets accept at most **256** elements this way. A larger constant
-collection is a `capability` decline with the diagnostic code
-`inline-collection-too-large`; the message names the element count and the
+A shader has no dynamic array, so a literal `List`, `Tuple` or `PointList` is
+written into the shader as a constant array constructor. The `glsl` target
+accepts at most **256** elements this way. A larger constant collection is
+outside the GLSL fragment: the compilation declines with the diagnostic code
+`outside-fragment`, and the message names the type of the list and the
 limit. Ship such a collection as a texture (a `storage: sampler2D` input read
 with `At`) instead. The `javascript` and `interval-js` targets have no such
 limit: a list of any length is one array constant there.
@@ -14519,12 +15216,13 @@ limit: a list of any length is one array constant there.
 const big = ce.box(['List', ...Array.from({ length: 300 }, (_, i) => i)]);
 const r = compile(ce.box(['At', big, 'k']), { to: 'glsl' });
 r.diagnostic.code;
-// ➔ "inline-collection-too-large"
+// ➔ "outside-fragment"
+r.diagnostic.operator;
+// ➔ "List"
 r.error;
-// ➔ "Could not compile `List`: a constant collection of 300 elements is above
-//    the 256 elements a shader array constructor takes on this target. Ship
-//    the collection as a texture (a `storage: sampler2D` input, read with
-//    `At`) instead."
+// ➔ "The value of `[0,1,2,…,299]` has the type `list<real, 300>`, which the
+//    GLSL target cannot hold (a list needs a static count of at most the
+//    array limit)."
 ```
 
 #### `Block` and `where`
@@ -14812,13 +15510,12 @@ which is `true`, and gives `1`. The two answers differ at the pole only. A
 closed form with no variable (`\{1/0 > 0: 1, 0\}`) is folded at compile time to
 the interpreter's answer, `0`.
 
-On the `glsl` and `wgsl` targets, an infinity or a `NaN` computed at run time
-is not guaranteed. The WGSL specification lets a GPU compiler assume that no
-infinity or `NaN` occurs at run time, and GPU drivers (Metal, for example)
-compile GLSL the same way. A division by zero in a shader can therefore give a
+On the `glsl` target, an infinity or a `NaN` computed at run time
+is not guaranteed. GPU drivers (Metal, for example) can assume that no
+infinity or `NaN` occurs at run time. A division by zero in a shader can therefore give a
 finite value, and so can a function of its result. For example,
 `\sin(2\pi T/P)` at `P = 0` is `NaN` on the `javascript` target, but on an
-Apple GPU both shader targets returned the same finite number. The compiled
+Apple GPU the shader returned a finite number. The compiled
 shader does not test each divisor for zero, because that test would add work
 to every division. When the value at a zero divisor matters, write the test
 in the expression, for example `\{P = 0: \operatorname{NaN}, \sin(2\pi T/P)\}`:
@@ -14947,7 +15644,7 @@ the value real (`x ≥ −1/e` for `LambertW`, `z ≤ 1` for `PolyLog`, `m ≤ 1
 the elliptic integrals), so under `mode: 'complex'` compiled `LambertW(x)` at
 `x = −1` is `{ re: -0.318…, im: 1.337… }`, as `.N()` gives, and compiled
 `LerchPhi(3, 2, 1)` is `0.7734 − 1.1505i`; under `strict` both are `NaN`. The
-GLSL and WGSL targets have no complex lane for these heads and decline a
+GLSL target has no complex lane for these heads and decline a
 provably complex value. `Arcsec` and `Arccsc` of a real operand of unknown
 magnitude are typed `complex | infinity | nan`, so with `x` declared `real`
 the compiled `Arcsec(x)` at `x = 0.5` is `{ re: 0, im: 1.317… }` in every
@@ -15291,419 +15988,242 @@ console.log(jsResult.run({ x: 3, y: 4 })); // → 25
 
 // Compile to GLSL
 const glslResult = compile(expr, { to: 'glsl' });
-console.log(glslResult.code); // → pow(x, 2.0) + pow(y, 2.0)
+console.log(glslResult.code); // → (x * x) + (y * y)
+```
+
+### What the GLSL Target Compiles: `canCompile()`
+
+A shader draws pixels, in 32-bit floats, on each frame. The `glsl` target
+therefore compiles a fixed list of forms, the **GLSL fragment**, and checks
+an expression against it before it writes code:
+
+- **Values**: real numbers, integers, booleans, complex numbers (a `vec2`),
+  points and vectors of 2 to 4 real components, colors, constant lists of at
+  most 256 numbers or points, and list inputs. A list input of at most 256
+  elements is a uniform array; a longer one must be in a texture (the
+  `storage` option below). Every free symbol has one of these types,
+  declared or inferred from its use.
+- **Operations**: arithmetic, the elementary and special functions of the
+  shader library, the parts of a complex number, points and vectors (`Dot`,
+  `Cross`, `Norm`, `Normalize`, `Distance`, `Length`, which is the number of
+  components), colors, comparisons and logic on numbers and booleans, `If`
+  and `Which` when every branch has the same type. An `If` with no else
+  branch gives `NaN` where its condition is false (`false` for a boolean
+  value): `If(x > 0, x)` compiles to `((0.0 < x) ? (x) : (_gpu_nan()))`.
+- **Sums and indexing**: `Sum` and `Product` over one or more integer ranges
+  (their bounds can read an input), `Sum` and `Product` of a point, of a
+  list of 2 to 4 numbers or of a list literal of at most 256 numbers, and
+  `At` with an integer index on a list or a point.
+- **Functions and blocks**: calls of user functions with no recursion, whose
+  body is an expression or a block of number, point or complex locals with
+  `for` loops over integer ranges, `break`, `if` and `+=`. A block can also
+  be the whole expression. A `parallel for` with number accumulators runs
+  its passes in order.
+- **Work done when compiling**: constant folding, derivatives with a closed
+  form, and comprehensions or `Map` over constant ranges, which are written
+  out (`x^2 \keyword{for} x = [1...5]` compiles to
+  `float[5](1.0, 4.0, 9.0, 16.0, 25.0)`).
+
+Random draws, matrices, `Match`, `Integrate`, symbolic operations, strings,
+dictionaries, function values, recursion and collections whose length is
+not known when compiling are outside the fragment.
+
+`canCompile(expr, options)` tells whether `compile(expr, options)` gives
+code, without writing any. It takes the options of `compile()` and answers
+`{ ok: true }`, or `{ ok: false, diagnostic }` with the first node outside
+the fragment. The diagnostic has the code `outside-fragment`, the operator
+of that node in `operator`, or the name of a symbol in `binding`. It never
+throws.
+
+```javascript
+import { ComputeEngine } from '@cortex-js/compute-engine';
+import { compile, canCompile } from '@cortex-js/compute-engine/compile';
+
+const ce = new ComputeEngine();
+
+canCompile(ce.parse('\\sin(x) + x^2'), { to: 'glsl' });
+// ➔ { ok: true }
+
+canCompile(ce.parse('\\int_0^x \\sin(t)\\,dt'), { to: 'glsl' });
+// ➔ { ok: false, diagnostic: {
+//      code: 'outside-fragment', kind: 'capability',
+//      message: 'The head `Integrate` is outside the GLSL fragment.',
+//      value: 'int_(0)^(x)(sin(t) dt)', operator: 'Integrate' } }
+```
+
+When the cause is a symbol, `binding` names it, and a declaration repairs
+it. The bound `n` of this sum has no type:
+
+```javascript
+canCompile(ce.parse('0.03\\sum_{k=0}^{n}kx'), { to: 'glsl' }).diagnostic.message;
+// ➔ "The symbol `n` has the type `unknown`, which has no type in the GLSL
+//    fragment: declare a numeric type for `n`."
+
+ce.declare('n', 'integer');
+canCompile(ce.parse('0.03\\sum_{k=0}^{n}kx'), { to: 'glsl' });
+// ➔ { ok: true }
+```
+
+A long list input names the option that puts it in a texture:
+
+```javascript
+ce.declare('H', 'list<number^1600>');
+canCompile(ce.box(['At', 'H', 'n']), { to: 'glsl' }).diagnostic.message;
+// ➔ "The list `H` has 1600 elements, more than the limit of 256 elements of
+//    a shader array: name it in the `storage` option
+//    (`storage: { H: 'sampler2D' }`) to read it from a texture."
+
+canCompile(ce.box(['At', 'H', 'n']), { to: 'glsl', storage: { H: 'sampler2D' } });
+// ➔ { ok: true }
+```
+
+A parameter of a user function with no declared type takes the type of its
+argument at the first call. A call with an argument of another type is
+refused:
+
+```javascript
+ce.declare('x', 'real');
+ce.declare('z', 'complex');
+ce.assign('sq', ce.box(['Function', ['Power', 'u', 2], 'u']));
+
+compile(ce.box(['sq', 'x']), { to: 'glsl' }).preamble;
+// ➔ "float _fn_sq(float u) {\n  return (u * u);\n}\n"
+
+canCompile(ce.box(['Add', ['sq', 'x'], ['Real', ['sq', 'z']]]), { to: 'glsl' })
+  .diagnostic.message;
+// ➔ "The parameter `u` of `sq` has no declared type in the GLSL fragment,
+//    and it has the type `real` of its argument at the first call; the
+//    argument `z` has the type `complex`. Declare the type of the
+//    parameter, or call the function with arguments of one type."
+```
+
+A parameter whose type is a list with no length, as the engine infers it
+from the `At` reads of the body, takes the type of its argument the same
+way: a list of 2 to 4 numbers, or a point, gives a `vecN` parameter.
+
+```javascript
+ce.declare('y', 'real');
+ce.declare('d', '(list<number>, list<number>) -> number');
+ce.assign('d', ce.box(['Function',
+  ['Add', ['Multiply', ['At', 'a', 1], ['At', 'b', 1]],
+          ['Multiply', ['At', 'a', 2], ['At', 'b', 2]]],
+  'a', 'b']));
+
+compile(ce.parse('d([x, y], [1, 2])'), { to: 'glsl' }).code;
+// ➔ "_fn_d(vec2(x, y), vec2(1.0, 2.0))"
+```
+
+A call of a user function with a list of 2 to 4 reals has the value that
+the interpreter gives. When every parameter of the function is scalar, the
+interpreter applies the function to each element of the list, and the
+shader code calls the function on each component with a wrapper. Otherwise
+the list binds its parameter whole: a parameter with no declared type, or a
+point parameter that the body reads by index, is a `vec2` to `vec4`.
+
+```javascript
+ce.assign('f', ce.box(['Function', ['Mod', 'u', 1], 'u']));
+compile(ce.box(['f', ['List', ['Negate', 'x'], ['Negate', 'y']]]), { to: 'glsl' })
+  .code;
+// ➔ "_fn_f_each2_1(vec2(-x, -y))"
+// The preamble has `float _fn_f(float u)` and the wrapper
+// `vec2 _fn_f_each2_1(vec2 a0) { return vec2(_fn_f(a0.x), _fn_f(a0.y)); }`
+
+ce.assign('R', ce.box(['Function',
+  ['List',
+    ['Sum', ['Multiply', 'V', ['List', ['Cos', 't'], ['Negate', ['Sin', 't']]]]],
+    ['Sum', ['Multiply', 'V', ['List', ['Sin', 't'], ['Cos', 't']]]]],
+  'V', 't']));
+compile(ce.box(['R', ['List', 'x', 'y'], 0.5]), { to: 'glsl' }).code;
+// ➔ "_fn_R_vector_real_2_number(vec2(x, y), 0.5)"
+```
+
+A longer list is refused, and so are lists of two lengths in one call of a
+scalar function, and a list at a point parameter that is declared or that a
+call in the body requires (the interpreter refuses the list there).
+
+`compile()` to `glsl` runs the same check first. For a node outside the
+fragment it declines with the same diagnostic: `success` is `false` and `run()` uses the
+interpreter, or, with `fallback: false`, it throws an error with the
+message. `compileFunction()`, `compileShader()` and `compileToSource()` of
+the GLSL target run the check too, and throw.
+
+```javascript
+const r = compile(ce.parse('\\int_0^x \\sin(t)\\,dt'), { to: 'glsl' });
+r.success;           // ➔ false
+r.diagnostic.code;   // ➔ "outside-fragment"
+r.diagnostic.operator; // ➔ "Integrate"
+```
+
+The answer depends only on the expression, the options and the declarations
+that the expression reaches (the types of its symbols, the definitions of the
+functions it calls). A program can keep it until one of those declarations
+changes. Only the `glsl` target has a fragment: for another target,
+`canCompile()` answers `ok: false`, and the program calls `compile()`. The
+exception is `javascript` with the option `profile: 'numeric-kernel'` (see
+"The `numeric-kernel` Profile (Experimental)").
+
+**A limit on the loops of a shader.** A shader cannot throw, and a loop with
+a large bound can stop the GPU long enough for the browser to lose the WebGL
+context. The code of `compile()` to `glsl` counts the passes of every loop
+(`Sum`, `Product`, `Loop`, `parallel for`, also in user functions), with one
+count for each evaluation. Over the limit, the loops stop and the value is
+`NaN` (`false` for a boolean). The limit is the `iterationBudget` option,
+10,000 by default; `Infinity` removes the counter. With
+`iterationBudget: 100`, `\sum_{k=1}^{n} kx` compiles to:
+
+```glsl
+_gpu_passes = 0;
+float _tv1 = 0.0;
+for (int k = 1; k <= int(floor(n)); k++) {
+  if (++_gpu_passes > 100) break;
+  _tv1 += float(k) * x;
+}
+float _tv2 = _tv1;
+return _gpu_passes > 100 ? _gpu_nan() : _tv2;
 ```
 
 ### Lists in Shader Storage: the `storage` Option
 
-On the `glsl` and `wgsl` targets, a free symbol that holds a list of numbers
-is by default a shader array of a fixed length (`uniform float S[1600];`,
-`array<f32, 1600>`), which you declare and fill. The `storage` option says
-where the values of a list live instead, per symbol name. The option is
-checked on every target, but only the shader targets use it: an unknown
+On the `glsl` target, a free symbol that holds a list of numbers is by
+default a shader array of a fixed length (`uniform float S[1600];`), which you
+declare and fill. The `storage` option says where the values of a list live
+instead, per symbol name. The option is checked on every target, but only the
+shader target uses it: an unknown
 kind, or a name that is not a free symbol of the expression, throws an error.
+
+A free symbol whose type gives no length (`list<number>`, `list`,
+`set<number>`, `matrix`) has no shader declaration, so a compilation that
+reads it declines and falls back to the interpreter. Declare the length in
+the type (`list<number^8>`).
 
 | Kind | Targets | The list | Reads |
 | :--- | :--- | :--- | :--- |
-| `'sampler2D'` | `glsl`, `wgsl` | A fixed length (`list<number^1600>`), in a single-channel float texture that you declare and upload | `At(S, i)` |
-| `{ kind: 'storage-buffer', group, binding }` | `wgsl` | A length and contents that you change at run time, in a storage buffer that the compilation declares | `At(S, i)`, `Length(S)`, `Sum`, `Product`, `Max`, `Min`, `Mean` of `S` |
+| `'sampler2D'` | `glsl` | A fixed length (`list<number^1600>`), in a single-channel float texture that you declare and upload | `At(S, i)` |
 
-#### Storage buffers (`'storage-buffer'`)
-
-A storage buffer holds a list whose contents and length change with no new
-compilation, for example the board of a game of life. Declare the symbol as
-a list of real numbers (`list<real>`), or of points of 2 to 4 real
-coordinates (`list<tuple<real, real>>`), and give the group and the binding
-of the buffer:
+A shader function has no parameter for a list. When a user-defined function
+receives a list input of the expression as an argument, the call uses a
+definition of the function with no parameter for the list, whose body reads
+the input itself, from the uniform array or the texture:
 
 ```javascript
-ce.declare('S', 'list<real>');
-const r = compile(ce.parse('S_{N\\lfloor y\\rfloor + \\lfloor x\\rfloor + 1}'), {
-  to: 'wgsl',
-  storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
+ce.declare('H', 'list<number^1600>');
+ce.declare('g', '(list<real>, real) -> real');
+ce.assign('g', ce.box(['Function', ['Multiply', ['At', 'L', 1600], 'x'], 'L', 'x']));
+const r = compile(ce.box(['g', 'H', 'x']), {
+  to: 'glsl',
+  storage: { H: 'sampler2D' },
 });
+// r.code: "_fn_g_bind0_H(x)"
+// r.preamble holds:
+// float _fn_g_bind0_H(float x) {
+//   return x * _gpu_texat1600(H, 1600.0);
+// }
 ```
 
-The preamble of the result declares the buffer, and the code reads it
-through helpers that the preamble also declares:
-
-```wgsl
-struct CE_List_f32 { len: u32, data: array<f32> }
-@group(1) @binding(0) var<storage, read> S: CE_List_f32;
-```
-
-The struct is named by its element type (`CE_List_f32`, `CE_List_vec2f`,
-`CE_List_vec3f`, `CE_List_vec4f`), so the same name always has the same
-text. The `var` line is declared once per buffer. If you merge the
-preambles of several compilations into one shader, keep one copy of each
-struct and one `var` line per buffer.
-
-`r.storageBuffers` gives the layout of each buffer that the code reads:
-`{ symbol, name, struct, group, binding, element, components, lengthOffset,
-dataOffset, stride, minBindingSize }`. A `vars` mapping of the symbol to an
-identifier names the buffer (`vars: { S: 'board' }` declares `board`); a
-mapping to anything else is a decline, and so are two lists mapped to one
-name. `freeSymbolTypes.S.lowered` is the name of the struct.
-
-**The layout that you write.** The buffer starts with the logical length of
-the list, a `u32` at byte 0. The elements follow, at the offset that the
-WGSL layout rules give to `data`, and with the stride of the element type:
-
-| Element | Element type | `dataOffset` | `stride` | `minBindingSize` |
-| :--- | :--- | ---: | ---: | ---: |
-| real number | `f32` | 4 | 4 | 8 |
-| point of 2 coordinates | `vec2f` | 8 | 8 | 16 |
-| point of 3 coordinates | `vec3f` | 16 | 16 | 32 |
-| point of 4 coordinates | `vec4f` | 16 | 16 | 32 |
-
-Element `k` (0-based) is at byte `dataOffset + k * stride`; the bytes
-between `len` and `dataOffset` are padding. A `vec3f` takes 16 bytes, not 12:
-write the three coordinates and leave the fourth `f32` unused. WebGPU
-requires room for one element in the binding, so the smallest buffer is
-`minBindingSize` bytes, also for an empty list.
-
-**A change of length** is one 4-byte write at offset 0
-(`device.queue.writeBuffer(buffer, 0, new Uint32Array([len]))`), with no new
-buffer, bind group or compilation. The buffer can hold more elements than
-`len`; `len = 0` is the empty list.
-
-**Index rules.** `At(S, i)` is 1-based and a negative index counts from the
-end, as on the other targets. An index of 0, a non-integer, `NaN`, an
-infinity, or an index whose absolute value is above `len` gives `NaN` (a
-vector of `NaN` for a point). A `len` larger than the number of elements the
-buffer holds makes every read of the list give `NaN`, never a read outside
-the buffer; `Length(S)` is then the number of elements the buffer holds, so
-that a loop bounded by `Length(S)` stops after them (a wrong `len` of 2³¹
-would otherwise run until the GPU times out). The index and the length are
-`f32` values in the shader, which are exact integers up to 2²⁴, so a list
-can have at most 16,777,216 (about 16.7 million) elements.
-
-**What reads the buffer.** `At(S, i)`; `Length(S)` (the `len` header);
-`Sum`, `Product`, `Max`, `Min` and `Mean` of `S` alone (a list of numbers
-only); and a sum or product whose bound is the length, such as
-`\sum_{k=1}^{\operatorname{Length}(S)} f(S_k, k)`, which is a loop over
-`len`. Each reduction runs once per shader invocation: with 22,500 elements,
-a reduction in a fragment shader reads 22,500 values per pixel. On the empty
-list, the values are those of the `javascript` target: `Sum` is 0,
-`Product` is 1, and `Max`, `Min` and `Mean` are `NaN`. An expression that
-uses the whole list in another way (`S + 1`, `2S`, `Max(S, 3)`, `Map`) has no
-shader form, because its length is known only at run time, and declines.
-
-The `glsl` target declines a storage buffer (WebGL2 has none): use
-`'sampler2D'` there. A list of complex numbers, booleans, strings or lists
-declines too.
-
-#### Long lists on `wgsl` with no `storage` hint
-
-WGSL guarantees a shader function only 8,192 bytes of function-scope
-variables, and an index read of an array value copies the array into such a
-variable. So on `wgsl`, a read of a free list symbol whose copy would need
-more than 8,192 bytes (more than 2,048 numbers, 1,024 points of 2
-coordinates, or 512 points of 3 or 4 coordinates) indexes the list where it
-is declared, with no copy: `At(S, i)` is `_gpu_at_S_22500(i)`, a helper whose
-body reads `S`. The symbol, or the identifier that `vars` maps it to, must
-then be a `var<storage>` declaration, not a parameter or a local of your own
-function. A `var<private>` does not do: WGSL gives `private` variables the
-same 8,192-byte guarantee as function variables. Nor does a `const` array,
-whose constructor is guaranteed only 2,047 elements. A read that would copy
-more than 8,192 bytes and cannot read in place (for example a `vars`
-mapping to a struct field, `u.S`) declines, with a message that names
-`'storage-buffer'`. A body that writes an input declines on every target,
-because compiled code writes only its own locals. A storage buffer is the recommended form for a long
-list. A shorter list keeps the copy, which is valid wherever you declare it.
-
-### WGSL Field Functions for Compute Shaders
-
-`WGSLTarget.compileFieldFunction()` compiles a scalar expression to a WGSL
-function that a compute shader of your own calls at each point of a grid, for
-example to sample an implicit surface `f(x, y, z) = 0` on a 3-D grid before
-meshing it. The Compute Engine supplies the function, the helper functions it
-calls and the layout of its parameters. You supply the entry point, the
-dispatch, the buffers and everything that reads the values.
-
-```javascript
-import { ComputeEngine, WGSLTarget } from '@cortex-js/compute-engine';
-
-const ce = new ComputeEngine();
-for (const s of ['x', 'y', 'z', 'c']) ce.declare(s, 'real');
-
-const wgsl = new WGSLTarget();
-const gyroid = wgsl.compileFieldFunction(
-  ce.parse('\\sin(x)\\cos(y) + \\sin(y)\\cos(z) + \\sin(z)\\cos(x) - c'),
-  { name: 'gyroid', coordinates: ['x', 'y', 'z'] }
-);
-```
-
-The result:
-
-- `function`: the declaration of the field function, with the coordinates as
-  `f32` arguments in the order of `coordinates`:
-
-  ```wgsl
-  fn gyroid(x: f32, y: f32, z: f32) -> f32 {
-    return -ce_params.c + sin(z) * cos(x) + sin(x) * cos(y) + sin(y) * cos(z);
-  }
-  ```
-
-- `paramsStructSource`: the declaration of the parameter struct type,
-  `struct CEParams { c: f32, }`. Every free symbol that is not a coordinate
-  is a **parameter**, a field of this struct, read as `ce_params.<name>`.
-- `params`: the fields of the struct, each with its `name`, `ceType`,
-  `wgslType` (`f32`, `vec2f`, `vec3f`, `vec4f` or `array<vec4f, k>`), byte
-  `offset` and `size` (and `length` for a list).
-- `paramsSize`: the size of the parameter buffer in bytes, a multiple of 16.
-- `helpers`: the other declarations that the function needs, by name: the
-  shared helpers (`_gpu_sin`, `_gpu_pow2`, …), the readers of list
-  parameters, and the user-defined functions that the expression calls. A
-  user-defined function `h` is named `_fn_<k>_<name>_h`, where `k` is the
-  number of characters of `name` (`_fn_6_fieldA_h`), so that two field
-  functions never give one name.
-- `warnings`: as `compile()` gives them, for example
-  `float32-unsafe-argument`.
-- `storageBuffers`: when the function reads a list in a storage buffer, the
-  layout of each buffer, as `compile()` gives it (see
-  [Storage buffers](#storage-buffers-storage-buffer)).
-
-The names are options: `paramsStruct` (default `'CEParams'`) and
-`paramsVariable` (default `'ce_params'`). The options `storage` and
-`constantFold` are those of `compile()`. A symbol with a `storage` hint is
-not a parameter: you supply the storage that the hint names.
-
-**Lists in a storage buffer.** A list with a `'storage-buffer'` hint is not a
-field of the parameter struct. The field function, and the user-defined
-functions it calls, read it with `At`, `Length`, `Sum`, `Product`, `Max`,
-`Min`, `Mean`, or a `\sum` to `\operatorname{Length}(S)`. Its declarations
-are in `helpers`: the struct type under its name (`CE_List_f32`), and the
-`var<storage, read>` line under the name of the buffer (`S`), so the module
-recipe below declares the buffer with no extra step. Its layout is in
-`storageBuffers`: bind the buffer at its `group` and `binding`, and write the
-`len` header and the elements as for `compile()`.
-
-```javascript
-const wave = wgsl.compileFieldFunction(
-  ce.parse('c + \\sum_{k=1}^{\\operatorname{Length}(S)} S_k \\sin(k x)'),
-  {
-    name: 'wave', coordinates: ['x', 'y', 'z'],
-    storage: { S: { kind: 'storage-buffer', group: 1, binding: 0 } },
-  }
-);
-// wave.helpers.S === '@group(1) @binding(0) var<storage, read> S: CE_List_f32;\n'
-// wave.storageBuffers[0] gives the offsets of `len` and of the elements.
-```
-
-**Parameters.** A real or integer scalar parameter is an `f32`. A
-parameter declared `integer` is a promise that you write an integral value:
-the field function relies on it (`\lfloor a \rfloor` compiles to
-`ce_params.a`). A list of
-`n` numbers, `n` at most 1024, (`list<number^n>`) is `array<vec4f, k>` with
-`k = ⌈n/4⌉`: element `i` (1-based) is the `f32` at byte `offset + 4(i − 1)`
-of the buffer. The function reads such a list only by position, with the
-rules of `At`: a negative index counts from the end, and `0`, an index that
-is not an integer and an index out of range give `NaN`.
-
-A **point**, a tuple of 2, 3 or 4 real numbers, is a `vec2f`, `vec3f` or
-`vec4f`. Its type comes from its declaration (`tuple<real, real, real>`) or,
-for a symbol that is not declared, from its value
-(`ce.assign('A', ['Tuple', 1, 2])`). A tuple of integers is a vector of `f32`
-too. A component declared `number` (`tuple<number, number>`) is read as a
-real number, as for a list of type `list<number^n>`: you can write only real
-values into the buffer. A component declared `complex` declines. The
-function reads the point as a WGSL vector, so you can use it whole or by
-component:
-
-```javascript
-// x, y, z and c are declared 'real', as in the first example. A coordinate
-// that is not declared is read with a NaN test: `_gpu_sin(y)`, not `sin(y)`.
-ce.assign('A', ce.box(['Tuple', 1, 2]));
-ce.assign('B', ce.box(['Tuple', 0.5, -1, 2]));
-const field = wgsl.compileFieldFunction(
-  ce.parse('c + \\operatorname{distance}((x,y,z),B) + A.x \\sin(y) - B.z'),
-  { name: 'field', coordinates: ['x', 'y', 'z'] }
-);
-// field.function:
-//   return ce_params.c + sin(y) * ce_params.A.x + -ce_params.B.z
-//     + distance(vec3f(x, y, z), ce_params.B);
-// field.paramsStructSource: struct CEParams { c: f32, A: vec2f, B: vec3f, }
-// offsets: c 0, A 8, B 16; paramsSize 32
-```
-
-`A.x` (or `A_1`) reads the first component, and `\operatorname{distance}`,
-`|A|`, `\operatorname{Norm}`, `\operatorname{Dot}`, the sum and difference of
-points, and `At(A, i)` work as in `compile()` for a symbol declared as a
-point. A point with 1 or more than 4 components, or with a component that is
-not a real number (a complex number, `NaN` or a list), declines.
-
-The scalars come first in the struct, in name order, then the points in name
-order, then the lists in name order. Each field starts at the next multiple
-of its alignment, as the WGSL layout rules require: an `f32` at a multiple of
-4 bytes, a `vec2f` (8 bytes) at a multiple of 8, a `vec3f` (12 bytes) and a
-`vec4f` (16 bytes) at a multiple of 16, and a list at a multiple of 16 bytes
-(the stride of `array<vec4f, k>` is 16 bytes, which a uniform buffer
-requires). Read the offsets from `params`: the padding between two fields is
-not written.
-
-A symbol whose value is a numeric constant is a parameter too: a number
-(`c := 0.5`), or a tuple or list of numbers (`A := (1, 2)`, `L := [1, 2, 3]`).
-The field function does not read its value in the engine, and you write the
-value to the buffer. A symbol whose value reads other symbols, or calls a
-user-defined function, is not a parameter: its value is written into the
-code, as `compile()` does. With
-`A := (x, 1)`, where `x` is a coordinate, `A.x` reads the coordinate `x`. With
-`a := 1`, `b := 2` and `A := (a, b)`, the parameters are `a` and `b`, and `A`
-is compiled as `vec2f(ce_params.a, ce_params.b)`. A value that reads itself
-through other symbols declines. A constant (`\pi`, or a symbol declared
-constant) is folded into the code, and a symbol whose value is a function is
-a user-defined function.
-
-**A user-defined function that reads a parameter.** Declare the parameter
-before its first assignment and before the function is defined:
-
-```javascript
-ce.declare('a', 'real');
-ce.assign('a', 5);
-ce.parse('h(t) := t + a').evaluate();   // reads ce_params.a
-```
-
-Without the declaration, the type of `a` is inferred from its value
-(`integer`), and the result type of `h` comes from that type. The field
-function reads `a` from the buffer as a real number, so that result type is
-not correct there: `\lfloor h(x) \rfloor` would lose its `floor`. The field
-function then declines, and its message names the declaration to add
-(`ce.declare('a', 'real')`, or `ce.declare('A', 'tuple<real, real>')` for a
-point). The same applies when the function reads the parameter through a
-symbol compiled in place (`c := a + 1`), and to a symbol compiled in place
-whose type comes from the parameter (`b := a`). A symbol compiled in place
-with a declared type that its value no longer fits (`b` declared `integer`,
-`b := a`, `a := 5`) declines too: declare `a` as `integer`, or `b` as `real`.
-A parameter with a real value (`a := 2.5`) needs no declaration.
-
-**A parameter change is a buffer write.** The compiled text does not depend
-on the parameter values: write the new values to the buffer, with no new
-compilation and no new pipeline.
-
-**The host module.** Declare the uniform variable with the struct type, then
-add the struct, the helpers and the function:
-
-```javascript
-const N = 64;  // grid points on each axis
-const module = [
-  gyroid.paramsStructSource,
-  '@group(0) @binding(0) var<uniform> ce_params: CEParams;',
-  '@group(0) @binding(1) var<storage, read_write> values: array<f32>;',
-  ...Object.values(gyroid.helpers),
-  gyroid.function,
-  '@compute @workgroup_size(4, 4, 4)',
-  'fn main(@builtin(global_invocation_id) id: vec3u) {',
-  `  if (any(id >= vec3u(${N}u))) { return; }`,
-  `  let p = vec3f(-4.712) + vec3f(id) * (9.424 / ${N - 1}.0);`,
-  `  values[id.x + ${N}u * (id.y + ${N}u * id.z)] = gyroid(p.x, p.y, p.z);`,
-  '}',
-].join('\n');
-```
-
-Write the parameter buffer from the `params` offsets:
-
-```javascript
-const paramsBuffer = device.createBuffer({
-  size: gyroid.paramsSize,
-  usage: GPUBufferUsage.UNIFORM | GPUBufferUsage.COPY_DST,
-});
-
-function writeParams(values) {
-  const data = new Float32Array(gyroid.paramsSize / 4);
-  for (const p of gyroid.params) {
-    const v = values[p.name];
-    if (p.wgslType === 'f32') data[p.offset / 4] = v;
-    else data.set(v, p.offset / 4);   // a point or a list: one f32 each
-  }
-  device.queue.writeBuffer(paramsBuffer, 0, data);
-}
-
-writeParams({ c: 0.3 });   // then dispatch again: no recompilation
-```
-
-When the function has no parameter, `params` is empty, `paramsSize` is `0`
-and `paramsStructSource` is `''`: do not declare the uniform variable.
-
-**Several fields in one module.** A helper name always has the same source
-text, so you can merge the `helpers` of several field functions by name.
-Give each field function its own `name`, struct and variable, and bind one
-uniform buffer for each. Two fields can read one storage buffer: give it the
-same hint (the same `group` and `binding`) in both, and its two `helpers`
-entries are then the same text under the same names. This is the one
-exception to the rule that a helper name always has the same text: the
-declaration of a buffer, under the name of the buffer, has the same text only
-for the same hint and the same element type (a list of numbers is a
-`CE_List_f32`, a list of 2-D points a `CE_List_vec2f`). If two fields give two
-different texts under one key, their hints disagree: treat that as an error,
-and give the buffer one hint in every field.
-
-```javascript
-const a = wgsl.compileFieldFunction(exprA, {
-  name: 'fieldA', coordinates: ['x', 'y', 'z'],
-  paramsStruct: 'AParams', paramsVariable: 'a_params',
-});
-const b = wgsl.compileFieldFunction(exprB, {
-  name: 'fieldB', coordinates: ['x', 'y', 'z'],
-  paramsStruct: 'BParams', paramsVariable: 'b_params',
-});
-const helpers = { ...a.helpers, ...b.helpers };
-const module = [
-  a.paramsStructSource,
-  b.paramsStructSource,
-  '@group(0) @binding(0) var<uniform> a_params: AParams;',
-  '@group(0) @binding(1) var<uniform> b_params: BParams;',
-  ...Object.values(helpers),
-  a.function,
-  b.function,
-  // … the entry point calls fieldA(…) and fieldB(…)
-].join('\n');
-```
-
-**Declines.** The result is `success: false` with a `diagnostic`
-(`{ code, kind, message }`) in these cases:
-
-- `compile(expr, { to: 'wgsl' })` declines the expression: for example a
-  recursive function, a `Random()` outside `WithRandomSeed`, or `Integrate`.
-  The diagnostic is the diagnostic of `compile()`.
-- A parameter is a boolean, text, a complex number, a tuple that is not a
-  point of 2, 3 or 4 real numbers, a list of unknown length, or a list of
-  more than 1024 elements (`code: 'unsupported-parameter'`).
-  Give a longer list, or a list of unknown length, a `'storage-buffer'`
-  hint. A storage buffer cannot hold complex numbers, text, booleans or
-  lists of lists either.
-- The parameter struct takes more than 65,536 bytes, the size of a uniform
-  buffer binding that WebGPU guarantees (`maxUniformBufferBindingSize`):
-  read the largest lists from storage buffers instead.
-- A list parameter is used other than by position, for example in `\max(P)`.
-- The body assigns a coordinate or a parameter: a field function cannot write
-  its inputs. A name that only the body assigns is a local, not a parameter.
-- The body has no value to return (a lone declaration or assignment).
-- A user-defined function reads a coordinate that it does not take as a
-  parameter (`h(t) := t + x` called as `h(y)`): a user-defined function is
-  declared outside the field function, where the coordinates do not exist.
-  Pass the coordinate as an argument.
-- A user-defined function declares the name of `paramsVariable` (a parameter
-  `p` with `paramsVariable: 'p'`). Choose another name.
-- The value is not a real scalar: a complex number, a point, a boolean or a
-  list (`code: 'unsupported-result'`, `kind: 'capability'`). The value of
-  each `Return` in the body must be a real scalar too.
-
-A wrong option throws an error: a name that is not a WGSL identifier
-starting with a letter, a reserved word, a predeclared WGSL function or type
-(`sin`, `max`, `vec4f`), which would hide the built-in that the helpers call,
-a name that starts with `CE_List_` (the prefix of the storage-buffer
-structs), or a `storage` hint on a coordinate. A storage buffer whose name
-(or `vars` mapping) is a predeclared WGSL name declines, here and in
-`compile()`.
-
-**Numerical limits.** The function computes in `f32` (about 7 decimal
-digits; integers are exact up to 2²⁴). An infinity or a `NaN` computed at run
-time is not guaranteed on a GPU (see [Non-Finite Results](#non-finite-results)),
-and `sin` and `cos` of a large argument lose accuracy. A parameter declared
-`real` is a promise that you write a finite value: the function then calls
-the built-in `sin` and `cos` of an operand that reads it, with no `NaN`
-test.
+The argument must be an input. For a list argument that is a local
+variable, a list literal or a computed list, the function still has no
+shader definition: the compilation declines, unless it can fold or inline
+the call.
 
 ### Python/NumPy Target
 
@@ -15890,13 +16410,13 @@ Many Points at Once* and *Worker Threads* above.
 #### GLSL Interval Target (`interval-glsl`)
 
 :::warning[Deprecated]
-The `interval-glsl` target (and the never-rebuilt `interval-wgsl` sibling) is
+The `interval-glsl` target is
 deprecated and will be removed in a future release. GPU interval evaluation only
 pays off when the entire pipeline stays on the GPU; a compile → GPU framebuffer →
 `readPixels` → CPU round-trip is net-negative versus CPU `interval-js`, and the
 target cannot compile any relational operator (so it cannot host
 restriction/masking conditions). Use **`interval-js`** (CPU interval arithmetic)
-or the scalar **`glsl`**/**`wgsl`** targets instead.
+or the scalar **`glsl`** target instead.
 :::
 
 For GPU-based plotting, compile to GLSL interval arithmetic:
@@ -16737,7 +17257,8 @@ ce.parse("x").isGreater(0);
 
 ## Type Inference from Assumptions
 
-The type of a symbol is automatically inferred from assumptions:
+The type of a symbol is automatically inferred from assumptions.
+`ce.assume()` declares the symbols that it constrains:
 
 ```js
 ce.assume(ce.parse("x > 4"));
@@ -17304,6 +17825,33 @@ Wildcards can be used to capture the head of functions:
 console.log(ce.expr(["Add", 1, "x"]).match(ce.expr(["_f", "__args"])));
 // ➔ { _f: "Add", __args: ["Sequence", [1, "x"]] }
 ```
+
+### Library Names in a Pattern
+
+A function name in a pattern that is the name of a library function, such as
+`Sqrt`, means the library function. In a scope where a user function `Sqrt`
+is declared, a call of the user function does not match the pattern, and a
+rewrite rule for the library function does not apply to it. A name that is not
+the name of a library function matches by name, and a wildcard head captures
+the name.
+
+```js
+const L = ce.box(['Sqrt', 'y']);    // the library square root
+ce.pushScope();
+ce.declare('Sqrt', 'function');
+ce.assign('Sqrt', ce.box(['Function', ['Add', 'x', 100], 'x']));
+const U = ce.box(['Sqrt', 'y']);    // the user function
+console.log(L.match(['Sqrt', '_x']));
+// ➔ { _x: "y" }
+console.log(U.match(['Sqrt', '_x']));
+// ➔ null
+console.log(U.match(['_f', '_x']));
+// ➔ { _f: "Sqrt", _x: "y" }
+ce.popScope();
+```
+
+A repeated named wildcard matches only parts that are `isSame`: the pattern
+`["Tuple", "_x", "_x"]` does not match `["Tuple", L, U]`.
 
 
 ## Substitution
@@ -18509,14 +19057,19 @@ ce.expr(['Trace', S]).evaluate().toString();  // → a + d
 A symbol whose type can hold a list (a `matrix`, a `tensor`, `number | tensor`)
 can be a matrix itself. Then the list can be a block matrix, so it is not
 typed as a matrix, and `Trace`, `Determinant` and `Inverse` of it stay
-unevaluated. A symbol gets such a type when it is declared with it, or when it is
-first used as the operand of a matrix operation: `Determinant(a)` gives `a`
-the type `matrix`, and `Trace(a)` gives it the type `number | tensor`
-(`Trace` also accepts a scalar and a tensor of any rank).
+unevaluated. A symbol gets such a type when it is declared with it. In an
+expression, the operand of a matrix operation has such a type:
+`Determinant(a)` gives `a` the type `matrix`, and `Trace(a)` gives it the
+type `number | tensor` (`Trace` also accepts a scalar and a tensor of any
+rank). That type belongs to the expression; `ce.infer()` declares it:
 
 ```js example
-ce.expr(['Determinant', 'a']);
-ce.expr('a').type.toString();   // → matrix
+const det = ce.expr(['Determinant', 'a']);
+det.op1.type.toString();        // → matrix
+ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
+// → matrix<2x2>: `a` is not declared
+
+ce.infer([det]);                // declares a: matrix
 ce.expr(['List', ['List', 'a', 'b'], ['List', 'c', 'd']]).type.toString();
 // → list<list<unknown>>
 ```
@@ -20147,6 +20700,33 @@ example:
 - prefer using `"Sum"` rather than **U+2211 `∑` N-ARY SUMMATION**, which can
   be visually confused with **U+03A3 `Σ` GREEK CAPITAL LETTER SIGMA**.
 
+### Library Names Shadowed by a Local Definition
+
+A symbol reads the definition of its name in the scope where it is read. A
+local definition can shadow a name of the standard library: in a block where
+`Pi` is declared and assigned `3`, the symbol `"Pi"` is `3`.
+
+The expression `["Module", name]` is the definition of `name` in the standard
+library, whatever the scope defines. A call of a library function is
+`["Apply", ["Module", name], ...arguments]`:
+
+```json
+["Add", ["Module", "Pi"], "Pi"]
+// ➔ π + 3 in the block above
+
+["Apply", ["Module", "Floor"], 2.5]
+// ➔ 2, also where a user function `Floor` is defined
+```
+
+The Compute Engine writes these forms in the MathJSON of an expression (`.json`
+and `toMathJson()`) only in a scope where the bare name would read another
+definition. So the MathJSON of a result, read again in that scope, has the same
+value. Outside such a scope, the bare name is written. A name that the library
+does not define is the error `["Error", "'not-a-library-name'", name]`. Where
+a user function shadows the name of a library function, a qualified call of it
+is the call of the library function, and the library rules apply to it, also
+for a library function that holds or binds its arguments (`Sum`, `If`).
+
 ---
 
 The following naming convention for wildcards, variables, constants and function
@@ -21383,13 +21963,13 @@ parses one.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -21896,11 +22476,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl`, `wgsl` and `python` once the full package entry,
+`glsl` and `python` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget` or `PythonTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -22218,13 +22798,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -22320,13 +22900,13 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -22406,6 +22986,30 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
+##### ComputeEngine.withValues() {#withvalues-1}
+
+```ts
+withValues<T>(values, fn): T
+```
+
+Run `fn` with each symbol of `values` bound to the given value, and
+put back the earlier value and type of each symbol when `fn` returns or
+throws. `fn` must be synchronous.
+
+• T
+
+####### values
+
+\{\}
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.declareType() {#declaretype-1}
 
 ```ts
@@ -22419,13 +23023,13 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -22493,13 +23097,13 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -22572,13 +23176,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -22592,13 +23196,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -22622,13 +23226,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -22676,13 +23280,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -22706,13 +23310,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -23526,6 +24130,23 @@ Lower and upper bounds for a symbol extracted from a domain restriction.
 
 </MemberCard>
 
+<MemberCard>
+
+### StaticShape {#staticshape}
+
+```ts
+type StaticShape = {
+  indexed: boolean;
+  count: number | bigint | undefined;
+  elementType: Type | undefined;
+};
+```
+
+The collection shape that an expression promises before it is evaluated.
+See `Expression.staticShape`.
+
+</MemberCard>
+
 ### NumberLiteralInterface {#numberliteralinterface}
 
 Narrowed interface for number literal expressions.
@@ -23849,7 +24470,7 @@ readonly isCollection: true;
 
 <MemberCard>
 
-##### CollectionInterface.count {#count-2}
+##### CollectionInterface.count {#count-3}
 
 ```ts
 readonly count: number | bigint | undefined;
@@ -25514,13 +26135,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -25660,6 +26281,12 @@ of two forms:
 In both forms the derivative of `F(g₁, …, gₙ)` with respect to `v` is
 given by the chain rule: `Σᵢ ∂ᵢF(g₁, …, gₙ) · ∂gᵢ/∂v`. A partial
 derivative is requested only for an argument that depends on `v`.
+
+For an argument that is a point (a tuple or a list of tuples), the
+product `∂ᵢF · ∂gᵢ/∂v` multiplies each coordinate. It is correct only
+when the partial derivative is a number `c` (the Jacobian is `c·I`). When
+the partial derivative is a point (a gradient) or is not given, the
+derivative of the application stays unevaluated.
 
 </MemberCard>
 
@@ -26048,8 +26675,8 @@ callsCallbackOnRead?: boolean;
 ```
 
 Set on a lazy operator that calls a function operand when its elements
-are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, `Fill`,
-…). An instance created during a function call keeps the evaluation
+are read, not when it is evaluated (`Map`, `Filter`, `Tabulate`, …).
+An instance created during a function call keeps the evaluation
 context of that call, and each read of the instance runs in it, so that
 a name that the callback reads by its binding in the context (the symbol
 default `d` of a parameter `(x, k = d) => x * k`) has the value it had in
@@ -26756,13 +27383,13 @@ of `admittedAs`. `undefined` leaves the expression unevaluated.
 ```ts
 resultType(operator, operandTypes): 
   | string
-  | ListType
+  | RecordType
   | AlgebraicType
   | NegationType
   | CollectionType
+  | ListType
   | SetType
   | BroadcastableType
-  | RecordType
   | ObjectType
   | DictionaryType
   | TupleType
@@ -29190,7 +29817,11 @@ occurrences of the new name are the name and not an element of the base.
 The other parts of `expr` are not changed. The parse of a body that
 precedes the clause (`n_{0} + 1 \operatorname{with} n_{0} = 2`, an infix
 entry) is rewritten the same way, so a custom clause can bind a name
-after its body was read.
+after its body was read. A `Subscript` that the parser made from a
+joined name in the body of an inner sum or product
+(`\sum_{m_{n_0}=1}^{3}\sum_{n_0=1}^{2} m_{n_0}`, where the inner sum
+reads `m_{n_0}` as `m` indexed by `n_0`) is replaced the same way: here
+it is the name `m_n_0`, the index of the outer sum.
 
 ####### expr
 
@@ -32375,6 +33006,12 @@ If the expression cannot be evaluated, due to the values, types, or
 assumptions about its arguments, return `undefined` or
 an `["Error"]` expression.
 
+The handler must not evaluate an expression that contains the call
+that it evaluates, for example an expression that the host code keeps
+in a variable. The engine does not detect this, and the result is not
+specified. Under `evaluateAsync()` the promise of the outer evaluation
+can never settle (see `evaluateAsync`).
+
 #### OperatorDefinition.evaluateAsync?
 
 ```ts
@@ -32391,6 +33028,17 @@ the precision window of an enclosing `N(x, p)` call. An operand
 evaluation started with options of the handler's own inherits the
 window in force when it starts, but a handler that awaits BEFORE it
 evaluates its operand starts that evaluation outside the window.
+
+The handler must not evaluate an expression that contains the call
+that it evaluates. If it does, the promise of the outer evaluation can
+never settle. For example, with `g` a host operator whose handler is
+`async () => { await node.evaluateAsync(); return ce.number(5); }`
+and `node` the expression `Reverse(List(1, g()))`, the call
+`node.evaluateAsync()` never settles. When `g` is declared `pure`, the
+nested call waits for the evaluation of `node` that is in progress,
+and that evaluation waits for the handler. Otherwise, each nested call
+starts a new evaluation of `node`, which calls the handler again,
+without end. The engine does not detect either case.
 
 #### OperatorDefinition.evalDimension?
 
@@ -33991,13 +34639,13 @@ parses one.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -34504,11 +35152,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl`, `wgsl` and `python` once the full package entry,
+`glsl` and `python` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget`, `WGSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget` or `PythonTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -34826,13 +35474,13 @@ type(type): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -34928,13 +35576,13 @@ createScope(bindings?, parent?): InspectableScope
 
 `Record`\<`string`, 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -35014,6 +35662,30 @@ assign(arg1, arg2?): IComputeEngine
 
 <MemberCard>
 
+##### IComputeEngine.withValues() {#withvalues}
+
+```ts
+withValues<T>(values, fn): T
+```
+
+Run `fn` with each symbol of `values` bound to the given value, and
+put back the earlier value and type of each symbol when `fn` returns or
+throws. `fn` must be synchronous.
+
+• T
+
+####### values
+
+\{\}
+
+####### fn
+
+() => `T`
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.declareType() {#declaretype}
 
 ```ts
@@ -35027,13 +35699,13 @@ declareType(name, type, options?): void
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -35101,13 +35773,13 @@ declare(id, type, scope?): IComputeEngine
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -35180,13 +35852,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
 ####### arg2?
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -35200,13 +35872,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`ValueDefinition`](#valuedefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -35230,13 +35902,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -35284,13 +35956,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   \| `Partial`\<`OnlyFirst`\<[`OperatorDefinition`](#operatordefinition), [`BaseDefinition`](#basedefinition) & \{
   `holdUntil`: `"never"` \| `"evaluate"` \| `"N"`;
   `type`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -35314,13 +35986,13 @@ declare(arg1, arg2?, arg3?): IComputeEngine
  \} & `Partial`\<[`BaseDefinition`](#basedefinition)\> & `Partial`\<[`OperatorDefinitionFlags`](#operatordefinitionflags)\> & \{
   `type`: [`OperatorTypeHandlerOnTypes`](#operatortypehandlerontypes);
   `signature`:   \| `string`
-     \| [`ListType`](#listtype)
+     \| [`RecordType`](#recordtype)
      \| [`AlgebraicType`](#algebraictype)
      \| [`NegationType`](#negationtype)
      \| [`CollectionType`](#collectiontype)
+     \| [`ListType`](#listtype)
      \| [`SetType`](#settype)
      \| [`BroadcastableType`](#broadcastabletype)
-     \| [`RecordType`](#recordtype)
      \| [`ObjectType`](#objecttype)
      \| [`DictionaryType`](#dictionarytype)
      \| [`TupleType`](#tupletype)
@@ -37035,8 +37707,9 @@ readonly defines: readonly string[];
 
 The symbols **defined** by this expression: the target of a top-level
 `["Assign", …]` or `["Declare", …]` (e.g. `a` in `a := 3`, `f` in
-`f(x) := …`), recursing through `["Block", …]` sequences. Empty for
-expressions that define nothing.
+`f(x) := …`), recursing through `["Block", …]` sequences. A
+destructuring target defines each name of its pattern: `a` and `b` in
+`(a, b) := (1, 2)`. Empty for expressions that define nothing.
 
 Complements [freeVariables](#freevariables) (the symbols an expression
 *references*). A tool that builds a dependency graph keyed on cells —
@@ -37524,19 +38197,59 @@ series in `Normal` to drop the remainder, before or after the
 substitution. `Normal(Series(sin x, x, 0, 3))` with `x` replaced by
 `0.5` evaluates to `0.479…` under `.N()`.
 
-The substitution does not avoid variable capture: a replacement that
-contains a name that a binder binds is inserted as it is, and the
-binder is not renamed. `["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]`
-with `j` replaced by `k` is `["Sum", ["Add", "k", "k"], ["Limits", "k",
-1, 3]]`, which evaluates to `12`. When the replacement can contain the
-index, rename the index first with a recursive `replace()` of the rule
-`k -> m`: the result is `["Sum", ["Add", "k", "m"], ["Limits", "m", 1,
-3]]`, which evaluates to `3k + 6`.
+A `Block` that assigns a variable of an enclosing scope, and can read it
+before the first assignment, reads its value from outside the block, so
+the variable is free. A replacement of each occurrence would give an
+invalid assignment, so the block keeps its occurrences and gets a first
+statement that assigns the replacement: with `a` declared outside the
+block, `["Block", ["Assign", "a", ["Add", "a", 1]], "a"]` with `a`
+replaced by `2` is `["Block", ["Assign", "a", 2], ["Assign", "a", ["Add",
+"a", 1]], "a"]`, which evaluates to `3`. When it is evaluated, the block
+writes the variable of the enclosing scope, as the block it replaces
+does. With several such variables, the first statement assigns them all
+at the same time: `["Assign", ["Tuple", "a", "b"], ["Tuple", "b",
+"a"]]` for `a` replaced by `b` and `b` replaced by `a`. A replacement of
+another name that reads such a variable (`x` replaced by `a` with `a`
+replaced by `3`) is inserted as it is, and reads the value that the
+first statement assigns.
 
-Note a similar effect can be achieved with `this.replace()`, but
-using `this.subs()` is more efficient and simpler, but limited
-to replacing symbols. A recursive `replace()` does not skip bound
-variables.
+The substitution avoids variable capture. When a replacement contains a
+free name that a binder binds, and the substitution replaces an
+occurrence in the scope of that name, the binder renames the name to a
+fresh name first: `k` becomes `k_1`, or `k_2` when `k_1` is used in the
+binder or in a replacement.
+`["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]` with `j` replaced by
+`k` is `["Sum", ["Add", "k", "k_1"], ["Limits", "k_1", 1, 3]]`, which
+evaluates to `3k + 6`, and `["Function", ["Power", "y", "x"], "x"]` with
+`y` replaced by `x` is the function `x_1 ↦ x^(x_1)`. A named argument of a
+call of such a renamed function uses the new name of the parameter. A
+binder with no such name is not renamed and keeps its identity.
+
+In two cases a bound name cannot be renamed before the block runs, and
+the replacement is inserted as it is, so the held block captures the
+name:
+- the target of an `Assign` in a `Block` that is not canonical (a held
+  block), when no `Declare` of the block declares it. The `Assign` makes
+  a local only when the name is not declared where the block is released.
+  With `s` declared, `["Hold", ["Block", ["Assign", "s", 3], ["Add", "y",
+  "s"]]]` with `y` replaced by `s` is `["Hold", ["Block", ["Assign", "s",
+  3], ["Add", "s", "s"]]]`, and its released value is `6`;
+- a `Declare` or an `Assign` in an operand of a statement of a held
+  block (a branch of an `If`): the later reads denote the local only when
+  that branch runs.
+
+The replacement is also inserted as it is in a few other rare cases
+where a correct rename cannot be decided before the expression runs.
+
+`this.replace()` can give a similar result, and it can replace more
+than symbols, but `this.subs()` is more efficient and simpler. A
+recursive `replace()` does not skip bound variables and does not rename
+a binder: it rewrites the structure of the expression. A rule whose
+match is the symbol `j` replaces the `j` of
+`["Sum", ["Add", "j", "k"], ["Limits", "k", 1, 3]]` by `k` with no
+rename, and its result evaluates to `12`. The values of the wildcards of
+a rule are inserted in its replacement the same way: a binder that the
+replacement writes binds the names in them.
 
 The free symbols of the result are bound in the CURRENT scope, not in the
 scope the receiver was built in. A node that owns a local scope keeps
@@ -38239,7 +38952,9 @@ different questions and neither implies the other:
   symbol declared `list<number>`/`vector<2>` that has not been assigned
   yet, and for an application whose head returns a collection (`L(1)`
   under `L: (number) -> vector<2>`): both are collection-shaped, but
-  there is nothing to walk.
+  there is nothing to walk. To ask what shape an expression promises
+  before evaluation (`L(1)` promises an indexed collection of 2
+  elements), read `staticShape`.
 - `type.matches('collection<any>')` — "is this operand
   collection-**shaped**?" It is `true` for those valueless cases, and
   `false` for a materialized collection whose type is top
@@ -38288,6 +39003,55 @@ union predicates in `collection-utils.ts` as well:
 `unionMayHoldACollection()` for an ENUMERATION gate (a big op folding its
 body — tuple, string and fixed-shape branches enumerate too), or
 `scalarOrCollectionUnionBranches()` for a BROADCAST gate.
+
+</MemberCard>
+
+<MemberCard>
+
+##### Expression.staticShape {#staticshape-1}
+
+```ts
+readonly staticShape: StaticShape | undefined;
+```
+
+The collection shape that this expression promises, read without
+evaluating it, or `undefined` when it promises no collection.
+
+`staticShape` answers the SHAPE question: "what does this expression
+promise to be?". `isCollection` answers the CAPABILITY question: "is a
+collection value present that I can walk now?". The two differ for an
+expression that has no value yet:
+
+```js
+ce.assign('f', ce.parse('n \\mapsto [n, n+1, n+2, n/2]'));
+const e = ce.box(['f', 3]);
+e.isCollection;  // false: nothing to walk before evaluation
+e.count;         // undefined
+e.staticShape;   // { indexed: true, count: 4, elementType: 'rational' }
+```
+
+The answer comes from:
+
+- the collection facets, when `isCollection` is `true` (a list, a
+  string, a dictionary, a symbol that holds a collection);
+- the declared type of a symbol with no collection value
+  (`L: vector<2>` gives a count of 2). A type that the engine inferred
+  from the uses of an undeclared name is not a promise;
+- the static type of an application whose head is bound: a library
+  operator, a function literal assigned to a name, or a declared
+  signature. A call of an undeclared name (`foo([1, 2])`) promises
+  nothing, although its type lifts over the collection argument. A
+  broadcast (`x + 1`) promises a collection only when one of its
+  operands promises one. A `missing` or `nothing` arm of the type is an
+  absence of the whole value and is set aside; a type with a scalar arm
+  or a string type promises nothing;
+- the arms of a selection (`If(c, a, b)`, `Which`), when every arm
+  promises a collection and no arm is a point or a string.
+
+`each()` and `at()` give the elements of the VALUE. When the value
+does not have the declared type, `each()` can give another number of
+elements than `staticShape.count`; the host must supply values of the
+declared types.
 
 </MemberCard>
 
@@ -38415,6 +39179,14 @@ for (const e of expr.each()) {
 }
 ```
 
+`each()` gives the elements of the value, and `staticShape.count` gives
+the number of elements that the expression promises before evaluation.
+The two can differ when the value does not have the declared type: a
+call of a function declared `(integer) -> vector<3>` whose body gives
+two elements has a `staticShape.count` of 3, but its value gives two
+elements. The host must supply values of the declared types. Read
+`staticShape` for the promised shape and `each()` for the elements.
+
 </MemberCard>
 
 <MemberCard>
@@ -38467,7 +39239,7 @@ If true, the subset relation is strict (i.e., proper subset).
 
 <MemberCard>
 
-##### Expression.count {#count-1}
+##### Expression.count {#count-2}
 
 If this is a collection, return the number of elements in the collection.
 
@@ -38482,6 +39254,9 @@ If the collection is infinite, return `Infinity`.
 If the number of elements cannot be determined, return `undefined`, for
 example, if the collection is lazy and not finite and the size cannot
 be determined without iterating over the collection.
+
+For the length that an expression with no value yet promises (a call of
+a function that returns a list), read `staticShape.count`.
 
 The count is a `bigint` only when it is finite and is not a safe integer
 (larger than `Number.MAX_SAFE_INTEGER`), for example the count of
@@ -38799,6 +39574,15 @@ Returns `true` if the expression is structurally identical to `rhs`.
 The value of a symbol is never followed: if `one` is assigned `1`,
 `ce.symbol('one').isSame(1)` is `false`.
 
+Two symbols, or two calls, with the same name are the same only when
+they denote the same binding. A call of the library `Sqrt`, boxed before
+a user function `Sqrt` is declared in a scope, and a call `Sqrt(y)`
+boxed in that scope are not the same: they are calls of two different
+functions. Two calls of the library function are the same, also when
+they come from two engines. A raw call (boxed with `form: 'raw'`, or
+held by `Hold`) has no binding: two raw calls are compared by their
+names, and a raw call is not the same as a canonical call.
+
 The elements of a set literal are not ordered, so two sets with the same
 elements in a different order are the same:
 `ce.box(['Set', 2, 1]).isSame(ce.box(['Set', 1, 2]))` is `true`. A
@@ -38809,6 +39593,10 @@ A finite `Range` whose bounds and step are integer literals and that has
 at most 10,000 elements is the same as the `List` of its integers, and
 has the same `hash`: `ce.box(['Range', 1, 3]).isSame(ce.box(['List', 1,
 2, 3]))` is `true`. A larger range is compared by its operands only.
+The range and the list are the same only when both are calls of the
+library functions, or both are raw calls: a raw `Range(1, 3)` is not the
+same as a canonical `[1, 2, 3]`, and a call of a user function named
+`Range` is not the same as a list.
 
 A character and a one-cluster string with the same content are the same,
 although their types are different: `ce.string('a')` is the same as
@@ -39062,13 +39850,13 @@ singular values of a matrix.
 get type(): BoxedType
 set type(type: 
   | string
-  | ListType
+  | RecordType
   | AlgebraicType
   | NegationType
   | CollectionType
+  | ListType
   | SetType
   | BroadcastableType
-  | RecordType
   | ObjectType
   | DictionaryType
   | TupleType
@@ -40484,13 +41272,13 @@ new BoxedType(type, typeResolver?): BoxedType
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -40783,13 +41571,13 @@ Box an ordinary type, sharing immutable type values within a resolver.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -40843,13 +41631,13 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -40879,13 +41667,13 @@ Normalization is shared only for immutable input types.
 ####### type
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -40958,13 +41746,13 @@ polymorphic one.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -40990,13 +41778,13 @@ is(other): boolean
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -41036,13 +41824,13 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -41114,13 +41902,13 @@ Throws if `other` is a string that is not a valid type.
 ####### other
 
   \| `string`
-  \| [`ListType`](#listtype)
+  \| [`RecordType`](#recordtype)
   \| [`AlgebraicType`](#algebraictype)
   \| [`NegationType`](#negationtype)
   \| [`CollectionType`](#collectiontype)
+  \| [`ListType`](#listtype)
   \| [`SetType`](#settype)
   \| [`BroadcastableType`](#broadcastabletype)
-  \| [`RecordType`](#recordtype)
   \| [`ObjectType`](#objecttype)
   \| [`DictionaryType`](#dictionarytype)
   \| [`TupleType`](#tupletype)
@@ -41782,30 +42570,37 @@ type ValueType = {
 type RecordType = {
   kind: "record";
   elements: Record<string, Type>;
-  closed: true;
+  optional: readonly string[];
 };
 ```
 
 A record is a collection of key-value pairs.
 
-The keys are strings. The set of keys is fixed.
+The keys are strings. A record type is CLOSED: a value of
+`record{a: integer, b: string}` has exactly the keys `a` and `b`, and no
+other key. A field can be OPTIONAL (`record{a: integer, b: string?}`): a
+value can leave the key `b` out, and when the key is there, its value is a
+`string`. A read of an optional field that the value leaves out gives the
+absent value of a read (`Missing`, or `NaN` for a numeric field), as an
+index out of range does.
 
-For a record type to be a subtype of another record type, it must contain
-every key required by the other type, and all their types must match (width
-subtyping). It may contain additional keys.
+Subtyping:
 
-A record type is OPEN: `record{a: integer}` holds every value that has a
-field `a` of type `integer`, and also other fields of any type. So it is a
-`dictionary<T>` only when `T` holds every value.
+- Depth subtyping: `record{a: integer}` is a subtype of `record{a: real}`.
+- No width subtyping: `record{a: integer, b: string}` is NOT a subtype of
+  `record{a: integer}`, because the second type has no key `b`.
+- A record type is a subtype of a record type that has every one of its
+  keys, when each key that the second type requires is also required by
+  the first: `record{a: integer}` and `record{a: integer, b: string}` are
+  subtypes of `record{a: integer, b: string?}`.
+- A record type is a subtype of `dictionary<V>` when every field type,
+  optional fields too, is a subtype of `V`.
 
-The type of a dictionary VALUE is CLOSED (`closed: true`): the value has
-exactly the listed fields and no other. `{a: 1}` is typed
-`record{a: integer}` with `closed: true`, and that type is a subtype of
-`dictionary<integer>`. No type syntax spells a closed record: a closed
-record prints as the open record with the same fields, and the parser
-makes only open records. A closed record is a subtype of the open record
-with the same fields, and a record type is a subtype of a closed record
-only when it is closed and has the same set of keys.
+A program that must accept other keys takes a `dictionary`. The bare
+primitive `record` holds every record.
+
+Build a record type with [makeRecordType](#makerecordtype), which keeps the list of
+optional keys in its normal form.
 
 </MemberCard>
 
@@ -42347,6 +43142,88 @@ value of the `~oo` value-literal type. Reads the tag, never the identity.
 
 <MemberCard>
 
+### isOptionalField() {#isoptionalfield}
+
+```ts
+function isOptionalField(t, key): boolean
+```
+
+Whether `key` is an optional field of the record type `t`. A key that
+`t` does not list is not optional: it is not a field.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+##### key
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+### hasRecordField() {#hasrecordfield}
+
+```ts
+function hasRecordField(t, key): boolean
+```
+
+Whether `key` is a field of the record type `t`, required or optional.
+An own-property test: `Object.prototype` member names (`toString`) are
+valid keys, and `key in` would find them on the prototype.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+##### key
+
+`string`
+
+</MemberCard>
+
+<MemberCard>
+
+### requiredFieldKeys() {#requiredfieldkeys}
+
+```ts
+function requiredFieldKeys(t): string[]
+```
+
+The keys of the record type `t` that every value has.
+
+##### t
+
+`Readonly`\<[`RecordType`](#recordtype)\>
+
+</MemberCard>
+
+<MemberCard>
+
+### makeRecordType() {#makerecordtype}
+
+```ts
+function makeRecordType(elements, optional?): RecordType
+```
+
+A record type with the fields `elements`, of which the keys in `optional`
+are optional. The list of optional keys is sorted, keeps only keys of
+`elements`, and is left out when it is empty, so that two spellings of
+one type have one structure.
+
+##### elements
+
+`Record`\<`string`, [`Type`](#type-3)\>
+
+##### optional?
+
+`Iterable`\<`string`, `any`, `any`\>
+
+</MemberCard>
+
+<MemberCard>
+
 ### listTensorRank() {#listtensorrank}
 
 ```ts
@@ -42552,6 +43429,71 @@ with no closed form therefore stays symbolic rather than numericizing:
 required to be finite reject an infinite argument outright — see
 [Number Theory](/compute-engine/reference/number-theory/).
 
+### Powers
+
+A power of exact numbers evaluates to an exact number. When the result would
+be too large, the power stays unevaluated, and `.N()` gives its floating-point
+value. The engine estimates the size of the result as the number of decimal
+digits of the base times the exponent, and the limit is 1,000,000 digits:
+
+```json example
+["Power", 2, 10]
+// ➔ 1024
+["Power", 999999999999999, 66000]
+// ➔ an integer of 990,000 digits
+["Power", 2, 10000000]
+// ➔ ["Power", 2, 10000000]  (unevaluated)
+// .N() ➔ 9.0498173063608003014e+3010299
+```
+
+A power of `0`, `1`, `−1`, `ImaginaryUnit` or `−ImaginaryUnit` to an integer
+exponent of any size is evaluated. A power of `ImaginaryUnit` uses the exponent
+modulo 4:
+
+```json example
+["Power", -1, 10000000]
+// ➔ 1
+["Power", "ImaginaryUnit", ["Add", ["Power", 10, 30], 1]]
+// ➔ ["Complex", 0, 1]
+```
+
+A power with an infinite operand gives its limit. A base whose absolute value
+is more than 1 raised to `PositiveInfinity` gives `PositiveInfinity`, and a
+base whose absolute value is less than 1 gives `0`. The engine compares the
+base with 1 by its exact value, so a base very near 1 also gives the limit.
+When an operand is a floating-point number, the result `0` is the
+floating-point `0.0`, as for `2.5/∞`. When the operands are exact, it is the
+exact `0`.
+
+```json example
+["Power", 2, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 1.00000000001, "PositiveInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 0.5, "NegativeInfinity"]
+// ➔ "PositiveInfinity"
+["Power", 0.5, "PositiveInfinity"]
+// ➔ 0.0  (a floating-point number)
+["Power", ["Rational", 1, 2], "PositiveInfinity"]
+// ➔ 0
+["Power", 1, "PositiveInfinity"]
+// ➔ "NaN"
+```
+
+A symbolic base raised to an infinity stays unevaluated until the base has a
+value, because the limit depends on that value:
+
+```js
+ce.declare('z', 'real');
+const expr = ce.parse('z^{\\infty}');
+expr.evaluate().json;
+// ➔ ["Power", "z", "PositiveInfinity"]
+expr.subs({ z: 2 }).evaluate().json;
+// ➔ "PositiveInfinity"
+expr.subs({ z: 0.5 }).evaluate().json;
+// ➔ { num: "0.0" }
+```
+
 ### Sums and Products
 
 <FunctionDefinition name="Sum">
@@ -42592,6 +43534,19 @@ Note this is equivalent to:
 
 ```json example
 ["Reduce", ["List", 5, 7, 11], "Add"]
+```
+
+An operand that is not a collection, with no indexing set, is one term. If it
+has no free variable, it is its own sum. If it has a free variable, the sum
+stays unevaluated, because no index is given: in `\sum x^k`, the index can be
+`x` or `k`. Write the index to sum over it: `\sum_{k} x^k`.
+
+```json example
+["Sum", 5]
+// ➔ 5
+
+["Sum", ["Power", "x", "k"]]
+// ➔ ["Sum", ["Power", "x", "k"]]
 ```
 
 
@@ -42693,6 +43648,12 @@ Mixed indexing sets (Element + Limits) can be used together:
 // ➔ 12  (n iterates {1,2}, m iterates 1 to 2)
 ```
 
+In LaTeX, the items of the superscript are the upper bounds, in order, of the
+ranges that have no upper bound in the subscript. A clause `n \in S` and its
+conditions take no superscript item, and neither does a range that gives its
+own upper bound, such as `n=0..10` or `1 \le n \le 10`. So
+`\sum_{n \in \{1,2\}, m=1}^{2} (n+m)` is the sum above, and gives `12`.
+
 #### Condition Filtering
 
 A condition can be attached to an Element expression to filter values from the set.
@@ -42714,7 +43675,16 @@ The condition is the optional 4th operand of the Element expression.
 // ➔ 8  (only (-2) × (-4))
 ```
 
-Supported condition operators: `Greater`, `GreaterEqual`, `Less`, `LessEqual`, `NotEqual`.
+The condition can be any boolean expression. In LaTeX, the item after
+`n \in S` is read as its condition when it is a relation (`n > 0`,
+`n \ne 2`), a logical expression (`n > 1 \land n < 5`), a predicate
+(`\mathrm{IsPrime}(n)`), an equation (`n \bmod 2 = 0`, `n = 3`) or a membership
+of the same index (`n \in T`). Every such item that follows the clause is a
+condition of it, and two or more are joined with `And`:
+`\sum_{n \in \{1,2,3\}, n > 1, n < 3} n` gives `2`. An item that binds another
+index, such as `m \in T` or `m = 1`, starts a new indexing set. The LaTeX of a sum with a
+condition writes the condition after the set, in parentheses when it could be
+read as a new indexing set: `\sum_{n\in S, (x=1)}n`.
 
 #### Simplification
 
@@ -42830,6 +43800,18 @@ Note this is equivalent to:
 
 ```json example
 ["Reduce", ["List", 5, 7, 11], "Multiply"]
+```
+
+An operand that is not a collection, with no indexing set, is one factor. If
+it has no free variable, it is its own product. If it has a free variable, the
+product stays unevaluated, because no index is given.
+
+```json example
+["Product", 5]
+// ➔ 5
+
+["Product", ["Power", "x", "k"]]
+// ➔ ["Product", ["Power", "x", "k"]]
 ```
 
 
@@ -43101,16 +44083,16 @@ is no one-argument form with default bounds (decided 2026-09-21).
 
 Smooth Hermite interpolation from 0 to 1 as `x` goes from `e0` to `e1`:
 `t² (3 − 2t)`, with `t = Clamp((x − e0) / (e1 − e0), 0, 1)`. This is the
-formula of the GLSL and WGSL built-in `smoothstep`, with the operands in the
+formula of the GLSL built-in `smoothstep`, with the operands in the
 same order. The result is exact for exact operands, and it broadcasts over
 collection arguments.
 
 - When `e0 = e1`, the result is the step function: 0 when `x < e0`, else 1.
 - When `e0 > e1`, the formula applies as written, and the result goes from 1
   to 0.
-- Every compile target gives these results. The GLSL and WGSL built-in
-  `smoothstep` has no defined result when `e0 ≥ e1`, so the shader targets
-  write the formula out instead of calling it.
+- Every compile target gives these results. The GLSL built-in
+  `smoothstep` has no defined result when `e0 ≥ e1`, so the shader target
+  writes the formula out instead of calling it.
 
 ```json example
 ["Smoothstep", 0, 1, ["Rational", 1, 3]]
@@ -43359,9 +44341,7 @@ while repeated draws **within** the frame still differ.
 
 The seed must be a **finite** real number: `real` excludes $\pm\infty$ and
 `NaN`, so an infinite or undefined seed is rejected with an `out-of-range`
-error rather than silently hashed. (Earlier releases spelled this parameter
-type `finite_real`. That name is retired; bare `real` now carries the same
-finiteness guarantee.)
+error rather than silently hashed.
 
 ```json example
 ["WithRandomSeed", "PositiveInfinity", ["Random"]]
@@ -44493,6 +45473,19 @@ A variable can be repeated to compute the second derivative of a function.
 ["D", "f", "x", "x"]
 ```
 
+In the body of a sum or a product, a variable with the index as subscript
+follows the index, so each term differentiates with respect to its own
+variable. The variable `["Subscript", "x", 1]` is the symbol `x_1`.
+
+<Latex value="\sum_{i=1}^{2} \frac{\partial}{\partial x_i} x_i^2"/>
+
+```json example
+    ["Sum", ["D", ["Power", ["Subscript", "x", "i"], 2], ["Subscript", "x", "i"]],
+      ["Limits", "i", 1, 2]]
+evaluates to
+    ["Add", ["Multiply", 2, "x_1"], ["Multiply", 2, "x_2"]]
+```
+
 Differentiating an application of an **unknown** function keeps the result
 symbolic. The partial with respect to each argument is carried as a multi-index
 `Derivative` (see the `Derivative` function below):
@@ -44580,7 +45573,7 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `Floor(x)` | `0` | Derivative is 0 almost everywhere |
 | `Ceil(x)` | `0` | Derivative is 0 almost everywhere |
 | `Round(x)` | `0` | Derivative is 0 almost everywhere |
-| `Mod(x, n)` | `0` | Derivative is 0 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
+| `Mod(x, n)` | `1` | Derivative is 1 almost everywhere. In the modulus, `D(Mod(x, m), m)` is `-floor(x/m)` |
 | `GCD(x, n)` | `0` | Discrete function |
 | `LCM(x, n)` | `0` | Discrete function |
 
@@ -44589,6 +45582,30 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 :::info[Chain Rule]
 For all supported functions, the chain rule is automatically applied. For example,
 `d/dx sin(x²) = cos(x²)·2x`.
+:::
+
+:::info[Definite Integrals]
+The derivative of a definite integral is the derivative of its closed form
+when the integral has one: `\frac{d}{dy}\int_0^1 xy\,dx` evaluates to `1/2`.
+Otherwise the derivative is taken under the integral sign (the Leibniz rule),
+with a term for each bound that depends on the variable:
+`\frac{d}{dx}\int_0^x e^{t^3}\,dt` evaluates to `e^(x^3)`, and
+`\frac{d}{dy}\int_0^1 e^{x^3 y}\,dx` to `int_(0)^(1)(x^3 * e^(y * x^3) dx)`.
+The derivative stays unevaluated when the integrand has a step, a condition or
+a singularity that depends on the variable (`\lfloor x + y \rfloor`,
+`\ln|x - y|`), and for an integral over an infinite range with no closed form.
+:::
+
+:::info[Indefinite Integrals]
+The derivative of an indefinite integral with respect to its own variable is
+the integrand (the fundamental theorem of calculus), also when the integrand
+has no antiderivative in closed form: `\frac{d}{dx}\int x^2\,dx` evaluates to
+`x^2`, and `\frac{d}{dx}\int e^{x^3}\,dx` to `e^(x^3)`. With respect to
+another variable, it is the derivative of the antiderivative, or the integral
+of the derivative of the integrand when there is no antiderivative in closed
+form: `\frac{d}{dy}\int x^2 y^3\,dx` evaluates to `x^3 * y^2`, and
+`\frac{d}{dy}\int e^{x^2 y}\,dx` to `int(x^2 * e^(y * x^2) dx)`. These
+results hold up to a constant of integration.
 :::
 
 
@@ -44839,16 +45856,35 @@ the function.
 ]
 ```
 
-Double integrals can be computed by specifying more than one limit.
+Double integrals can be computed by specifying more than one limit. The first
+limit is the outermost integral, as in `Sum` and `Product`. In LaTeX, the
+first integral sign is the outermost integral and the differentials are
+written innermost first, so the first limit is the variable of the last
+differential.
 <Latex flow="column" value="\int_1^3\int_0^2 x^2+y^2 dx dy"/>
 
 ```json example
 ["Integrate", 
   ["Add", ["Power", "x", 2], ["Power", "y", 2]], 
-  ["Tuple", "x", 0, 2], 
-  ["Tuple", "y", 1, 3]
+  ["Tuple", "y", 1, 3], 
+  ["Tuple", "x", 0, 2]
 ]
+// evaluates to 68/3
 ```
+
+The order is important when a bound of an inner integral uses the variable of
+an outer integral:
+
+```json example
+["Integrate", ["Multiply", "x", "y"],
+  ["Limits", "y", 0, 1],
+  ["Limits", "x", 0, ["Multiply", 2, "y"]]
+]
+// evaluates to 1/2
+```
+
+The double integral sign gives the same order: the first limit of
+`\iint f(x, y)\,dx\,dy` is `y` and the second is `x`.
 
 The bounds can also be written flat after the variable. After the variable,
 an operand that is not a variable name starts the bounds, and the next operand
@@ -44942,6 +45978,20 @@ divergent integral is `+∞`, `−∞` or `NaN`:
 ```json example
 ["NIntegrate", ["Function", ["Divide", 1, "x"], "x"], 0, 1]
 // -> +∞
+```
+
+Some convergent integrals cannot be told apart from divergent ones by
+quadrature, because most of their value is closer to a bound than the
+floating-point numbers can sample. Their value is also `NaN`. For example,
+$\int_0^{1/2} \frac{dt}{t(-\ln t)^{1.001}}$ converges to $1000.37$:
+
+```json example
+["NIntegrate",
+  ["Function",
+    ["Divide", 1, ["Multiply", "t", ["Power", ["Negate", ["Ln", "t"]], 1.001]]],
+    "t"],
+  0, 0.5]
+// -> NaN
 ```
 
 
@@ -46006,13 +47056,57 @@ Examples of function evaluating to a lazy collection include:
 - [**Cycle**](#cycle): infinite collections that repeat a finite collection.
 - [**Iterate**](#iterate): infinite collections that apply a function to an initial value repeatedly.
 - [**Repeat**](#repeat): infinite collections that repeat a single value.
-- [**Fill**](#fill) and [**Tabulate**](#tabulate): collections of a specified
-  size, where each element is computed by a function or set to a specific value.
+- [**Tabulate**](#tabulate): collections of a specified size, where each
+  element is computed by a function.
 
 ### Types
 
 - The type `collection` represents any collection, whether indexed or not, finite or infinite.
 - The type `indexed_collection` applies to collections that support index-based access, such as `List`, and `Tuple`.
+
+### The Shape of an Expression Before Evaluation
+
+In JavaScript, two properties of an expression tell different things:
+
+- `expr.isCollection` (and `expr.count`, `expr.each()`, `expr.at()`) tells
+  whether a collection value is present that can be walked **now**.
+- `expr.staticShape` tells which collection shape the expression
+  **promises**, read from its type without evaluating it. It is
+  `{ indexed, count, elementType }`, or `undefined` when the expression
+  promises no collection.
+
+A call of a function that returns a list has no value before it is evaluated,
+but its type gives its shape:
+
+```js
+ce.assign('f', ce.parse('n \\mapsto [n, n+1, n+2, \\frac{n}{2}]'));
+const call = ce.parse('f(3)');
+
+call.isCollection;
+// ➔ false
+call.count;
+// ➔ undefined
+call.staticShape;
+// ➔ { indexed: true, count: 4, elementType: 'rational' }
+call.evaluate().toString();
+// ➔ [3,4,5,3/2]
+
+ce.declare('g', '(integer) -> list<real>');
+ce.parse('g(3)').staticShape;
+// ➔ { indexed: true, count: undefined, elementType: 'real' }
+
+ce.parse('\\sin(x)').staticShape;
+// ➔ undefined
+```
+
+A symbol declared with a collection type and no value (`L: vector<2>`) gives
+its declared shape. A call of a name that was never declared gives
+`undefined`: its type is a guess, not a promise. An `If` with an else branch
+whose branches are collections gives the shape they agree on.
+
+The elements still come from the value: when the value does not have the
+declared type, `each()` can give another number of elements than
+`staticShape.count`.
 
 
 
@@ -46459,6 +47553,19 @@ If the `count` is not specified, it is assumed to be `50`.
 
 If there is a single argument, it is assumed to be the `upper` bound, and the `lower` bound is assumed to be `1`.
 
+If a bound is an infinity or `NaN`, the samples cannot be computed and the
+collection has no value: its reads (`Sum`, `Count`, `Max`, `At`, `Element`)
+stay unevaluated, and compiled code gives `NaN`. With a `count` of `0` there
+are no samples, so `["Linspace", 0, "PositiveInfinity", 0]` is the empty list.
+
+```json example
+["Count", ["Linspace", 0, "PositiveInfinity", 3]]
+// ➔ ["Count", ["Linspace", 0, "PositiveInfinity", 3]]
+
+["Count", ["Linspace", 0, "PositiveInfinity", 0]]
+// ➔ 0
+```
+
 ```json example
 ["Linspace", 3, 10]
 // ➔ ["List", 3, 3.142857142857143, 3.2857142857142856,
@@ -46487,33 +47594,42 @@ If there is a single argument, it is assumed to be the `upper` bound, and the `l
 
 <FunctionDefinition name="Fill">
 
-<Signature name="Fill" returns="list">_f_:function, _dimensions_:tuple</Signature>
+<Signature name="Fill" returns="list">_value_, _d1_:integer, _d2_:integer, ...</Signature>
 
-<div className="tags"><span className="tag">lazy</span></div>
-
-Produce a matrix of the given `dimensions` by applying `f` to each pair of row
-and column indexes. The function comes **first** and the dimensions are a
-`Tuple`, so `["Fill", f, ["Tuple", 2, 3]]` is a 2×3 matrix whose element at row
-`i`, column `j` is `f(i, j)`.
+Create a list or a tensor with each element equal to `value`. Each argument
+after the value is the length of one axis: one gives a list, two give a
+matrix, three give a tensor of rank 3. In Epsil, the function is written
+`fill`.
 
 ```json example
-["Fill", 
-  ["Function", ["Add", "i", "j"], "i", "j"], 
-  ["Tuple", 2, 3]
-]
-// ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
+["Fill", 7, 3]
+// ➔ ["List", 7, 7, 7]
+
+["Fill", 7, 2, 3]
+// ➔ ["List", ["List", 7, 7, 7], ["List", 7, 7, 7]]
 ```
 
-A constant function fills every cell with the same value:
+The value is evaluated once: `["Fill", ["Random"], 3]` holds three copies of
+one number. A function value is an element and is not called; to compute
+each element from its indexes, use [`Tabulate`](#tabulate).
+
+An extent of 0 or less gives an empty axis, and a symbolic extent leaves the
+expression unevaluated:
 
 ```json example
-["Fill", ["Function", 0], ["Tuple", 2, 3]]
-// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+["Fill", 7, 2, 0]
+// ➔ ["List", ["List"], ["List"]]
 ```
 
-`Fill` always builds a two-dimensional result: the dimension tuple must carry
-both a row count and a column count. To build a one-dimensional collection from
-an index, use [`Tabulate`](#tabulate) instead.
+A tensor with more than 10,000 elements is returned as a lazy collection: its
+elements are not created before they are read.
+
+[`Zeros`](/compute-engine/reference/linear-algebra/#zeros) and
+[`Ones`](/compute-engine/reference/linear-algebra/#ones) are the same as
+`Fill` with the value 0 or 1.
+
+Up to version 0.184.0, `Fill(f, (m, n))` built an m×n matrix of `f(i, j)`.
+That form is now an `incompatible-type` error: write `Tabulate(f, m, n)`.
 
 </FunctionDefinition>
 
@@ -46543,7 +47659,7 @@ and the result is a nested list.
 // ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
 ```
 
-Unlike [`Fill`](#fill), `Tabulate` takes each dimension as a separate argument.
+To give every element the same value, use [`Fill`](#fill).
 
 </FunctionDefinition>
 
@@ -48152,7 +49268,7 @@ otherwise produce are never what was meant. This contract holds for every
 callback-taking collection operator: `Filter`, `Any`, `All`, `Count`,
 `TakeWhile`, `FlatMap` and their kin supply one argument (the element),
 `Reduce`, `Fold` and `Scan` supply two (the accumulator and the element),
-`Fill` supplies two (row and column), and `Sort`/`Ordering` (a key or a
+`Tabulate` supplies one index per dimension, and `Sort`/`Ordering` (a key or a
 comparator) and `Iterate` (`f(previous)` or `f(index, previous)`) accept
 either of their two arities. A nullary literal such as `["Function", 42]`
 is a constant and is applied at any arity. To take a pair apart inside a
@@ -48708,6 +49824,23 @@ string:
 ["DeleteAt", {str: "abcdef"}, -1]
 // ➔ "abcde"
 ```
+
+<Signature name="DeleteAt" returns="dictionary">_dictionary_, _key_:string</Signature>
+
+On a dictionary or a record, return a copy without the entry of the string
+`key`. A key that is not there gives the value unchanged.
+
+```json example
+["DeleteAt", {dict: {a: 1, b: "x"}}, {str: "b"}]
+// ➔ {dict: {a: 1}}
+
+["DeleteAt", {dict: {a: 1, b: "x"}}, {str: "zz"}]
+// ➔ {dict: {a: 1, b: "x"}}
+```
+
+The type of a record loses the field: `record{a: integer, b: string?}` gives
+`record{a: integer}`. With a key known only at evaluation, every field of the
+record becomes optional.
 
 </FunctionDefinition>
 
@@ -50010,6 +51143,97 @@ single-collection case).<Icon name="chevron-right-bold" />
 
 </FunctionDefinition>
 
+<nav className="hidden">
+### ParallelLoop
+</nav>
+
+<FunctionDefinition name="ParallelLoop">
+
+<Signature name="ParallelLoop">_body_, _element_</Signature>
+
+A loop whose passes are independent: `body` is evaluated once for each
+element of the `Element` clause (a pass), and the passes can run in any order.
+The value is `Nothing`. This is the MathJSON form of the Epsil
+`parallel for x in xs { … }` statement.
+
+The body can change a variable declared outside the loop only with
+[`AddTo`](#addto): such a variable is an accumulator, and the value after the
+loop is the value before it plus the contributions of all the passes. A read
+of an accumulator in a pass (directly, in a function that the body calls, in a
+function of the host) gives an unspecified value. The Epsil checker reports a
+read written by name in the body (`parallel-accumulator-read`), a body that
+breaks the other rules, and one with an effect other than `random`; a read by
+another route is not reported.
+
+Inside a `WithRandomSeed` frame, the loop consumes one draw index of the frame,
+and each pass draws from its own frame, so the values do not depend on how the
+passes are run. The interpreter runs the passes in order, and the compiled
+JavaScript gives the same values, also for a pass that reads an accumulator.
+This applies to the direct draws of a pass (a `Random` that the pass
+evaluates). The draws of a lazy collection inside a pass (a `Comprehension`
+or a `Map` whose function draws) are not specified, because the caches of a
+collection are shared by the passes. To get the draws of each pass, build the
+list directly, for example as `["List", ["Random"], ["Random"]]`.
+The other compile targets decline the loop.
+
+```json example
+["Block",
+  ["Assign", "L", ["List", 0, 0]],
+  ["ParallelLoop",
+    ["AddTo", ["At", "L", ["Add", ["Mod", "i", 2], 1]], "i"],
+    ["Element", "i", ["Range", 1, 5]]],
+  "L"]
+// ➔ [6, 9]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ParallelComprehension
+</nav>
+
+<FunctionDefinition name="ParallelComprehension">
+
+<Signature name="ParallelComprehension">_body_, _element-1_, _element-2_, ...</Signature>
+
+The list that `Comprehension` with the same operands gives, but the passes of
+the first clause are independent, as in a [`ParallelLoop`](#parallelloop): the
+other clauses run in order inside each pass, and the body changes no variable
+declared outside it. Unlike `Comprehension`, which is a lazy collection, it is
+evaluated at once to a `List`. This is the MathJSON form of the Epsil
+`[f(x) parallel for x in xs]`.
+
+```json example
+["ParallelComprehension", ["Square", "k"], ["Element", "k", ["Range", 1, 4]]]
+// ➔ [1, 4, 9, 16]
+```
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### AddTo
+</nav>
+
+<FunctionDefinition name="AddTo">
+
+<Signature name="AddTo">_symbol_, _value_</Signature>
+
+<Signature name="AddTo">["At", _list_, _position-1_, ...], _value_</Signature>
+
+The compound assignment: `["AddTo", "s", v]` is
+`["Assign", "s", ["Add", "s", v]]`, and `["AddTo", ["At", "L", i], v]` is
+`["Assign", "L", ["ReplaceAt", "L", i, ["Add", ["At", "L", i], v]]]`, with
+each position evaluated once, before `v`. In the body of a
+[`ParallelLoop`](#parallelloop), it adds a contribution to an accumulator.
+This is the MathJSON form of the Epsil `s += v` and `L[i] += v`.
+
+```json example
+["Block", ["Assign", "L", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
+// ➔ [1, 12, 3]
+```
+
+</FunctionDefinition>
+
 <FunctionDefinition name="FixedPoint">
 
 <Signature name="FixedPoint">_body_, _initial-value_</Signature>
@@ -50622,7 +51846,7 @@ entries present depend on what the operand is; keys include:
 The `type` entry is the constant's precise static type, so a numeric constant
 reports the `real` tier narrowed to the range that encloses its value, not a
 bare tier name. Note that `real` here means a **finite** real: the numeric
-types are finite by default, and the spelling `finite_real` has been retired.
+types are finite by default.
 
 Since the result is a dictionary, individual entries are addressable:
 `["At", ["About", "Pi"], "'type'"]` evaluates to the string
@@ -50732,8 +51956,7 @@ Evaluate to the type of _expression_, as a type value.
 
 The result is the expression's **literal type** — the most precise claim
 available about the value, here the number itself. Its widening tier is
-`real`, which since the finite-by-default flip denotes a *finite* real; the
-retired spelling `finite_real` is no longer produced.
+`real`, which denotes a *finite* real.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>
@@ -51120,6 +52343,33 @@ the solutions as if it were the answer. For example,
 stay unevaluated, because the solver finds `1` and `2`, but not the other
 solutions.
 
+**An equation with a decimal number.** The engine compares two numbers within
+its tolerance (`ce.tolerance`, `1e-10` by default), so `10 = 10.0000000000001`
+is `True`. Over the real or the complex numbers (an `Interval`,
+`RealNumbers`, a declared `real` type, or no domain), `Solve` does not use
+this tolerance: the solutions are the exact roots of the equation, with its
+decimal numbers as they are written. A value at which the equation is only
+`True` within the tolerance is not a solution. Thus, when the domain or the
+real type removes every exact root, the result is the empty list:
+
+```json example
+["Solve",
+  ["Equal", "x", 10.0000000000001],
+  ["Element", "x", ["Interval", -10, 10]]]
+// -> ["List"]   (the root 10.0000000000001 is not in the interval)
+
+["Solve",
+  ["Equal", ["Power", "x", 2], -1e-20],
+  ["Element", "x", "RealNumbers"]]
+// -> ["List"]   (the roots are ±10⁻¹⁰i; the equation is True at x = 0)
+```
+
+Over a discrete domain (integers, rationals, a `Range` or a finite list of
+values), an equation with a decimal number is checked at each element of the
+domain, with the tolerance: `Solve(x = 10.0000000000001, x ∈ Range(-10, 10))`
+is `[10]`. When the domain has too many elements to check one by one,
+`Solve` stays unevaluated, for example `Solve(x = 2.5, x ∈ ℤ)`.
+
 An equation that holds for every value of the unknown (`x = x`,
 `2(x + 1) = 2x + 2`) gives `[t]`: one solution for every value of the fresh
 parameter `t`, the same form as the parametric answers of the integer solver.
@@ -51435,6 +52685,7 @@ breadcrumb recording the operators it passed through. The breadcrumb is an
 ["Add", ["Ln", "'a'"], 2]
 // ➔ ["Error",
 //      ["ErrorCode", "'incompatible-type'", "'number'", "'string'"],
+//      "'a'",
 //      ["ErrorTrace", ["ErrorFrame", "'Ln'", 1], ["ErrorFrame", "'Add'", 1]]]
 ```
 
@@ -51528,6 +52779,65 @@ Evaluate to the inverse function of its argument for example `Arcsin` for `Sin`.
 
 In the mathematical sense, this is an operator (a function that takes a function
 as an argument and returns a function).
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Module
+</nav>
+<FunctionDefinition name="Module">
+
+<Signature name="Module">_symbol_</Signature>
+
+The definition of a name in the standard library, also in a scope where a
+local definition shadows the name.
+
+The canonical form is the symbol bound to the library definition. Where nothing
+shadows the name, it is the symbol itself:
+
+```json example
+["Module", "Pi"]
+
+// ➔ "Pi"
+```
+
+A call of a library function is written with `Apply`:
+
+```json example
+["Apply", ["Module", "Floor"], 2.5]
+
+// ➔ 2
+```
+
+The canonical form of such a call is the plain call, `["Floor", 2.5]`, bound to
+the library function, also where a user function `Floor` is defined. The rules
+of the library function apply to it: it is simplified symbolically, a library
+function that holds or binds its arguments (`Sum`, `If`, `Hold`) reads them as
+the library does, and a named argument is valid. The arguments read the
+definitions of the scope, so a call of the user function `Floor` in an argument
+stays a call of the user function.
+
+The name `Module` itself cannot be declared or assigned: such a statement is
+an error (`module-binding` for an assignment or a declaration with a value)
+and defines nothing, so no definition of a program changes what
+`["Module", name]` reads.
+
+In a scope where `Pi` is declared and assigned `3`, the expression
+`["Add", ["Module", "Pi"], "Pi"]` is `π + 3`. In such a scope, the MathJSON of
+an expression (`.json` and `toMathJson()`) writes a symbol bound to the library
+definition as `["Module", "Pi"]`, so that the MathJSON, read again in that
+scope, has the same value.
+
+A name that the library does not define is an error:
+
+```json example
+["Module", "Floo"]
+
+// ➔ ["Error", "'not-a-library-name'", "Floo"]
+```
+
+A second operand, the name of another module, is reserved, and is an error.
+LaTeX has no spelling of `Module`: `["Module", "Pi"]` is written `\pi`.
 
 </FunctionDefinition>
 
@@ -51706,10 +53016,19 @@ The index is in canonical form, so a free `i` is the imaginary unit:
 `A_{i+1}` holds `["Complex", 1, 1]`. Declare `i` to use it as a variable.
 
 `A_{(n)}` keeps its parentheses because `["Subscript", "A", "n"]` is the
-compound symbol `A_n`. The two forms have different values in a sum:
-`\sum_{n=1}^{3} A_{(n)}` gives `A_1+A_2+A_3`, and `\sum_{n=1}^{3} A_{n}` gives
-`3A_{n}`. When you read the index of this form with `.op2`, you get
-`Delimiter(n)`, and its value is the value of `n`.
+compound symbol `A_n`. When you read the index of this form with `.op2`, you
+get `Delimiter(n)`, and its value is the value of `n`.
+
+In the body of a sum or a product, a subscript that is the index is read by
+value: `\sum_{n=1}^{3} A_{n}` and `\sum_{n=1}^{3} A_{(n)}` both give
+`A_1+A_2+A_3`, and the canonical term is
+`["Subscript", "A", ["Delimiter", "n"]]` in both. The same applies to the
+variable of a comprehension over integers. The variable of `D` or `Integrate`
+is not an index: in `["D", ["Subscript", "c", "x"], "x"]`, `c_x` is a compound
+symbol. A compound symbol that you declared or assigned stays that symbol:
+after `ce.assign("A_n", 5)`, `\sum_{n=1}^{3} A_{n}` gives `15`. The name of a
+function in a call also stays one name: `\sum_{k=1}^{2} f_k(x)` gives
+`2f_k(x)`.
 
 A product index is written in parentheses, `A_{(mn)}`, because `A_{mn}` is the
 compound symbol `A_mn`.
@@ -51878,6 +53197,19 @@ To specify a function literal with LaTeX use the `\mapsto` command:
 ["Function", ["Add", ["Multiply", "x", 2], "y"], "x", "y"]
 ```
 
+In the body, a parameter with no type followed by a parenthesized argument is
+a **call** of the parameter, so a function can take another function as an
+argument. The exception is an argument that contains the parameter:
+`q \mapsto q(2q)` is the product `2q^2`. A parameter with a number type is a
+value, and the juxtaposition is a product:
+
+```js example
+ce.parse('(g \\mapsto \\int_0^1 g(x)\\,dx)(t \\mapsto t^2)').evaluate();
+// ➔ 1/3
+ce.parse('((x\\colon \\mathrm{real}) \\mapsto x(2))(3)').evaluate();
+// ➔ 6
+```
+
 A parameter may also be a **tuple pattern**: a `["Tuple", …]` of parameter
 names (or `_` to skip a position, or a nested pattern) in a parameter
 position. It is still **one** parameter — it takes one argument, which must
@@ -51939,6 +53271,20 @@ An argument that is not a tuple of that shape yields the same
 produces. Function literals with a tuple-pattern parameter are interpreted;
 the compile targets decline them rather than emit code that binds the wrong
 names.
+
+A function literal with a tuple pattern, a rest parameter (`["Spread", name]`)
+or a default value has no `\mapsto` notation in LaTeX: `(x, y) \mapsto xy` is
+a function of two parameters, not of one pair. The LaTeX of such a literal is
+`\mathrm{Function}(…)` with its MathJSON operands, and `ce.parse()` reads that
+text back as the same literal:
+
+```js example
+ce.box(["Function", ["Multiply", "x", "y"], ["Tuple", "x", "y"]]).latex;
+// ➔ "\mathrm{Function}(xy, \mathrm{Tuple}(x, y))"
+
+ce.box(["Function", ["Multiply", "k", "x"], "x", ["Optional", "k", 2]]).latex;
+// ➔ "\mathrm{Function}(kx, x, \mathrm{Optional}(k, 2))"
+```
 
 The examples in this section define functions as a simple expression, but 
 function literals can include more complex control structures, including blocks,
@@ -52155,7 +53501,7 @@ ce.expr(['g', ['List', ['Tuple', 1, 2], ['Tuple', 3, 4]]]).evaluate();
 
 A parameter with no declared type, or declared `string`, binds the tuple
 whole: `Apply(u ↦ 7, (a, b))` is `7`. The compiled code gives the same tuple:
-an array on the `javascript` target, and a `vecN` on the GLSL and WGSL targets.
+an array on the `javascript` target, and a `vecN` on the GLSL target.
 
 #### Opting Out
 
@@ -52182,8 +53528,10 @@ operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
 `StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
 `GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
 argument binds whole. The parameter is followed through element-wise
-operators (`mean(v^2)`, `sin(v)`) and through a local of the body assigned
-from it.
+operators (`mean(v^2)`, `sin(v)`), through a local of the body assigned
+from it, and through a call to another function whose parameter binds whole,
+also when the body assigns that function to a local before the call
+(`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
 
 ```js example
 ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));
@@ -52504,6 +53852,19 @@ definition is not an error — the pipe stays symbolic and evaluates once the
 symbol is defined. Note that `Pipe` is stricter here than `Apply`, which
 treats a non-function operand as a constant: `["Apply", 3, 5]` evaluates
 to `3` (this shorthand is relied on by operators such as `Map`).
+
+One function operand is read as the name of a term, not as a value: a
+subscript on the index of a sum or a product. The LaTeX
+`\sum_{k=1}^{2} f_k(x)` is
+`["Sum", ["Apply", ["Subscript", "f", "k"], "x"], ["Limits", "k", 1, 2]]`,
+and it evaluates to `f_1(x) + f_2(x)`. Each term is read as the term written
+alone: `f_1(x)` is a call when `f_1` is a function or has no definition, and
+a product when `f_1` has a value. With `w_1 = 2` and `w_2 = 3`:
+
+```json example
+["Sum", ["Apply", ["Subscript", "w", "i"], 4], ["Limits", "i", 1, 2]]
+// ➔ 20
+```
 
 A `\square` topic marker in the right-hand side names the position the piped
 value fills, so a stage can be a multi-argument call:
@@ -53482,6 +54843,63 @@ m×m matrix.
 ```
 
 Both _m_ and _n_ must be positive integers.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Zeros
+</nav>
+<FunctionDefinition name="Zeros">
+
+<Signature name="Zeros">_d1_, _d2_, ...</Signature>
+
+Creates a list or a tensor filled with zeros. Each argument is the length of
+one axis: one argument gives a list, two arguments give a matrix, three
+arguments give a tensor of rank 3. In Epsil, the function is written `zeros`.
+
+```json example
+["Zeros", 3]
+// ➔ ["List", 0, 0, 0]
+
+["Zeros", 2, 3]
+// ➔ ["List", ["List", 0, 0, 0], ["List", 0, 0, 0]]
+
+["Zeros", 2, 2, 2]
+// ➔ ["List", ["List", ["List", 0, 0], ["List", 0, 0]], ["List", ["List", 0, 0], ["List", 0, 0]]]
+```
+
+With one argument, `Zeros` gives a list: `["Zeros", 3]` has 3 elements, while
+`["ZeroMatrix", 3]` is a 3×3 matrix.
+
+An argument of 0 or less gives an empty axis: `["Zeros", 0]` is
+`["List"]`. With a symbolic argument, the expression stays unevaluated. A
+tensor with more than 10,000 elements is returned as a lazy collection: its
+elements are not created before they are read.
+
+`Zeros` is the same as
+[`Fill`](/compute-engine/reference/collections/#fill) with the value 0.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### Ones
+</nav>
+<FunctionDefinition name="Ones">
+
+<Signature name="Ones">_d1_, _d2_, ...</Signature>
+
+Creates a list or a tensor filled with ones. The arguments are the same as
+for [`Zeros`](#zeros). In Epsil, the function is written `ones`. `Ones` is
+the same as [`Fill`](/compute-engine/reference/collections/#fill) with the
+value 1.
+
+```json example
+["Ones", 3]
+// ➔ ["List", 1, 1, 1]
+
+["Ones", 2, 3]
+// ➔ ["List", ["List", 1, 1, 1], ["List", 1, 1, 1]]
+```
 
 </FunctionDefinition>
 
@@ -55204,13 +56622,6 @@ a **finite** value. So a type-name membership test agrees with the set constant 
 the same name: neither `real` nor `RealNumbers` admits $\pm\infty$. To include the
 infinities, use an extended set (`ExtendedRealNumbers`) or the type `number`,
 which covers the finite numbers, the infinities and NaN.
-
-:::info[Deprecated spellings]
-The type names `finite_integer`, `finite_rational`, `finite_real`,
-`finite_complex` and `finite_number` are **retired**. They are still accepted on
-input for one release cycle and normalize to the bare name — `finite_real`
-becomes `real`, `finite_number` becomes `complex` — but they are never emitted.
-:::
 
 Checking if an element is in a set is equivalent to checking if the type of the
 element matches the type associated with the set.
@@ -59148,7 +60559,7 @@ Grapheme segmentation is not available on every compilation target, so each
 target either implements a string operation grapheme-correctly or **fails
 closed** with a diagnostic — never by silently counting code units.
 
-| Operation | JavaScript | Python | GLSL/WGSL |
+| Operation | JavaScript | Python | GLSL |
 | :--- | :--- | :--- | :--- |
 | `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported | Not supported |
 | Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported | Not supported |
@@ -59158,8 +60569,8 @@ closed** with a diagnostic — never by silently counting code units.
 
 Python has no grapheme segmentation in its standard library (`len()` counts
 code points), so string collection operations report a target-capability
-diagnostic rather than compiling to something subtly wrong. GLSL and WGSL
-have no string support at all, and string-typed operands are rejected as
+diagnostic rather than compiling to something subtly wrong. GLSL
+has no string support at all, and string-typed operands are rejected as
 before.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
@@ -62789,9 +64200,13 @@ structural expression. A pipeline that must stay on the structural tier
 should not route through `.evaluate()`.
 :::
 
-Also note that `.subs()` is not capture-avoiding on **any** tier. If a
-substitution reaches into a binder body, avoiding name collisions is the
-caller's responsibility.
+Also note that `.subs()` avoids variable capture on every tier. When a
+replacement contains a name that a binder binds, the binder renames that name
+first: `\sum_{k=1}^{3} (j+k)`, parsed in the structural form, with `j`
+replaced by `k` gives `["Sum", ["Delimiter", ["Add", "k", "k_1"]], ["Tuple",
+"k_1", 1, 3]]`, which evaluates to `3k + 6`. The target of an `Assign` in a
+held `Block`, and a `Declare` or an `Assign` in a branch of an `If` of a held
+`Block`, are not renamed: see the documentation of `subs()`.
 
 ## Parse Vocabulary vs Canonical Vocabulary
 
@@ -62893,8 +64308,7 @@ a promise that it never changes.
    To ask whether a name *would* resolve to a constant — and to get the
    answer for the current scope chain, so a user redeclaration is respected —
    use `ce.lookupDefinition(name)`. It returns `undefined` for an undeclared
-   name and has no auto-declare side effect, so it is safe to call
-   speculatively:
+   name and declares nothing, so it is safe to call speculatively:
 
    ```ts
    const v = ce.lookupDefinition('i')?.value;
@@ -62993,7 +64407,7 @@ ce.parse('\\int_0^1 x^2 dx').json;
 ## Undeclared Call Heads Bind Vacuously
 
 A structural box of a function expression whose head is **undeclared**
-succeeds. There is no error, no auto-declare, and no operator definition:
+succeeds. There is no error, no declaration, and no operator definition:
 
 ```ts
 const expr = ce.expr(['myHead', 1, 2], { form: 'structural' });
@@ -63007,20 +64421,24 @@ console.log(ce.lookupDefinition('myHead')); // ➔ undefined
 The head is simply not bound — the node is inert. This is the intended
 behavior, and it is covered by the notice guarantee above.
 
-The **canonical** route does the opposite: it auto-declares the head as a
-`function` with an inferred type, a write to the current lexical scope.
+The **canonical** route declares nothing either: the node is a call of
+`myHead`, and the head is resolved when the call is evaluated. The type that
+the call requires of the head (`function`) is kept with the expression;
+`ce.infer()` declares it:
 
 ```ts
 const ce2 = new ComputeEngine();
-ce2.expr(['myHead', 1, 2]);   // canonical
+const call = ce2.expr(['myHead', 1, 2]);   // canonical
+console.log(ce2.lookupDefinition('myHead')); // ➔ undefined
 
+ce2.infer([call]);
 const def = ce2.lookupDefinition('myHead');
 console.log(def.value.type.toString());   // ➔ "function"
 console.log(def.value.inferredType);      // ➔ true
 ```
 
-Inert versus declaring is precisely the structural/canonical split. If the
-head *is* declared as an operator, the structural box binds it normally:
+If the head *is* declared as an operator, the structural box binds it
+normally:
 
 ```ts
 ce.expr(['Sin', 1], { form: 'structural' }).operatorDefinition?.name;
@@ -63163,9 +64581,8 @@ ce.expr(['k', ['List', 1, 2]]).type.toString(); // ➔ "vector<2>"
 Validity itself is compositional, and `Error` nodes attach at the offending
 operator, so a subtree probe (`ce.expr(changedSubtreeJson).isValid`, then
 discard the tree) costs work proportional to the change rather than to the
-whole expression. Note that a canonical probe **writes to scope** — it
-auto-declares undeclared heads and free symbols. Contain those writes with a
-per-call scope (below), or with `ce.pushScope()`/`ce.popScope()`.
+whole expression. A canonical probe declares no symbol and no head, so it
+does not change the types that another expression reads.
 
 ## Per-Call Scope Control
 
@@ -63175,11 +64592,12 @@ here as a contract; the spellings are subject to the notice guarantee only
 once it ships. Check the CHANGELOG for the release that carries it.
 :::
 
-Canonical parsing and boxing write to the engine's current lexical scope:
-free symbols are declared by usage inference, undeclared call heads are
-auto-declared, the subscript fold resolves names, and an `Assign` left-hand
-side is pre-declared. A consumer parsing untrusted or out-of-order input
-needs to contain those writes.
+Canonical parsing and boxing read the engine's current lexical scope: the
+subscript fold resolves names, and each symbol is bound to the definition that
+its name has there. They declare nothing: a symbol with no definition keeps
+its name and the scope it was boxed in, and `ce.infer()` declares it there. A
+consumer parsing untrusted or out-of-order input chooses the scope that both
+read.
 
 ### The `scope` Option
 
@@ -63189,16 +64607,10 @@ ce.expr(json,   { scope });
 ```
 
 When a `scope` is supplied, the parse or box runs with it as the current
-lexical scope. Lookups walk `scope → parents`, and **all auto-declares and
-inference land rooted at the supplied scope**. Discarding the scope discards
-the writes.
-
-:::warning[Behavior change]
-`ce.expr`'s existing `scope` option steers *lookup only* today —
-auto-declares still land in the engine's current scope. Receiving the writes
-is a semantic change to a shipped option, and lands as a called-out BREAKING
-CHANGELOG entry.
-:::
+lexical scope. Lookups walk `scope → parents`, and a symbol with no
+definition belongs to the supplied scope: `ce.infer()` declares it there,
+when that scope is current (`ce.pushScope(scope)`). Discarding the scope
+discards those declarations.
 
 ### `ce.createScope()`
 
@@ -63309,9 +64721,9 @@ interface InspectableScope extends Scope {
 ```
 
 `declarations()` reports the scope's own bindings — the initializer's entries
-with their post-inference types, alongside anything auto-declared during the
-call. `inferred` is true when the type was auto-declared or inferred from
-usage rather than stated by the caller; an initializer entry declared with an
+with their post-inference types, alongside the declarations that `ce.infer()`
+made in the scope. `inferred` is true when the type was inferred from usage
+rather than stated by the caller; an initializer entry declared with an
 explicit type reports `false` even if inference later narrowed it. For an
 operator definition, `type` is its signature. Types are answered as
 `BoxedType` — the same boxed form as `expr.type` — so `entry.type.toString()`
@@ -63323,6 +64735,9 @@ independently of the order in which declares interleaved; a fingerprint over
 ```ts
 const scope = ce.createScope(heads);
 const expr = ce.parse(row, { scope });
+ce.pushScope(scope);
+ce.infer([expr]);
+ce.popScope();
 const harvested = scope.declarations();
 // … read inferred parameter types; drop `scope` when done
 ```
@@ -63352,16 +64767,12 @@ A hand-rolled `{ parent, bindings }` object literal still satisfies `Scope`
 and works as the `scope` option, but only `createScope()` products are
 inspectable.
 
-### Known Residual: Outer-Scope Narrowing
+### Outer-Scope Declarations
 
-An ephemeral scope contains new *declarations*; it does not contain
-*narrowing* of declarations that already exist. Type inference during a
-contained parse can still narrow a symbol declared in an **outer** scope.
-
-That residual is observable rather than silent: `narrowings()` reports every
-outer definition the contained parse narrowed, with its before and after
-type. A caller that needs containment rather than observation can compare or
-restore from that listing.
+A contained parse does not narrow a symbol declared in an **outer** scope:
+parsing and boxing change no definition, also an inferred one. So
+`narrowings()` has nothing to report after a parse. The type that the parse
+requires of such a symbol is kept with the expression.
 
 ---
 

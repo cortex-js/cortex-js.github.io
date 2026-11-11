@@ -198,7 +198,9 @@ names, so that a program keeps working when the language does claim them.
 - **Modules and imports** — `import`, `export`, `module`.
 - **Error-handling keywords** — `try`, `catch`, `throw`. In Epsil, errors are
   ordinary values, so these are not needed for the current design.
-- **Concurrency** — `async`, `await`, `parallel`.
+- **Concurrency** — `async`, `await`. (`parallel` is in use: it is the
+  contextual keyword of `parallel for`, see
+  [Control Flow](/control-flow#parallel-loops).)
 - **Macros** and compile-time metaprogramming.
 
 A word the grammar DOES claim — a literal or an active keyword such as `match`,
@@ -1777,8 +1779,9 @@ A user binding shadows a library name for the rest of its scope, whichever
 spelling the library name has: a `let`, a `const`, a parameter, a loop
 variable, a `match` pattern, or a `function` definition. A function member
 of a `protocol` shadows a library name the same way, from the `protocol`
-statement onward; the library function stays reachable by its capitalized
-name (`Floor(x)`).
+statement onward. The qualified name `std::name` always names the library
+definition: `std::floor(x)` calls the library function wherever the program
+binds `floor` or `Floor`.
 
 ```epsil
 let sum = 0
@@ -1815,6 +1818,15 @@ The capitalized spelling shadows the same way in a nested scope: in a
 function body, `let Pi = 3` makes `Pi` the number `3` for the rest of the
 body, and `function Square(x) { x + 100 }` makes `Square(3)` call that
 function.
+
+A definition in math style with the capitalized name of a library function,
+`Sin(x) := 5` or `Sin(x) = 5`, is the error `assignment-to-library-function`,
+and it defines no function. At the top level it would replace `Sin` for every
+later computation on the engine, LaTeX `\sin(0)` included. Use another name,
+or write `function Sin(x) { 5 }` to replace the function on purpose. A
+lowercase name, `sin(x) := 5`, is a name of the program: it shadows `sin`
+only. `At(xs, k) := 5` is not a definition: it assigns to an element of the
+list, as `xs[k] := 5` does.
 
 At the top level of a program, a `let` or a `const` of a library constant
 that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`, `True`) is
@@ -1863,8 +1875,80 @@ absent — so a binding could never behave like the value it holds. In a
 `match`, test for a marker with `== Missing`: a bare `Missing` there would
 be a new variable.
 
+`Module` cannot be rebound either, and a binding of it is an error
+(`module-binding`): it is the form of every qualified name (`std::pi` is
+`["Module", "Pi"]`). A `let`, a `const`, an assignment or a `function`
+named `Module` defines nothing and gives the error when it runs; the static
+check reports every binding of `Module`, also a parameter, a loop variable,
+a `match` pattern and the index of a `sum`. A qualified name reads the
+library in every case, whatever the program binds.
+
 To name a raw symbol that happens to spell a library name, use the verbatim
 form: `` `sin` `` is the symbol `sin`, not the sine function.
+
+### The qualified name `std::name`
+
+`std` is the name of the standard library, and `std::name` is the library
+definition of `name`, in either spelling: `std::pi` and `std::Pi` are the
+constant π, and `std::floor(2.5)` calls the library function `Floor`. A
+binding of the program never changes what a qualified name reads:
+
+```epsil
+function Floor(x) { x + 100 }
+let floor = 7
+std::floor(2.5) + Floor(1) + floor
+// ➔ 110
+```
+
+```epsil
+function f() { let Pi = 3; std::pi + Pi }
+f()
+// ➔ 3 + pi
+```
+
+A library name that has no lowercase spelling (see
+[Names with no lowercase spelling](#names-with-no-lowercase-spelling)) takes
+its capitalized name after `std::`: `std::Not(x)`, `std::Add(a, b)`,
+`std::If(c, a, b)`, `std::D(f, x)`. The language writes these with `!`, `+`,
+`if` and `D`, so `std::not`, `std::add`, `std::if` and `std::d` are the error
+`not-a-library-name`.
+
+`std` is not a reserved word and not a variable: `let std = 5` is a
+binding like any other, and `std::pi` still names the constant π in that
+program. A qualified name reads a name of a module, and `.` reads a field
+of a value, so `m.x` is the field `x` of a variable `m`.
+
+These are errors: a name other than `std` before `::` (`unknown-module`),
+a name after `std::` that the library does not define, such as
+`std::mine` for a function of the program (`not-a-library-name`), `std::`
+with no name, and a nested name such as `std::a::b`.
+
+A qualified call is the call of the library function, also where a
+function or a parameter of the program has the name. The engine simplifies
+it by the rules of the library, a library function that holds or binds an
+argument, such as `std::sum(k, k in 1..3)` or `std::If(c, a, b)`, reads its
+arguments as the library does, and a named argument, such as
+`std::log(8, base: 2)`, is valid. The arguments read the bindings of the
+program, so a call of the function of the program inside them stays a call
+of that function:
+
+```epsil
+function Sum(x) { 0 }
+std::sum(k, k in 1..3)
+// ➔ 6
+```
+
+```epsil
+function Not(x) { x }
+std::Not(Not(false))
+// ➔ true
+```
+
+In MathJSON, a qualified name is `["Module", "Pi"]`, and a qualified call
+is `["Apply", ["Module", "Floor"], 2.5]`. The engine writes these forms in
+the MathJSON of a result only in a scope where the bare name would read
+another definition, so that the result, read again in that scope, keeps its
+value.
 
 ## Glyph Aliases
 
@@ -2398,9 +2482,10 @@ sum(m)
 // ➔ 6
 ```
 
-A generator that is not assigned (an argument, an operand) reads variables
-at *materialization* time, and so does an assigned generator with no last
-element (`filter(1..oo, k => k > n)`).
+An assigned generator with no last element (`filter(1..oo, k => k > n)`)
+stays a generator, and stores the value that `n` has at the assignment. A
+generator that is not assigned (an argument, an operand) reads variables at
+*materialization* time.
 
 ## Control Flow
 
@@ -3074,7 +3159,7 @@ them as names.
 `internal`, `import`, `iterator`, `label`, `lazy`, `local`, `loop`, `match`,
 `module`, `mutable`,
 `namespace`, `NaN`, `native`, `new`, `not`, `of`, `on`, `oo`, `optional`, `or`, `package`,
-`parallel`, `private`, `protected`, `protocol`, `public`, `repeat`, `return`,
+`private`, `protected`, `protocol`, `public`, `repeat`, `return`,
 `self`, `set`, `static`, `super`, `switch`, `this`, `throw`, `to`, `true`,
 `try`, `union`, `until`, `using`, `var`, `variant`, `warn`, `when`,
 `while`, `with`, `xor`, `yield`.
@@ -3857,6 +3942,8 @@ p.x + p.y
 ```
 
 On a dictionary, `d.x` is exactly `d["x"]`, absent-key behavior included.
+On a record, a field that the type does not list is refused (see
+[records and dictionaries](#records-and-dictionaries)).
 The accessor reads one named field through the type's definition; it does
 not make the value a collection — `first(p)`, `p["x"]` and destructuring
 keep rejecting. (The dot must touch the value it reads: `p.x` is a field
@@ -4139,6 +4226,69 @@ between lengths (`^(M+N)`) is not supported.
 Note that a function is generic only when it is **declared** generic. Nothing
 is silently generalized: `x => x` is a function on some inferred type, not an
 implicit "for all `T`".
+
+## Records and dictionaries
+
+A **record** type lists the fields of its values, and a value has exactly
+those fields: `record{w: real, h: real}` holds `{w -> 2, h -> 3}`, and not
+`{w -> 2, h -> 3, d -> 1}`. The type of a dictionary literal is the record
+of exactly its keys.
+
+```epsil-live
+function area(r: record{w: real, h: real}) { r.w * r.h }
+area({w -> 2, h -> 3})
+// ➔ 6
+```
+
+A field that a value can leave out is **optional**: write a `?` after its
+type. A read of an optional field that the value leaves out gives the
+absent value of the field type — `missing`, or `NaN` for a numeric field —
+so `??` supplies a fallback:
+
+```epsil-live
+function label(r: record{id: integer, name: string?}) { r.name ?? "no name" }
+(label({id -> 1, name -> "a"}), label({id -> 2}))
+// ➔ ("a", "no name")
+```
+
+A field that a declared record type does not list is not a field: with
+`r: record{w: real, h: real}`, `r.d` is refused before the program runs
+(`unknown-field`). Without a declaration, the type of a value only describes
+that value, and a key that the value does not have reads as absent, as for a
+dictionary. The type of a conditional that gives records with different
+fields lists the fields of both, and a field that one branch leaves out is
+optional:
+
+```epsil-live
+function f(c: boolean) { if c { {a -> 1} } else { {a -> 2, b -> "x"} } }
+type(f(true))
+// ➔ TypeFrom("record{a: integer, b: string?}")
+```
+
+A record is a value: it does not change. A new field, or a new value for a
+field, is a copy made with the spread (`{->, ...p, z -> 3}`), and
+`deleteAt(p, key)` is a copy without the key. The type of the copy follows:
+
+```epsil-live
+let p = {x -> 1, y -> 2}
+let q = deleteAt(p, "y")
+(q, p, type(q))
+// ➔ ({"x" -> 1}, {"x" -> 1, "y" -> 2}, TypeFrom("record{x: integer}"))
+```
+
+A **dictionary** has any keys, with values of one type: declare it
+`dictionary<V>` when a program reads keys that are not known in advance. A
+key that it does not have reads as the absent value of `V`:
+
+```epsil-live
+let counts: dictionary<integer> = {a -> 1}
+(counts["b"], keys(counts))
+// ➔ (NaN, ["a"])
+```
+
+A record type is a `dictionary<V>` when every field type, optional fields
+too, is a `V`: a function that takes a `dictionary<integer>` takes
+`{a -> 1, b -> 2}`.
 
 ## Absence values
 
@@ -4742,9 +4892,29 @@ constructors) are **global** — a `type` statement is only allowed at the top
 level of a program, and the declared name means the same thing everywhere on
 the engine.
 
-`let` and `const` are the binding keywords. There is currently no compound
-assignment (`+=`); destructuring declarations (`let (x, y) = t`) and
-destructuring assignments (`(x, y) := t`) are described above.
+`let` and `const` are the binding keywords. Destructuring declarations
+(`let (x, y) = t`) and destructuring assignments (`(x, y) := t`) are described
+above.
+
+## Compound assignment {#compound-assignment}
+
+`s += e` adds `e` to the variable `s`: it is `s = s + e`. `L[i] += e` adds `e`
+to an element of a list: it is `L[i] = L[i] + e`, with the positions that
+`L[i] = v` accepts (`m[j, i] += e`, `m[j][i] += e`). Each position is
+evaluated once, before `e`.
+
+```epsil-live
+let L = [1, 2, 3]
+L[2] += 10
+L
+// ➔ [1, 12, 3]
+```
+
+Any other target (a field `p.x`, a call, a string position) is the error
+`add-to-target`. `+=` is the only compound assignment. In the body of a
+[`parallel for` loop](/control-flow/#parallel-loops), it adds a
+contribution to a variable declared outside the loop. The MathJSON form is
+`["AddTo", target, e]`.
 
 ---
 
@@ -4830,6 +5000,11 @@ precedence (for example `+` and `-`, or `*` and `/`).
 Postfix calls and indexing (`f(x)`, `xs[i]`) bind tighter than every entry in
 this table — they are handled directly by the parser rather than through the
 operator table, since they are not spelled with an operator symbol.
+
+The qualified name `std::name` is not in the table either. It is one
+primary, like a name: `std::floor(x)` is a call of `std::floor`, and
+`std::pi^2` is the square of `std::pi`. See
+[Qualified names](#qualified-names).
 
 The three Unicode-only rows — the radical signs, and the superscript and
 subscript runs — have no ASCII spelling. By default the serializer writes the
@@ -5060,7 +5235,7 @@ Compiled code raises on the absent branch (JavaScript, the interval
 JavaScript target, Python) with the
 message `expected-present: <operand> is absent`; the check is left out when
 the operand's type already excludes absence (a declared length with a literal
-index, a type without `nan`). A shader target (GLSL, WGSL) cannot raise:
+index, a type without `nan`). A shader target (GLSL) cannot raise:
 there the assertion compiles as the identity and the absent value flows on
 as `NaN`, and a later absence test on the value keeps its own rule.
 
@@ -5212,6 +5387,30 @@ It binds tighter than relational operators and more loosely than addition and
 subtraction. The Unicode two-dot leader `‥` is an input alias. Serialization
 uses `Range(a, b)`, and a stepped range continues to use the three-argument
 call `Range(a, b, step)`.
+
+## Qualified names: `::` {#qualified-names}
+
+`std::name` is the definition of `name` in the standard library, also where
+a binding of the program shadows the name. The name takes either spelling:
+`std::pi` and `std::Pi` are the constant π.
+
+```epsil
+function f() { let Pi = 3; std::pi + Pi }
+f()
+// ➔ 3 + pi
+```
+
+```epsil
+let floor = 7
+std::floor(2.5) + floor
+// ➔ 9
+```
+
+The `::` must follow the module name with no space, as the `.` of a field
+follows its base. `std` is the only module name; any other name before `::`
+is the error `unknown-module`. A qualified name does not nest (`std::a::b`
+is an error). See [Naming Conventions](/naming/) for the rules of
+shadowing.
 
 ## Spread: `...` {#spread}
 
@@ -5925,20 +6124,42 @@ xs = filter(xs, c => c > 2)
 
 Two lazy collections stay lazy when they are assigned: one with no last
 element (`filter(1..oo, p)`), which cannot be listed, and one that reads no
-variable (`map(f, 1..1000000)`), which nothing can change. A lazy collection
-that is not assigned (an argument, an operand) still reads program state
-**at materialization time**, like a generator in Python. An unbounded one
-that captures a variable reflects the later value of that variable.
+variable (`map(f, 1..1000000)`), which nothing can change. A `filter` over a
+dictionary also stays lazy. When such a collection reads a variable, also
+in an inline function, the statement stores it with the value that the
+variable has at that statement, so a later assignment of the variable does
+not change it:
+
+```epsil
+let k = 3
+let big = filter(1..oo, c => c > k)
+k = 10
+first(big)
+// ➔ 4
+```
+
+A variable that the collection assigns, in its callback or through a
+function with the `scope` effect that it calls, is not replaced: the
+collection reads and writes that variable when its elements are read. A
+variable that holds a function is replaced with that function, and the
+function is a closure: it reads the later values of its own variables. With
+`let p = c => c > k` and `let big = filter(1..oo, p)`, `first(big)` gives
+`11` after `k = 10`. A finite collection made from such a stored collection
+(`take(big, 2)`) reads no variable, so it also stays lazy when it is
+assigned, and its callback runs each time its elements are read.
+
+A lazy collection that is not assigned (an argument, an operand) still reads
+program state **at materialization time**, like a generator in Python.
 
 ```mermaid
 flowchart TD
   rhs["let xs = … or xs = …"] --> lit{"right-hand side<br/>is a literal?"}
   lit -- yes --> snap["stored as its elements: a snapshot"]
-  lit -- "no: a lazy collection" --> fin{"has a last element?"}
-  fin -- "no, as filter(1..oo, p)" --> lazy["stays lazy: enumerated when materialized,<br/>reading variables as they are then"]
-  fin -- yes --> reads{"reads a variable, as written?<br/>(an inline function counts;<br/>a named function is not inspected)"}
-  reads -- "no, as map(f, 1..1000000)" --> lazy
-  reads -- yes --> snap2["stored as the list of its elements,<br/>computed with the values at this statement"]
+  lit -- "no: a lazy collection" --> reads{"reads a variable, as written?<br/>(an inline function counts;<br/>a named function is not inspected)"}
+  reads -- "no, as map(f, 1..1000000)" --> lazy["stays lazy: enumerated when materialized"]
+  reads -- yes --> fin{"has a last element?"}
+  fin -- "no, as filter(1..oo, c => c > k)" --> bound["stays lazy, with the values<br/>of its variables at this statement"]
+  fin -- yes --> snap2["stored as the list of its elements,<br/>computed with the values at this statement"]
 ```
 
 The test "reads a variable" looks at the expression as written, and does not
@@ -7187,6 +7408,163 @@ optionally with an `if` guard:
 
 See [Comprehensions](/syntax/#comprehensions).
 
+### Parallel loops {#parallel-loops}
+
+`parallel for x in xs { … }` runs the body once for each element, as `for`
+does, but the passes are independent: they can run in any order, and a later
+version of the engine can split them between workers. The value is `nothing`.
+
+```epsil-live
+let L = [0, 0, 0]
+parallel for k in 1..6 { L[k % 3 + 1] += k }
+L
+// ➔ [9, 5, 7]
+```
+
+To make the result the same for any order of the passes, the body follows
+these rules. `epsil check` reports each one with its own code:
+
+- The body can declare and change its own locals. It can change a variable
+  declared outside the loop only with
+  [`+=`](/declarations/#compound-assignment): `s += e` or `L[i] += e`.
+  Any other write, such as `L[c] = v` or `L = replaceAt(L, c, v)`, is
+  `parallel-outer-write`.
+- A variable that the body changes with `+=` is an **accumulator**. Each pass
+  adds its contributions, and the value after the loop is the value before it
+  plus all the contributions. With exact numbers the result does not depend
+  on the order of the passes; with machine floating-point numbers, it can
+  differ in rounding. A read of an accumulator in a pass gives an
+  unspecified value. `epsil check` reports a read written by name in the
+  body, also in a function literal written in the body (`L[c] += L[d]`,
+  `if s > 3 { … }`), as `parallel-accumulator-read`. A read by another
+  route, such as a function that the body calls, `parse("s")` or a function
+  of the host, is not reported, and its value is unspecified too. The
+  interpreter and the JavaScript target run the passes in order, and such a
+  read gives the value that the earlier passes gave. A target that runs the
+  passes in parallel declines a pass that reads an accumulator (see the
+  examples after this list). A loop with no accumulator, and a parallel
+  comprehension, can call any function.
+- The effects of the body can only be `random` (see
+  [effect specifiers](#effect-specifiers)): a `print` in the body is
+  `parallel-effect`. The effects are the ones that the engine infers, also
+  for the functions that the body calls: a function that the program defines
+  has the effects of its body, and a loop variable or a parameter whose type
+  is a function type has the effects of that type. So
+  `parallel for f in [() => print(1)] { f() }` is `parallel-effect`. One case
+  is not seen: a call of a function value whose type is not known, such as a
+  function that an unannotated parameter holds, is inferred `pure`, whatever
+  function it holds. So `function run(fs) { parallel for f in fs { f() } }`
+  is accepted. Annotate the parameter with the effects that it admits
+  (`function run(fs: list<() any -> any>) { … }`) to have the loop refused.
+  A function that the program defines after the loop is not seen either.
+- No `break`, `continue` or `return` leaves the loop (`parallel-exit`). An
+  inner loop of the body can use `break` and `continue`.
+
+The domain `xs` is read to its end before the first pass, and it is not a
+part of the passes: it can read an accumulator, and a `+=` in it does not make
+its target an accumulator. A domain that is computed as it is read, such as
+`map((x) => s, 1..3)`, gives the values of before the loop.
+
+A read of an accumulator written by name is reported by `epsil check`:
+
+```epsil
+let s = 0
+parallel for k in 1..3 { if s < 2 { s += k } }   // parallel-accumulator-read
+```
+
+A read through a function is not reported, and its value is unspecified.
+Today the interpreter and the JavaScript target give 11 for `s` here (the
+passes add 1, 3 and 7), but this value is not guaranteed:
+
+```epsil
+let s = 0
+function total() { s }
+parallel for k in 1..3 { s += total() + k }   // not reported
+s                                             // unspecified (11 today)
+```
+
+To use values that the passes need, compute them before the loop:
+
+```epsil-live
+let s = 0
+let T = [k^2 for k in 1..3]
+parallel for k in 1..3 { s += T[k] }
+s
+// ➔ 14
+```
+
+Inside `WithRandomSeed`, each pass draws from its own random frame, derived
+from the seed, the position of the pass in the domain, and one draw of the
+enclosing frame. So the values of a pass do not depend on the other passes:
+the third element is the same in these two lists.
+
+```epsil
+WithRandomSeed(7, [random() parallel for k in 1..3])
+WithRandomSeed(7, [random() parallel for k in 1..5])
+```
+
+This applies to the direct draws of a pass, a `random()` that the pass
+evaluates. The draws of a lazy view inside a pass, such as
+`sum([random() for j in 1..2])`, are not specified, because the caches of a
+view are shared by the passes; to get the draws of each pass, build the list
+directly, as `[random(), random()]` or with a loop that appends.
+
+The **parallel comprehension** puts `parallel` before the first `for` of a
+comprehension. It is the list of the comprehension, in the order of the
+domain, and its passes follow the same rules; its body changes no variable
+declared outside it, also with `+=` (`parallel-comprehension-write`):
+
+```epsil-live
+[k^2 parallel for k in 1..4]
+// ➔ [1, 4, 9, 16]
+```
+
+Only the first clause can be `parallel` (`parallel-clause-not-first`); the
+other clauses run in order inside each pass. Unlike a plain comprehension,
+which is a lazy collection, a parallel comprehension is evaluated at once.
+
+`parallel` is a contextual keyword: it is read as a keyword only before `for`,
+and it stays an identifier everywhere else. The statement lowers to
+`["ParallelLoop", body, ["Element", "x", "xs"]]`, and the comprehension to
+`["ParallelComprehension", body, …clauses]`. Compiled to JavaScript, the
+passes run in order, with the same direct draws as the interpreter. The
+other compile targets do not compile them.
+
+**On worker threads.** A host that compiles a program to JavaScript can call
+`runAsync()` on the result in place of `run()`. When the engine has a worker
+pool, `runAsync()` gives each worker one range of consecutive passes of a
+`parallel for`, and adds the sums of the workers to the accumulators. A loop
+that does not meet the conditions of the compiler runs in order, as with
+`run()`; a loop that reads an accumulator is one of these. Three conditions
+depend on how the program is written:
+
+- The domain is a range, `a..b`, not a list.
+- Each accumulator is a number or a list of numbers, declared with `let` in
+  the function or block that holds the loop, and the loop changes it only
+  with `+=`.
+- The loop is a statement of a function (also inside an `if`, a `for` or a
+  `while`), and the program calls that function as a statement, as the value
+  of `let a = f(…)` or of `a = f(…)`, or as its last value. A call in an
+  operand, `f(…) + 1`, runs the loop in order: write `let a = f(…)`, then
+  `a + 1`.
+
+This function meets the three conditions:
+
+```epsil-live
+function count(H: list<integer>, n: integer) -> list<integer> {
+  let L = H
+  parallel for k in 1..n { L[k % 3 + 1] += 1 }
+  L
+}
+count([0, 0, 0], 9)
+// ➔ [3, 3, 3]
+```
+
+The other conditions, the threshold of 20 000 passes, and the values (an
+accumulator of integers gives the value of `run()`, one of real numbers can
+differ in rounding) are in the
+[compile guide](https://mathlive.io/compute-engine/guides/compiling/#parallel-loops-on-worker-threads-runasync).
+
 ## Pipelines
 
 `x |> f` means exactly `f(x)`. For a single call that is a wash — `sqrt(2)`
@@ -8227,7 +8605,7 @@ _dictionary_ → **`{`** \[(_key-value-pair_)#**`,`**\] **`}`** | **`{->}`** | *
 
 _key-value-pair_ → _expression_ **`->`** _expression_
 
-_comprehension-clauses_ → **`for`** (_comprehension-clause_)#**`,`**
+_comprehension-clauses_ → \[**`parallel`**\] **`for`** (_comprehension-clause_)#**`,`**
 
 _comprehension-clause_ → (_symbol_ | _tuple-pattern_) **`in`** _expression_ \[**`if`** _expression_\]
 
@@ -8643,6 +9021,11 @@ The lowering is the engine's `Comprehension` with one `Element` clause per
 {k -> v for (k, v) in ps} // ➔ ["DictionaryFrom", ["Comprehension", ["Tuple", "k", "v"], ["Element", ["Tuple", "k", "v"], "ps"]]]
 ```
 
+With `parallel` before the first `for`, the comprehension is a **parallel
+comprehension** (`[f(k) parallel for k in 1..n]`, lowered to
+`ParallelComprehension`): its passes can run in any order. See
+[Parallel loops](/control-flow/#parallel-loops).
+
 Trailing commas are allowed in every collection form (lists, sets, tuples,
 dictionaries, and call/index argument lists) — friendly to notebook editing
 and diffs:
@@ -8918,9 +9301,15 @@ Rename one side so the two agree — the quick fix renames the annotation's para
 
 ## `absence-marker-binding`
 
-A binding names one of the absence markers `Nothing` or `Missing`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — an arithmetic operand named `Nothing` is refused as a non-number, and an arithmetic operand named `Missing` is read as absent — so a binding of one of them could never behave like the value it holds. They are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
+A binding names one of the absence markers `Nothing` or `Missing`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable or a `match` pattern. The engine recognizes these markers by their name wherever they appear — an arithmetic operand named `Nothing` is refused as a non-number, and an arithmetic operand named `Missing` is read as absent — so a binding of one of them could never behave like the value it holds. With `Module` (see `epsil doc module-binding`), they are the only library names that cannot be rebound in any scope. Every other one, including `Pi` and `Square`, is shadowed by a user binding, with one exception: at the top level of a program, a `let` or `const` of a library constant that results carry by name (`Pi`, `ExponentialE`, `GoldenRatio`) is refused with a run-time error, because a result built with the library constant would read the user value when its MathJSON is boxed again.
 
 Choose another name. In a `match`, a bare name is a new variable, not a comparison: to test for the marker, write `== Missing`.
+
+## `module-binding`
+
+A binding names `Module`: a `let`, a `const`, an assignment, a function, a parameter, a loop variable, a `match` pattern or the index of a `sum`. `Module` is the operator of every qualified name: `std::pi` is `["Module", "Pi"]` in MathJSON. It cannot be rebound in any scope. The static check reports every such binding. A `let`, a `const`, an assignment or a `function` statement also defines nothing when it runs, and it evaluates to a `module-binding` error value. A parameter, a loop variable, a pattern or an index named `Module` is still bound when the program runs, but no binding changes what a qualified name reads: the head of a qualified name always reads the library operator `Module`.
+
+Choose another name.
 
 ## `variable-redeclaration`
 
@@ -8944,6 +9333,14 @@ A `let` or a `const` declares a name without a value: `let x: integer`. A declar
 
 The first assignment of a name is in a branch of an `if`, in a branch of a `match` or in the body of a loop. In `if c { t = 1 }; t`, the name `t` has no value when `c` is false. A first assignment declares a local only at the own level of a block that is not in a branch or a loop body. Declare the name with a value before the branch, `let t = 0; if c { t = 1 }; t`, or with a `let` in the branch when the name is a local of the branch only.
 
+## `assignment-to-library-function`
+
+A definition in math style, `Sin(x) := 5` or `Sin(x) = 5`, has the name of a function of the library. At the top level of a program it would replace that function for every later computation on the engine: a later LaTeX `\sin(0)` would give `5`. The statement is refused there and in a block or a function body too, and it defines no function.
+
+To define a function of your own, give it another name: `mySin(x) := 5`. A name with an initial lowercase letter, `sin(x) := 5`, is a name of the program: it hides the library function `Sin` only where the program writes `sin`. To replace the library function on purpose, write a `function` statement: `function Sin(x) { 5 }`. A math-style definition after that statement in the same block adds to that function: `function Sin(x) { 5 }` then `Sin(0) := 7`. In a block inside it, the definition is accepted too, and defines a local function that hides it.
+
+`At(xs, k) := v` is not a definition: it assigns to the element `k` of the list `xs`, as `xs[k] := v` does.
+
 ## `assignment-to-list-element`
 
 An assignment to a list element, `xs[i] = v`, gives `xs` a new list with the element replaced, as `xs = replaceAt(xs, i, v)` does. This error is a write that cannot give a list, and the variable keeps its value.
@@ -8952,9 +9349,55 @@ The target is a name with no value (`ys[1] = 9` with `ys` not declared). The pos
 
 A string and a tuple are written as `replaceAt` writes them, and give a list: with `s = "abc"`, `s[1] = "z"` gives the list of characters `["z", "b", "c"]`. A position past the end, zero or not an integer is the error `out-of-range`; the length of a string is its number of characters. A target that is a number, or a position that selects a number (`xs[1, 1] = 5` when `xs` is a flat list), is the error `incompatible-type` of `replaceAt`.
 
+## `add-to-target`
+
+The target of `+=` is not a variable or a list element. `s += e` is `s = s + e`, and `L[i] += e` is `L[i] = L[i] + e`, with the positions that `L[i] = v` accepts: `m[j, i] += e` and `m[j][i] += e` are the same element.
+
+A field (`p.x += 1`), a call (`f(x) += 1`) and a string position (`d["a"] += 1`) are not accepted. Write the assignment in full, `p.x = p.x + 1`, where that form is valid.
+
+## `parallel-clause-not-first`
+
+In a comprehension, only the first clause can be `parallel`: `[f(x, y) parallel for x in xs, y in ys]`. The first clause gives the passes, which can run in any order; the other clauses run in order inside each pass, so they cannot be parallel.
+
+To run the inner clause in parallel instead, make it the first clause, or write a parallel comprehension inside the body: `[[f(x, y) parallel for y in ys] for x in xs]`.
+
+## `parallel-outer-write`
+
+The body of a `parallel for` loop changes a variable that is declared outside the loop, and the change is not a `+=`. The passes of a parallel loop can run in any order, so a write such as `L[c] = v`, `s = s + 1` or `L = replaceAt(L, c, v)` would give a result that depends on that order.
+
+Write the change as `+=`: `L[c] += 1`, `s += x`. A variable that the body changes with `+=` is an accumulator: each pass adds its contributions, and the final value is the value before the loop plus all the contributions. The body can declare and change its own locals with `let` and `=`.
+
+## `parallel-accumulator-read`
+
+The body of a `parallel for` loop reads a variable that it also changes with `+=` (an accumulator). While the loop runs, the value of an accumulator depends on which passes have run, so a read of it in the body gives an unspecified value. (This is the rule of the Dex language and of OpenMP.)
+
+`epsil check` reports a read written by name in the body, also in a function literal written in the body: `L[c] += L[d]` and `if s > 3 { … }`. A read by another route cannot be found before the program runs, and is not reported: a function that the body calls (`s += total(k)` with `function total(x) { s + x }`), `parse("s")`, a function of the host. Its value is still unspecified. The interpreter and the JavaScript target run the passes in order and give the value that this order gives, but a target that runs the passes in parallel declines such a loop, and a later version can give another value.
+
+Read the value after the loop. To use a value of the list from before the loop, copy it first: `let H = L` before the loop, then `L[c] += H[d]` in the body.
+
+## `parallel-effect`
+
+The body of a parallel loop or a parallel comprehension can have only the `random` effect. Its passes can run in any order, so an effect such as `console` (`print`) or `state` would happen in an order that is not specified. The message lists the effects that the engine inferred for the body, also for the functions that it calls: a function of the program has the effects of its body, and a loop variable or a parameter whose type is a function type has the effects of that type. `any` means that the body calls a function that can have any effect.
+
+Move the effect out of the loop: collect the values with a parallel comprehension, then print them after it. A random draw is accepted: inside `WithRandomSeed`, each pass draws from its own frame, so the values do not depend on the order of the passes.
+
+A call of a function value whose type is not known, such as a function that an unannotated parameter holds, is inferred `pure`: in `function run(fs) { parallel for f in fs { f() } }`, a `print` in a function of `fs` is not seen. Annotate the parameter with the effects that it admits (`fs: list<() any -> any>`) to have such a loop checked.
+
+## `parallel-exit`
+
+A `break`, `continue` or `return` in the body of a parallel loop would leave the loop, or skip the rest of a pass, in an order that depends on how the passes run. A parallel loop always runs every pass.
+
+An inner loop of the body can use `break` and `continue`: they leave or skip that inner loop only. To skip the rest of a pass, put it in an `if`.
+
+## `parallel-comprehension-write`
+
+The body of a parallel comprehension changes a variable that is declared outside it. A parallel comprehension gives one element for each pass and changes nothing else, also with `+=`.
+
+To add to a variable in each pass, use the statement form: `parallel for x in xs { s += f(x) }`. The body of the comprehension can declare and change its own locals in a `do { … }` block.
+
 ## `assignment-in-operand`
 
-An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`.
+An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) + 1` the assignment is an operand of another expression. Write the assignment as a statement of its own, then use the name: `a := 2; f(a)`. The compound assignment `+=` is an assignment too: write `s += 1; f(s)`, not `f(s += 1)`.
 
 ## `assignment-type-mismatch`
 
@@ -8977,6 +9420,8 @@ Two clauses of one function in a single program have the same dispatch domain, s
 Only replacement is refused. Clauses that dispatch on genuinely different domains accumulate — a different arity (`k(x)` and `k(x, y)`), different parameter types (`h(x: integer)` and `h(x: string)`), or a literal pattern (`g(0) = 99` alongside `g(x) = x`). That is what multi-clause definitions are for.
 
 The boundary is the program (one file, one cell). Within it, a same-domain redefinition is a mistake with no possible intent. Interactively, re-running an edited definition as a SEPARATE program — a later notebook cell, the next REPL line — replaces the earlier one; that is the intended redefinition gesture, and is legal.
+
+The rule applies in a function body and in a block too: two clauses with the same domain in one block are this error, as two `let` of one name are `variable-redeclaration`. `epsil check` reports it, and the block is invalid: in `function g() { f(y) = 1; f(x) = 3; f(0) }`, `g` is not defined. A clause in a nested block, or in a function body, with the domain of a clause of an enclosing scope is not a redefinition: it makes a local function that shadows the outer one. A statement that runs more than once, such as a definition in a loop body, does not collide with itself.
 
 ## `type-redefinition`
 
@@ -9003,6 +9448,16 @@ A protocol's `function` member was read with a dot, as if it were a field or a p
 A protocol declares two kinds of member, and they are used differently. A `function` member is CALLED, with the receiver as its first argument: `span(b)`, or with the dot and parentheses, `b.span()`. A `readonly` or `readwrite` member is a PROPERTY, read with a dot and no parentheses: `b.area`. So `b.span` — no parentheses — is a spelling mistake rather than a missing field — the name exists, on a protocol the value conforms to. The parentheses are what make the dot a call; `b.span` is never a function value bound to `b`.
 
 The mirror mistake, calling a property (`area(b)`), is reported as `protocol-property-not-callable`.
+
+## `unknown-field`
+
+A field was read, with a dot (`r.b`) or with a key (`r["b"]`), and the value has no field of that name.
+
+A record type lists every field of its values: `record{a: integer, b: string}` holds the values with the keys `a` and `b`, and no other key. So with `r: record{a: integer}`, `r.b` is refused before the program runs. A field that a value can leave out is declared optional, with a `?` after its type: with `r: record{a: integer, b: string?}`, `r.b` is a `string`, and it reads as `Missing` when the value has no key `b` (as `NaN` for a numeric field).
+
+A value that can have any keys is a dictionary: declare it `dictionary<V>`, and read a key with `d["b"]`.
+
+An object, or a value of a declared type, also has a fixed list of fields; the message names them.
 
 ## `dot-call-not-a-protocol-function`
 
@@ -9040,6 +9495,24 @@ This problem was detected before anything ran, when the program was canonicalize
 
 A static diagnostic never suppresses evaluation: the program still runs exactly as written (errors are values — see `epsil doc runtime-error`), so the same mistake may be reported a second time by the run itself. The label distinguishes the tiers: "Type error"/"Static error" for the pre-run analysis, "Runtime error" for the run.
 
+## `unknown-module`
+
+A qualified name `m::x` names a module that does not exist. The only module is `std`, the standard library: `std::pi` is the library constant `Pi`, and `std::floor(2.5)` calls the library function `Floor`, also where the program binds `pi` or `floor` to something else.
+
+A qualified name reads a name of a module, and `.` reads a field of a value: to read a field of a variable `m`, write `m.x`.
+
+## `not-a-library-name`
+
+A qualified name `std::x` names a definition of the standard library, and the library defines no `x`. Both spellings of a library name are valid after `std::`: `std::pi` and `std::Pi` are the constant `Pi`. A name of the program is never a library name, so `std::` cannot reach a variable or a function that the program defines.
+
+The program still runs, and the qualified name evaluates to a `not-a-library-name` error value.
+
+## `qualified-call-arguments-canonical`
+
+A call of a library function was made with arguments that were already canonical, where the program binds the name of the function, and the library function holds or binds an argument: the index `k` of a sum, the branches of an `If`. The MathJSON `["Apply", ["Module", "Sum"], "k", ["Limits", "k", 1, 3]]` (the Epsil `std::sum(k, k in 1..3)`) is valid: the engine reads the arguments as written. A callee in another form that becomes the library function only when it is canonicalized, such as `["Apply", ["Sequence", ["Module", "Sum"]], …]`, gets the arguments after they were canonicalized in the scope of the call, where the index `k` is a variable of that scope. So the call is an error.
+
+Write the callee as `["Module", name]`, in parentheses (`["Delimiter", ["Module", name]]`) or not. A library function whose arguments are all values (`Floor`, `Equal`, `List`) accepts canonical arguments, and is called with any form of the callee.
+
 ## `unknown-protocol`
 
 A conformance test named a protocol that does not exist: `Conforms(x, "Hashble")` where no `protocol Hashble` was ever declared. A name that does not exist is a mistake to surface, so it is an error — never a quiet `False`, which would make a typo indistinguishable from a genuine non-conformance.
@@ -9062,7 +9535,7 @@ Source: https://epsil.dev/library/
 
 # Epsil Standard Library
 
-The 711 functions and constants of the standard library, by category.
+The 718 functions and constants of the standard library, by category.
 Each row gives a name, its signature (for a function) or its kind and type
 (for a constant or variable), and the first sentence of its description —
 the same description `epsil doc <name>` prints in full and the editor
@@ -9073,10 +9546,10 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 117 definitions · [full reference](/reference/core/)
-- [Control structures](#control-structures) — 12 definitions · [full reference](/reference/control-structures/)
+- [Core](#core) — 118 definitions · [full reference](/reference/core/)
+- [Control structures](#control-structures) — 16 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
-- [Collections](#collections) — 126 definitions · [full reference](/reference/collections/)
+- [Collections](#collections) — 125 definitions · [full reference](/reference/collections/)
 - [Colors](#colors) — 20 definitions · [full reference](/reference/colors/)
 - [Regular expressions](#regular-expressions) — 4 definitions · [full reference](/reference/regexp/)
 - [Relations](#relations) — 30 definitions · [full reference](/reference/relop/)
@@ -9088,7 +9561,7 @@ To search the library by concept rather than by name, use
 - [Combinatorics](#combinatorics) — 11 definitions · [full reference](/reference/combinatorics/)
 - [Number theory](#number-theory) — 60 definitions · [full reference](/reference/number-theory/)
 - [Special functions](#special-functions) — 19 definitions · [full reference](/reference/special-functions/)
-- [Linear algebra](#linear-algebra) — 43 definitions · [full reference](/reference/linear-algebra/)
+- [Linear algebra](#linear-algebra) — 46 definitions · [full reference](/reference/linear-algebra/)
 - [Statistics](#statistics) — 35 definitions · [full reference](/reference/statistics/)
 - [Units](#units) — 7 definitions · [full reference](/reference/units/)
 - [Physics](#physics) — 11 definitions · [full reference](/reference/physics/)
@@ -9150,6 +9623,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `LatexString` | `(string) -> string` | Value preserving type conversion/tag indicating the string is a LaTeX string |
 | — | `MatchesType` | `(subject: any, type: string \| type) -> boolean` | True iff the first operand, EVALUATED, is a value of the given type — the engine form of the Epsil `x is T` test and of `match` type patterns, which both lower here. |
 | `missing` | `Missing` | variable `missing` | A value that is absent but whose position is preserved (Julia `missing`, R `NA`); the sole member of the `missing` type. |
+| — | `Module` | `(symbol) -> unknown` | The definition of a name in the standard library, also where a local definition shadows the name |
 | — | `N` | `(any, (integer \| list<number>)?) -> unknown` | N(expr): numerically evaluate an expression |
 | `nSolve` | `NSolve` | `(any, any*) -> list` | NSolve(equation, unknown): the solutions of an equation as floats. |
 | — | `NamedArgument` | `(string, any) -> nothing` | NamedArgument(name, value): one named argument of a call (Epsil |
@@ -9223,6 +9697,7 @@ The [Control structures reference](/reference/control-structures/) has the full 
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
+| — | `AddTo` | `(expression, any) scope -> any` | Compound assignment: `AddTo(s, e)` is `Assign(s, Add(s, e))`, and `AddTo(At(L, i, …), e)` is `Assign(L, ReplaceAt(L, i, …, Add(At(L, i, …), e)))`, with each position evaluated once, before `e`. |
 | — | `Alternatives` | `(expression+) -> nothing` | Inside a `Match` pattern, `Alternatives(p1, p2, …)` matches if any alternative matches. |
 | — | `Break` | `(value: any?) -> nothing` | Exit the enclosing loop immediately, optionally with a value (`Break(v)`) that becomes the loop value. |
 | — | `Comprehension` | `(body: expression, iterators: expression+) -> list` | Value-producing comprehension: evaluate `body` in nested iteration over one or more `Element` clauses and collect the results into a list. |
@@ -9233,6 +9708,9 @@ The [Control structures reference](/reference/control-structures/) has the full 
 | — | `Loop` | `(body: expression, iterators: expression*) -> any` | Imperative loop, evaluated **for effect**. |
 | — | `Match` | `(expression, expression+) -> unknown` | Structural pattern match. |
 | — | `MatchCase` | `(expression, expression, expression?) -> nothing` | A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. |
+| — | `ParallelComprehension` | `(body: expression, iterators: expression+) random -> list` | Parallel comprehension: `ParallelComprehension(body, Element(x, xs), …)` is the list that `Comprehension` with the same operands gives, but the passes of the first clause can run in any order. |
+| `parallelDomain` | `ParallelDomain` | `(collection: any) random -> any` | The domain of the passes of a parallel loop (engine-internal). |
+| — | `ParallelLoop` | `(body: expression, iterators: expression+) random -> any` | Parallel loop, evaluated **for effect**: `ParallelLoop(body, Element(x, coll))` evaluates `body` once for each element of `coll` (a pass), and the passes can run in any order. |
 | — | `Pin` | `(expression) -> nothing` | Inside a `Match` pattern, `Pin(expr)` matches the value of `expr` (evaluated at match time) rather than its structure. |
 | — | `Which` | `(expression+) -> unknown` | `Which(c1, e1, c2, e2, …)` evaluates to the value of the first `e` whose condition `c` is `True`, and to `Missing` when no condition is `True`. |
 
@@ -9294,7 +9772,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `countIf` | `CountIf` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the number of elements in the collection satisfying the predicate. |
 | `cycle` | `Cycle` | `(list<any>) -> list` | Produce an infinite sequence by cycling through the elements of a finite collection. |
 | `dedup` | `Dedup` | `(collection<any>) -> collection` | Return the collection with consecutive duplicate elements collapsed to a single element. |
-| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
+| `deleteAt` | `DeleteAt` | `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any) & ((dictionary<V>, string) -> dictionary<V> where V: any)` | Return a copy of the indexed collection with the element at the 1-based `index` removed. |
 | — | `Dictionary` | `(tuple<string, unknown>*) -> dictionary` | A collection of key -&gt; value entries with string keys (`{x -> 1, y -> 2}` in Epsil). |
 | `dictionaryFrom` | `DictionaryFrom` | `(collection<any>) -> dictionary` | Create a dictionary from the elements of a collection of (key, value) pairs. |
 | `differences` | `Differences` | `(indexed_collection<any>) -> indexed_collection` | Return the successive differences of a collection: a collection whose k-th element is `x(k+1) − xk`, of length one less than the input. |
@@ -9308,7 +9786,6 @@ The [Collections reference](/reference/collections/) has the full description an
 | `extendedRationalNumbers` | `ExtendedRationalNumbers` | constant `set<rational \| signed_infinity>` | The set of all rational numbers, including infinities. |
 | `extendedRealNumbers` | `ExtendedRealNumbers` | constant `set<real \| signed_infinity>` | The set of all real numbers, including infinities. |
 | `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
-| `fill` | `Fill` | `(function, tuple) -> list` | Produce a 2D list (matrix) by applying a function to each pair of row and column indexes. |
 | `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
 | `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate. |
 | `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
@@ -9833,6 +10310,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `eigen` | `Eigen` | `(matrix) -> tuple` | Eigenvalue-eigenvector decomposition of a square matrix. |
 | `eigenvalues` | `Eigenvalues` | `(matrix) -> list` | Eigenvalues of a square matrix. |
 | `eigenvectors` | `Eigenvectors` | `(matrix) -> list` | Eigenvectors of a square matrix. |
+| `fill` | `Fill` | `(value: any, integer+) -> list` | List or tensor with each element equal to a value. |
 | `flatten` | `Flatten` | `(value, integer?) -> list` | Flatten a tensor or collection into a list. |
 | `hadamardProduct` | `HadamardProduct` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Hadamard (element-wise) product of two vectors or matrices of the same shape. |
 | `hom` | `Hom` | `(value*) -> value` | Hom-set of morphisms between objects |
@@ -9849,6 +10327,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `matrixPower` | `MatrixPower` | `(matrix, real) -> matrix` | Square matrix raised to a power. |
 | `matrixRank` | `MatrixRank` | `(value) -> integer` | Rank of a matrix (number of linearly independent rows/columns). |
 | `norm` | `Norm` | `(list<tuple> \| number \| tensor \| tuple, (+oo \| real \| string)?) -> +oo \| nan \| real` | Vector or matrix norm. |
+| `ones` | `Ones` | `(integer+) -> list` | List or tensor filled with ones. |
 | `onesMatrix` | `OnesMatrix` | `(integer, integer?) -> matrix` | Matrix filled with ones. |
 | `pseudoInverse` | `PseudoInverse` | `(matrix) -> matrix` | Moore-Penrose pseudoinverse of a matrix. |
 | `qrDecomposition` | `QRDecomposition` | `(matrix) -> tuple` | QR decomposition of a matrix. |
@@ -9862,6 +10341,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `transpose` | `Transpose` | `(value, axis1: integer?, axis2: integer?) -> value` | Transpose a matrix or swap two tensor axes. |
 | `vector` | `Vector` | `(any+) -> vector` | Construct a column vector. |
 | `zeroMatrix` | `ZeroMatrix` | `(integer, integer?) -> matrix` | Matrix filled with zeros. |
+| `zeros` | `Zeros` | `(integer+) -> list` | List or tensor filled with zeros. |
 
 ## Statistics
 
@@ -10846,6 +11326,22 @@ missing + 1
 // ➔ "Missing"
 ```
 
+### Module
+
+`(symbol) -> unknown`
+
+The definition of a name in the standard library, also where a local definition shadows the name
+
+```epsil
+Module(Pi)
+// ➔ pi
+```
+
+```epsil
+apply(Module(Floor), 2.5)
+// ➔ 2
+```
+
 ### N
 
 `(any, (integer | list<number>)?) -> unknown`
@@ -11682,7 +12178,7 @@ Source: https://epsil.dev/reference/control-structures/
 
 # Control structures
 
-The 12 definitions of the control structures library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The 16 definitions of the control structures library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
@@ -11690,6 +12186,12 @@ it has none), with its signature in the engine's type syntax. The
 category.
 
 ## Definitions
+
+### AddTo
+
+`(expression, any) scope -> any`
+
+Compound assignment: `AddTo(s, e)` is `Assign(s, Add(s, e))`, and `AddTo(At(L, i, …), e)` is `Assign(L, ReplaceAt(L, i, …, Add(At(L, i, …), e)))`, with each position evaluated once, before `e`. In the body of a `ParallelLoop`, it adds a contribution to an accumulator, a variable declared outside the loop.
 
 ### Alternatives
 
@@ -11767,6 +12269,24 @@ Structural pattern match. `Match(subject, MatchCase(pattern, body), …)` evalua
 `(expression, expression, expression?) -> nothing`
 
 A case of a `Match`: `MatchCase(pattern, body)` or `MatchCase(pattern, guard, body)`. The pattern holds engine wildcards; the body references the bound capture names.
+
+### ParallelComprehension
+
+`(body: expression, iterators: expression+) random -> list`
+
+Parallel comprehension: `ParallelComprehension(body, Element(x, xs), …)` is the list that `Comprehension` with the same operands gives, but the passes of the first clause can run in any order. The other clauses run in order inside each pass. The body changes no variable declared outside it. Inside a `WithRandomSeed` frame, the comprehension consumes one draw index and each pass draws from its own frame (`docs/RANDOMNESS-MODEL.md`). Unlike `Comprehension`, it is evaluated at once to a `List`.
+
+### parallelDomain
+
+MathJSON `ParallelDomain` · `(collection: any) random -> any`
+
+The domain of the passes of a parallel loop (engine-internal).
+
+### ParallelLoop
+
+`(body: expression, iterators: expression+) random -> any`
+
+Parallel loop, evaluated **for effect**: `ParallelLoop(body, Element(x, coll))` evaluates `body` once for each element of `coll` (a pass), and the passes can run in any order. The body can change a variable declared outside the loop only with `AddTo` (an accumulator). A read of an accumulator in a pass gives an unspecified value. Inside a `WithRandomSeed` frame, the loop consumes one draw index and each pass draws from its own frame (`docs/RANDOMNESS-MODEL.md`). The value is `Nothing`.
 
 ### Pin
 
@@ -12476,7 +12996,7 @@ dedup([1, 1, 2, 2, 1])
 
 ### deleteAt
 
-MathJSON `DeleteAt` · `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any)`
+MathJSON `DeleteAt` · `((T, integer) -> T where T: string) & ((indexed_collection<T>, integer) -> list<T> where T: any) & ((dictionary<V>, string) -> dictionary<V> where V: any)`
 
 Return a copy of the indexed collection with the element at the 1-based `index` removed.
 
@@ -12484,9 +13004,18 @@ A negative index counts from the end. An out-of-range, zero, or non-integer inde
 
 Deleting from a string yields a string.
 
+On a dictionary or a record, `DeleteAt(d, key)` returns a copy without the entry of the string `key`; `d` does not change. A key that is not there gives the value unchanged. The type of a record loses the field (`record{a: integer, b: string?}` gives `record{a: integer}`); with a key known only at evaluation, every field of the record becomes optional.
+
+A value of a declared (nominal) record type is not a collection, so `DeleteAt` refuses it, as `At` does.
+
 ```epsil
 deleteAt([1, 2, 3, 4], 2)
 // ➔ [1,3,4]
+```
+
+```epsil
+deleteAt({a -> 1, b -> "x"}, "b")
+// ➔ {"a" -> 1}
 ```
 
 ### Dictionary
@@ -12653,20 +13182,11 @@ On a value of a NOMINAL type whose definition body has named fields (a record bo
 
 A field name that is not in a record/named-tuple definition is a static defect (the result type is `error`); on an unknown-typed operand the expression stays symbolic.
 
+Record types are closed: on an operand of a record type, a field name that the type does not list is refused when the expression is boxed (`unknown-field`). An optional field (`b: string?`) that the value leaves out reads as the absent value of its type: `Missing`, or `NaN` for a numeric field.
+
 ```epsil
 {x -> 1, y -> 2}.y
 // ➔ 2
-```
-
-### fill
-
-MathJSON `Fill` · `(function, tuple) -> list`
-
-Produce a 2D list (matrix) by applying a function to each pair of row and column indexes.
-
-```epsil
-fill((i, j) => 10i + j, (2, 3))
-// ➔ [[11,12,13],[21,22,23]]
 ```
 
 ### filter
@@ -18176,6 +18696,22 @@ eigenvectors([[2, 1], [1, 2]])
 // ➔ [[1,1],[-1,1]]
 ```
 
+### fill
+
+MathJSON `Fill` · `(value: any, integer+) -> list`
+
+List or tensor with each element equal to a value. Each operand after the value is the length of one axis.
+
+```epsil
+fill(7, 3)
+// ➔ [7,7,7]
+```
+
+```epsil
+fill(7, 2, 3)
+// ➔ [[7,7,7],[7,7,7]]
+```
+
 ### flatten
 
 MathJSON `Flatten` · `(value, integer?) -> list`
@@ -18357,6 +18893,22 @@ norm([3, 4], 1)
 // ➔ 7
 ```
 
+### ones
+
+MathJSON `Ones` · `(integer+) -> list`
+
+List or tensor filled with ones. Each operand is the length of one axis.
+
+```epsil
+ones(3)
+// ➔ [1,1,1]
+```
+
+```epsil
+ones(2, 3)
+// ➔ [[1,1,1],[1,1,1]]
+```
+
 ### onesMatrix
 
 MathJSON `OnesMatrix` · `(integer, integer?) -> matrix`
@@ -18497,6 +19049,22 @@ Matrix filled with zeros.
 
 ```epsil
 zeroMatrix(2, 3)
+// ➔ [[0,0,0],[0,0,0]]
+```
+
+### zeros
+
+MathJSON `Zeros` · `(integer+) -> list`
+
+List or tensor filled with zeros. Each operand is the length of one axis.
+
+```epsil
+zeros(3)
+// ➔ [0,0,0]
+```
+
+```epsil
+zeros(2, 3)
 // ➔ [[0,0,0],[0,0,0]]
 ```
 
@@ -19625,7 +20193,7 @@ and monitoring.
 | `doc`       | Look up a library function by name, or search the library by keywords |
 | `parse`     | Convert Epsil source, or LaTeX with `format: "latex"`, to MathJSON |
 | `serialize` | Convert MathJSON to Epsil source, or to LaTeX with `format: "latex"`; `fancySymbols: true` for the Unicode notations |
-| `compile`   | Show the code a compilation target (JavaScript, GLSL, WGSL, Python, interval JavaScript) generates for a program or a LaTeX expression, or why the target declines it |
+| `compile`   | Show the code a compilation target (JavaScript, GLSL, Python, interval JavaScript) generates for a program or a LaTeX expression, or why the target declines it |
 
 The server also publishes the [language card for AI agents](/for-agents/)
 as a resource (`epsil://docs/for-agents`), and its setup instructions tell
@@ -19678,7 +20246,7 @@ The result has `ok`, the generated `code` (`atan(z.y, z.x) + 1.0`), and
 it as (here `vec2`, the uniform to declare), and whether it was declared or
 inferred. When the target declines, `ok` is `false`, there is no `code`, and
 `error` and `diagnostic` give the reason. `to` is `javascript` (the default),
-`glsl`, `wgsl`, `python` or `interval-js`, and `mode` selects the arithmetic
+`glsl`, `python` or `interval-js`, and `mode` selects the arithmetic
 discipline: `strict` (the default), `complex` or, on `javascript` only,
 `bigint`.
 
@@ -20070,7 +20638,8 @@ sort([3, 1, 4, 1, 5], (a, b) => a > b)
   immediately, and so does an **assignment**: `let ys = filter(xs, p)` and
   `xs = filter(xs, p)` store the list of the elements when the generator is
   finite and reads a variable. A generator with no last element
-  (`filter(1..oo, p)`) stays lazy when it is assigned.
+  (`filter(1..oo, p)`) stays lazy when it is assigned, and stores the values
+  that the variables it reads have at the assignment.
 - **Output is the engine's textual form**: strings and booleans print
   *quoted* (`"True"`, `"florb"`) — that quoted `"True"` is a boolean, not a
   string. Derived collections (`Range`, `map`/`filter` results, loop-built
@@ -20248,6 +20817,60 @@ source, ce)`, which rewrites every free occurrence of a spelling to the
 library name it stands for (`Sin`, `Pi`) while leaving names the program or
 the engine binds alone — `executeEpsil` does this itself. See
 [Naming](/naming/).
+
+### Variables of a call
+
+`binderSitesOf(ce, node, source)` tells which names of a call to a library
+operator are the call's own variables, and which ones the call reads from
+outside. It gives one site per bound variable: the name, and the operands
+that see it (`"all"`, or the zero-based indices of the arguments; the head is
+not counted):
+
+```js
+import {
+  ComputeEngine,
+  binderSitesOf,
+  parseEpsil,
+} from "@cortex-js/compute-engine/epsil";
+
+const ce = new ComputeEngine();
+const source = "sum(k^2, k, 1, n)";
+const [call] = parseEpsil(source);
+binderSitesOf(ce, call, source);
+// ➔ [{ name: "k", operands: [0, 1, 2, 3] }]
+```
+
+Here `k` is bound and `n` is read. The result is `[]` for a library operator
+that binds nothing in the call (`max(pi, pi)`), and `undefined` for a call of
+a name that is not a library operator. The function does not see the
+bindings of the program: call it only for a call whose callee the program
+does not define. A `limit`, `nLimit`, `nd` or `nIntegrate` that does not
+write its variable binds the variable that the engine chooses, in its first
+operand only: `limit(sin(h)/h, 0)` gives `[{ name: "h", operands: [0] }]`.
+The engine reads the value of a name that the program binds, so its choice
+can depend on that value: after `let L = [1, 2]`, the variable of
+`limit(total(L)*t, 0)` is `t`, because `L` is a list, and the engine does not
+choose a `const` name. A host that knows the names the program binds at the
+call gives them as a fifth argument,
+`binderSitesOf(ce, call, source, undefined, (name) => …)`: when such a name
+comes first and other names follow, the result is `[]`. Without it, the
+result for this call is `[{ name: "L", operands: [0] }]`. A host that also
+knows how the program declares such a name gives a sixth argument, a
+function that returns a `ProgramDeclaration` for the name, or `undefined`:
+`{ constant, annotated, value, boxedEarly }`, for a `let` or `const` at the
+top level of the program that no other statement writes. `constant` is
+`true` for a `const`, `annotated` is `true` when the statement has a type
+annotation, `value` is the raw initializer, and `boxedEarly` is `true` when
+the call is in the body of a `function` statement that the program can call
+above that statement. With it, a `let` whose initializer is a number, a
+string, a list or a function literal, and a `const`, give the variable that
+the engine chooses: after `let L = [1, 2]` the result for
+`limit(total(L)*t, 0)` is `[{ name: "t", operands: [0] }]`, and after
+`const h = 5` the result for `limit(sin(h)/h, 0)` is `[]`. In the body of a
+function that the program can call above its `function` statement, the
+engine can box the body before the declaration runs, so a `const` whose
+initializer is a number, and a name with a type annotation, are not decided
+there.
 
 ### Execution
 
