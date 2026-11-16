@@ -21289,7 +21289,7 @@ export declare const nthRootInterval: typeof nthRootIntervalRaw;
  * `x^y` with a point exponent that is not an integer read as the
  * interpreter reads a float exponent (`realPowerBranchTerms()` of
  * `numerics/real-power.ts`, to `digits` significant digits, clamped to
- * [15, 17]; by default the digits of `BigDecimal.precision`): a
+ * [15, 17]; by default 17, the digits of a double): a
  * rational `p/q` of odd denominator is the real root `±|x|^y` with the
  * double `y`, negative when `p` is odd (`powRealBranch`: `x^0.2` at -8 is
  * -1.5157…, `0.2` read as `1/5`), and any other point (`1.5`, an irrational) has no real value over a negative
@@ -35438,7 +35438,10 @@ import { BigDecimal } from '../../big-decimal/index.js';
 import type { RoundingTies } from '../types-definitions.js';
 export declare function gcd(a: BigNum, b: BigNum): BigNum;
 export declare function lcm(a: BigNum, b: BigNum): BigNum;
-export declare function factorial2(n: BigNum): Generator<BigNum, BigNum>;
+/** The double factorial of the integer `n`. Every step is exact: `prec`,
+ * the precision of the engine (default `BigDecimal.precision`), only bounds
+ * the gap of the subtraction, so the result does not depend on it. */
+export declare function factorial2(n: BigNum, prec?: number): Generator<BigNum, BigNum>;
 /**
  * If the BigDecimal is exactly the value of a machine number (a double),
  * return true.
@@ -64240,15 +64243,21 @@ export declare abstract class NumericValue {
     abstract gte(other: number | NumericValue, prec?: number): boolean | undefined;
     /** Object.valueOf(): returns a primitive value, preferably a JavaScript
      *  number over a string, even if at the expense of precision. A complex
-     *  value is a string with `prec` significant digits in each part. */
+     *  value is a string with `prec` significant digits in each part. Without
+     *  `prec`, it uses `BigDecimal.precision`, not the precision of an
+     *  engine. */
     valueOf(prec?: number): number | string;
-    /** Object.toPrimitive() */
+    /** Object.toPrimitive(). It uses `BigDecimal.precision`, not the
+     * precision of an engine. */
     [Symbol.toPrimitive](hint: 'number' | 'string' | 'default'): number | string | null;
-    /** Object.toJSON */
+    /** Object.toJSON. It uses `BigDecimal.precision`, not the precision of
+     * an engine. */
     toJSON(): unknown;
     /** A string of the value. A big decimal value is rounded to `prec`
      * significant digits (default `BigDecimal.precision`). */
     abstract toString(prec?: number): string;
+    /** Print the value to the console. It uses `BigDecimal.precision`, not
+     * the precision of an engine. */
     print(): void;
 }
 import { BigDecimal } from '../../big-decimal/index.js';
@@ -76463,9 +76472,14 @@ export type PassOptions = {
 };
 export declare const ALL_PASSES: PassOptions;
 /** The most instructions of a body that `inline` copies (arms included),
- *  and of all its copies in one program. */
+ *  and of all its copies in one program, by the rule of the sites. The
+ *  rule `'repeated'` is the interval mode's, where the sums written out
+ *  multiply the sites: a function read at 16 terms of each of four sums. */
 export declare const INLINE_SIZE = 64;
-export declare const INLINE_BUDGET = 1000;
+export declare const INLINE_BUDGET: {
+    readonly loop: 1000;
+    readonly repeated: 4000;
+};
 export declare function runPasses(p: Program, options: PassOptions, rows: readonly OperatorRow[]): Program;
 /** The most elements of a list that `scalarize` writes one by one. */
 export declare const SCALARIZE_LIMIT = 64;
