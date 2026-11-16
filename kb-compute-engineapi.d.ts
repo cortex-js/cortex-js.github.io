@@ -9734,8 +9734,10 @@ export declare class EngineNumericConfiguration {
     get precision(): number;
     setPrecision(value: number | 'machine' | 'auto'): boolean;
     /**
-     * Run `fn` with the precision of the engine and the precision of the big
-     * decimals set to `digits`, then restore both, also when `fn` throws.
+     * Run `fn` with the precision of the engine set to `digits`, then restore
+     * it, also when `fn` throws. The engine passes its precision to every
+     * operation of `BigDecimal` that rounds, so `BigDecimal.precision` is
+     * neither read nor written.
      *
      * Unlike `setPrecision`, this does not recompute an `'auto'` tolerance:
      * inside `fn` the tolerance is the one of the outer precision. The
@@ -11216,6 +11218,7 @@ interface PureEngineViewMirror {
     type(type: Type | TypeString | BoxedType): BoxedType;
     readonly _typeResolver: import('../common/type/types.js').TypeResolver;
     readonly tolerance: number;
+    readonly precision: number;
     readonly strict: boolean;
     readonly _protocolRegistry: Readonly<Record<string, object>>;
     lookupDefinition(id: string): {
@@ -11931,9 +11934,10 @@ export interface Expression {
      * Used when coercing a `Expression` to a `String`.
      *
      * For arbitrary-precision numbers (`BigNumericValue`), the output is
-     * rounded to `BigDecimal.precision` significant digits. Digits beyond the
-     * working precision are noise from precision-bounded operations (division,
-     * transcendentals) and are not displayed. Machine-precision numbers use
+     * rounded to the precision of the engine (`ce.precision`) in significant
+     * digits. Digits beyond the working precision are noise from
+     * precision-bounded operations (division, transcendentals) and are not
+     * displayed. Machine-precision numbers use
      * their native `Number.toString()`.
      *
      * @category Primitive Methods
@@ -14764,6 +14768,11 @@ export interface PureEngineView {
      * membership handler consults (`Element` declines rather than refute a
      * near-match inside it). */
     readonly tolerance: number;
+    /** The engine's precision, the number of significant digits of its
+     * numeric calculations (`ComputeEngine.precision`): a handler that reads
+     * a float literal reads it to the digits it was rounded to (the branch of
+     * `Power` for a negative base and a float exponent). */
+    readonly precision: number;
     /** True when the engine checks the types of operands when it boxes an
      * expression (`ComputeEngine.strict`). A handler that answers `error` for
      * an operand that the boxing check refuses reads it, so that a non-strict
@@ -18931,7 +18940,7 @@ export type EvaluateOptions = {
      * digits is above the precision of the engine, or for a goal
      * `N(x, [p, a])`), and the digits `requested` by the call, which the
      * handlers receive as `options.precision`. Both are one value for the
-     * whole engine or module (`BigDecimal.precision`,
+     * whole engine (`ce.precision`,
      * `ce._requestedPrecision`), so neither can stay set across an `await`:
      * another evaluation would compute at the raised precision or read the
      * other call's digits, and the restores would race. Instead the window
@@ -21280,7 +21289,7 @@ export declare const nthRootInterval: typeof nthRootIntervalRaw;
  * `x^y` with a point exponent that is not an integer read as the
  * interpreter reads a float exponent (`realPowerBranchTerms()` of
  * `numerics/real-power.ts`, to `digits` significant digits, clamped to
- * [15, 17]; by default the digits of the global working precision): a
+ * [15, 17]; by default the digits of `BigDecimal.precision`): a
  * rational `p/q` of odd denominator is the real root `±|x|^y` with the
  * double `y`, negative when `p` is odd (`powRealBranch`: `x^0.2` at -8 is
  * -1.5157…, `0.2` read as `1/5`), and any other point (`1.5`, an irrational) has no real value over a negative
@@ -30428,17 +30437,17 @@ export interface BigComplexValue {
 /** `x` is finite, not zero, and outside the range of a normal double. */
 export declare function isOutsideDoubleRange(x: BigDecimal): boolean;
 /**
- * The value of `head` at a real `x` with `|x| ≠ 1`, at the working precision
- * of `BigDecimal`. The callers pass an `x` outside the range of a double, an
+ * The value of `head` at a real `x` with `|x| ≠ 1`, at `prec` digits. The callers pass an `x` outside the range of a double, an
  * `x` at which the value is not real, or an `x` next to ±1 read with the
  * digits that hold |x| ∓ 1 (the big-decimal functions then keep the digits
  * of the value, which depends on |x| ∓ 1 there).
  */
-export declare function realInverseTrig(head: InverseTrigHead, x: BigDecimal): BigComplexValue;
+export declare function realInverseTrig(head: InverseTrigHead, x: BigDecimal, prec: number): BigComplexValue;
 /**
  * The value of `head` at the complex `re + i·im`, a part of which is outside
- * the range of a double, with the digits of a double. `undefined` when a
- * kernel value does not have the expected form.
+ * the range of a double, with the digits of a double (the big-decimal
+ * parts at `prec` digits). `undefined` when a kernel value does not have the
+ * expected form.
  *
  * Let M be the larger of |re| and |im|.
  *
@@ -30465,10 +30474,8 @@ export declare function realInverseTrig(head: InverseTrigHead, x: BigDecimal): B
  * double kernels would compute the value at the branch point itself, so the
  * caller keeps the expression unevaluated.
  */
-export declare function complexInverseTrig(head: InverseTrigHead, re: BigDecimal, im: BigDecimal): BigComplexValue | null | undefined;
+export declare function complexInverseTrig(head: InverseTrigHead, re: BigDecimal, im: BigDecimal, prec: number): BigComplexValue | null | undefined;
 import { BigDecimal } from '../../big-decimal/index.js';
-/** `fn` run with BigDecimal's working precision set to `digits`, restored after. */
-export declare function atDigits<T>(digits: number, fn: () => T): T;
 /** A real in `[mid − rad, mid + rad]`. */
 export interface Ball {
     readonly mid: BigDecimal;
@@ -30480,29 +30487,29 @@ export declare function certify<T>(fn: () => T): T | undefined;
 export declare function certain<T>(x: T | undefined): T;
 /** An exact value, as a ball of radius 0. */
 export declare const exact: (x: BigDecimal | number) => Ball;
-/** `p/q` at the working precision. */
-export declare function rational(p: bigint, q: bigint): Ball;
+/** `p/q` at `prec` digits. */
+export declare function rational(p: bigint, q: bigint, prec: number): Ball;
 /** The ball's least value. */
-export declare const lower: (x: Ball) => BigDecimal;
+export declare const lower: (x: Ball, prec: number) => BigDecimal;
 /** The ball's greatest value. */
-export declare const upper: (x: Ball) => BigDecimal;
+export declare const upper: (x: Ball, prec: number) => BigDecimal;
 /** The greatest |value| in the ball, rounded up. */
-export declare const magnitude: (x: Ball) => BigDecimal;
+export declare const magnitude: (x: Ball, prec: number) => BigDecimal;
 export declare const neg: (x: Ball) => Ball;
-export declare const add: (x: Ball, y: Ball) => Ball;
-export declare const sub: (x: Ball, y: Ball) => Ball;
+export declare const add: (x: Ball, y: Ball, prec: number) => Ball;
+export declare const sub: (x: Ball, y: Ball, prec: number) => Ball;
 /** `x·y`: (m + δ)(n + ε) − mn = mε + nδ + δε. */
-export declare const mul: (x: Ball, y: Ball) => Ball;
+export declare const mul: (x: Ball, y: Ball, prec: number) => Ball;
 /** `x/y`, for a `y` that keeps away from 0. */
-export declare function div(x: Ball, y: Ball): Ball;
+export declare function div(x: Ball, y: Ball, prec: number): Ball;
 /** `x`ⁿ for an integer n, by repeated squaring. */
-export declare function powInt(x: Ball, n: number): Ball;
+export declare function powInt(x: Ball, n: number, prec: number): Ball;
 /** `x^s` for an `x` that keeps above 0: e^{s ln x}, or repeated squaring for an exact integer `s`. */
-export declare function pow(x: Ball, s: Ball): Ball;
+export declare function pow(x: Ball, s: Ball, prec: number): Ball;
 /** eˣ. */
-export declare function exp(x: Ball): Ball;
+export declare function exp(x: Ball, prec: number): Ball;
 /** ln x, for an `x` that keeps above 0. */
-export declare function ln(x: Ball): Ball;
+export declare function ln(x: Ball, prec: number): Ball;
 import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 import type { BigNum } from './types.js';
 export { erf, erfc, erfi, dawson } from './error-functions.js';
@@ -30649,13 +30656,13 @@ export declare function betaRegularized(x: number, a: number, b: number): number
 export declare function erfInv(x: number): number;
 /**
  * Bignum log-Gamma via Stirling asymptotic series with runtime-computed
- * Bernoulli numbers.  Precision scales with BigDecimal.precision.
+ * Bernoulli numbers.  Precision scales with `prec`.
  *
  * Uses reflection for z < 0.5, exact formulas for positive integers and
  * half-integers, and for the general case shifts z upward so the asymptotic
  * series converges rapidly.
  */
-export declare function bigGammaln(ce: ComputeEngine, z: BigNum): BigNum;
+export declare function bigGammaln(ce: ComputeEngine, z: BigNum, prec: number): BigNum;
 /**
  * `ln Γ(a) − ln Γ(a − d)` for big numbers, with `a` and `a − d` large and
  * positive. When both are large, the two log-Γ values are nearly equal and
@@ -30672,7 +30679,7 @@ export declare function bigGammaln(ce: ComputeEngine, z: BigNum): BigNum;
  * Returns `undefined` when `a` or `a − d` is below that size; the caller
  * then uses `bigGammaln()` for both, where the cancellation is small.
  */
-export declare function bigLnGammaRatio(ce: ComputeEngine, a: BigNum, d: BigNum): BigNum | undefined;
+export declare function bigLnGammaRatio(ce: ComputeEngine, a: BigNum, d: BigNum, prec: number): BigNum | undefined;
 /**
  * `C(n, k) = Γ(n+1)/(Γ(k+1)·Γ(n−k+1))` for big numbers in log form, for
  * `n + 1 > 0` and `n − k + 1 > 0`. This is for the arguments where a `Γ`
@@ -30682,15 +30689,15 @@ export declare function bigLnGammaRatio(ce: ComputeEngine, a: BigNum, d: BigNum)
  * paired with the larger denominator argument, whose log-Γ value is close
  * to its own (`bigLnGammaRatio()`). Returns `undefined` outside that domain.
  */
-export declare function bigBinomialLogForm(ce: ComputeEngine, n: BigNum, k: BigNum): BigNum | undefined;
+export declare function bigBinomialLogForm(ce: ComputeEngine, n: BigNum, k: BigNum, prec: number): BigNum | undefined;
 /**
- * Bignum Gamma function.  Precision scales with BigDecimal.precision.
+ * Bignum Gamma function.  Precision scales with `prec`.
  *
  * Reflection for z < 0.5; general case delegates to exp(bigGammaln(z)).
  * Note: integer fast paths are in bigGammaln (returning exact ln(n!)).
  * bigGamma goes through exp(ln(...)) so the result is a full-precision float.
  */
-export declare function bigGamma(ce: ComputeEngine, z: BigNum): BigNum;
+export declare function bigGamma(ce: ComputeEngine, z: BigNum, prec: number): BigNum;
 /**
  * Compute even Bernoulli numbers B_2, B_4, ..., B_{2n} as exact rationals.
  * Returns [numerator, denominator] bigint pairs reduced to lowest terms.
@@ -30708,12 +30715,12 @@ export declare function getBernoulliRationals(ce: ComputeEngine, minTerms: numbe
  * Same algorithm as machine `digamma`: reflection for negative z,
  * recurrence to shift z > 7, then asymptotic expansion with Bernoulli numbers.
  */
-export declare function bigDigamma(ce: ComputeEngine, z: BigNum): BigNum;
+export declare function bigDigamma(ce: ComputeEngine, z: BigNum, prec: number): BigNum;
 /**
  * Bignum Trigamma function ψ₁(z) = d/dz ψ(z) = d²/dz² ln(Γ(z))
  * Same recurrence/asymptotic structure as digamma but for the second derivative.
  */
-export declare function bigTrigamma(ce: ComputeEngine, z: BigNum): BigNum;
+export declare function bigTrigamma(ce: ComputeEngine, z: BigNum, prec: number): BigNum;
 /**
  * Bignum Polygamma function ψₙ(z) = dⁿ/dzⁿ ψ(z)
  * Delegates to bigDigamma/bigTrigamma for n=0,1.
@@ -30724,28 +30731,28 @@ export declare function bigTrigamma(ce: ComputeEngine, z: BigNum): BigNum;
  * an order of 10⁵ runs for minutes. The complex kernel `polygammaComplex`
  * uses the same limit.
  */
-export declare function bigPolygamma(ce: ComputeEngine, n: BigNum, z: BigNum): BigNum;
+export declare function bigPolygamma(ce: ComputeEngine, n: BigNum, z: BigNum, prec: number): BigNum;
 /**
  * Bignum Beta function B(a, b) = Γ(a)Γ(b)/Γ(a+b)
  * Uses bigGamma directly. The poles of Γ(a + b) are answered as in `beta()`.
  */
-export declare function bigBeta(ce: ComputeEngine, a: BigNum, b: BigNum): BigNum;
+export declare function bigBeta(ce: ComputeEngine, a: BigNum, b: BigNum, prec: number): BigNum;
 /**
  * Bignum upper regularized incomplete gamma Q(a, x) = Γ(a, x)/Γ(a) for a
  * NEGATIVE NON-INTEGER order `a` and x > 0, where Γ(a) is finite and of
  * either sign (`bigGammaQUpperTail`). Precision scales with
- * `BigDecimal.precision`. Returns NaN outside that domain.
+ * `prec`. Returns NaN outside that domain.
  */
-export declare function bigGammaQNegativeOrder(ce: ComputeEngine, a: BigNum, x: BigNum): BigNum;
+export declare function bigGammaQNegativeOrder(ce: ComputeEngine, a: BigNum, x: BigNum, prec: number): BigNum;
 /**
  * Bignum lower regularized incomplete gamma P(a,x) = γ(a,x)/Γ(a), for a > 0
- * and x ≥ 0. Precision scales with `BigDecimal.precision`. Returns a NaN
+ * and x ≥ 0. Precision scales with `prec`. Returns a NaN
  * BigNum outside the validated domain.
  */
-export declare function bigGammaP(ce: ComputeEngine, a: BigNum, x: BigNum): BigNum;
+export declare function bigGammaP(ce: ComputeEngine, a: BigNum, x: BigNum, prec: number): BigNum;
 /**
  * Bignum upper regularized incomplete gamma Q(a,x) = Γ(a,x)/Γ(a) = 1 − P(a,x),
- * for a > 0 and x ≥ 0. Precision scales with `BigDecimal.precision`. Below
+ * for a > 0 and x ≥ 0. Precision scales with `prec`. Below
  * x = 2a+2 the series is cheaper (see bigGammaP), and Q = 1 − P is taken from
  * it while Q is at least `BIG_GAMMA_Q_SERIES_MIN`; a smaller Q, and every
  * x ≥ 2a+2, comes from Γ(a, x)/Γ(a) directly (`bigGammaQUpperTail`) so the
@@ -30754,10 +30761,10 @@ export declare function bigGammaP(ce: ComputeEngine, a: BigNum, x: BigNum): BigN
  * is kept while it is at least `BIG_CANCELLED_MIN`. Returns a NaN BigNum
  * outside the validated domain.
  */
-export declare function bigGammaQ(ce: ComputeEngine, a: BigNum, x: BigNum): BigNum;
+export declare function bigGammaQ(ce: ComputeEngine, a: BigNum, x: BigNum, prec: number): BigNum;
 /**
  * Bignum upper incomplete gamma Γ(s, z) = ∫_z^∞ t^{s−1} e^{−t} dt, for real s
- * and real z > 0, at the working precision (`BigDecimal.precision`). Returns
+ * and real z > 0, at the working precision `prec`. Returns
  * NaN for z ≤ 0 (the value is then complex in general, and the caller uses
  * the complex kernel), for a non-finite operand, and where no kernel is
  * fast and correct (the caller then uses the machine kernel).
@@ -30767,14 +30774,14 @@ export declare function bigGammaQ(ce: ComputeEngine, a: BigNum, x: BigNum): BigN
  * and where it reaches its iteration cap, the value is from a computation
  * that subtracts (`bigUpperGammaBySubtraction`).
  */
-export declare function bigIncompleteGammaUpper(ce: ComputeEngine, s: BigNum, z: BigNum): BigNum;
+export declare function bigIncompleteGammaUpper(ce: ComputeEngine, s: BigNum, z: BigNum, prec: number): BigNum;
 /**
  * Bignum regularized incomplete beta I_x(a,b) (Mathematica's
  * BetaRegularized[x,a,b]), for a > 0, b > 0 and 0 ≤ x ≤ 1. Precision scales
- * with `BigDecimal.precision`. Returns the exact endpoints 0/1, and a NaN
+ * with `prec`. Returns the exact endpoints 0/1, and a NaN
  * BigNum outside the validated domain.
  */
-export declare function bigBetaRegularized(ce: ComputeEngine, x: BigNum, a: BigNum, b: BigNum): BigNum;
+export declare function bigBetaRegularized(ce: ComputeEngine, x: BigNum, a: BigNum, b: BigNum, prec: number): BigNum;
 /**
  * Bignum Riemann zeta function ζ(s).
  *
@@ -30783,7 +30790,7 @@ export declare function bigBetaRegularized(ce: ComputeEngine, x: BigNum, a: BigN
  * accuracy per term); the kernel runs with working-precision guard digits so
  * the result is accurate to the full requested precision.
  */
-export declare function bigZeta(ce: ComputeEngine, s: BigNum): BigNum;
+export declare function bigZeta(ce: ComputeEngine, s: BigNum, prec: number): BigNum;
 /**
  * A real operand of the bignum Hurwitz kernels: a BigDecimal, or an exact
  * rational `[numerator, denominator]` with a positive denominator. The
@@ -30817,7 +30824,7 @@ export declare function bigDecimalQuotient(num: bigint, den: bigint, digits: num
  *
  * Contributed in GitHub PR #360.
  */
-export declare function bigHurwitzZeta(ce: ComputeEngine, s: HurwitzOperand, a: HurwitzOperand): BigNum | undefined;
+export declare function bigHurwitzZeta(ce: ComputeEngine, s: HurwitzOperand, a: HurwitzOperand, prec: number): BigNum | undefined;
 /**
  * Bignum generalized zeta Zeta(s,a) in Wolfram's convention (see
  * `zetaGeneralizedComplex`), for real s, a: the terms with k+a < 0 as
@@ -30825,13 +30832,13 @@ export declare function bigHurwitzZeta(ce: ComputeEngine, s: HurwitzOperand, a: 
  * the first k with k+a ≥ 0, dropping a k+a = 0 there rather than treating
  * it as a pole.
  */
-export declare function bigZetaGeneralized(ce: ComputeEngine, s: HurwitzOperand, a: HurwitzOperand): BigNum | undefined;
+export declare function bigZetaGeneralized(ce: ComputeEngine, s: HurwitzOperand, a: HurwitzOperand, prec: number): BigNum | undefined;
 /**
  * Bignum η(s) for real s ≠ 1, with `ce.precision` significant digits.
  * Returns `undefined` when s is within 10⁻⁴⁰⁰ of the pole of ζ (η(1) = ln 2
  * is the caller's closed form).
  */
-export declare function bigDirichletEta(ce: ComputeEngine, s: BigNum): BigNum | undefined;
+export declare function bigDirichletEta(ce: ComputeEngine, s: BigNum, prec: number): BigNum | undefined;
 /**
  * Bignum L(s, χ) = k^{−s} Σ_{r=1}^{k} χ(r) ζ(s, r/k) (DLMF 25.15.1) for real
  * s ≠ 1 and a real character χ mod k, given as its values `chi[r − 1]` ∈
@@ -30842,14 +30849,14 @@ export declare function bigDirichletEta(ce: ComputeEngine, s: BigNum): BigNum | 
  * digits, or when the Laurent series would cost more than
  * `DIRICHLET_LAURENT_MAX_COST`.
  */
-export declare function bigDirichletL(ce: ComputeEngine, s: BigNum, k: number, chi: readonly number[]): BigNum | undefined;
+export declare function bigDirichletL(ce: ComputeEngine, s: BigNum, k: number, chi: readonly number[], prec: number): BigNum | undefined;
 /**
  * Bignum β(s) for real s ≠ 1: the L-function of the odd character mod 4,
  * 4^{−s} (ζ(s, ¼) − ζ(s, ¾)).
  */
-export declare const bigDirichletBeta: (ce: ComputeEngine, s: BigNum) => BigNum | undefined;
+export declare const bigDirichletBeta: (ce: ComputeEngine, s: BigNum, prec: number) => BigNum | undefined;
 /**
- * Φ(z, s, a) = Σ_{k≥0} zᵏ(k+a)^(−s) at `BigDecimal.precision` significant
+ * Φ(z, s, a) = Σ_{k≥0} zᵏ(k+a)^(−s) at `requested` significant
  * digits, for real z, s, a with |z| < 1 — the arbitrary-precision twin of
  * `numerics/lerch-phi.ts`'s double series (`lerchPhiComplex`), for the
  * same disk of convergence. `PolyLog` rides on it at a = 1, via
@@ -30875,15 +30882,15 @@ export declare const bigDirichletBeta: (ce: ComputeEngine, s: BigNum) => BigNum 
  * `HurwitzOperand`) so it converts only once the working precision below
  * is raised — the same reason `hurwitzOperand` gives for `HurwitzZeta`.
  */
-export declare function bigLerchPhi(ce: ComputeEngine, z: HurwitzOperand, s: HurwitzOperand, a: HurwitzOperand): BigNum | undefined;
+export declare function bigLerchPhi(ce: ComputeEngine, z: HurwitzOperand, s: HurwitzOperand, a: HurwitzOperand, requested: number): BigNum | undefined;
 /**
  * PolyLog's arbitrary-precision route: Liₛ(z) = z·Φ(z, s, 1) on
- * `bigLerchPhi`, at `BigDecimal.precision` significant digits — the same
+ * `bigLerchPhi`, at `requested` significant digits — the same
  * identity the double kernel (`polylogOrderReal`/`polylogOrderComplex`)
  * uses, but exact for a rational z or s and answering the requested
  * digits above machine precision.
  */
-export declare function bigPolyLog(ce: ComputeEngine, s: HurwitzOperand, z: HurwitzOperand): BigNum | undefined;
+export declare function bigPolyLog(ce: ComputeEngine, s: HurwitzOperand, z: HurwitzOperand, requested: number): BigNum | undefined;
 /**
  * Bignum Lambert W function W_k(x) satisfying W(x)·e^{W(x)} = x.
  *
@@ -30892,7 +30899,7 @@ export declare function bigPolyLog(ce: ComputeEngine, s: HurwitzOperand, z: Hurw
  * non-integer) branch index returns NaN — the complex branches are out of
  * scope for this real kernel. Uses Halley's method with adaptive precision.
  */
-export declare function bigLambertW(ce: ComputeEngine, x: BigNum, branch?: number): BigNum;
+export declare function bigLambertW(ce: ComputeEngine, x: BigNum, branch: number, prec: number): BigNum;
 export declare const BERNOULLI_2K: number[];
 /**
  * Digamma function ψ(x) = d/dx ln(Γ(x)) = Γ'(x)/Γ(x)
@@ -31077,27 +31084,27 @@ export declare function fresnelC(x: number): number;
 /** Unnormalized cardinal sine: sinc(x) = sin(x)/x, sinc(0) = 1. */
 export declare function sinc(x: number): number;
 /**
- * Bignum error function. Precision scales with `BigDecimal.precision`.
+ * Bignum error function. Precision scales with `prec`.
  *
  * - |x| ≤ √((p+10)·ln 10): Maclaurin series (DLMF 7.6.2), no cancellation.
  * - beyond: erf(x) rounds to ±1 at the working precision
  *   (erfc(x) < e^{−x²} ≤ 10^{−(p+10)}).
  */
-export declare function bigErf(ce: ComputeEngine, x: BigNum): BigNum;
-export declare function bigErfi(ce: ComputeEngine, x: BigNum): BigNum;
+export declare function bigErf(ce: ComputeEngine, x: BigNum, prec: number): BigNum;
+export declare function bigErfi(ce: ComputeEngine, x: BigNum, prec: number): BigNum;
 /**
  * Bignum complementary error function.
- * Precision scales with `BigDecimal.precision`.
+ * Precision scales with `prec`.
  *
  * - x² log10(e) ≤ p+10: computed as 1 − erf(x) with the working precision
  *   raised by the x²·log10(e) digits lost to cancellation.
  * - beyond: the asymptotic series (DLMF 7.12.1), which by construction of
  *   the switchover delivers ≥ p+10 digits there.
  */
-export declare function bigErfc(ce: ComputeEngine, x: BigNum): BigNum;
+export declare function bigErfc(ce: ComputeEngine, x: BigNum, prec: number): BigNum;
 /**
  * Bignum inverse error function: y such that erf(y) = x, for x ∈ [−1, 1].
- * Precision scales with `BigDecimal.precision`.
+ * Precision scales with `prec`.
  *
  * Newton iteration on `bigErf`:
  *    y ← y − (erf(y) − x)·(√π/2)·e^{y²}
@@ -31107,24 +31114,24 @@ export declare function bigErfc(ce: ComputeEngine, x: BigNum): BigNum;
  * best possible for the given input, but tiny perturbations of x near ±1
  * produce large changes in y.
  */
-export declare function bigErfInv(ce: ComputeEngine, x: BigNum): BigNum;
+export declare function bigErfInv(ce: ComputeEngine, x: BigNum, prec: number): BigNum;
 /**
  * Bignum unnormalized cardinal sine: sinc(x) = sin(x)/x, sinc(0) = 1.
- * Precision scales with `BigDecimal.precision` (sin uses the engine's
+ * Precision scales with `prec` (sin uses the engine's
  * 1100-digit π for argument reduction).
  */
-export declare function bigSinc(x: BigNum): BigNum;
+export declare function bigSinc(x: BigNum, prec: number): BigNum;
 /**
  * Bignum Fresnel sine integral S(x). Precision scales with
- * `BigDecimal.precision`: Taylor series for πx²/2·log10(e) ≤ p+20 (with
+ * `prec`: Taylor series for πx²/2·log10(e) ≤ p+20 (with
  * raised working precision to absorb the alternating-series cancellation),
  * asymptotic expansion beyond (where it delivers ≥ p+10 digits).
  */
-export declare function bigFresnelS(x: BigNum): BigNum;
+export declare function bigFresnelS(x: BigNum, prec: number): BigNum;
 /**
  * Bignum Fresnel cosine integral C(x). Same switchover as `bigFresnelS`.
  */
-export declare function bigFresnelC(x: BigNum): BigNum;
+export declare function bigFresnelC(x: BigNum, prec: number): BigNum;
 /**
  * Arithmetic-geometric mean of two non-negative reals.
  * Quadratic convergence: ~6 iterations at machine precision.
@@ -31132,10 +31139,9 @@ export declare function bigFresnelC(x: BigNum): BigNum;
 export declare function agm(a: number, b: number): number;
 /**
  * Bignum arithmetic-geometric mean of two non-negative reals, at the
- * current `BigDecimal.precision` (callers should raise precision around
- * this for guard digits).
+ * precision `prec` (callers should raise it for guard digits).
  */
-export declare function bigAgm(a: BigNum, b: BigNum): BigNum;
+export declare function bigAgm(a: BigNum, b: BigNum, prec: number): BigNum;
 /**
  * Complete elliptic integral of the first kind K(m), parameter convention.
  * Valid for m ≤ 1 (K(1) = ∞; for m > 1 the value is complex — handled by
@@ -31150,9 +31156,9 @@ export declare function ellipticK(m: number): number;
  */
 export declare function ellipticE(m: number): number;
 /** Bignum K(m) for m < 1 (parameter convention). */
-export declare function bigEllipticK(ce: ComputeEngine, m: BigNum): BigNum;
+export declare function bigEllipticK(ce: ComputeEngine, m: BigNum, prec: number): BigNum;
 /** Bignum E(m) for m < 1 (parameter convention). */
-export declare function bigEllipticE(ce: ComputeEngine, m: BigNum): BigNum;
+export declare function bigEllipticE(ce: ComputeEngine, m: BigNum, prec: number): BigNum;
 /** Carlson R_C(x, y) = R_F(x, y, y), machine real, PV for y < 0. */
 export declare function carlsonRC(x: number, y: number): number;
 /** Carlson R_F(x, y, z), machine real. */
@@ -31209,9 +31215,9 @@ export declare function appellF1(a: number, b1: number, b2: number, c: number, x
  * machine kernel; the degenerate integer-c−a−b connection case returns NaN
  * (stays symbolic) rather than computing the logarithmic limit.
  */
-export declare function bigHypergeometric2F1(ce: ComputeEngine, a: BigNum, b: BigNum, c: BigNum, z: BigNum): BigNum;
+export declare function bigHypergeometric2F1(ce: ComputeEngine, a: BigNum, b: BigNum, c: BigNum, z: BigNum, prec: number): BigNum;
 /** Bignum ₁F₁(a; b; z) for real arguments. */
-export declare function bigHypergeometric1F1(ce: ComputeEngine, a: BigNum, b: BigNum, z: BigNum): BigNum;
+export declare function bigHypergeometric1F1(ce: ComputeEngine, a: BigNum, b: BigNum, z: BigNum, prec: number): BigNum;
 /**
  * Result-count caps shared by the interpreter and the compiled lane for
  * operators whose work scales with an operand VALUE — one materialized
@@ -31304,13 +31310,13 @@ export declare function logBarnesGComplexImError(z: Complex): number | undefined
 /** G(z) = exp(ln G(z)); exactly 0 at the non-positive integers, NaN where it overflows a double. */
 export declare function barnesGComplex(z: Complex): Complex;
 /**
- * G(x) to the working precision (`BigDecimal.precision`), undefined at the
- * zeros of G and where x is more than `MAX_BIG_SHIFT` from 1.
+ * G(x) to `prec` digits, undefined at the zeros of G and where x is more
+ * than `MAX_BIG_SHIFT` from 1.
  */
-export declare function bigBarnesG(ce: ComputeEngine, x: BigDecimal): BigDecimal | undefined;
+export declare function bigBarnesG(ce: ComputeEngine, x: BigDecimal, prec: number): BigDecimal | undefined;
 /**
- * ln G(x) for a real x > 0 to the working precision (`BigDecimal.precision`),
- * undefined where x is more than `MAX_BIG_SHIFT` from 1.
+ * ln G(x) for a real x > 0 to `prec` digits, undefined where x is more than
+ * `MAX_BIG_SHIFT` from 1.
  *
  * The walk of `bigBarnesG` is kept in the log domain: ln G(x) is
  * ln(G(M + 1) / Π Γ(j + w)) + A(M + w) − A(M), formed at the working
@@ -31321,32 +31327,32 @@ export declare function bigBarnesG(ce: ComputeEngine, x: BigDecimal): BigDecimal
  * adds the digits its size calls for; when it is below what a pass can
  * resolve, the next pass adds `digits` more.
  */
-export declare function bigLogBarnesG(ce: ComputeEngine, x: BigDecimal): BigDecimal | undefined;
+export declare function bigLogBarnesG(ce: ComputeEngine, x: BigDecimal, prec: number): BigDecimal | undefined;
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Incomplete elliptic integral of the first kind F(φ|m) (parameter
  * convention) for real φ and m, where the value is real.
  */
-export declare function bigEllipticF(ce: ComputeEngine, phi: BigDecimal, m: BigDecimal): BigDecimal | null;
+export declare function bigEllipticF(ce: ComputeEngine, phi: BigDecimal, m: BigDecimal, prec: number): BigDecimal | null;
 /**
  * Incomplete elliptic integral of the second kind E(φ|m) (parameter
  * convention) for real φ and m, where the value is real.
  */
-export declare function bigEllipticEIncomplete(ce: ComputeEngine, phi: BigDecimal, m: BigDecimal): BigDecimal | null;
+export declare function bigEllipticEIncomplete(ce: ComputeEngine, phi: BigDecimal, m: BigDecimal, prec: number): BigDecimal | null;
 /**
  * Complete elliptic integral of the third kind Π(n|m) for m < 1. `+∞` at
  * n = 1 or m = 1, NaN for m > 1 (complex). For n > 1 it is the Cauchy
  * principal value, the real kernel's ruling (compute-engine#422).
  */
-export declare function bigEllipticPiComplete(ce: ComputeEngine, n: BigDecimal, m: BigDecimal): BigDecimal | null;
+export declare function bigEllipticPiComplete(ce: ComputeEngine, n: BigDecimal, m: BigDecimal, prec: number): BigDecimal | null;
 /**
  * Incomplete elliptic integral of the third kind Π(n; φ|m) for real
  * operands where m·sin²φ < 1; NaN where the value is complex because of m.
  * Where 1 − n·sin²φ < 0 it is the Cauchy principal value, as for the
  * machine kernel (compute-engine#422).
  */
-export declare function bigEllipticPiIncomplete(ce: ComputeEngine, n: BigDecimal, phi: BigDecimal, m: BigDecimal): BigDecimal | null;
+export declare function bigEllipticPiIncomplete(ce: ComputeEngine, n: BigDecimal, phi: BigDecimal, m: BigDecimal, prec: number): BigDecimal | null;
 import { Complex } from 'complex.js';
 import { BigDecimal } from '../../big-decimal/index.js';
 import { type DeadlineFrame } from '../../common/interruptible.js';
@@ -31401,14 +31407,14 @@ export declare function clausen(n: number, theta: number): number;
 /** Orders above this decline: the expansion needs ζ(m) for each m = 2 … n−1. */
 export declare const CLAUSEN_BIG_MAX_ORDER = 40;
 /**
- * Clₙ(θ) at `BigDecimal.precision` digits for an integer 2 ≤ n ≤
+ * Clₙ(θ) at `prec` digits for an integer 2 ≤ n ≤
  * `CLAUSEN_BIG_MAX_ORDER` (n = 1 is −ln|2 sin(θ/2)|) and a finite real θ with
  * |θ| ≤ 10¹²; `undefined` where the kernel cannot vouch for the digits: past
  * those bounds, at θ ≡ 0 for n = 1, or where the value cancels against its
  * own terms by more than `CLAUSEN_CANCELLATION_DIGITS` digits (n = 1 near
  * θ ≡ ±π/3, where Cl₁ crosses 0).
  */
-export declare function bigClausen(ce: ComputeEngine, n: number, theta: BigDecimal): BigDecimal | undefined;
+export declare function bigClausen(ce: ComputeEngine, n: number, theta: BigDecimal, prec: number): BigDecimal | undefined;
 import { Complex } from 'complex.js';
 /**
  * All complex roots of a polynomial via the Durand–Kerner (Weierstrass)
@@ -31521,7 +31527,7 @@ export declare function certifiedTerms(lo: Q, hi: Q, n: number): bigint[];
 export declare function surdFromPeriodicTerms(pre: ReadonlyArray<bigint>, period: ReadonlyArray<bigint>): Surd | undefined;
 import { BigDecimal } from '../../big-decimal/index.js';
 /** I_x(a, b) for x < 0 or x > 1 at the working precision, or NaN. */
-export declare function bigBetaRegularizedOutside(x: BigDecimal, a: BigDecimal, b: BigDecimal): BigDecimal;
+export declare function bigBetaRegularizedOutside(x: BigDecimal, a: BigDecimal, b: BigDecimal, target: number): BigDecimal;
 /** I_x(a, b) for x < 0 or x > 1, as a double, or NaN. */
 export declare function betaRegularizedOutside(x: number, a: number, b: number): number;
 /**
@@ -32173,7 +32179,7 @@ import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 import { type HurwitzOperand } from './special-functions.js';
 /**
  * Arbitrary-precision Bessel functions J, Y, I and K of a real order ν and a
- * real argument x, at `BigDecimal.precision` digits.
+ * real argument x, at the digits asked for (`prec`).
  *
  * - Power series about x = 0 (DLMF 10.2.2, 10.25.2) for J and I:
  *   `(x/2)^ν Σ (±x²/4)^k / (k! Γ(ν+k+1))`. The ratio of two terms decreases
@@ -32204,30 +32210,30 @@ export declare const BESSEL_BIG_MAX_ORDER = 1000;
 export declare const BESSEL_BIG_MAX_SERIES_ARGUMENT = 1000;
 export type BesselKind = 'J' | 'Y' | 'I' | 'K';
 /**
- * The Bessel function `kind` of order `order` at `x`, at `BigDecimal.precision`
- * digits, or `undefined` when the kernel declines: x = 0 (the caller's exact
+ * The Bessel function `kind` of order `order` at `x`, at `prec` digits, or
+ * `undefined` when the kernel declines: x = 0 (the caller's exact
  * values), a negative x for Y and K or for J and I of a non-integer order
  * (the value is complex), the order or the argument past the caps above, or
  * the digits not reached.
  */
-export declare function bigBessel(ce: ComputeEngine, kind: BesselKind, order: HurwitzOperand, argument: HurwitzOperand): BigDecimal | undefined;
+export declare function bigBessel(ce: ComputeEngine, kind: BesselKind, order: HurwitzOperand, argument: HurwitzOperand, prec: number): BigDecimal | undefined;
 import { BigDecimal } from '../../big-decimal/index.js';
 export declare function mean(values: Iterable<number>): number;
-export declare function bigMean(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigMean(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function median(values: Iterable<number>): number;
-export declare function bigMedian(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigMedian(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function variance(values: Iterable<number>): number;
-export declare function bigVariance(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigVariance(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function populationVariance(values: Iterable<number>): number;
-export declare function bigPopulationVariance(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigPopulationVariance(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function standardDeviation(values: Iterable<number>): number;
-export declare function bigStandardDeviation(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigStandardDeviation(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function populationStandardDeviation(values: Iterable<number>): number;
-export declare function bigPopulationStandardDeviation(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigPopulationStandardDeviation(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function kurtosis(values: Iterable<number>): number;
-export declare function bigKurtosis(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigKurtosis(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function skewness(values: Iterable<number>): number;
-export declare function bigSkewness(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigSkewness(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 /**
  * The most frequent value of a machine sample. Among values that occur
  * equally often, the SMALLEST one is the mode, the same tie rule as the exact
@@ -32244,7 +32250,7 @@ export declare function mode(values: Iterable<number>): number;
  * `mode`: the smallest value among the most frequent ones.
  *
  * Two data count together when they agree within the working precision
- * (`BigDecimal.precision`, p significant digits): when `|a - b|` is less
+ * (`prec`, p significant digits): when `|a - b|` is less
  * than `max(|a|, |b|) · 10^(1-p)`. Two spellings of one real value, such as
  * `ln 6` and `ln 2 + ln 3`, are computed by different operations and can
  * differ by a few units in the last digit; a comparison of the digits would
@@ -32252,13 +32258,13 @@ export declare function mode(values: Iterable<number>): number;
  * member, so a chain of values that each differ from the next by less than
  * the tolerance does not merge into one group.
  */
-export declare function bigMode(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigMode(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function quartiles(values: Iterable<number>): [number, number, number];
-export declare function bigQuartiles(values: Iterable<BigDecimal>): [BigDecimal, BigDecimal, BigDecimal];
+export declare function bigQuartiles(values: Iterable<BigDecimal>, prec: number): [BigDecimal, BigDecimal, BigDecimal];
 export declare function covariance(xs: Iterable<number>, ys: Iterable<number>): number;
-export declare function bigCovariance(xs: Iterable<BigDecimal>, ys: Iterable<BigDecimal>): BigDecimal;
+export declare function bigCovariance(xs: Iterable<BigDecimal>, ys: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function populationCovariance(xs: Iterable<number>, ys: Iterable<number>): number;
-export declare function bigPopulationCovariance(xs: Iterable<BigDecimal>, ys: Iterable<BigDecimal>): BigDecimal;
+export declare function bigPopulationCovariance(xs: Iterable<BigDecimal>, ys: Iterable<BigDecimal>, prec: number): BigDecimal;
 /**
  * Pearson's r, in [−1, 1]. The centered sums, scaled per column, keep the
  * rounding of `r` at a few ulps and survive data of machine range; the
@@ -32274,9 +32280,9 @@ export declare function bigPopulationCovariance(xs: Iterable<BigDecimal>, ys: It
  * product within the machine range.
  */
 export declare function correlation(xsI: Iterable<number>, ysI: Iterable<number>): number;
-export declare function bigCorrelation(xsI: Iterable<BigDecimal>, ysI: Iterable<BigDecimal>): BigDecimal;
+export declare function bigCorrelation(xsI: Iterable<BigDecimal>, ysI: Iterable<BigDecimal>, prec: number): BigDecimal;
 export declare function interquartileRange(values: Iterable<number>): number;
-export declare function bigInterquartileRange(values: Iterable<BigDecimal>): BigDecimal;
+export declare function bigInterquartileRange(values: Iterable<BigDecimal>, prec: number): BigDecimal;
 /**
  * Interval arithmetic for arithmetic RESULT types.
  *
@@ -32594,21 +32600,17 @@ export declare const COINCIDENCE_BUDGET = 0.0001;
  * compiled constant fold, which shares this helper — deciding the same branch
  * for the same node.
  *
- * The window is scaled to `BigDecimal.precision` — the PROCESS-GLOBAL working
- * precision, which is the value that actually governed the rounding, NOT the
- * `precision` of whichever engine happens to be asking. The two diverge,
- * because constructing any engine writes the global: create a default engine
- * and THEN a machine one, and the first still reports `precision` 21 while its
- * `.N()` now rounds at 15. Sizing the window off the engine then computed a
- * 17-digit tolerance for a 15-digit double, lost the reconstruction, and
- * resurrected the exact bug this helper exists to fix — with the outcome
- * depending on engine CREATION ORDER. Reading the global also makes every lane
- * of the interpreter agree by construction, since there is only one of it.
- *
- * `digits`, when given, replaces the global precision. Compiled JavaScript
- * gives the number of digits recorded when the code was generated
- * (`CompilationResult.reconstructionDigits`), so that the value of the compiled
- * code does not change when the precision changes after the compilation.
+ * The window is scaled to `digits`, the working precision of the engine
+ * that rounded the double (`realPowerReconstructionDigits()` clamps it).
+ * Every engine computes at its own precision, so the engine that asks is the
+ * one whose precision governed the rounding: the window does not depend on
+ * another engine made or configured since. Sizing a 17-digit tolerance for a
+ * 15-digit double loses the reconstruction and brings back the bug this
+ * helper exists to fix. Compiled JavaScript gives the number of digits of the
+ * engine when the code was generated
+ * (`CompilationResult.reconstructionDigits`), so that the value of the
+ * compiled code does not change when the precision changes after the
+ * compilation.
  *
  * Precision matters because numericizing an exact rational rounds to that many
  * digits BEFORE the double is formed: at precision 15, `100/3` becomes
@@ -32658,17 +32660,19 @@ export declare const COINCIDENCE_BUDGET = 0.0001;
  * Callers with the EXACT rational in hand never pay either price: the float
  * path is a fallback for an exponent that has already been numericized.
  */
-export declare function realPowerBranchTerms(exact: Rational | undefined, value: number, digits?: number): [p: number, q: number] | undefined;
+export declare function realPowerBranchTerms(exact: Rational | undefined, value: number, digits: number): [p: number, q: number] | undefined;
 /**
  * The number of significant digits that `realPowerBranchTerms` reads a float
- * exponent to: the global working precision (`BigDecimal.precision`), which
- * is what rounded the exponent, clamped to [15, 17] (a double never carries
- * more than 17 significant digits, and a precision configured below machine
- * precision must not widen the window). A compiled JavaScript result carries
- * it as `reconstructionDigits`: the runtime has its own `BigDecimal`, whose
- * precision says nothing about the engine's.
+ * exponent to: `precision`, the working precision of the engine that rounded
+ * the exponent, clamped to [15, 17]. A double never carries more than 17
+ * significant digits, and a precision configured below machine precision
+ * must not widen the window: `new ComputeEngine({ precision: 3 })` keeps a
+ * precision of 3, below the `MACHINE_PRECISION` floor that `setPrecision`
+ * applies, and a 1%-wide window snaps essentially any float to a small
+ * rational. A compiled JavaScript result carries the digits of the engine
+ * at compile time as `reconstructionDigits`.
  */
-export declare function realPowerReconstructionDigits(): number;
+export declare function realPowerReconstructionDigits(precision: number): number;
 /**
  * The REAL value of `base^expValue` for a NEGATIVE `base`, or `undefined` when
  * the principal branch is not real.
@@ -32696,7 +32700,7 @@ export declare function realPowerReconstructionDigits(): number;
  * falls back to an ulp-tolerant float reconstruction, which is what the
  * interpreter is left with once `.N()` has numericized the exponent.
  */
-export declare function negativeBaseRealPowFromRational(base: number, exact: Rational | null | undefined, expValue: number, digits?: number): number | undefined;
+export declare function negativeBaseRealPowFromRational(base: number, exact: Rational | null | undefined, expValue: number, digits: number): number | undefined;
 /**
  * The machine kernels of the reciprocal inverse hyperbolic functions on a
  * real argument: the interpreter's (`boxed-expression/trigonometry.ts`) and
@@ -33058,9 +33062,9 @@ export declare const CANCELLATION_MAX_EXTRA_DIGITS = 1500;
 /** The decimal order of magnitude of a non-zero value: ⌊log₁₀|x|⌋. */
 export declare function magnitude(x: BigDecimal): number;
 /**
- * `run(working)` evaluated at `BigDecimal.precision` plus guard digits, which
- * it must read from `BigDecimal.precision`; it returns a value with the
- * largest magnitude in its computation, or `undefined` when it declines.
+ * `run(working)` evaluated at `prec` plus guard digits, the working precision
+ * it is given and computes at; it returns a value with the largest magnitude
+ * in its computation, or `undefined` when it declines.
  *
  * The digits lost are `log₁₀(peak / |value|)`. If the working precision
  * covers them with `CANCELLATION_MARGIN_DIGITS` to spare, the value is
@@ -33068,18 +33072,18 @@ export declare function magnitude(x: BigDecimal): number;
  * the digits it lost added, up to `CANCELLATION_MAX_EXTRA_DIGITS` and
  * `CANCELLATION_MAX_RUNS` runs; a value that is exactly zero at a working
  * precision has lost more digits than were carried and is run again with
- * double the guard. `BigDecimal.precision` is restored.
+ * double the guard.
  */
-export declare function bigWithCancellation(run: (working: number) => Scaled | undefined): BigDecimal | undefined;
+export declare function bigWithCancellation(run: (working: number) => Scaled | undefined, prec: number): BigDecimal | undefined;
 /**
  * Σ term_k for `term_{k+1} = term_k · ratio(k)` from `first` (the term of
- * index `from`), at `BigDecimal.precision`, with the largest term. The caller
+ * index `from`), at `prec` digits, with the largest term. The caller
  * guarantees that `|ratio(k)|` does not increase for k ≥ `from`; then once the
  * next ratio is at most ½ the tail is at most the term, so the sum ends after
  * `RATIO_SERIES_CONSECUTIVE` terms in a row at most 10^−precision times the
  * largest term with that bound holding. `undefined` past `maxTerms`.
  */
-export declare function sumByRatio(first: BigDecimal, from: number, ratio: (k: number) => BigDecimal, maxTerms: number, checkTime?: () => void): Scaled | undefined;
+export declare function sumByRatio(first: BigDecimal, from: number, ratio: (k: number) => BigDecimal, maxTerms: number, prec: number, checkTime?: () => void): Scaled | undefined;
 /**
 
     Translated from https://github.com/JuliaMath/Richardson.jl/blob/master/src/Richardson.jl
@@ -33174,8 +33178,7 @@ export declare function poissonQuantile(lambda: number, prob: number, deadline?:
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
- * Arbitrary-precision Dedekind eta η(τ) for Im(τ) > 0, at
- * `BigDecimal.precision` digits.
+ * Arbitrary-precision Dedekind eta η(τ) for Im(τ) > 0, at `prec` digits.
  *
  * τ is first moved into the fundamental domain with the two generators of the
  * modular group (DLMF 23.15.1, 23.15.2): `η(τ + 1) = e^{iπ/12} η(τ)` and
@@ -33204,10 +33207,10 @@ export interface BigComplex {
     im: BigDecimal;
 }
 /**
- * η(re + i·im) for im > 0 at `BigDecimal.precision` digits, or `undefined`
- * where the kernel declines.
+ * η(re + i·im) for im > 0 at `prec` digits, or `undefined` where the
+ * kernel declines.
  */
-export declare function bigDedekindEta(ce: ComputeEngine, re: BigDecimal, im: BigDecimal): BigComplex | undefined;
+export declare function bigDedekindEta(ce: ComputeEngine, re: BigDecimal, im: BigDecimal, prec: number): BigComplex | undefined;
 import type { BigDecimal } from '../../big-decimal/index.js';
 import type { DisplayDigits } from '../types-kernel-serialization.js';
 /**
@@ -33496,8 +33499,8 @@ export declare function tailReachesInfinity(f: (x: number) => number, lower: num
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
- * Arbitrary-precision Airy functions Ai(x) and Bi(x) for a real x, at
- * `BigDecimal.precision` digits, from the Bessel functions of order ±1/3 of
+ * Arbitrary-precision Airy functions Ai(x) and Bi(x) for a real x, at `prec`
+ * digits, from the Bessel functions of order ±1/3 of
  * ζ = (2/3)|x|^{3/2} (DLMF 9.6.2–9.6.6):
  *
  *   Ai(x)  = (1/π)·√(x/3)·K_{1/3}(ζ)                    x > 0
@@ -33515,7 +33518,7 @@ import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 /** |x| above this declines: ζ = (2/3)|x|^{3/2} would pass the range of `bigBessel`. */
 export declare const AIRY_BIG_MAX_ARGUMENT = 10000;
 /** Ai(x) or Bi(x), or `undefined` where the kernel declines. */
-export declare function bigAiry(ce: ComputeEngine, kind: 'Ai' | 'Bi', x: BigDecimal): BigDecimal | undefined;
+export declare function bigAiry(ce: ComputeEngine, kind: 'Ai' | 'Bi', x: BigDecimal, prec: number): BigDecimal | undefined;
 /**
  * Roots, discrete logarithms and primitive roots in the unit groups (ℤ/m)ˣ,
  * over bigints.
@@ -34614,7 +34617,7 @@ import { BigDecimal } from '../../big-decimal/index.js';
 import type { IComputeEngine as ComputeEngine } from '../global-types.js';
 /**
  * Arbitrary-precision exponential integral Ei(x) and logarithmic integral
- * li(x) = Ei(ln x) for a real argument, at `BigDecimal.precision` digits.
+ * li(x) = Ei(ln x) for a real argument, at `prec` digits.
  *
  * - The power series (DLMF 6.6.1 and 6.2.8, the principal value)
  *   `Ei(x) = γ + ln|x| + Σ_{k≥1} x^k/(k·k!)`. The ratio of two terms,
@@ -34634,10 +34637,10 @@ import type { IComputeEngine as ComputeEngine } from '../global-types.js';
  */
 /** Ei(x) for x above this declines: the series needs about 3x terms. */
 export declare const EI_BIG_MAX_ARGUMENT = 1000;
-/** Ei(x) for a real x ≠ 0 at `BigDecimal.precision` digits, or `undefined` where the kernel declines. */
-export declare function bigExpIntegralEi(ce: ComputeEngine, x: BigDecimal): BigDecimal | undefined;
-/** li(x) = Ei(ln x) for a real x > 0, x ≠ 1, or `undefined` where the kernel declines. */
-export declare function bigLogIntegral(ce: ComputeEngine, x: BigDecimal): BigDecimal | undefined;
+/** Ei(x) for a real x ≠ 0 at `prec` digits, or `undefined` where the kernel declines. */
+export declare function bigExpIntegralEi(ce: ComputeEngine, x: BigDecimal, prec: number): BigDecimal | undefined;
+/** li(x) = Ei(ln x) for a real x > 0, x ≠ 1, at `prec` digits, or `undefined` where the kernel declines. */
+export declare function bigLogIntegral(ce: ComputeEngine, x: BigDecimal, prec: number): BigDecimal | undefined;
 import type { RoundingTies } from '../types-definitions.js';
 import { type DeadlineFrame } from '../../common/interruptible.js';
 export declare const DEFAULT_PRECISION = 21;
@@ -35478,9 +35481,10 @@ export declare function isExactJsonNumber(n: number, value: BigDecimal | bigint)
  * The difference with the truncated value is exact (`BigDecimal.sub()` does
  * not round), so a tie is found exactly. `BigDecimal.round()` always rounds
  * a tie away from zero, so it is not used for `Round`. A NaN or an infinity
- * is returned unchanged.
+ * is returned unchanged. `prec` is the working precision of the gap limits
+ * of `BigDecimal.sub()` and `add()`.
  */
-export declare function bigRoundToInteger(x: BigDecimal, ties: RoundingTies): BigDecimal;
+export declare function bigRoundToInteger(x: BigDecimal, ties: RoundingTies, prec: number): BigDecimal;
 import { BigDecimal } from '../../big-decimal/index.js';
 import { Rational, SmallInteger } from './types.js';
 export declare function isRational(x: unknown | null): x is Rational;
@@ -64066,11 +64070,11 @@ export declare class MachineNumericValue extends NumericValue {
     floor(): NumericValue;
     ceil(): NumericValue;
     round(): NumericValue;
-    eq(other: number | NumericValue): boolean;
-    lt(other: number | NumericValue): boolean | undefined;
-    lte(other: number | NumericValue): boolean | undefined;
-    gt(other: number | NumericValue): boolean | undefined;
-    gte(other: number | NumericValue): boolean | undefined;
+    eq(other: number | NumericValue, prec?: number): boolean;
+    lt(other: number | NumericValue, prec?: number): boolean | undefined;
+    lte(other: number | NumericValue, prec?: number): boolean | undefined;
+    gt(other: number | NumericValue, prec?: number): boolean | undefined;
+    gte(other: number | NumericValue, prec?: number): boolean | undefined;
 }
 /**
  *
@@ -64195,7 +64199,8 @@ export declare abstract class NumericValue {
      * `mul`, `div`, `pow`, `root`, `sqrt`, `abs`, `ln`, `exp`) take an
      * optional last argument `prec`, the number of significant digits of the
      * working precision. An engine passes its own precision; the default is
-     * `BigDecimal.precision`, which the last engine made or configured wrote.
+     * `BigDecimal.precision`, which no engine writes (50 unless the host sets
+     * it).
      */
     abstract N(prec?: number): NumericValue;
     /**
@@ -64228,11 +64233,11 @@ export declare abstract class NumericValue {
     abstract floor(): NumericValue;
     abstract ceil(): NumericValue;
     abstract round(): NumericValue;
-    abstract eq(other: number | NumericValue): boolean;
-    abstract lt(other: number | NumericValue): boolean | undefined;
-    abstract lte(other: number | NumericValue): boolean | undefined;
-    abstract gt(other: number | NumericValue): boolean | undefined;
-    abstract gte(other: number | NumericValue): boolean | undefined;
+    abstract eq(other: number | NumericValue, prec?: number): boolean;
+    abstract lt(other: number | NumericValue, prec?: number): boolean | undefined;
+    abstract lte(other: number | NumericValue, prec?: number): boolean | undefined;
+    abstract gt(other: number | NumericValue, prec?: number): boolean | undefined;
+    abstract gte(other: number | NumericValue, prec?: number): boolean | undefined;
     /** Object.valueOf(): returns a primitive value, preferably a JavaScript
      *  number over a string, even if at the expense of precision. A complex
      *  value is a string with `prec` significant digits in each part. */
@@ -64249,13 +64254,13 @@ export declare abstract class NumericValue {
 import { BigDecimal } from '../../big-decimal/index.js';
 /**
  * The relative size of the rounding noise of a big-decimal complex kernel:
- * `10^(2−precision)`, where `precision` is the working precision (default
- * `BigDecimal.precision`). A kernel that computes at the working precision
- * has a rounding error of about `10^{−precision}` times the modulus of its
+ * `10^(2−precision)`, where `precision` is the working precision. A kernel
+ * that computes at the working precision has a rounding error of about
+ * `10^{−precision}` times the modulus of its
  * result; the factor 100 is a margin for the error of the inputs and of the
  * few operations of the kernel.
  */
-export declare function complexNoiseRatio(precision?: number): BigDecimal;
+export declare function complexNoiseRatio(precision: number): BigDecimal;
 /**
  * Whether `part`, a part of a complex result of a big-decimal kernel, is
  * roundoff noise: whether it is not larger than
@@ -64271,7 +64276,7 @@ export declare function complexNoiseRatio(precision?: number): BigDecimal;
  *
  * When `magnitude` is not finite, the result is `false`.
  */
-export declare function isComplexDust(part: BigDecimal | number, magnitude: BigDecimal, precision?: number): boolean;
+export declare function isComplexDust(part: BigDecimal | number, magnitude: BigDecimal, precision: number): boolean;
 import { BigDecimal } from '../../big-decimal/index.js';
 import type { SmallInteger } from '../numerics/types.js';
 import { NumericValue, NumericValueData } from './types.js';
@@ -64307,7 +64312,7 @@ export declare class BigNumericValue extends NumericValue {
     /**
      * Serialize to MathJSON. Preserves the full raw `BigDecimal` value
      * with no rounding, ensuring lossless round-tripping. Digits beyond
-     * `BigDecimal.precision` may be present (from exact arithmetic) but
+     * the working precision may be present (from exact arithmetic) but
      * are not guaranteed to be accurate after precision-bounded operations.
      */
     toJSON(): MathJsonExpression;
@@ -64363,11 +64368,11 @@ export declare class BigNumericValue extends NumericValue {
     floor(): NumericValue;
     ceil(): NumericValue;
     round(): NumericValue;
-    eq(other: number | NumericValue): boolean;
-    lt(other: number | NumericValue): boolean | undefined;
-    lte(other: number | NumericValue): boolean | undefined;
-    gt(other: number | NumericValue): boolean | undefined;
-    gte(other: number | NumericValue): boolean | undefined;
+    eq(other: number | NumericValue, prec?: number): boolean;
+    lt(other: number | NumericValue, prec?: number): boolean | undefined;
+    lte(other: number | NumericValue, prec?: number): boolean | undefined;
+    gt(other: number | NumericValue, prec?: number): boolean | undefined;
+    gte(other: number | NumericValue, prec?: number): boolean | undefined;
 }
 import { BigDecimal } from '../../big-decimal/index.js';
 import { Rational, SmallInteger } from '../numerics/types.js';
@@ -64498,7 +64503,7 @@ export declare class ExactNumericValue extends NumericValue {
     floor(): NumericValue;
     ceil(): NumericValue;
     round(): NumericValue;
-    eq(other: number | NumericValue): boolean;
+    eq(other: number | NumericValue, prec?: number): boolean;
     /**
      * The order of this value against `other`, both real: `-1`, `0` or `1`,
      * or `undefined` when the pair is unordered (a complex operand, a NaN).
@@ -64522,16 +64527,16 @@ export declare class ExactNumericValue extends NumericValue {
      * exponent range the double projection loses.
      */
     private _order;
-    lt(other: number | NumericValue): boolean | undefined;
-    lte(other: number | NumericValue): boolean | undefined;
-    gt(other: number | NumericValue): boolean | undefined;
-    gte(other: number | NumericValue): boolean | undefined;
+    lt(other: number | NumericValue, prec?: number): boolean | undefined;
+    lte(other: number | NumericValue, prec?: number): boolean | undefined;
+    gt(other: number | NumericValue, prec?: number): boolean | undefined;
+    gte(other: number | NumericValue, prec?: number): boolean | undefined;
     /** The answer of an ordering test whose pair `_order()` could not order:
      * `undefined` for a complex operand (the documented "indeterminate"), and
      * `false` for a NaN operand (IEEE 754: every comparison with NaN fails,
      * which is what `this.re < NaN` used to answer). */
     private _unorderedAnswer;
-    static sum(values: NumericValue[], factory: NumericValueFactory, prec?: number): NumericValue[];
+    static sum(values: NumericValue[], factory: NumericValueFactory, prec: number): NumericValue[];
 }
 /**
  * The EXACT order of the exact value `x` against a finite real value `y`
@@ -64554,13 +64559,13 @@ export declare function orderExactAgainstInexact(x: ExactNumericValue, y: number
  * float, although the result can be in the double range: `10^{309} / 10.0i`
  * is `-1e308i`, not `~oo`.
  */
-export declare function hasExactPartOutsideDoubleRange(v: NumericValue): boolean;
+export declare function hasExactPartOutsideDoubleRange(v: NumericValue, prec: number): boolean;
 /**
  * The product (p + q·i)·(c + d·i) of two complex values given by their parts
  * as big decimals, at the digits of a double (`doubleDigits()`) for the
  * working precision `prec`.
  */
-export declare function bigComplexProduct(p: BigDecimal, q: BigDecimal, c: BigDecimal, d: BigDecimal, prec?: number): {
+export declare function bigComplexProduct(p: BigDecimal, q: BigDecimal, c: BigDecimal, d: BigDecimal, prec: number): {
     re: BigDecimal;
     im: BigDecimal;
 };
@@ -64569,7 +64574,7 @@ export declare function bigComplexProduct(p: BigDecimal, q: BigDecimal, c: BigDe
  * parts as big decimals, at the digits of a double (`doubleDigits()`) for
  * the working precision `prec`. The divisor is not zero.
  */
-export declare function bigComplexQuotient(p: BigDecimal, q: BigDecimal, c: BigDecimal, d: BigDecimal, prec?: number): {
+export declare function bigComplexQuotient(p: BigDecimal, q: BigDecimal, c: BigDecimal, d: BigDecimal, prec: number): {
     re: BigDecimal;
     im: BigDecimal;
 };
@@ -64584,9 +64589,6 @@ export declare function bigComplexQuotient(p: BigDecimal, q: BigDecimal, c: BigD
  * `_bignumComponent()` does.
  */
 export declare function doubleDigits(prec: number): number;
-/** Evaluate `f` with the digits of `doubleDigits(BigDecimal.precision)`
- * (see `doubleDigits()`). */
-export declare function withDoubleDigits(f: () => BigDecimal): BigDecimal;
 import { NumericValue } from './types.js';
 /**
  * Extract the exact integer value of a `NumericValue`, or `null` if it does
@@ -65602,16 +65604,14 @@ export declare class ComputeEngine implements IComputeEngine {
      *
      * If the precision is set to `auto`, the precision is set to a default value.
      *
-     * The precision of the arbitrary-precision arithmetic is shared by every
-     * engine in the program: creating an engine, or setting the precision of
-     * any engine, sets it for all of them. A program that sets different
-     * precisions on two engines computes in both at the precision set last,
-     * so use one engine per program.
+     * Each engine computes at its own precision: creating an engine, or
+     * setting the precision of one engine, does not change the precision of
+     * another.
      *
      */
     set precision(p: number | 'machine' | 'auto');
-    /** Run `fn` at the precision `digits` (of the engine and of the big
-     * decimals) without a reset of the engine: see
+    /** Run `fn` at the precision `digits` of the engine without a reset of
+     * the engine: see
      * `EngineNumericConfiguration.withTransientPrecision`.
      * @internal */
     _withTransientPrecision<T>(digits: number, fn: () => T): T;
@@ -73981,8 +73981,9 @@ import { BigDecimal } from '../../big-decimal/index.js';
  * option of `compile()`).
  */
 export declare function gpuExactConstant(op: Expression): Expression | undefined;
-/** The value of a number literal as a `BigDecimal`, at the current precision. */
-export declare function gpuBigValue(op: Expression): BigDecimal | undefined;
+/** The value of a number literal as a `BigDecimal`, at `prec` significant
+ * digits. */
+export declare function gpuBigValue(op: Expression, prec: number): BigDecimal | undefined;
 /**
  * Call `fn` with the exact sum `c = Σ literals + π·Σ piFactors`, computed with
  * `BigDecimal` at a precision that keeps every digit of `c` and 30 more, and
@@ -73991,10 +73992,12 @@ export declare function gpuBigValue(op: Expression): BigDecimal | undefined;
  *
  * The constant is first added at 50 digits to read its magnitude; `fn` then
  * runs at the precision that magnitude needs, so that the integer part of
- * `c/P` for any period `P` is exact. `BigDecimal.precision` is global, so it
- * is restored afterwards.
+ * `c/P` for any period `P` is exact. `fn` receives that precision, the
+ * number of significant digits of its own computations. The precisions do
+ * not depend on the precision of the engine: the compiled code computes in
+ * float32.
  */
-export declare function gpuWithExactConstant<T>(literals: ReadonlyArray<Expression>, piFactors: ReadonlyArray<Expression>, fn: (c: BigDecimal) => T | undefined): T | undefined;
+export declare function gpuWithExactConstant<T>(literals: ReadonlyArray<Expression>, piFactors: ReadonlyArray<Expression>, fn: (c: BigDecimal, prec: number) => T | undefined): T | undefined;
 /**
  * The largest `|K·x|` the exact reduction handles: `k = round(K·x · 2/π)`
  * must be below 2^24, so that it is an exact float32 integer and its two
@@ -76257,7 +76260,7 @@ export type IntervalPrinted = StoredIntervalJavaScript & {
 };
 /** The stored form of `p` in the mode and its `run()` (README, "The
  *  interval mode"). */
-export declare function printInterval(p: Program, rows: readonly OperatorRow[], syntax: Syntax, iterationBudget?: number): IntervalPrinted;
+export declare function printInterval(p: Program, rows: readonly OperatorRow[], syntax: Syntax, precision: number, iterationBudget?: number): IntervalPrinted;
 /**
  * The JavaScript printer of the slice compiler, in the form of the stored
  * code of the existing compiler (`StoredJavaScript`): `preambleOnce`, the
@@ -85928,7 +85931,7 @@ export declare function tryGetConstant(expr: Expression): number | undefined;
  * falls back to an ulp-tolerant float reconstruction, which is what the
  * interpreter is left with once `.N()` has numericized the exponent.
  */
-export declare function negativeBaseRealPow(base: number, exp: Expression | null | undefined, expValue: number): number | undefined;
+export declare function negativeBaseRealPow(base: number, exp: Expression | null | undefined, expValue: number, precision: number): number | undefined;
 /**
  * The PRINCIPAL complex power of two real constants — the value a
  * `Power`/`Root` node typed `complex` folds to, shared by every target

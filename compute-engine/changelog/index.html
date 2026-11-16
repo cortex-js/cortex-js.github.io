@@ -21,8 +21,8 @@
 <link rel="preload" as="font" type="font/woff2" href="https://cdn.jsdelivr.net/npm/mathlive/fonts/KaTeX_Size1-Regular.woff2" crossorigin="anonymous">
 <link rel="preload" as="image" href="/img/hand-slugs.jpg" fetchpriority="high">
 <link rel="preload" as="image" href="/img/hand-gears.jpg" fetchpriority="high">
-<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.1cd81852.css">
-<script src="/assets/js/runtime~main.5f5d75ad.js" defer="defer"></script>
+<link rel="preload" as="image" href="/img/hand-cube2.jpg" fetchpriority="high"><link rel="stylesheet" href="/assets/css/styles.b57f2a44.css">
+<script src="/assets/js/runtime~main.bda0d589.js" defer="defer"></script>
 <script src="/assets/js/main.94eba5c8.js" defer="defer"></script>
 </head>
 <body>
@@ -98,6 +98,16 @@ environment values <code>CE_JS_PROFILE=numeric-kernel</code> and
 <code>CE_JS_PROFILE_SHADOW=1</code> no longer turn anything on.</li>
 </ul><h3 class="anchor anchorTargetStickyNavbar_Vzrq" id="behavior-changes">Behavior Changes<a href="#behavior-changes" class="hash-link" aria-label="Direct link to Behavior Changes" title="Direct link to Behavior Changes" translate="no">​</a></h3><ul>
 <li class="">
+<p><strong>Creating an engine or setting its <code>precision</code> no longer changes
+<code>BigDecimal.precision</code>.</strong> <code>BigDecimal.precision</code> is now only the default
+precision of the <code>BigDecimal</code> operations called without a precision
+argument (50, unless the host sets it). After
+<code>new ComputeEngine({ precision: 80 })</code>, <code>BigDecimal.precision</code> was <code>80</code>; it
+is now unchanged. A host that computes with <code>BigDecimal</code> directly at the
+precision of an engine passes it: <code>x.div(y, ce.precision)</code>. Setting
+<code>BigDecimal.precision</code> does not change the results of any engine.</p>
+</li>
+<li class="">
 <p><strong>Runtime-local self-quotients evaluate before cancellation.</strong>
 <code>const x = 0; x/x</code> returned <code>1</code>; it now returns <code>NaN</code>. Nonzero library
 constants retain their ordinary self-quotient simplification.</p>
@@ -152,13 +162,11 @@ numbers computed by the first</strong>
 (<a href="https://github.com/cortex-js/compute-engine/issues/556" target="_blank" rel="noopener noreferrer" class="">#556</a>). With an
 engine <code>a</code> at precision 30, creating an engine <code>b</code> at
 <code>precision = &#x27;machine&#x27;</code> made <code>a.expr([&#x27;Sqrt&#x27;, 2]).N().toString()</code> give
-<code>1.4142135623731</code> instead of <code>1.41421356237309504880168872421</code>. <code>.N()</code> of a
-number, the arithmetic methods of an expression (<code>add</code>, <code>mul</code>, <code>div</code>,
-<code>pow</code>, <code>root</code>, <code>sqrt</code>, <code>inv</code>), the numeric values of <code>Sqrt</code>, <code>Root</code>, <code>Ln</code>
-and <code>Power</code>, and the display of a number now use the precision of their own
-engine. Trigonometric and special functions still use the precision of the
-engine that was created or configured last: for them, keep using one engine
-per program.</p>
+<code>1.4142135623731</code> instead of <code>1.41421356237309504880168872421</code>. Every
+numeric evaluation of an engine (arithmetic, <code>.N()</code>, trigonometric and
+special functions, statistics, comparisons, compilation, and the display of
+a number) now uses the precision of that engine, so several engines with
+different precisions can be used in one program.</p>
 </li>
 <li class="">
 <p><strong>A numeric constant tested against a <code>Set</code> of numbers is decided by

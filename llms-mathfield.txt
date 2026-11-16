@@ -550,6 +550,8 @@ div.figure {
 
 </div>
 
+<GraphPaperBanner />
+
 <h2>Why MathField?</h2>
 
 <div id="features-section">
