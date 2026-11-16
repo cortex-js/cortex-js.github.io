@@ -1686,10 +1686,62 @@ waits for a definition of the name in its own scope chain: evaluated while
 the name has no value, it stays symbolic; evaluated after the definition, it
 applies the function.
 
+The scope chain is the scope the call was written in and the scopes around
+it. A function of the same name that a scope pushed later declares is not
+called. To call it, parse the expression in that scope:
+
+```js
+const call = ce.parse('h(2) + 1');
+call.evaluate().print();
+// ➔ 1 + h(2)   ("h" has no definition yet)
+
+ce.assign('h', ce.parse('t \\mapsto 10t'));
+call.evaluate().print();
+// ➔ 21
+
+ce.pushScope();
+ce.declare('h', 'function');
+ce.assign('h', ce.parse('t \\mapsto t + 1000'));
+call.evaluate().print();
+// ➔ 21         (the call reads the scope it was written in)
+ce.parse('h(2) + 1').evaluate().print();
+// ➔ 1003       (written in the pushed scope)
+ce.popScope();
+```
+
+Compiled code calls the same function as the evaluation.
+
+A function passed by name as a callback follows the same rule: written
+before the function is defined, it reads the definition of the scope it was
+written in, and with no definition there it stays symbolic.
+
+```js
+const squares = ce.parse('\\operatorname{Map}(h, [1, 2])');
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [h(1),h(2)]
+
+ce.assign('h', ce.parse('t \\mapsto t^2'));
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [1,4]
+
+ce.pushScope();
+ce.declare('h', 'function');
+ce.assign('h', ce.parse('t \\mapsto 100'));
+ce.function('ListFrom', [squares]).evaluate().print();
+// ➔ [1,4]      (the callback reads the scope it was written in)
+ce.popScope();
+```
+
+A function whose body calls a function that is not defined yet gets its
+result type and its effects again when that function is defined: with
+`honest := () ↦ later()` and then `later := () ↦ Random()`, `honest` is
+typed `() random -> real`.
+
 Within one evaluation, the symbolic result of such a call is a value: it is
 not resolved again when the name is assigned later in the same evaluation.
-So with `h` declared by `ce.declare('h', 'function')` (a first assignment of
-a name in a branch of an `If` is the error `first-assignment-in-branch`),
+So with `h` declared by `ce.declare('h', 'function')` (an assignment in a
+branch of an `If` to a name that no scope declares is the error
+`assignment-to-undeclared-variable`),
 `Sum(Block(If(k = 2, h := z ↦ 2z), h(k)), k, 1, 3)` is `10 + h(1)`: the
 term `h(1)` was computed while `h` had no value, and the assignment at
 `k = 2` does not reach it. A later evaluation resolves the stored result
@@ -1708,8 +1760,9 @@ result.evaluate().print();
 ```
 
 In a `Block`, a `DefineFunction` statement (the Epsil `function g(k) { … }`)
-defines its name for the whole block, including the statements written before
-it. An `Assign` of a function literal takes effect when it runs. A `Block`
+declares a local variable that holds the function. A call before the
+statement is the error `read-before-declaration`. An `Assign` of a function
+literal takes effect when it runs. A `Block`
 evaluated directly by the host is a program: each of its statements is an
 evaluation of its own, so a result stored by one statement is resolved again
 when a later statement reads it.
@@ -1737,17 +1790,44 @@ Additional scopes can be created using the `ce.pushScope()` method.
 ```ts
 ce.assign('x', 100); // "x" is defined in the current scope
 ce.pushScope();
-ce.assign('x', 500); // "x" is defined in the new scope
-console.log(ce.expr('x')); // 500
+ce.declare('x', 'integer'); // "x" is defined in the new scope
+ce.assign('x', 500);
+console.log(ce.expr('x').evaluate()); // 500
 ce.popScope();
-console.log(ce.expr('x')); // 100
+console.log(ce.expr('x').evaluate()); // 100
 ```
+
+Without the `ce.declare()`, `ce.assign('x', 500)` in the new scope writes the
+`x` of the outer scope, and `x` is `500` after the `ce.popScope()` too.
 
 **To exit a scope** use `ce.popScope()`.
 
-This will invalidate any definitions associated with the scope, and restore the
-symbol table from previous scopes that may have been shadowed by the current
-scope.
+The names of an expression boxed after the `ce.popScope()` resolve in the
+scopes that remain. An expression boxed while the scope was current keeps the
+definitions of that scope.
+
+### An Expression Reads the Scope It Was Boxed In
+
+An expression resolves each name from the scope it was boxed in, for its type
+and for its value. The scope that is current when the expression is evaluated
+plays no part. A declaration made later in the scope the expression was boxed
+in, or in one of its parents, is read; a declaration in a scope pushed after
+the expression was boxed is not. To read the current scope, bind the
+expression again with `ce.rebind()`:
+
+```ts
+ce.assign('x', 100);
+const e = ce.expr(['Add', 'x', 1]);
+ce.pushScope();
+ce.declare('x', 'integer');
+ce.assign('x', 500);
+console.log(e.evaluate()); // 101
+console.log(ce.rebind(e).evaluate()); // 501
+const inner = ce.expr(['Add', 'x', 1]);
+ce.popScope();
+console.log(inner.evaluate()); // 501: it keeps the definitions of the popped scope
+console.log(e.evaluate()); // 101
+```
 
 
 ## Evaluation Loop
@@ -2730,7 +2810,9 @@ equal**, set the `tolerance` property of a `ComputeEngine` instance.
 By default, the tolerance is $ 10^{-10} $.
 
 The tolerance is accounted for by the `Chop` function to determine when to
-replace a number of a small magnitude with the exact integer 0.
+replace a number of a small magnitude with 0 (the float `0.0` for a float
+operand: `Chop(1e-12)` is `0.0`). A second
+operand gives another tolerance for one call: `Chop(x, 0.01)`.
 
 It is also used when doing some comparison to zero: a number whose absolute
 value is smaller than the tolerance will be considered equal to 0.
@@ -3645,6 +3727,23 @@ conflict is not declared and is reported in `skipped`, with the reason
 other reasons are `"untyped"` (no use requires a type), `"defined"` (the
 symbol has a declared type) and `"out-of-scope"`.
 
+```js
+ce.declare("g", "real");
+ce.infer([ce.box(["List", "g", "q"])]);
+// ➔ { declared: [],
+//     skipped: [{ name: "g", reason: "defined", … },
+//               { name: "q", reason: "untyped", … }] }
+```
+
+A symbol declared with the type `unknown` has no declared type: `ce.infer()`
+gives it the type that its uses require.
+
+```js
+ce.declare("u", "unknown");
+ce.infer([ce.parse("u + 1")]);
+// ➔ { declared: [{ name: "u", type: number, … }], skipped: [] }
+```
+
 An expression reads a declaration made after it was created: after
 `ce.declare("x", "string")`, the `x` of `expr` above has the type `string`.
 
@@ -3674,6 +3773,50 @@ Note that only symbols in the current scope are forgotten. If assumptions about
 the symbol existed in a previous scope, those assumptions will be in effect when
 returning to the previous scope.
 :::
+
+## Temporary Names
+
+A program sometimes needs a name of its own: a dummy variable, the parameter
+of a function it builds, an input or a helper function it adds to a
+compilation. The name must not be a name that the expressions at hand already
+use.
+
+**To get such a name**, use `ce.temporaryName()`. It returns
+`<hint>_tmp<n>`, with `n` the smallest number such that the name has no
+definition visible from the current scope and is not in the expressions or
+the names given after the hint.
+
+```js
+ce.temporaryName('t');
+// ➔ "t_tmp1"
+
+const expr = ce.parse('t_{tmp1} + x');
+ce.temporaryName('t', expr);
+// ➔ "t_tmp2"
+
+const a = ce.temporaryName('p');
+ce.temporaryName('p', a);
+// ➔ "p_tmp2"
+```
+
+The result is the name of an ordinary symbol. Declare it, assign it, or use it
+as the parameter of a function, as any other name:
+
+```js
+const u = ce.temporaryName('u');
+ce.declare(u, 'real');
+
+ce.temporaryName('u');
+// ➔ "u_tmp2"
+```
+
+The function keeps no state and declares nothing. Pass it every expression
+that the name will be combined with, and the names you got earlier and have
+not declared yet: a name that an expression only uses, without a declaration,
+is seen only when that expression or that name is passed.
+
+A name that ends with `_tmp` and a positive integer is reserved for
+`ce.temporaryName()`. To get the hint back from a name, remove that suffix.
 
 ---
 
@@ -3931,6 +4074,89 @@ ce.declare("m_e", {
   isConstant: true,
 });
 ```
+
+### Declaring a Macro
+
+A symbol with a value keeps the meaning that its value had where it was
+defined: in `f(x) = A + 1`, an `A` defined as `x^2 + y^2` reads the global `x`,
+not the parameter of `f`.
+
+A **macro** is the other kind of name. It has no value and no type of its own.
+Wherever the name is written, the engine puts the body of the macro in its
+place when it boxes the expression. The names of the body then mean what they
+mean at that place: a parameter or an index of the surrounding expression
+binds them.
+
+**To declare a macro** use `ce.declare()` with a `macro` property. Its value is
+the body, as MathJSON.
+
+```js
+ce.declare("A", { macro: ["Add", ["Power", "x", 2], ["Power", "y", 2]] });
+
+ce.parse("A + 1").json;
+// ➔ ["Add", ["Power", "x", 2], ["Power", "y", 2], 1]
+
+ce.assign("f", ce.parse("x \\mapsto A + 1"));
+ce.parse("f(3)").evaluate().latex;
+// ➔ "y^2+10": the `x` of the macro is the parameter of `f`
+
+ce.declare("B", { macro: ["Multiply", "k", "x"] });
+ce.parse("\\sum_{k=1}^{3} B").evaluate().json;
+// ➔ ["Multiply", 6, "x"]: the `k` of the macro is the index of the sum
+```
+
+The expanded expression is an ordinary expression: `ce.box(["D", "A", "x"])`
+evaluates to `2x`, and compiled code contains the body, not the name.
+
+A function is not a macro: the body of `f` above is expanded once, when `f` is
+defined, and a call of `f` never takes a name from its caller.
+
+The rules:
+
+- **Declare a macro before the expressions that use it.** An expression that
+  was boxed earlier keeps the name, which has no value:
+
+  ```js
+  const early = ce.parse("C + 1");
+  ce.declare("C", { macro: ["Power", "x", 2] });
+  early.evaluate().json;             // ➔ ["Add", "C", 1]
+  ce.parse("C + 1").evaluate().json; // ➔ ["Add", ["Power", "x", 2], 1]
+  ```
+
+- **A macro is declared once in a scope and has no value to assign.** A second
+  `ce.declare()` of the name in the same scope and `ce.assign()` both throw. To
+  change a macro, declare your macros again in a new scope and box the
+  expressions again.
+- **A parameter, an index or a local variable of the same name hides the
+  macro.** With a macro named `k`, `\sum_{k=1}^{3} k` is still `6`.
+- **A position that takes a name is not expanded**: a parameter, an index, the
+  variable of `D` or `Solve`, the target of an assignment.
+- **A macro can use another macro.** A macro that uses itself gives the error
+  `macro-cycle` in place of the name.
+- **The raw form keeps the name**: `ce.parse("A + 1", { form: "raw" }).json` is
+  `["Add", "A", 1]`. The canonical and the structural form expand it. A symbol
+  made with `ce.symbol("A")` is not expanded.
+- **Nothing is expanded during an evaluation.** An expression that is boxed
+  while `evaluate()`, `simplify()` or `compile()` runs (for example in a
+  callback) keeps the name. `Hold(A)` keeps the name, also when it is released.
+- **A macro has no parameters.** `A(x+1)` in LaTeX is a product.
+
+**To know whether a name can be a macro** read `ce.macroNames`, the set of the
+names that were declared as a macro on the engine, in any scope:
+
+```js
+ce.macroNames.size;      // ➔ 0 on an engine with no macro
+ce.declare("A", { macro: ["Add", ["Power", "x", 2], ["Power", "y", 2]] });
+ce.macroNames.has("A");  // ➔ true
+ce.macroNames.has("x");  // ➔ false
+```
+
+The set never shrinks: a name stays in it after the scope of its declaration is
+popped. A name that is not in the set is not a macro in any scope; for a name
+that is in the set, `ce.lookupDefinition(name)` gives the definition that the
+current scope reads.
+
+`ce.lookupDefinition("A").value.macro` is the body of a macro.
 
 
 ### Declaring a Function
@@ -5736,7 +5962,7 @@ ce.declare("Do", {
 
 ce.box([
   "Block",
-  ["Assign", "s", 0],
+  ["Declare", "s", "'unknown'", 0],
   ["Do", ["Assign", "s", ["Add", "s", 1]], 5],
   "s",
 ]).evaluate();
@@ -5744,12 +5970,13 @@ ce.box([
 ```
 
 The body of `Do` is a branch: the engine cannot know how many times the
-operator runs it, so a first assignment there does not declare a variable. An
+operator runs it, so a `Declare` there is the error
+`declaration-below-statement`. An assignment never declares a variable: an
 assignment of a name that no enclosing scope declares is an error:
 
 ```js
 ce.box(["Do", ["Assign", "t", 1], 3]);
-// ➔ ["Do", ["Error", ["ErrorCode", "'first-assignment-in-branch'", "'t'"]], 3]
+// ➔ ["Do", ["Error", ["ErrorCode", "'assignment-to-undeclared-variable'", "'t'"]], 3]
 ```
 
 A `held` operand lets a handler read an operand before it is evaluated, while
@@ -6998,9 +7225,11 @@ console.log(ce.parse("x \\coloneq 3; x^2 + 1").json);
 
 A block that ends with an assignment has the value `Nothing`: end the block
 with the name. The first assignment of a name must be at the level of the
-block. In a branch of an `If`, in a loop body or in a case of a `Match`, it is
-the error `first-assignment-in-branch`: assign a value to the name before the
-branch. A use of a name before its declaration is the error
+block. In a branch of an `If`, in a loop body or in a case of a `Match`, an
+assignment is an `Assign`, which never declares a name: when no scope declares
+the name, it is the error `assignment-to-undeclared-variable`. Assign a value
+to the name before the branch. A use of a name before its declaration is the
+error
 `read-before-declaration`. A later assignment must keep the type of the local
 (a number can become another number, not a string); otherwise it is the error
 `assignment-type-mismatch`.
@@ -10122,8 +10351,9 @@ A **scalar** bound interacts with broadcasting. On an operator that
 broadcasts, a collection argument is admitted against a scalar parameter —
 the bound is checked against the scalar base, as it always was — and the
 variable binds the argument's **element** type; the call's ordinary broadcast
-wrap then puts the argument's shape back on the result. `Conjugate` and
-`Chop` are `(T) -> T where T: number`, `Remainder` is
+wrap then puts the argument's shape back on the result. `Conjugate` is
+`(T) -> T where T: number`, `Chop` is `(T, real<0..>?) -> T where T: number`,
+`Remainder` is
 `(T, T) -> T where T: number`:
 
 ```js
@@ -11028,7 +11258,9 @@ ce.expr("n").type;
 
 ### Declared vs Inferred: Contract vs Evidence
 
-A type reaches a symbol on one of two tracks, and they behave differently:
+For host-created bindings, a type reaches a symbol on one of two tracks,
+and they behave differently. Program and Block variables instead use the fixed
+initialization contracts described below:
 
 - A **declared** type — written by you, in `ce.declare("a", "list")` or
   `let a: list` — is a **contract**. It never moves: assigning `[1, 2, 3]`
@@ -11036,10 +11268,63 @@ A type reaches a symbol on one of two tracks, and they behave differently:
   the much more precise `vector<integer^3>`. An assignment that
   violates the contract (`a = 42`) is an `incompatible-type` error.
 - An **inferred** type — produced by the engine from evidence — is
-  **revisable**. It follows the value: after `b = [1, 2, 3]` an undeclared
-  `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
+  **revisable**. It follows each assignment: after `b = [1, 2, 3]` an
+  undeclared `b` types `vector<integer^3>`; after `b = ["x", "y"]` it types
   `list<string^2>`. Inference is never a trap: a new assignment or a new use
   re-infers.
+
+A Program or Block variable has a fixed contract even when its type was inferred.
+Preparation uses its initialization without executing it: mutable numeric values
+give `number`, lists lose fixed lengths and widen their element types, tuples keep
+their arity with widened components, and callable values give `function`. Constants
+may retain more precision. An empty unannotated list keeps unknown elements; later
+assignments do not infer them. Write `let xs: list<real> = []` when a known element
+type is required.
+
+A unique later initialization in the same straight-line sequence before any use
+can establish the contract of `let x`; `let x; x = 1` establishes `number` during
+preparation but initializes the slot only when the assignment executes. Branches,
+loops and called functions are not searched for initialization. Without an explicit
+annotation or such an initialization, the type stays `unknown` even after a runtime
+write. Reading an uninitialized slot reports `read-before-initialization`.
+Assignments check the fixed contract; evaluation and `N()` never revise it.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+
+An unannotated function parameter assigned in its body keeps an unknown contract;
+its uses and later assigned values do not establish a type. Annotate such a
+parameter when compilation needs its shape.
+
+The type of an expression does not depend on the values that its symbols
+hold. It depends on their declared or inferred types, and on the values of
+constants. With `x` declared `real` and holding 4, `\sqrt{x}` is typed
+`complex`, the type for every real `x`, and its value is 2.
+
+A symbol whose value reads other symbols has the type of that value, as the
+types of those symbols give it:
+
+```js
+ce.assign("y", ce.parse("x + 1"));
+ce.expr("y").type;
+// ➔ "number"
+
+ce.assign("x", 2);
+ce.expr("y").type;
+// ➔ "integer": the type of x + 1 for an integer x
+
+ce.assign("x", ce.parse("[1, 2]"));
+ce.expr("y").type;
+// ➔ "vector<integer^2>"
+ce.expr("y").evaluate();
+// ➔ [2, 3]
+
+ce.assign("x", ce.parse("[5, 6]"));
+ce.expr("y").type;
+// ➔ "vector<integer^2>": a new value of the same type changes no type
+```
 
 An assignment to a symbol with a declared type accepts a value whose type
 **overlaps** the declared type, as a function call accepts such an argument.
@@ -11163,7 +11448,11 @@ Inference writes happen at these moments:
    `tuple<boolean, real>` and accepts `(true, 4)`. When some read uses a
    non-literal index, the parameter is an `indexed_collection` whose element
    type is the union of the read requirements. The inferred tuple is not
-   enforced at application.
+   enforced at application, and it is not a point parameter: a list
+   argument, a list of points included, is taken whole. With
+   `h(v) = v[1] + v[2]`, `h([(1, 2), (3, 4)])` is `(4, 6)`, the first
+   point plus the second. To apply `h` to each point, declare the
+   parameter: `h(v: tuple<number, number>) = v[1] + v[2]` gives `[3, 7]`.
 4. **Uses of an element**: a use of an element taken out of a collection
    refines the collection's *element* type, in the expression that holds
    the use. `xs[1] + 1` makes an undeclared
@@ -13377,6 +13666,14 @@ console.log(f.run());
 If the expression cannot be compiled, the `result.success` property will be
 `false`.
 
+A boxed `Program` from Epsil parsing can be passed directly to `compile()`.
+Its declarations and global function signatures are already canonical; compilation
+uses the existing sequence compiler. For example, a paired declaration
+`let g: (integer) -> integer; function g(k) { k + 1 }; g(1)` compiles to a
+JavaScript result of `2`. Invalid subexpressions still prevent compilation.
+Compilation returns the final result; it does not provide interpreted Program
+statement callbacks or publish variable values back to the caller's scope.
+
 ### Which Targets Are Registered
 
 The `to` option of `compile()` names a target registered on the expression's
@@ -13385,13 +13682,13 @@ loads:
 
 | Entries loaded in the program | Targets of every engine |
 |---|---|
-| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl`, `python` |
+| `@cortex-js/compute-engine` (the full entry), `…/epsil`, or the `epsil` CLI, with or without `…/core` | `javascript`, `interval-js`, `glsl` |
 | `@cortex-js/compute-engine/core` only | `javascript`, `interval-js` |
 
 The `javascript` and `interval-js` targets are part of every engine: the engine
 uses them itself (the `Map` auto-compile, the numeric integration and
-differentiation kernels, the solver's domain enumeration). The GPU and Python
-targets are bundled in the full entry, not in `core`; once the full entry is
+differentiation kernels, the solver's domain enumeration). The GPU targets
+are bundled in the full entry, not in `core`; once the full entry is
 loaded anywhere in the program, every engine resolves them, including an engine
 made earlier from `core`. In a program that loads only `core`, import the class
 of the target you need from `@cortex-js/compute-engine/compile` and register
@@ -13399,11 +13696,10 @@ it:
 
 ```javascript
 import { ComputeEngine } from '@cortex-js/compute-engine/core';
-import { compile, GLSLTarget, PythonTarget } from '@cortex-js/compute-engine/compile';
+import { compile, GLSLTarget } from '@cortex-js/compute-engine/compile';
 
 const ce = new ComputeEngine();
 ce.registerCompilationTarget('glsl', new GLSLTarget());
-ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
 
 const shader = compile(ce.box(['Sin', 'x']), { to: 'glsl' });
 ```
@@ -13902,7 +14198,7 @@ ce.declare('n', 'integer');
 const count = compile(
   ce.box([
     'Block',
-    ['Assign', 'L', 'H'],
+    ['Declare', 'L', "'unknown'", 'H'],
     [
       'ParallelLoop',
       ['AddTo', ['At', 'L', ['Add', ['Mod', 'k', 3], 1]], 1],
@@ -14007,7 +14303,7 @@ that runs it, also under `ce.withTimeLimit()`. When you run a document that you
 did not write, set a limit when you compile it:
 
 ```js
-const expr = ce.box(['Block', ['Assign', 'k', 0],
+const expr = ce.box(['Block', ['Declare', 'k', "'unknown'", 0],
   ['Loop', ['Assign', 'k', ['Add', 'k', 1]]], 'k']);
 const { run } = compile(expr, { iterationBudget: 1e6 });
 run({}); // throws a CancellationError, cause 'iteration-limit-exceeded'
@@ -14022,7 +14318,6 @@ pass on every machine. To get a time limit, measure the cost of a pass.
   `createJavaScriptRuntime()` or `createIntervalRuntime()` keeps the limit.
 - `broadcast()` gives `NaN` for a cell over the limit, as for any error of a
   cell. Each cell has its own count, so a batch costs up to cells × budget.
-- `python` declines a program with a `Loop` when the option is set.
 - `glsl` cannot throw: over the limit, the loops of the shader stop and the
   value is `NaN`. On this target the limit also applies to `Sum` and
   `Product`, and it is 10,000 passes when the option is not set (see "What
@@ -14031,366 +14326,6 @@ pass on every machine. To get a time limit, measure the cost of a pass.
   `interval-js` it gives the `entire` interval.
 
 Without the option, the compiled code has no check.
-
-### The `numeric-kernel` Profile (Experimental)
-
-The option `profile: 'numeric-kernel'` compiles a numeric program with the
-structured compiler of the `javascript` target. It admits scalar
-arithmetic of reals, integers and complex numbers, `If` and the comparisons
-(`Less`, `LessEqual`, `Equal`, `NotEqual`),
-powers and roots of real numbers, powers of a complex base with a number
-literal exponent, `Sqrt`, `Ln`, `Log`, `Exp`, the
-trigonometric and hyperbolic functions and their inverses (`Sin`, `Cos`,
-`Tan`, `Cot`, `Sec`, `Csc`, `Sinh`, `Cosh`, `Tanh`, `Arcsin`, `Arccos`,
-`Arctan`, `Arctan2`, `Arsinh`, `Arcosh`, `Artanh`), `Abs`, `Sign`, `Gamma`,
-`Erf`, `Erfc`, `Digamma`, `Haversine`, `Conjugate`, `Min`, `Max`, `Floor`, `Ceil`,
-`Round`, `Mod`, captured numbers, function literals with typed parameters
-and local variables, `Loop` over an integer range with `Break` in a branch
-of an `If`, `Sum` and `Product` of a real or integer body over integer
-ranges (`Limits`), `Which` and an `If` with no else branch whose values are
-real or integer numbers, calls of user functions
-with or without a declared signature, and lists of numbers read with `At` and `Length`,
-made with a comprehension over a range and updated with `ReplaceAt`,
-list literals of numbers and tuples of reals.
-A block of statements can be the compiled expression itself: its free
-symbols are then the inputs. A power or a root of two number literals is
-written as the value that the ordinary compiler folds it to.
-
-A block can hold another block, and a block whose statements declare names
-with a value can be an operand. A local declared `unknown` with a value has
-the type of its value, and a first write to a new name of a block declares
-a local, as in the ordinary compiler. In the `strict` mode, a local function
-of the block (a `Declare` of a function literal, or `DefineFunction`) and a
-user function declared `function` are compiled once; a local function reads
-the names of the block at each call, as a closure does. A local function in
-a branch or a loop, a recursive one, a local function in the `complex` mode,
-and a local of a nested block with the name of an outer one decline:
-
-```js
-const o = compile(
-  ce.box(['Add',
-    ['Block', ['Declare', 'a', "'real'", ['Multiply', 3.7, 'x']],
-      ['Subtract', 'a', ['Floor', 'a']]],
-    1]),
-  { profile: 'numeric-kernel' }
-);
-o.code;          // ➔ "(() => { const _tv1 = 3.7 * _.x; return _tv1 + -Math.floor(_tv1) + 1; })()"
-o.run({ x: 1 }); // ➔ 1.7000000000000002
-
-const l = compile(
-  ce.box(['Block',
-    ['Assign', 'a', ['Multiply', 2, 'x']],
-    ['Declare', 'g', "'function'", ['Function', ['Add', 't', 'a'], 't']],
-    ['Assign', 'a', 10],
-    ['g', 3]]),
-  { profile: 'numeric-kernel' }
-);
-l.run({ x: 5 }); // ➔ 13
-```
-
-```js
-import { compile, canCompile } from '@cortex-js/compute-engine/compile';
-
-ce.declare('x', 'real');
-ce.declare('y', 'real');
-const r = compile(ce.box(['Add', ['Sin', 'x'], ['Multiply', 'x', 'y']]), {
-  profile: 'numeric-kernel',
-});
-r.code;      // ➔ "_.x * _.y + Math.sin(_.x)"
-r.profile;   // ➔ "numeric-kernel"
-r.pure;      // ➔ true
-r.shippable; // ➔ true
-r.run({ x: 0, y: 2 }); // ➔ 0
-
-const f = compile(
-  ce.box(['Function', ['Block', ['Multiply', 'a', ['Sqrt', 'a']]],
-    ['Typed', 'a', "'real'"]]),
-  { profile: 'numeric-kernel' }
-);
-f.code;      // ➔ "(a) => { return a * Math.sqrt(a); }"
-f.run(4);    // ➔ 8
-f.shippable; // ➔ true
-
-const b = compile(
-  ce.box(['Block', ['Declare', 'a', "'real'", ['Add', 'x', 1]],
-    ['Multiply', 'a', 'a']]),
-  { profile: 'numeric-kernel' }
-);
-b.code;          // ➔ "(() => { const _tv1 = _.x + 1; return _tv1 * _tv1; })()"
-b.run({ x: 2 }); // ➔ 9
-
-const g = compile(ce.box(['Exp', ['Multiply', 'ImaginaryUnit', 'x']]), {
-  profile: 'numeric-kernel',
-});
-g.code;          // ➔ "_SYS.cexp(({ re: 0, im: _.x }))"
-g.run({ x: 1 }); // ➔ { re: 0.5403023058681398, im: 0.8414709848078965 }
-```
-
-A product, a quotient or a power with a complex operand, and most functions
-of a complex operand, are written as the ordinary compiler writes them. A
-real operand of a product is not converted to a complex number, so
-`x·(a + bi)` is `x·a + x·b·i`, as in the ordinary compiler. Some forms
-decline: a power whose exponent is not a number literal (`z^x`), `Abs` of a
-complex operand that is not a name, and `Sinh`, `Cosh`, `Tanh` and `Exp` of
-a complex operand that reads `Pi`.
-
-A bound of a `Sum` or a `Product` is floored, as in the ordinary compiler;
-with an `iterationBudget`, a range of more terms than the budget gives
-`NaN`. A `Which` with no `True` clause gives `NaN` when no condition holds.
-A complex body of a `Sum` or a `Product`, and a complex value of a `Which`,
-decline:
-
-```js
-const s = compile(
-  ce.box(['Function', ['Block', ['Sum', ['Divide', 1, 'k'], ['Limits', 'k', 1, 'n']]],
-    ['Typed', 'n', "'integer'"]]),
-  { profile: 'numeric-kernel' }
-);
-s.run(4); // ➔ 2.083333333333333
-
-const w = compile(ce.box(['Which', ['Less', 'x', 0], 0, ['Less', 'x', 1], 'x']), {
-  profile: 'numeric-kernel',
-});
-w.code;          // ➔ "_.x < 0 ? 0 : _.x < 1 ? _.x : NaN"
-w.run({ x: 2 }); // ➔ NaN
-```
-
-A list of reals or of integers (an input, a parameter, a literal such as
-`[x, y, 1]`, or the result of a comprehension or of a user function) and a
-tuple of reals (`(x, y)`, an input or a parameter declared
-`tuple<real, real>`) are values of the program and can be its result, a
-JavaScript array. `Sum`, `Product`, `Max` and `Min` of one list or tuple
-fold its elements; `Max` and `Min` of an empty list are `NaN`. Arithmetic of
-a list and numbers applies to each element (`2·L + 1`). Two lists are
-combined only when their lengths are equal by construction, such as `L` and
-`2·L`: `L + M` of two inputs declines, because the ordinary compiler gives
-`NaN` for lists of different lengths. A comprehension can have a guard that
-does not draw, with bounds that are integer literals or a `Length`:
-
-```js
-ce.declare('L', 'list<real>');
-const e = compile(ce.box(['Add', ['Multiply', 2, 'L'], 1]), {
-  profile: 'numeric-kernel',
-});
-e.run({ L: [1, 2.5] }); // ➔ [3, 6]
-
-const m = compile(ce.box(['Max', 'L']), { profile: 'numeric-kernel' });
-m.run({ L: [1, 7, 3] }); // ➔ 7
-m.run({ L: [] });        // ➔ NaN
-
-const t = compile(
-  ce.box(['Function', ['Block', ['Tuple', ['Sum', 'P'], ['Product', 'P']]],
-    ['Typed', 'P', "'tuple<real, real>'"]]),
-  { profile: 'numeric-kernel' }
-);
-t.run([3, 4]); // ➔ [7, 12]
-
-const stones = compile(
-  ce.box(['Function',
-    ['Block', ['Comprehension', 'k',
-      ['Element', 'k', ['Range', 1, ['Length', 'B']], ['Equal', ['At', 'B', 'k'], 'p']]]],
-    ['Typed', 'B', "'list<integer>'"], ['Typed', 'p', "'integer'"]]),
-  { profile: 'numeric-kernel' }
-);
-stones.run([1, 0, 1, -1], 1); // ➔ [1, 3]
-```
-
-A list of lists, a list or a tuple of booleans or of complex numbers,
-`Power` or a function of a list (`L^2`, `sin(L)`), arithmetic on a tuple,
-`First`, `Last`, `Count` and a captured list decline. A fold that the
-ordinary compiler writes as a complex value declines too: the fold of an
-expression whose type is not real (`Sum(I/2.5)`), and in the `complex`
-mode the `Sum` or `Product` of a local list. So does a product or a
-quotient with the call of a user function that has a list argument, whose
-type admits a list and a number (`10·(2/f(L))`).
-
-The result reports two facts about the compiled program:
-
-- `pure`: two calls, with any arguments, give the same results whether they
-  run one after the other or at the same time in two workers, and a call
-  changes nothing that the host can observe. A list argument is only read.
-- `shippable`: the code can run on a worker of the kernel pool. Under the
-  profile, a function literal has this field too.
-
-Neither fact starts a parallel execution.
-
-The profile admits random draws: `Random()`, `Random` of an `Interval` or a
-`Range` whose bounds are number literals, `WithRandomSeed`, and calls of
-user functions whose body draws. The code draws the same numbers as the
-ordinary compiler, in the same order and the same number of times, and a
-compiled function called inside an interpreted `WithRandomSeed` draws from
-its frame. A draw makes the program not `pure`, unless it is inside a
-`WithRandomSeed`; a program that draws or seeds the random stream is not
-`shippable`. A draw in a comprehension declines, because the interpreter
-draws the elements of a comprehension when they are read. A program that
-draws more than once declines when one of its draws is in a complex value
-(`Random() + Sqrt(Random(Range(-2, 8, 2)))` in the `complex` mode), because
-the ordinary compiler evaluates a complex operand first. `RandomChoice`,
-`RandomSample`, `RandomShuffle` and `Random` of a domain with a variable
-decline too:
-
-```js
-const u = compile(ce.box(['Add', 'x', ['Random', ['Interval', -1, 1]]]), {
-  profile: 'numeric-kernel',
-});
-u.pure;      // ➔ false
-u.shippable; // ➔ false
-
-const s = compile(ce.box(['WithRandomSeed', 42, ['Add', 'x', ['Random']]]), {
-  profile: 'numeric-kernel',
-});
-s.pure;          // ➔ true
-s.shippable;     // ➔ false
-s.run({ x: 1 }); // ➔ 1.7367300395263547, at each call
-```
-
-A parameter or a free symbol with no declared type is a real number in the
-`strict` mode and a complex number in the `complex` mode. The result lists
-these names in `defaultedSymbols`, so that you can find a name you did not
-mean to leave undeclared. Declare a name that is a list, a boolean or an
-integer (a loop bound, an index), or call `ce.infer()` before `compile()`.
-
-`ce.infer()` declares each free symbol of the expressions you give it with
-the type that they require of it, and the profile reads that type as a
-declared type. So does a type that `ce.assume()` writes (`x > 0` gives `x`
-the type `real<0<..>`), and the type of a value assigned with `ce.assign()`.
-Boxing, evaluating or compiling an expression writes no type, so the type
-of a name does not depend on what you boxed before:
-
-```js
-ce.infer([ce.box(['Mod', 'v', 2])]); // `v` is real
-const k = compile(ce.box(['Sin', 'v']), {
-  profile: 'numeric-kernel',
-  mode: 'complex',
-});
-k.code;             // ➔ "Math.sin(_.v)"
-k.defaultedSymbols; // ➔ undefined
-```
-
-The same rule applies to a user function with no declared signature that
-the code calls: a parameter with no type is a real number in the `strict`
-mode and a complex number in the `complex` mode, and the result has the type
-of the body. A call with an argument of another type (a list, a boolean, a
-complex value in the `strict` mode) declines. `defaultedSymbols` lists the
-name of the function:
-
-```js
-ce.parse('f(t) := t^2 + 1').evaluate();
-const g = compile(ce.box(['Function', ['Block', ['f', 'x']], 'x']), {
-  profile: 'numeric-kernel',
-});
-g.defaultedSymbols; // ➔ ["x", "f"]
-g.run(3);           // ➔ 10
-```
-
-A name declared `number` (an input, a parameter, a parameter of a user
-function) has the type it has in the ordinary compiler: a real number in the
-`strict` mode, a complex number in the `complex` mode, where the code
-accepts a number or a complex value for an input or a parameter. A name
-declared a union of a real type with `nan` or `signed_infinity` is a real
-number in both modes. A user function declared with the result `number`
-returns the type of its body, and a name declared `number` whose value is a
-number is captured as that number. `defaultedSymbols` does not list these
-names, since their type is declared:
-
-```js
-ce.declare('w', 'number');
-const n = compile(ce.box(['Sin', 'w']), {
-  profile: 'numeric-kernel',
-  mode: 'complex',
-});
-n.code;                        // ➔ "_SYS.csin(_SYS.cplx(_.w))"
-n.run({ w: { re: 0, im: 1 } }); // ➔ { re: 0, im: 1.1752011936438014 }
-n.run({ w: 2 });               // ➔ 0.9092974268256817
-n.defaultedSymbols;            // ➔ undefined
-```
-
-A program outside the profile declines with the diagnostic code
-`outside-profile`. The diagnostic names the first node outside the profile:
-its head in `operator`, or a name in `binding`. The `fallback` option applies
-as for any other decline, and the ordinary compiler is never used for a part
-of the program.
-
-```js
-ce.declare('L', 'list<real>');
-const d = compile(ce.box(['RandomChoice', 'L', 2]), {
-  profile: 'numeric-kernel',
-});
-d.success;    // ➔ false
-d.diagnostic; // ➔ { code: "outside-profile", kind: "capability",
-              //     message: "Could not compile with the profile 'numeric-kernel': unsupported head RandomChoice",
-              //     operator: "RandomChoice", value: "RandomChoice(L, 2)" }
-```
-
-`canCompile()` answers for the profile with the same options: `ok: true`
-exactly when `compile()` gives code, with `pure` and `shippable`, and
-otherwise the diagnostic that `compile()` gives. It runs the whole
-compilation, so it costs as much as `compile()`.
-
-```js
-canCompile(ce.box(['Add', 'x', ['Sin', 'x']]), { profile: 'numeric-kernel' });
-// ➔ { ok: true, pure: true, shippable: true }
-```
-
-Under the profile:
-
-- `cse` and `constantFold` are ignored: the structured compiler does neither.
-- The modes are `strict` and `complex`.
-- The options `vars`, `functions`, `operators`, `imports` and `preamble`
-  give the code of the ordinary compiler. The functions of the host run the
-  same number of times, in the same order, on both compilers:
-  - A `vars` entry that reads the vars object under another name
-    (`u: '_.w'`) makes the name an input.
-  - Another source that is one operand (a name, a call, a member access, an
-    expression in parentheses: `t: 'next()'`) is read once at each
-    occurrence of the name. The result is then neither `pure` nor
-    `shippable`.
-  - A call of a `functions` entry, or of an `operators` entry whose operator
-    is a name, is a call of the host. It is `pure` only when the entry is
-    declared pure (`{ source, pure: true }`). The result is never
-    `shippable`, because a worker does not have the function.
-  - `imports` and `preamble` work as on the ordinary compiler. A preamble
-    that is not blank runs on every call, so the result is not `pure`.
-- `broadcast` is ignored: the result has no `batch`, and the values are those
-  of `broadcast: false`.
-- These decline with `outside-profile`, each with a message that names the
-  cause:
-  - the function form of `operators`, and an infix `operators` entry;
-  - an entry for an operator or a constant of the library
-    (`functions: { Sin: … }`);
-  - a `vars` source that is not one operand (`'Math.PI / 4'`);
-  - a read or a call of the host in the `complex` mode;
-  - a `functions` source that is not a name, a dotted path of names or a
-    function expression with a pure arithmetic body (`'_.getTransform()'`):
-    the ordinary compiler evaluates it before the arguments;
-  - a source with a line terminator or a comment;
-  - a `Sum` or a `Product` that calls a function declared pure (the
-    ordinary compiler skips such calls after a sum of `NaN`);
-  - `mode: 'bigint'`.
-- An empty object of `functions`, `operators` or `vars` is the same as an
-  absent option.
-
-```javascript
-ce.declare('x', 'real');
-ce.declare('f', '(real, real) -> real');
-const r = compile(ce.box(['Add', ['f', 'x', 1], 1]), {
-  profile: 'numeric-kernel',
-  functions: { f: { source: 'Math.hypot', pure: true } },
-});
-r.code;      // ➔ "(() => { const _tv1 = Math.hypot(_.x, 1); return _tv1 + 1; })()"
-r.pure;      // ➔ true
-r.shippable; // ➔ false
-r.run({ x: 3 }); // ➔ 4.16227766016838
-```
-- A program of more than 100,000 operations declines with
-  `outside-profile`, also one with no repeated subexpression (a sum of
-  30,000 terms `sin(x + c)`); the diagnostic names no node.
-- With another target than `javascript`, or in the `compile()` method of a
-  target object (`new JavaScriptTarget().compile(expr, { profile })`), the
-  option is an error, thrown whatever `fallback` says.
-
-The profile is experimental: the list of what it admits will grow, and its
-options can change.
 
 ### Constant Folding
 
@@ -14497,6 +14432,13 @@ such a name declines, only the message names it.
 
 ### Inputs With No Type and Values With No Settled Shape
 
+Program and Block locals keep the contracts established during preparation.
+Runtime writes cannot give an unknown local, or an empty unannotated list's
+elements, a known static type. Supply annotations when compilation needs that
+information. Declarations without an initializer conservatively decline
+compilation, including a declaration followed by a straight-line initialization;
+that form remains valid for interpreted execution.
+
 Compiled code settles the shape of every value (a number, a complex number, a
 string, a list, a point or a matrix) at compile time, and does not test it at
 run time. Two declines follow from this rule. Both occur on every target, and
@@ -14562,8 +14504,8 @@ declines, and compiles after `ce.declare('N', 'real')`.
   shape: `Block(p ≔ [1, 2]; p ≔ [1, 2, 3]; p)` compiles. A declared type that
   is a union of shapes (`real | list<real>`) compiles with one body per
   member.
-- Arithmetic over a symbol declared `any` or `value`, on the `javascript`,
-  `python` and `interval-js` targets. Such a symbol can hold a number or a list.
+- Arithmetic over a symbol declared `any` or `value`, on the `javascript` and
+  `interval-js` targets. Such a symbol can hold a number or a list.
   `(t: any) ↦ 2t` declines, and `unsupported` holds `t`. With the fallback, the
   interpreter gives `[2, 4]` for `[1, 2]`. Declare the shape, such as `real` or
   `list<real>`, to compile it.
@@ -14605,6 +14547,121 @@ body per member. With `y: real | tuple<real, real>`, `f(y)` compiles to
 `Array.isArray(y) ? f_point(y) : f(y)`, and gives `6` for `y = 3` and
 `[2, 4]` for `y = [1, 2]`. To avoid the test, declare one shape, or compile
 one function for each shape.
+
+### Which Definitions the Compiled Code Reads
+
+A compilation reads each name from the scope the expression was boxed in,
+as `evaluate()` does. A declaration of the same name in a scope that is
+pushed later does not change the compiled code:
+
+```js
+ce.declare("x", "real");
+ce.declare("a", "real");
+ce.assign("a", 10);
+const expr = ce.parse("x + a");
+
+ce.pushScope();
+ce.declare("a", "real");
+ce.assign("a", 1);
+
+compile(expr).run({ x: 2 });
+// ➔ 12
+
+compile(ce.rebind(expr)).run({ x: 2 });
+// ➔ 3: `rebind()` gives the expression bound in the current scope
+```
+
+The same holds for a function that the expression calls: its body reads
+the names of the scope the function was defined in.
+
+An expression built from parts that were boxed in scopes that define a name
+differently has no single scope to compile in. Its compilation declines,
+with the name in `binding`, and the result falls back to the interpreter:
+
+```js
+const mixed = ce.function("Add", [expr, ce.parse("a")]);
+const result = compile(mixed);
+result.success;
+// ➔ false
+result.run({ x: 2 });
+// ➔ 13: the interpreter reads 10 for the first `a` and 1 for the second
+```
+
+Box the expression in one scope, or bind it again with `ce.rebind()`.
+
+#### Naming the Inputs: the `symbolic` Option
+
+A symbol that holds a value is folded into the compiled code. To keep it as
+an input, name it in the `symbolic` option. The name is then an input
+wherever the compilation reads it, also inside the functions that the
+expression calls, and its value is supplied at each run:
+
+```js
+ce.declare("x", "real");
+ce.declare("a", "real");
+ce.assign("a", 4);
+ce.parse("f(x) := |a| x").evaluate();
+const expr = ce.parse("f(x) + a");
+
+compile(expr).run({ x: 2 });
+// ➔ 12: `a` is folded as 4
+
+compile(expr, { symbolic: ["a"] }).run({ x: 2, a: -3 });
+// ➔ 3: `a` is an input, in the expression and in the body of `f`
+```
+
+The symbol needs a declared type (`ce.declare("a", "real")`). A symbol
+whose type was only inferred from an assigned value makes the compilation
+decline. Use `vars` when the input must have a given spelling in the
+emitted code.
+
+#### Giving the Types of the Inputs: the `inputs` Option
+
+The `inputs` option names the inputs and gives their types at the call. No
+declaration is needed, and nothing is declared after the call:
+
+```js
+ce.parse("g(t) := t x").evaluate();
+const expr = ce.parse("g(2) + x");
+
+compile(expr, { inputs: { x: "real" } }).run({ x: 3 });
+// ➔ 9: `x` is an input in the expression and in the body of `g`
+```
+
+The given type wins over a declaration and over a stored value, for that
+compilation only:
+
+```js
+ce.declare("x", "real");
+ce.assign("n", ce.parse("[1, 2, 3]"));
+const row = ce.parse("n x");
+
+compile(row, { inputs: { n: "real" } }).run({ n: 2, x: 5 });
+// ➔ 10: `n` is one number here, not the stored list
+```
+
+The expression keeps the canonical form it was boxed with, so give a type
+that is the type the name had when the expression was boxed, or a subtype of
+it (`list<real>` for a list, a range for `real`). A rewrite that was right
+for the type at boxing is not undone by a wider type:
+
+```js
+ce.declare("x", "real");
+ce.declare("k", "integer");
+const power = ce.parse("(x^2)^k");
+power.json;
+// ➔ ["Power", "x", ["Multiply", 2, "k"]]: right for an integer `k`
+
+compile(power, { inputs: { k: "real" } }).run({ x: -3, k: 0.5 });
+// ➔ -3, and (x^2)^k is 3: the rewrite is wrong for k = 0.5
+```
+
+For a wider type, parse the expression in a scope that declares the name
+with that type.
+
+A name of `inputs` that a function of the expression reads as a constant is
+not an input: the compilation declines, and `diagnostic.binding` is the name.
+Compile again without the name to read the constant.
 
 ### Supplying Inputs
 
@@ -14665,11 +14722,6 @@ scalar or a list, such as the result of a call whose return type is
   more possibly-list operands (a run-time matrix would require the matrix
   product, not an element-wise one), `Equal`/`NotEqual` over a possibly-list
   operand, and complex-element broadcasts.
-- **Python**: arithmetic over a possibly-list operand always fails closed —
-  Python's `*` and `+` repeat or concatenate a plain `list` rather than
-  broadcasting, so scalar code would silently compute the wrong value.
-  Function heads that lower to NumPy calls (`np.sin`, …) are unaffected —
-  NumPy broadcasts natively.
 - **GLSL**: such operands compile as scalar slots, unchanged — the shader
   target has no dynamic lists.
 
@@ -14744,8 +14796,7 @@ time`.
 The integer operations `Mod`, `Remainder`, `GCD` and `LCM` use the same
 convention for magnitude. Compiled code works in doubles, so an operand beyond
 the safe integer range (±2^53) or an infinity throws a `RangeError` that names
-the operation and the value, instead of returning a different number. The
-Python target raises a `ValueError` with the same message. The `Mod(x, 1)`
+the operation and the value, instead of returning a different number. The `Mod(x, 1)`
 fractional-part forms are not checked. A plot kernel that samples
 `Mod(1/x, 2)` at `x = 0` throws at that sample. A constant operand is folded
 from the exact value, so `DigitSum(2^1000)` compiles to `1366`.
@@ -14863,7 +14914,7 @@ f.run(5);      // ➔ 5
 f.run(NaN);    // ➔ NaN
 ```
 
-Inside compiled code, every target (JavaScript, Python, GLSL and
+Inside compiled code, every target (JavaScript, GLSL and
 interval-js) adds the default value to each call that leaves the argument out
 when the expression is compiled. With
 `g = (k: real = 2) ↦ k + 1`, `g()` compiles to `3`. With `L: list<real>`,
@@ -14971,8 +15022,8 @@ expressions compile to arrays.
 
 ### Dictionary Expressions
 
-A dictionary compiles to a JavaScript object literal, or a Python `dict`, with
-each value compiled. Each evaluation returns a new object:
+A dictionary compiles to a JavaScript object literal, with each value
+compiled. Each evaluation returns a new object:
 
 ```js
 const f = compile(ce.box([
@@ -15020,7 +15071,7 @@ answers `Missing` for the same input — the absence marker has no value in the
 target's floating-point model, so it projects to `NaN`. See
 [Non-Finite Results](#non-finite-results). A selection whose arms are all
 provably not numbers — strings, lists — answers the target's missing-object
-literal instead, `undefined` in JavaScript and `None` in Python, so that
+literal instead, `undefined` in JavaScript, so that
 `IsMissing` and `Coalesce` work on a compiled string selection; an arm whose
 type is unknown counts as a number. Under a list of conditions, a position
 that no clause selects is `NaN` for a number and `[NaN, NaN]` for a point,
@@ -15039,7 +15090,7 @@ of places in compiled code:
 
 - **where it is produced**: the producer gives `NaN` for a numeric result, a
   point of `NaN` coordinates (`[NaN, NaN]`) for a point, and the target's absent
-  object (`undefined` in JavaScript, `None` in Python) otherwise;
+  object (`undefined` in JavaScript) otherwise;
 - **where it is moved without computation**: `At`, `First`, `Last`, `Rest`,
   `Length`, `Reverse`, and the binding of a `Map` callback parameter keep the
   hole in its position (`Length([1, Missing])` is 2 everywhere);
@@ -15051,8 +15102,8 @@ of places in compiled code:
 
 Every other operator applied to an absent operand gives the target's own
 value, and nothing is promised about it or about anything computed from it:
-`undefined + 1` is `NaN`, `undefined > 0` is `false`, `undefined[0]` throws,
-and Python's `None + 1` is a `TypeError`. The interpreter keeps its own
+`undefined + 1` is `NaN`, `undefined > 0` is `false`, and `undefined[0]`
+throws. The interpreter keeps its own
 propagation (`Missing + 1` is `Missing`, `Missing > 0` is `False`), so a program
 that computes on an absent value before discharging it can give one value in
 the interpreter and another when compiled. Discharge first:
@@ -15127,8 +15178,7 @@ a write, for example `ys = xs` in the loop or a function literal that reads
 `xs`. Each pass of the loop then copies the whole list, and the result reports
 it in `warnings`, with the code `'copying-list-update'` and the name of the
 local in `binding`. The code does not change. An update that is not in a loop,
-which copies once, is not reported; nor is the Python target, which always
-copies a block local.
+which copies once, is not reported.
 
 ```live
 // import { compile } from '@cortex-js/compute-engine';
@@ -15256,12 +15306,13 @@ The serializer writes such a `Block`, and every single-branch `If`, with
 `where`: `ce.parse("x^2\\{x>0\\}+1").latex` is
 `x^2+1\text{ where }0\lt x`.
 
-A local has a value from its declaration: `Declare(x, type, v)`, or the first
-assignment of the name at the level of the block. A `Declare` with no value,
-a first assignment in a branch or in a loop body, and a read of a local before
-its declaration are static errors (`declaration-without-value`,
-`first-assignment-in-branch`, `read-before-declaration`), so the compilation
-declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
+A local has a value from its declaration: `Declare(x, type, v)`, or, in
+LaTeX, the first assignment of the name at the level of the block, which
+parses as a `Declare`. A `Declare` with no value, a `Declare` in a branch or in
+a loop body, an `Assign` to a name that no scope declares, and a read of a
+local before its declaration are static errors (`declaration-without-value`,
+`declaration-below-statement`, `assignment-to-undeclared-variable`,
+`read-before-declaration`), so the compilation declines. An assignment is a statement, never an operand: `f(a \coloneq 2)` is
 the error `assignment-in-operand`. A later assignment must keep the type of the
 local, or it is the error `assignment-type-mismatch`.
 
@@ -15969,7 +16020,6 @@ The Compute Engine comes with these compilation targets:
 
 - **`javascript`** (default) - Compiles to executable JavaScript functions
 - **`glsl`** - Compiles to GLSL (OpenGL Shading Language) for WebGL shaders
-- **`python`** - Compiles to Python/NumPy code for scientific computing (requires registration)
 - **`interval-js`** - Compiles to JavaScript using interval arithmetic for reliable function plotting
 - **`interval-glsl`** - _(Deprecated)_ Compiles to GLSL using interval arithmetic for GPU-based plotting
 
@@ -16034,6 +16084,17 @@ code, without writing any. It takes the options of `compile()` and answers
 the fragment. The diagnostic has the code `outside-fragment`, the operator
 of that node in `operator`, or the name of a symbol in `binding`. It never
 throws.
+
+`canCompile` is also exported by the main package, beside `compile`, where
+it takes a LaTeX string, a MathJSON expression or an expression, as the
+free function `compile` does:
+
+```javascript
+import { canCompile } from '@cortex-js/compute-engine';
+
+canCompile('\\sin(x) + x^2', { to: 'glsl' });
+// ➔ { ok: true }
+```
 
 ```javascript
 import { ComputeEngine } from '@cortex-js/compute-engine';
@@ -16158,9 +16219,7 @@ The answer depends only on the expression, the options and the declarations
 that the expression reaches (the types of its symbols, the definitions of the
 functions it calls). A program can keep it until one of those declarations
 changes. Only the `glsl` target has a fragment: for another target,
-`canCompile()` answers `ok: false`, and the program calls `compile()`. The
-exception is `javascript` with the option `profile: 'numeric-kernel'` (see
-"The `numeric-kernel` Profile (Experimental)").
+`canCompile()` answers `ok: false`, and the program calls `compile()`.
 
 **A limit on the loops of a shader.** A shader cannot throw, and a loop with
 a large bound can stop the GPU long enough for the browser to lose the WebGL
@@ -16225,92 +16284,70 @@ variable, a list literal or a computed list, the function still has no
 shader definition: the compilation declines, unless it can fold or inline
 the call.
 
-### Python/NumPy Target
+### Inputs That Are Local to Your Shader Code: the `callerLocals` Option
 
-The Compute Engine includes a complete Python/NumPy compilation target for
-scientific computing. The full package entry registers it as `python` with its
-default options; register your own instance to change the options, or to add
-it to an engine made from `@cortex-js/compute-engine/core`, where it is not
-bundled:
+A user-defined function is emitted as a shader function in the preamble, at
+file scope. When its body reads an input of the expression, the shader
+function names that input:
 
 ```javascript
-import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
+ce.declare('x', 'real');
+ce.declare('y', 'real');
+ce.parse('g(u) := u + x').evaluate();
+const r = compile(ce.parse('g(1)'), { to: 'glsl' });
+// r.code: "_fn_g(1.0)"
+// r.preamble:
+// float _fn_g(float u) {
+//   return u + x;
+// }
+```
 
-const ce = new ComputeEngine();
+This works when `x` is a global of your shader (a uniform). It does not when
+you place the code in a function of your own, such as
+`float userFn(float x, float y) { … }`: `x` is then a parameter of `userFn`,
+and `_fn_g` cannot see it.
 
-// Register the Python target with NumPy support
-ce.registerCompilationTarget(
-    'python', new PythonTarget({ includeImports: true })
-);
+The `callerLocals` option names the symbols that are local to the code that
+runs the compiled expression. A shader function that reads one of them,
+directly or through a shader function it calls, takes it as a parameter after
+its own, and each call passes it:
 
-// Compile expressions to Python/NumPy code
-const f = compile("\\sin(x) + \\cos(y)", { to: 'python' });
-console.log(f.code);
-// → import numpy as np
+```javascript
+ce.parse('h(x) := g(x) \\cdot y').evaluate();
+const r = compile(ce.parse('h(3)'), {
+  to: 'glsl',
+  callerLocals: ['x', 'y'],
+});
+// r.code: "_fn_h(3.0, x, y)"
+// r.preamble:
+// float _fn_g(float u, float _in_x) {
+//   return u + _in_x;
+// }
 //
-//   np.sin(x) + np.cos(y)
+// float _fn_h(float x, float _in_x, float _in_y) {
+//   return _in_y * _fn_g(x, _in_x);
+// }
 ```
 
-#### Generating Python Functions
+- The entries are symbol names, not shader text. A call in the code passes
+  the `vars` source of the name when there is one (`vars: { x: 'p.x' }`
+  gives `_fn_g(1.0, p.x)`), and the name otherwise.
+- The added parameters follow the function's own, in the sorted order of the
+  symbol names. They depend on the function and the option only, so two
+  compilations with the same option emit the same text for the same function.
+- A name that is not in the option is read by its name, as before. With the
+  option absent or empty, the emitted text does not change. The other
+  targets ignore the option.
+- A variable bound in the expression does not reach into the body of a
+  function. In `\sum_{x=1}^{300} (x + g(x))` the `x` that `g` reads is the
+  input, so the code copies the input to a temporary before the loop
+  (`float _tv2 = x;`) and passes the temporary. The code is then a list of
+  statements that ends with a `return`.
 
-The `PythonTarget` can generate complete Python functions:
-
-```javascript
-import { PythonTarget } from '@cortex-js/compute-engine';
-
-const python = new PythonTarget({ includeImports: true });
-
-const func = python.compileFunction(
-  "\\sqrt{x^2 + y^2}",
-  'euclidean_distance',
-  ['x', 'y'],
-  'Calculate Euclidean distance between two points'
-);
-
-console.log(func);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def euclidean_distance(x, y):
-    """Calculate Euclidean distance between two points"""
-    return np.sqrt(x ** 2 + y ** 2)
-```
-
-#### Use Cases
-
-The Python target is ideal for:
-
-- **Scientific Computing**: Generate NumPy code for numerical analysis
-- **Machine Learning**: Create feature engineering functions
-- **Data Analysis**: Convert formulas to Pandas/NumPy operations
-- **Education**: Show Python equivalents of mathematical notation
-- **Code Generation**: Automated function creation from LaTeX
-
-#### Lambda Functions
-
-Generate Python lambda expressions:
-
-```javascript
-const lambda = python.compileLambda("x^2 + 2x + 1", ['x']);
-console.log(lambda);
-// → lambda x: x ** 2 + 2 * x + 1
-```
-
-#### Supported Functions
-
-The Python target maps to NumPy functions:
-
-- **Trigonometric**: `sin` → `np.sin`, `cos` → `np.cos`, etc.
-- **Exponential**: `exp` → `np.exp`, `ln` → `np.log`
-- **Power**: `x^n` → `x ** n`, `sqrt` → `np.sqrt`
-- **Statistics**: `sum` → `np.sum`, `mean` → `np.mean`
-- **Linear Algebra**: `dot` → `np.dot`, `cross` → `np.cross`
-
-For complete documentation, see the [Python Target Guide](https://cortexjs.io/compute-engine/guides/python-target/).
+The compilation declines when a shader function reads a caller local that has
+no GLSL value type (only scalars, booleans, complex values and vectors of 2
+to 4 components have one), or when a call must pass a caller local whose
+`vars` source is not a read of a variable (`vars: { x: 'next()' }`).
 
 ### Interval Arithmetic Targets
 
@@ -16584,22 +16621,13 @@ For complete examples of custom targets including RPN (Reverse Polish Notation),
 
 ## Performance Benchmarks
 
-### JavaScript vs Python/NumPy
+### JavaScript Benchmarks
 
-To compare performance across compilation targets, the project includes benchmark scripts:
+To measure the performance of compiled code, the project includes a benchmark script:
 
 **JavaScript Benchmarks** (Node.js):
 ```bash
 npm run test compute-engine/compile-performance
-```
-
-**Python Benchmarks** (generated):
-```bash
-# Generate the Python benchmark script
-npm run test compute-engine/compile-python-generate
-
-# Run Python benchmarks (requires NumPy)
-python benchmarks/python-performance.py
 ```
 
 ### Expected Results
@@ -16609,12 +16637,10 @@ The benchmarks test the same mathematical expressions across different targets:
 | Target | Performance | Use Case |
 |--------|------------|----------|
 | **JavaScript Compiled** | 40-2900x faster than eval | CPU computation, real-time calculations |
-| **Python/NumPy** | Fast for arrays, some overhead for scalars | Scientific computing, data analysis |
 | **GLSL** | Massively parallel on GPU | Graphics, WebGL shaders |
 
 **Key Insights**:
 - JavaScript compilation is excellent for single-threaded CPU performance
-- Python/NumPy excels at vectorized array operations
 - GLSL enables GPU parallelism for millions of simultaneous operations
 
 ## Limitations
@@ -16666,471 +16692,6 @@ functions (basic math, trig, hyperbolic, gamma).
 
 When a target fails, callers should fall back to a more capable target (e.g.,
 GLSL → JavaScript, interval-js → JavaScript).
-
----
-
-# Python/NumPy Compilation Target
-
-Source: https://mathlive.io/compute-engine/guides/python-target/
-
-<Intro>
-The Python compilation target generates NumPy-compatible Python code from mathematical expressions, enabling seamless integration with scientific Python workflows.
-</Intro>
-
-## Overview
-
-The `PythonTarget` class compiles Compute Engine expressions to Python code that uses NumPy for numerical operations. The generated code is:
-- **Vectorized**: Works with both scalars and NumPy arrays
-- **Readable**: Clean, idiomatic Python code
-- **Efficient**: Leverages NumPy's optimized implementations
-- **Compatible**: Works with SciPy, Pandas, and other scientific Python libraries
-
-## Basic Usage
-
-```typescript
-import { ComputeEngine, PythonTarget } from '@cortex-js/compute-engine';
-
-const ce = new ComputeEngine();
-const python = new PythonTarget();
-
-// Compile a simple expression
-const expr = ce.parse('x^2 + y^2');
-const code = python.compile(expr);
-console.log(code); // "x ** 2 + y ** 2"
-```
-
-## Using with compile()
-
-To use the Python target with `compile()`, register it first:
-
-```javascript
-import { ComputeEngine, PythonTarget, compile } from '@cortex-js/compute-engine';
-
-const ce = new ComputeEngine();
-
-// Register the Python target (only need to do this once)
-ce.registerCompilationTarget('python', new PythonTarget({ includeImports: true }));
-
-// Now you can use it throughout your code
-const expr = ce.parse('\\sin(x) + \\cos(y)');
-const result = compile(expr, { to: 'python' });
-console.log(result.code);
-// → import numpy as np
-//
-//   np.sin(x) + np.cos(y)
-```
-
-## Features
-
-### 1. Expression Compilation
-
-Convert mathematical notation to Python code:
-
-```typescript
-const python = new PythonTarget();
-
-// Polynomial
-ce.parse('x^4 + 3x^3 + 2x^2 + x + 1');
-// → "x ** 4 + 3 * x ** 3 + 2 * x ** 2 + x + 1"
-
-// Trigonometric
-ce.parse('\\sin(x) + \\cos(y)');
-// → "np.sin(x) + np.cos(y)"
-
-// Square root
-ce.parse('\\sqrt{x^2 + y^2}');
-// → "np.sqrt(x ** 2 + y ** 2)"
-
-// Constants
-ce.parse('2\\pi r');
-// → "2 * np.pi * r"
-```
-
-### 2. Function Generation
-
-Generate complete Python functions:
-
-```typescript
-const python = new PythonTarget({ includeImports: true });
-
-const expr = ce.parse('\\sqrt{(x_2-x_1)^2 + (y_2-y_1)^2}');
-const func = python.compileFunction(
-  expr,
-  'euclidean_distance',
-  ['x_1', 'y_1', 'x_2', 'y_2'],
-  'Calculate Euclidean distance between two points'
-);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def euclidean_distance(x_1, y_1, x_2, y_2):
-    """Calculate Euclidean distance between two points"""
-    return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
-```
-
-### 3. Lambda Functions
-
-Create Python lambda expressions:
-
-```typescript
-const expr = ce.parse('x^2 + 2x + 1');
-const lambda = python.compileLambda(expr, ['x']);
-// → "lambda x: x ** 2 + 2 * x + 1"
-```
-
-### 4. Vectorized Functions
-
-Generate NumPy-vectorized functions:
-
-```typescript
-const expr = ce.parse('\\sin(x) * \\cos(x)');
-const func = python.compileVectorized(expr, 'trig_product', ['x']);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def _trig_product_scalar(x):
-    return np.sin(x) * np.cos(x)
-
-# Vectorized version
-trig_product = np.vectorize(_trig_product_scalar)
-```
-
-## Supported Functions
-
-### Trigonometric
-- `sin`, `cos`, `tan` → `np.sin`, `np.cos`, `np.tan`
-- `arcsin`, `arccos`, `arctan` → `np.arcsin`, `np.arccos`, `np.arctan`
-- `sinh`, `cosh`, `tanh` → `np.sinh`, `np.cosh`, `np.tanh`
-
-### Exponential & Logarithmic
-- `exp` → `np.exp`
-- `ln` → `np.log`
-- `log10` → `np.log10`
-- `log2` → `np.log2`
-
-### Power & Roots
-- `x^n` → `x ** n`
-- `sqrt` → `np.sqrt`
-- `power` → `np.power`
-
-### Rounding
-- `abs` → `np.abs`
-- `floor` → `np.floor`
-- `ceiling` → `np.ceil`
-- `round` → `_ce_round(x, rule)`, a helper written before the code, which
-  rounds a tie with the rule of `ce.roundingTies` at compile time; with the
-  rule `"to-even"`, `round` → `np.round`
-
-### Statistics
-- `sum` → `np.sum`
-- `mean` → `np.mean`
-- `median` → `np.median`
-- `std` → `np.std`
-
-### Linear Algebra
-- `dot` → `np.dot`
-- `cross` → `np.cross`
-- `norm` → `np.linalg.norm`
-- `det` → `np.linalg.det`
-- `inv` → `np.linalg.inv`
-
-## Configuration Options
-
-```typescript
-new PythonTarget({
-  includeImports: true,  // Add "import numpy as np" to output
-  useScipy: false        // Include scipy.special for advanced functions
-})
-```
-
-## Real-World Examples
-
-### Physics: Kinematic Equation
-
-```typescript
-const expr = ce.parse('u \\cdot t + \\frac{1}{2} a \\cdot t^2');
-const kinematics = python.compileFunction(
-  expr,
-  'position',
-  ['u', 'a', 't'],
-  'Position with initial velocity u, acceleration a, at time t'
-);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def position(u, a, t):
-    """Position with initial velocity u, acceleration a, at time t"""
-    return 0.5 * a * t ** 2 + t * u
-```
-
-### Mathematics: Quadratic Formula
-
-```typescript
-const expr = ce.parse('\\frac{-b + \\sqrt{b^2 - 4ac}}{2a}');
-const quadratic = python.compileFunction(
-  expr,
-  'quadratic_root',
-  ['a', 'b', 'c'],
-  'Calculate one root of a quadratic equation'
-);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def quadratic_root(a, b, c):
-    """Calculate one root of a quadratic equation"""
-    return (-b + np.sqrt(b ** 2 + -(4 * a * c))) / (2 * a)
-```
-
-### Statistics: Gaussian Function
-
-```typescript
-const expr = ce.parse('e^{-x^2}');
-const gaussian = python.compileFunction(
-  expr,
-  'gaussian',
-  ['x'],
-  'Unnormalized Gaussian function'
-);
-```
-
-Generates:
-
-```python
-import numpy as np
-
-def gaussian(x):
-    """Unnormalized Gaussian function"""
-    return np.e ** (-x ** 2)
-```
-
-## Use Cases
-
-### 1. Scientific Computing
-Generate NumPy code for numerical analysis and simulations:
-
-```python
-# Generated function works with arrays
-import numpy as np
-
-# ... generated function here ...
-
-x = np.linspace(0, 10, 100)
-y = gaussian(x)  # Vectorized operation
-```
-
-### 2. Machine Learning
-Create feature engineering functions:
-
-```typescript
-const expr = ce.parse('\\frac{x - \\mu}{\\sigma}');
-const normalize = python.compileFunction(expr, 'z_score', ['x', 'mu', 'sigma']);
-// Use in ML pipeline for feature normalization
-```
-
-### 3. Data Analysis
-Convert formulas to vectorized Pandas operations:
-
-```python
-import pandas as pd
-# Generated function
-def calculate_metric(x, y):
-    return np.sqrt(x ** 2 + y ** 2)
-
-# Use with DataFrames
-df['result'] = calculate_metric(df['col1'], df['col2'])
-```
-
-### 4. Education
-Show Python equivalents of mathematical notation:
-
-```typescript
-// Students see: ∑(xᵢ - μ)²/n
-const expr = ce.parse('\\frac{\\sum(x - \\mu)^2}{n}');
-const code = python.compile(expr);
-// Students learn: np.sum((x - mu) ** 2) / n
-```
-
-### 5. Code Generation
-Automated function creation from specifications:
-
-```typescript
-// Read formulas from config/database
-const formulas = loadFormulas();
-formulas.forEach(formula => {
-  const expr = ce.parse(formula.latex);
-  const code = python.compileFunction(expr, formula.name, formula.params);
-  writeToFile(`generated/${formula.name}.py`, code);
-});
-```
-
-## Integration Examples
-
-### With Jupyter Notebooks
-
-```python
-# Cell 1: Generated functions
-%load generated_functions.py
-
-# Cell 2: Use with data
-import numpy as np
-import matplotlib.pyplot as plt
-
-x = np.linspace(-5, 5, 1000)
-y = gaussian(x)
-
-plt.plot(x, y)
-plt.title('Generated Gaussian Function')
-plt.show()
-```
-
-### With SciPy
-
-```typescript
-// Generate function using SciPy special functions
-const python = new PythonTarget({ includeImports: true, useScipy: true });
-const expr = ce.parse('\\Gamma(x)');
-const code = python.compile(expr);
-// → Uses scipy.special.gamma
-```
-
-### Complete Pipeline
-
-```typescript
-// 1. Parse LaTeX from document
-const latex = extractLatexFromDocument('paper.tex');
-
-// 2. Compile to Python
-const python = new PythonTarget({ includeImports: true });
-const functions = latex.formulas.map(f =>
-  python.compileFunction(ce.parse(f.equation), f.name, f.variables)
-);
-
-// 3. Generate Python module
-const module = functions.join('\n\n');
-fs.writeFileSync('generated_math.py', module);
-
-// 4. Use in Python
-// from generated_math import *
-```
-
-## Comparison with Other Targets
-
-| Feature | JavaScript | GLSL | Python |
-|---------|-----------|------|--------|
-| **Execution** | Node.js/Browser | GPU (WebGL) | Python Runtime |
-| **Use Case** | CPU Computation | Graphics/Parallel | Scientific Computing |
-| **Output** | Executable Function | Shader Code (String) | Python Code (String) |
-| **Performance** | Fast (JIT) | Very Fast (Parallel) | Fast (NumPy/C) |
-| **Integration** | Direct in JS | WebGL Context | Import in Python |
-
-## Best Practices
-
-### 1. Choose the Right Target
-- **JavaScript**: Browser/Node.js execution, immediate use
-- **Python**: Scientific workflows, NumPy integration
-- **GLSL**: GPU parallel computation, graphics
-
-### 2. Handle Imports Properly
-```typescript
-// For standalone scripts
-const python = new PythonTarget({ includeImports: true });
-
-// For modules (import at top of file separately)
-const python = new PythonTarget({ includeImports: false });
-```
-
-### 3. Vectorization
-Generated functions work with both scalars and arrays:
-
-```python
-# Scalar
-result = euclidean_distance(1, 2, 4, 6)  # Single value
-
-# Arrays (element-wise)
-x1 = np.array([1, 2, 3])
-y1 = np.array([1, 2, 3])
-x2 = np.array([4, 5, 6])
-y2 = np.array([4, 5, 6])
-result = euclidean_distance(x1, y1, x2, y2)  # Array of distances
-```
-
-### 4. Type Safety
-Remember that generated Python code is untyped. Add type hints manually if needed:
-
-```python
-def euclidean_distance(x_1: float, y_1: float, x_2: float, y_2: float) -> float:
-    return np.sqrt((x_2 - x_1) ** 2 + (y_2 - y_1) ** 2)
-```
-
-## Non-Finite Values
-
-The engine tells the signed infinities $+\infty$ and $-\infty$ apart from
-complex infinity $\tilde\infty$, and both from `NaN`. NumPy floats have only
-`np.inf`, `-np.inf` and `np.nan`, so the generated code carries a **projection**
-of the interpreted value:
-
-```typescript
-const python = new PythonTarget();
-
-python.compile(ce.parse('\\infty'));   // → "np.inf"
-python.compile(ce.parse('-\\infty'));  // → "-np.inf"
-python.compile(ce.box(NaN));           // → "np.nan"
-```
-
-The signed infinities and `NaN` survive the trip unchanged. Complex infinity
-does not: it has no direction, and there is no NumPy float that means "infinite
-magnitude, direction unknown", so it projects onto `np.inf`. That is what you
-see at a pole, where the interpreter answers $\tilde\infty$ but the folded
-constant is positive:
-
-```typescript
-python.compile(ce.parse('\\frac{1}{0}'));  // → "np.inf"
-python.compile(ce.parse('\\ln(0)'));       // → "-np.inf"   (genuinely signed)
-```
-
-Absence markers project the same way. An unmatched `cases` expression evaluates
-to `Missing` in the interpreter, which is not a number; the generated Python
-falls through to `float('nan')`:
-
-```typescript
-python.compile(ce.parse('\\begin{cases} x^2 & x > 0 \\\\ -x & x < 0 \\end{cases}'));
-// → "((x ** 2) if (0 < x) else ((-x) if (x < 0) else float('nan')))"
-```
-
-Keep the projection in mind when reading a type off an expression before
-compiling it. Every bare numeric type name — `integer`, `real`, `complex` —
-denotes a **finite** value, so a symbol typed `real` never stands for `np.inf`;
-the non-finite values belong to the separate `infinity` and `nan` types.
-
-## Limitations
-
-1. **Not Executable in JavaScript**: Python code must be run in a Python environment
-2. **Type Information Lost**: Generated code is untyped (can add hints manually)
-3. **Some Simplifications**: Expressions are canonicalized (e.g., `x/2` → `0.5 * x`)
-4. **Requires NumPy**: Most functions need NumPy to be installed
-5. **Complex Infinity Is Flattened**: $\tilde\infty$ compiles to `np.inf` — see
-   [Non-Finite Values](#non-finite-values)
-
-## See Also
-
-- [Compiling Expressions Guide](/compute-engine/guides/compiling/)
-- [Custom Compilation Targets](/compute-engine/guides/compiling/#plugin-architecture-registering-custom-targets)
 
 ---
 
@@ -18908,6 +18469,41 @@ Matrix multiplication is **not commutative** — operand order is preserved, and
 `vector·vector` product reduces to the dot product. For detailed information,
 see the [Matrix Multiplication](#matrix-multiplication) section below.
 
+The order is preserved when the engine knows that an operand is a matrix: a
+matrix literal, a symbol declared as a matrix, or a symbol that holds a matrix
+when the expression is created. A symbol with no type is read as a number,
+and a product of numbers is put in a standard order. So declare the symbols of
+a matrix expression, or use `MatrixMultiply`, when the expression is created
+before the symbols get their values:
+
+```js example
+const A = ['List', ['List', 1, 2], ['List', 3, 4]];
+const B = ['List', ['List', 0, 1], ['List', 1, 0]];
+
+// `p` and `q` have no type: the product is ordered as a product of numbers
+const e = ce.expr(['Multiply', 'q', 'p']);
+e.json;
+// → ["Multiply", "p", "q"]
+ce.assign('p', ce.expr(A));
+ce.assign('q', ce.expr(B));
+e.evaluate();
+// → [[2,1],[4,3]]  (this is p·q; q·p is [[3,4],[1,2]])
+
+// Declared as matrices: the order is kept
+ce.declare('r', 'matrix');
+ce.declare('s', 'matrix');
+ce.expr(['Multiply', 's', 'r']).json;
+// → ["Multiply", "s", "r"]
+
+// `MatrixMultiply` keeps the order of symbols with no type
+ce.expr(['MatrixMultiply', 'q', 'p']).evaluate();
+// → [[3,4],[1,2]]
+```
+
+The same holds for the parameters of a function: `(A, B) ↦ A * B - B * A`
+with no parameter types is a function of two numbers, and gives the zero
+matrix for two matrices. Write `(A: matrix, B: matrix) ↦ A * B - B * A`.
+
 ## LaTeX Matrix Notation
 
 The Compute Engine supports standard LaTeX matrix environments. Here's a quick
@@ -20188,7 +19784,7 @@ Source: https://mathlive.io/math-json/
 import Mathfield from '@site/src/components/Mathfield';
 import ConsoleMarkup from '@site/src/components/ConsoleMarkup';
 import {useState, useEffect} from 'react';
-import {BrowserOnly} from '@docusaurus/BrowserOnly';
+import BrowserOnly from '@docusaurus/BrowserOnly';
 import ErrorBoundary from '@site/src/components/ErrorBoundary';
 
 export function setupComputeEngine() {
@@ -20410,6 +20006,19 @@ the following differences:
   A repeating-decimal number boxes to the exact `["Rational", …]` it represents
   (for example `{ "num": "0.(3)" }` boxes to `["Rational", 1, 3]`), rather than
   a truncated decimal float.
+
+- A string with no decimal point represents an exact integer, also when it has
+  an exponent: `{ "num": "7e+60" }` is the integer 7 followed by 60 zeros. The
+  Compute Engine writes a large integer this way when it ends with more than
+  five zeros. The JavaScript `BigInt()` constructor does not accept an
+  exponent; the function `bigint()` of `@cortex-js/compute-engine/numerics`
+  does, and returns `null` for a string that is not an integer:
+
+```js
+import { bigint } from '@cortex-js/compute-engine/numerics';
+bigint('184763904e+8');   // 18476390400000000n
+bigint('1.5e+20');        // null
+```
 
 - The following characters in a string representing a number are ignored:
 
@@ -21438,6 +21047,34 @@ contextStack: readonly EvalContext[];
 
 <MemberCard>
 
+##### ComputeEngine.\_delegatedEvaluations {#_delegatedevaluations-1}
+
+```ts
+_delegatedEvaluations: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.macroNames {#macronames-1}
+
+```ts
+readonly macroNames: ReadonlySet<string>;
+```
+
+The names that were declared as a macro on this engine
+(`ce.declare(name, { macro })`), in any scope. The set never shrinks: a
+name stays in it after the scope of its declaration is popped, and after
+a later declaration of the name that is not a macro. So a name that is
+not in the set is not a macro in any scope, and a name that is in the set
+may be one: `ce.lookupDefinition(name)` gives the definition that the
+current scope reads. The set of an engine with no macro is empty.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.timeRemaining {#timeremaining-1}
 
 ```ts
@@ -21757,94 +21394,6 @@ recomputed at each precision change.
 
 <MemberCard>
 
-##### ComputeEngine.checkpoint() {#checkpoint-1}
-
-```ts
-checkpoint(label?): EngineCheckpoint
-```
-
-Take a checkpoint of the engine's state at a quiescent point — between
-statements, at any scope depth — so a later [restore](#restore) can rewind
-to it. Legal on a freshly constructed engine, which is how a client gets
-a `cp[0]` covering an edit of the first cell, and inside a host-pushed
-scope, which is how a notebook takes per-cell checkpoints within a pass.
-A checkpoint taken inside a scope dies when that scope pops. Throws a
-`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
-[restore](#restore) additionally requires the same scope stack the
-checkpoint was taken on.
-
-####### label?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.restore() {#restore-1}
-
-```ts
-restore(cp): void
-```
-
-Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again.
-
-The definitions that existed when `cp` was taken are rewritten in place,
-and the version counters advance, so every expression that reads them,
-whether it was built before or during the rewound window, reads the
-restored state afterwards and its cached answers are computed again.
-The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
-affected, with one exception: the fields of a mutable object are
-rewound in place, so the `json` and `digest` of that object, and of
-every expression that holds it, can change.
-
-The definitions CREATED during the window are removed from their scope
-and disposed. This includes a symbol that was declared or assigned for
-the first time there, and a free symbol that was boxed for the first
-time there (boxing declares it). An expression built during the window
-that names such a symbol keeps the disposed definition, and the symbol
-is inert: it reads no value and counts as unknown (`unknowns`, a
-compile reads it as an input), also after a later declaration or
-assignment of the same name, and its type is the one its record had
-before the declaration (usually `unknown`). The index of a `Sum` and the
-locals of a `Block` built during the window are not affected: they
-still take their values when the expression runs. Nor is a symbol
-declared in a scope that is not on the scope chain when `restore()`
-runs (a scope pushed and popped during the window): it still resolves
-by name, so it reads a later declaration of the same name in that scope
-with its old type (ROADMAP CE-590). `isSame` with the
-same expression built after the
-restore is false. Do not keep such an expression: build it again to
-read the new definition, and cache a cell output as a serialized
-artifact rather than as a live boxed node.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
-##### ComputeEngine.discard() {#discard-1}
-
-```ts
-discard(cp): void
-```
-
-Release `cp`'s restore capability. Restoring past a discarded INTERIOR
-checkpoint stays possible through any earlier live one; discarding the
-OLDEST makes the state before the next-younger one unreachable.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
 ##### ComputeEngine.declareProtocol() {#declareprotocol-1}
 
 ```ts
@@ -21957,7 +21506,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
@@ -22292,6 +21841,11 @@ Verbatim LaTeX and source positions are dropped, as the MathJSON route
 drops them. A mutable object is rebuilt as its record snapshot, as that
 route boxes it.
 
+To give a name a value for one evaluation, or to hide its value, use
+`withValues()`, not a declaration in a pushed scope followed by
+`rebind()`: a stored function that the expression calls reads the names
+of the scope it was defined in, which a pushed scope does not change.
+
 ####### expr
 
 [`Expression`](#expression-5)
@@ -22326,13 +21880,13 @@ but uses the engine's symbol definitions for better parsing accuracy.
 `options.scope` RECEIVES the parse's writes: the whole parse runs with
 that scope as the current lexical scope, so name resolution (including
 the parser's symbol oracle) walks `scope → parents`, and every
-auto-declare and inference lands rooted there. Discarding the scope
-discards the writes. Use `ce.createScope()` to make one that can be read
+declaration and inference made while it runs lands rooted there. Boxing
+itself declares no name. Discarding the scope discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
 `options.speculative` leaves NO trace in the engine's type state: the
-parse runs inside a transient scope (auto-declares land there and are
-discarded with it), and every ambient symbol whose type is currently
+parse runs inside a transient scope (declarations and inferences land
+there and are discarded with it), and every ambient symbol whose type is currently
 inferred is shadowed in that scope with its current type — so a
 narrowing use in `latex` refines the discarded shadow instead of
 persistently narrowing the ambient symbol. Use it for derive-style
@@ -22476,11 +22030,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl` and `python` once the full package entry,
+`glsl` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -22789,7 +22343,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### ComputeEngine.type() {#type-11}
+##### ComputeEngine.type() {#type-12}
 
 ```ts
 type(type): BoxedType
@@ -23218,6 +22772,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -23302,6 +22857,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -23423,6 +22979,43 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
+##### ComputeEngine.infer() {#infer-1}
+
+```ts
+infer(exprs): InferResult
+```
+
+**`Experimental`**
+
+Declare the names that `exprs` use, with the types that their uses
+require.
+
+Each name is declared, marked as inferred, in its home scope: the scope
+that a declaration of the name would go in when the expression that uses
+it was boxed. When the home scope already holds an inferred definition
+of the name, that definition is narrowed instead. The type is the meet of
+the types that the uses in `exprs` require, met with the type of that
+inferred definition. The order of `exprs` does not change the result.
+
+A name is not changed, and is reported in `skipped`, when the uses
+require types that have no common subtype (`x + 1` and `x(3)`), when
+they require no type, when the home scope holds a definition of the name
+that is not inferred, and when the home scope is not the current scope
+or one of its ancestors. Each expression then keeps the type that its
+own uses require.
+
+A library name used as a value (`N` in `N + 1`) is declared as a
+variable, which shadows the library definition in the home scope. A
+call head (`f` in `f(x)`) is declared with a function type.
+
+####### exprs
+
+readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
 ##### ComputeEngine.declareSequence() {#declaresequence-1}
 
 ```ts
@@ -23522,8 +23115,7 @@ Check if a symbol is a defined sequence.
 The answer is for the definition that the name has in the current
 scope. A sequence declared in an enclosing scope is a sequence. A
 sequence is no longer one after the scope that declared it is popped,
-after `undeclare()`, or after a checkpoint restore that removes its
-declaration.
+or after `undeclare()`.
 
 ####### name
 
@@ -23779,8 +23371,6 @@ Assumptions about the name are not removed: an assumption applies to
 the name, and so to a new declaration of it. Use `forget()` to remove
 them.
 
-A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
-
 ####### names
 
 `string` \| readonly `string`[]
@@ -23979,6 +23569,63 @@ ce.suggestOperatorName('foo');      // → undefined
 ####### name
 
 `string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### ComputeEngine.temporaryName() {#temporaryname-1}
+
+```ts
+temporaryName(hint, ...avoid): string
+```
+
+Return a name for a temporary symbol: `<hint>_tmp<n>`, with `n` the
+smallest integer from 1 such that the name
+- has no definition that `ce.lookupDefinition()` finds from the current
+  scope, and
+- is not a name of `avoid`, and does not occur in an expression of
+  `avoid`, as a symbol (free or bound) or as the operator of a call.
+
+Each item of `avoid` is a boxed expression, a string (one name, not text
+to search) or a set of names. An array throws: an array of strings is
+also a MathJSON call, so box it or pass the set of its names. An
+expression is walked as it is written, each shared subtree once; the
+walk does not enter the values or the bodies of the names it reads.
+
+Pass in `avoid` every expression that the name will be put in or
+combined with, the bodies and stored values that the computation reads,
+and the names returned by earlier calls that are not declared yet: two
+calls in a row with the same hint return the same name otherwise. A name
+that an expression uses with no definition is not seen by the lookup.
+
+The hint is cleaned: the `_` at its start and at its end are removed and
+each `__` becomes `_`; `tmp` is used if nothing is left. A hint that is
+not a valid symbol name, or for which `<hint>_tmp1` is not one (an
+emoji), throws.
+
+The function keeps no state and declares nothing: the same call in the
+same state returns the same name. The caller declares the name if it
+needs a definition, and the definition ends with its scope.
+
+A name that ends with `_tmp` and a positive integer is reserved for this
+function. The engine does not enforce it. A host can remove
+`/_tmp[1-9]\d*$/` from the name to get the hint.
+
+```ts
+ce.temporaryName('t');                                // → 't_tmp1'
+ce.temporaryName('t', ce.box(['Add', 't_tmp1', 'x'])); // → 't_tmp2'
+ce.temporaryName('s', new Set(['s_tmp1']));           // → 's_tmp2'
+ce.temporaryName('_x');                               // → 'x_tmp1'
+```
+
+####### hint
+
+`string`
+
+####### avoid
+
+...(`string` \| `ReadonlySet`\<`string`\> \| [`Expression`](#expression-5))[]
 
 </MemberCard>
 
@@ -25267,6 +24914,7 @@ type ValueDefinition = BaseDefinition & {
   value:   | LatexString
      | ExpressionInput
      | ((ce) => Expression | null);
+  macro: MathJsonExpression;
   eq: (a) => boolean | undefined;
   neq: (a) => boolean | undefined;
   cmp: (a) => "=" | ">" | "<" | undefined;
@@ -25320,6 +24968,25 @@ value:
 `value` can be a JS function since for some constants, such as
 `Pi`, the actual value depends on the `precision` setting of the
 `ComputeEngine` and possible other environment settings
+
+#### ValueDefinition.macro
+
+```ts
+macro: MathJsonExpression;
+```
+
+The raw MathJSON body of a macro: `ce.declare('A', { macro: body })`.
+
+A macro has no value and the type `unknown`. A name of the input
+(MathJSON or LaTeX) that resolves to the macro where it is boxed in a
+canonical or a structural form is replaced by the body, boxed at that
+place, in the scope of the occurrence and in the same form. A position
+that takes a name (a parameter, an index, the variable of `D`, the
+target of `Assign`) is not an occurrence, and a symbol made with
+`ce.symbol()` is not expanded. A parameter, an index or a local of the
+same name hides the macro.
+
+A definition with `macro` takes no other field.
 
 #### ValueDefinition.subscriptEvaluate?
 
@@ -27476,7 +27143,6 @@ type TypeProvenanceEntry = {
   kind: "declared" | "auto-declared" | "inferred" | "value-derived";
   axis: "type" | "effects";
   cause: Expression;
-  epoch: number;
   span: {
      start: number;
      end: number;
@@ -27575,6 +27241,20 @@ Some examples:
 
 <MemberCard>
 
+##### BoxedValueDefinition.macro? {#macro}
+
+```ts
+readonly macro?: MathJsonExpression;
+```
+
+The raw body of a macro definition (`ce.declare(name, { macro })`),
+`undefined` for every other value definition. A macro definition has no
+value and the type `unknown`.
+
+</MemberCard>
+
+<MemberCard>
+
 ##### BoxedValueDefinition.value {#value-6}
 
 ```ts
@@ -27646,6 +27326,16 @@ True if the type has been inferred. An inferred type can be updated as
 more information becomes available.
 
 A type that is not inferred, but has been set explicitly, cannot be updated.
+
+</MemberCard>
+
+<MemberCard>
+
+##### BoxedValueDefinition.\_programVariable {#_programvariable}
+
+```ts
+_programVariable: boolean;
+```
 
 </MemberCard>
 
@@ -27786,14 +27476,15 @@ of the operator runs.
   operand unevaluated (`raw`).
 - `statement`: the operand is a statement that the operator runs, zero,
   one or several times (the body of a loop, a branch of a conditional). An
-  `Assign` or a `Declare` there is valid. The operand is not evaluated
+  `Assign` there is valid. The operand is not evaluated
   before the `evaluate` handler runs: the handler evaluates it when and as
   often as it needs to. The engine canonicalizes the operand as a branch,
   except in a `lazy` operator with a `canonical` handler, which receives
-  it as written and canonicalizes it itself. In a branch, a first
-  assignment of a name that no enclosing scope declares is the error
-  `first-assignment-in-branch`, an assignment of a declared name writes
-  that name, and a bare `Break` or `Continue` symbol is an error.
+  it as written and canonicalizes it itself. In a branch, a `Declare` is
+  the error `declaration-below-statement`, an assignment of a name that
+  no enclosing scope declares is the error
+  `assignment-to-undeclared-variable`, an assignment of a declared name
+  writes that name, and a bare `Break` or `Continue` symbol is an error.
 - `raw`: the operand is kept as written, not canonicalized and not
   evaluated. The default of a `lazy` operator. Valid only on a `lazy`
   operator.
@@ -28512,6 +28203,52 @@ The options of `ce.declare(id, def, options)`.
 - `extend`: when `true`, `def` is a PATCH applied to the operator definition
   currently visible for `id`, not a new definition. See
   [OperatorDefinitionPatch](#operatordefinitionpatch).
+
+</MemberCard>
+
+<MemberCard>
+
+### InferResult {#inferresult}
+
+```ts
+type InferResult = {
+  declared: {
+     name: string;
+     scope: Scope;
+     type: Type;
+    }[];
+  skipped: {
+     name: string;
+     scope: Scope;
+     reason: "conflict" | "untyped" | "defined" | "out-of-scope";
+    }[];
+};
+```
+
+The result of `ce.infer()`.
+
+- `declared`: each name that `ce.infer()` declared in its home scope, or
+  whose inferred definition it narrowed there, with the type it has now.
+- `skipped`: each symbol of the expressions that it did not change, with
+  the reason:
+  - `'conflict'`: the expressions require types that have no common
+    subtype (`x + 1` and `x(3)`), or a type that has none in common with
+    the inferred definition of the name;
+  - `'untyped'`: no use requires a type of the name (`q` in `[q]`), or the
+    requirements give the type `unknown`;
+  - `'defined'`: the home scope holds a definition of the name with a
+    declared type (`ce.declare('x', 'real')`). A definition with the
+    declared type `unknown` states no type: `ce.infer()` gives it the type
+    that the uses require;
+  - `'out-of-scope'`: the home scope is not the current scope or one of its
+    ancestors (it was popped).
+
+A symbol whose type is already the type that the uses require, a symbol
+of the library (`Pi`), a parameter of a function literal, the variable of
+a binder (the index of a `Sum`) and a symbol declared in a scope that was
+popped are in neither list.
+
+Each list is sorted by name, then by the depth of the scope.
 
 </MemberCard>
 
@@ -33712,6 +33449,50 @@ per canonicalization would not be).
 
 <MemberCard>
 
+### ParameterRequirement {#parameterrequirement}
+
+```ts
+type ParameterRequirement = {
+  type: BoxedType;
+  cause: InferenceCauseContext;
+  numeric: boolean;
+};
+```
+
+What the uses of a parameter of a function literal required while the
+literal is boxed (decision D18 of
+`docs/plans/2026-11-11-bound-once-spec.md`): the type that a read of the
+parameter gives, and the cause of the use that last changed it, recorded
+as the provenance of the type when it is written on the definition.
+
+</MemberCard>
+
+<MemberCard>
+
+### ParameterRecord {#parameterrecord}
+
+```ts
+type ParameterRecord = {
+  requirements: Map<BoxedValueDefinition, ParameterRequirement>;
+  env: UnitEnvironment;
+  collectorDepth: number;
+  memoStarts: number;
+  created: Set<BoxedValueDefinition>;
+};
+```
+
+The record of a function literal while it is boxed: the requirement of
+each parameter, keyed by its value definition, and the environment of the
+literal, which holds the entries that the uses of its parameters write
+(outside a trial) and that a later use reads. The environment is made with
+the record: a read of it is recorded only by the caches whose computation
+started after that (`collectorDepth`, `objectDepCollectorDepth()`), as a
+computation that started before boxes the literal again.
+
+</MemberCard>
+
+<MemberCard>
+
 ### JSImplementation {#jsimplementation}
 
 ```ts
@@ -33850,40 +33631,6 @@ The host-API shape of an IMPLEMENTATION block. Property handlers are given
 under their surface names (`getters.hash`), not under the internal
 `__get__hash` mangling (Appendix A "Properties": the mangling is an
 implementation detail, not part of the public surface).
-
-</MemberCard>
-
-### EngineCheckpoint {#enginecheckpoint}
-
-A handle on a saved engine state, from [IComputeEngine.checkpoint](#checkpoint).
-Deliberately opaque: `id` is for logging and `live` is the only state a
-client can act on. Declared here rather than in `checkpoint.ts` because it
-is part of the engine's public type surface — and because importing it from
-the implementation would make this file depend on it, closing a cycle
-through the sequence registry.
-
-<MemberCard>
-
-##### EngineCheckpoint.id {#id-4}
-
-```ts
-readonly id: number;
-```
-
-</MemberCard>
-
-<MemberCard>
-
-##### EngineCheckpoint.live {#live}
-
-```ts
-readonly live: boolean;
-```
-
-False once invalidated — by a restore to an EARLIER checkpoint, by
-`discard()`, or by popping a scope this checkpoint was taken inside
-(the pop disposes the scope's bindings, so there is no world left to
-restore). A dead checkpoint can never be restored again.
 
 </MemberCard>
 
@@ -34109,6 +33856,34 @@ readonly context: EvalContext;
 ```ts
 contextStack: readonly EvalContext[];
 ```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.\_delegatedEvaluations {#_delegatedevaluations}
+
+```ts
+_delegatedEvaluations: number;
+```
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.macroNames {#macronames}
+
+```ts
+readonly macroNames: ReadonlySet<string>;
+```
+
+The names that were declared as a macro on this engine
+(`ce.declare(name, { macro })`), in any scope. The set never shrinks: a
+name stays in it after the scope of its declaration is popped, and after
+a later declaration of the name that is not a macro. So a name that is
+not in the set is not a macro in any scope, and a name that is in the set
+may be one: `ce.lookupDefinition(name)` gives the definition that the
+current scope reads. The set of an engine with no macro is empty.
 
 </MemberCard>
 
@@ -34433,94 +34208,6 @@ recomputed at each precision change.
 
 <MemberCard>
 
-##### IComputeEngine.checkpoint() {#checkpoint}
-
-```ts
-checkpoint(label?): EngineCheckpoint
-```
-
-Take a checkpoint of the engine's state at a quiescent point — between
-statements, at any scope depth — so a later [restore](#restore) can rewind
-to it. Legal on a freshly constructed engine, which is how a client gets
-a `cp[0]` covering an edit of the first cell, and inside a host-pushed
-scope, which is how a notebook takes per-cell checkpoints within a pass.
-A checkpoint taken inside a scope dies when that scope pops. Throws a
-`CheckpointError` when the engine is mid-evaluation or mid-pre-pass;
-[restore](#restore) additionally requires the same scope stack the
-checkpoint was taken on.
-
-####### label?
-
-`string`
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.restore() {#restore}
-
-```ts
-restore(cp): void
-```
-
-Rewind to `cp`, invalidating every checkpoint taken after it; `cp` itself
-stays live and can be restored again.
-
-The definitions that existed when `cp` was taken are rewritten in place,
-and the version counters advance, so every expression that reads them,
-whether it was built before or during the rewound window, reads the
-restored state afterwards and its cached answers are computed again.
-The structure of an expression (`ops`, `json`, `digest`, `hash`) is not
-affected, with one exception: the fields of a mutable object are
-rewound in place, so the `json` and `digest` of that object, and of
-every expression that holds it, can change.
-
-The definitions CREATED during the window are removed from their scope
-and disposed. This includes a symbol that was declared or assigned for
-the first time there, and a free symbol that was boxed for the first
-time there (boxing declares it). An expression built during the window
-that names such a symbol keeps the disposed definition, and the symbol
-is inert: it reads no value and counts as unknown (`unknowns`, a
-compile reads it as an input), also after a later declaration or
-assignment of the same name, and its type is the one its record had
-before the declaration (usually `unknown`). The index of a `Sum` and the
-locals of a `Block` built during the window are not affected: they
-still take their values when the expression runs. Nor is a symbol
-declared in a scope that is not on the scope chain when `restore()`
-runs (a scope pushed and popped during the window): it still resolves
-by name, so it reads a later declaration of the same name in that scope
-with its old type (ROADMAP CE-590). `isSame` with the
-same expression built after the
-restore is false. Do not keep such an expression: build it again to
-read the new definition, and cache a cell output as a serialized
-artifact rather than as a live boxed node.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
-##### IComputeEngine.discard() {#discard}
-
-```ts
-discard(cp): void
-```
-
-Release `cp`'s restore capability. Restoring past a discarded INTERIOR
-checkpoint stays possible through any earlier live one; discarding the
-OLDEST makes the state before the next-younger one unreachable.
-
-####### cp
-
-[`EngineCheckpoint`](#enginecheckpoint)
-
-</MemberCard>
-
-<MemberCard>
-
 ##### IComputeEngine.declareProtocol() {#declareprotocol}
 
 ```ts
@@ -34633,7 +34320,7 @@ Inheritance included: a conformance registered for a supertype answers
 for its subtypes. A CONDITIONAL conformance (`list<T> is P where T is
 P`) recurses, deciding itself against `type`'s own arguments.
 
-`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-10)
+`type` may be a `TypeString`, parsed the way [IComputeEngine.type](#type-11)
 parses one.
 
 ####### type
@@ -34968,6 +34655,11 @@ Verbatim LaTeX and source positions are dropped, as the MathJSON route
 drops them. A mutable object is rebuilt as its record snapshot, as that
 route boxes it.
 
+To give a name a value for one evaluation, or to hide its value, use
+`withValues()`, not a declaration in a pushed scope followed by
+`rebind()`: a stored function that the expression calls reads the names
+of the scope it was defined in, which a pushed scope does not change.
+
 ####### expr
 
 [`Expression`](#expression-5)
@@ -35002,13 +34694,13 @@ but uses the engine's symbol definitions for better parsing accuracy.
 `options.scope` RECEIVES the parse's writes: the whole parse runs with
 that scope as the current lexical scope, so name resolution (including
 the parser's symbol oracle) walks `scope → parents`, and every
-auto-declare and inference lands rooted there. Discarding the scope
-discards the writes. Use `ce.createScope()` to make one that can be read
+declaration and inference made while it runs lands rooted there. Boxing
+itself declares no name. Discarding the scope discards the writes. Use `ce.createScope()` to make one that can be read
 back.
 
 `options.speculative` leaves NO trace in the engine's type state: the
-parse runs inside a transient scope (auto-declares land there and are
-discarded with it), and every ambient symbol whose type is currently
+parse runs inside a transient scope (declarations and inferences land
+there and are discarded with it), and every ambient symbol whose type is currently
 inferred is shadowed in that scope with its current type — so a
 narrowing use in `latex` refines the discarded shadow instead of
 persistently narrowing the ambient symbol. Use it for derive-style
@@ -35152,11 +34844,11 @@ target lacks one of `getOperators()`, `getFunctions()`, `createTarget()`
 and `compile()`.
 
 Every engine has `javascript` and `interval-js`. Every engine also has
-`glsl` and `python` once the full package entry,
+`glsl` once the full package entry,
 `@cortex-js/compute-engine/epsil` or the CLI has been loaded anywhere in
 the program, whichever entry made the engine and in whichever order. A
 program that loads only `@cortex-js/compute-engine/core` has the two
-built-in targets: import `GLSLTarget` or `PythonTarget`
+built-in targets: import `GLSLTarget`
 from `@cortex-js/compute-engine/compile` and register it here.
 
 ####### name
@@ -35465,7 +35157,7 @@ back with `expr.array`.
 
 <MemberCard>
 
-##### IComputeEngine.type() {#type-10}
+##### IComputeEngine.type() {#type-11}
 
 ```ts
 type(type): BoxedType
@@ -35894,6 +35586,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -35978,6 +35671,7 @@ declare(arg1, arg2?, arg3?): IComputeEngine
   `effectsDeclared`: `boolean`;
   `value`:   \| [`ExpressionInput`](#expressioninput)
      \| ((`ce`) => [`Expression`](#expression-5) \| `null`);
+  `macro`: [`MathJsonExpression`](#mathjsonexpression);
   `eq`: (`a`) => `boolean` \| `undefined`;
   `neq`: (`a`) => `boolean` \| `undefined`;
   `cmp`: (`a`) => `"<"` \| `">"` \| `"="` \| `undefined`;
@@ -36099,6 +35793,43 @@ assume(predicate): AssumeResult
 
 <MemberCard>
 
+##### IComputeEngine.infer() {#infer}
+
+```ts
+infer(exprs): InferResult
+```
+
+**`Experimental`**
+
+Declare the names that `exprs` use, with the types that their uses
+require.
+
+Each name is declared, marked as inferred, in its home scope: the scope
+that a declaration of the name would go in when the expression that uses
+it was boxed. When the home scope already holds an inferred definition
+of the name, that definition is narrowed instead. The type is the meet of
+the types that the uses in `exprs` require, met with the type of that
+inferred definition. The order of `exprs` does not change the result.
+
+A name is not changed, and is reported in `skipped`, when the uses
+require types that have no common subtype (`x + 1` and `x(3)`), when
+they require no type, when the home scope holds a definition of the name
+that is not inferred, and when the home scope is not the current scope
+or one of its ancestors. Each expression then keeps the type that its
+own uses require.
+
+A library name used as a value (`N` in `N + 1`) is declared as a
+variable, which shadows the library definition in the home scope. A
+call head (`f` in `f(x)`) is declared with a function type.
+
+####### exprs
+
+readonly [`Expression`](#expression-5)[]
+
+</MemberCard>
+
+<MemberCard>
+
 ##### IComputeEngine.declareSequence() {#declaresequence}
 
 ```ts
@@ -36198,8 +35929,7 @@ Check if a symbol is a defined sequence.
 The answer is for the definition that the name has in the current
 scope. A sequence declared in an enclosing scope is a sequence. A
 sequence is no longer one after the scope that declared it is popped,
-after `undeclare()`, or after a checkpoint restore that removes its
-declaration.
+or after `undeclare()`.
 
 ####### name
 
@@ -36455,8 +36185,6 @@ Assumptions about the name are not removed: an assumption applies to
 the name, and so to a new declaration of it. Use `forget()` to remove
 them.
 
-A checkpoint taken before the call (`ce.checkpoint()`) undoes it.
-
 ####### names
 
 `string` \| readonly `string`[]
@@ -36655,6 +36383,63 @@ ce.suggestOperatorName('foo');      // → undefined
 ####### name
 
 `string`
+
+</MemberCard>
+
+<MemberCard>
+
+##### IComputeEngine.temporaryName() {#temporaryname}
+
+```ts
+temporaryName(hint, ...avoid): string
+```
+
+Return a name for a temporary symbol: `<hint>_tmp<n>`, with `n` the
+smallest integer from 1 such that the name
+- has no definition that `ce.lookupDefinition()` finds from the current
+  scope, and
+- is not a name of `avoid`, and does not occur in an expression of
+  `avoid`, as a symbol (free or bound) or as the operator of a call.
+
+Each item of `avoid` is a boxed expression, a string (one name, not text
+to search) or a set of names. An array throws: an array of strings is
+also a MathJSON call, so box it or pass the set of its names. An
+expression is walked as it is written, each shared subtree once; the
+walk does not enter the values or the bodies of the names it reads.
+
+Pass in `avoid` every expression that the name will be put in or
+combined with, the bodies and stored values that the computation reads,
+and the names returned by earlier calls that are not declared yet: two
+calls in a row with the same hint return the same name otherwise. A name
+that an expression uses with no definition is not seen by the lookup.
+
+The hint is cleaned: the `_` at its start and at its end are removed and
+each `__` becomes `_`; `tmp` is used if nothing is left. A hint that is
+not a valid symbol name, or for which `<hint>_tmp1` is not one (an
+emoji), throws.
+
+The function keeps no state and declares nothing: the same call in the
+same state returns the same name. The caller declares the name if it
+needs a definition, and the definition ends with its scope.
+
+A name that ends with `_tmp` and a positive integer is reserved for this
+function. The engine does not enforce it. A host can remove
+`/_tmp[1-9]\d*$/` from the name to get the hint.
+
+```ts
+ce.temporaryName('t');                                // → 't_tmp1'
+ce.temporaryName('t', ce.box(['Add', 't_tmp1', 'x'])); // → 't_tmp2'
+ce.temporaryName('s', new Set(['s_tmp1']));           // → 's_tmp2'
+ce.temporaryName('_x');                               // → 'x_tmp1'
+```
+
+####### hint
+
+`string`
+
+####### avoid
+
+...(`string` \| `ReadonlySet`\<`string`\> \| [`Expression`](#expression-5))[]
 
 </MemberCard>
 
@@ -39014,8 +38799,13 @@ body — tuple, string and fixed-shape branches enumerate too), or
 readonly staticShape: StaticShape | undefined;
 ```
 
-The collection shape that this expression promises, read without
-evaluating it, or `undefined` when it promises no collection.
+The collection shape that this expression promises, or `undefined` when
+it promises no collection.
+
+It does not evaluate an application or a symbol. For a collection value
+it reads the collection facets, and the `count` of a lazy view over an
+eager source (`Join(f(1), [4])`, a `Filter`) evaluates that source: it
+calls `f`, or runs the filter's function once per element.
 
 `staticShape` answers the SHAPE question: "what does this expression
 promise to be?". `isCollection` answers the CAPABILITY question: "is a
@@ -39844,7 +39634,7 @@ singular values of a matrix.
 
 <MemberCard>
 
-##### Expression.type {#type-12}
+##### Expression.type {#type-13}
 
 ```ts
 get type(): BoxedType
@@ -43751,6 +43541,7 @@ accelerated numerical approximation). The recognized families:
 | $$\sum_{k=1}^{\infty} \frac{1}{(2k-1)^s}, \; s > 1$$ | $$(1 - 2^{-s})\,\zeta(s)$$ | Odd p-series ($\pi^2/8$ for $s=2$) |
 | $$\sum_{k=0}^{\infty} \frac{(-1)^k}{(2k+1)^s}$$ | $$\beta(s)$$ | Dirichlet beta ($\pi/4$, Catalan's constant, $\pi^3/32$, $5\pi^5/1536$ for $s = 1, 2, 3, 5$) |
 | $$\sum_{k=a}^{\infty} \frac{r^k}{k!}$$ | $$e^r - \sum_{k<a} \frac{r^k}{k!}$$ | Exponential series (symbolic $r$ allowed) |
+| $$\sum_{k=a}^{\infty} \frac{k^n r^k}{k!}$$ | $$e^r\,T_n(r) - \sum_{k<a} \frac{k^n r^k}{k!}$$ | Touchard / Dobiński ($T_n$ the Touchard polynomial; $\sum k^n/k! = B_n\,e$, $B_n$ the Bell number; $n \le 200$) |
 | $$\sum_{k=1}^{\infty} k\,r^k, \; \|r\| < 1$$ | $$\frac{r}{(1-r)^2}$$ | First-moment geometric |
 | $$\sum_{k=1}^{\infty} \frac{r^k}{k}, \; \|r\| < 1$$ | $$-\ln(1-r)$$ | Logarithmic series |
 
@@ -43760,7 +43551,8 @@ $\frac{\pi^2}{6}$, $\sum_{k=1}^{\infty} \frac{1}{(k+1)^2}$ is
 $\frac{\pi^2}{6} - 1$, and the telescoping sum
 $\sum_{k=1}^{\infty} \frac{1}{k^2+k}$ is $1$. The comparison runs only for a
 body whose denominator, as written, is zero at no integer index of the domain.
-A pole there keeps the sum symbolic.
+A pole there keeps the sum symbolic. A polynomial in $k$ over $k!$ is summed
+term by term: $\sum_{k=0}^{\infty} \frac{k^2 + k}{k!}$ is $3e$.
 
 For a **symbolic** ratio $r$, the families with a convergence region return a
 restriction `["If", condition, value]` that records it — for example
@@ -43993,7 +43785,7 @@ See also **Statistics** for statistics functions and functions on lists<Icon nam
 | `Abs`    | $$\|x\| $$ | Absolute value, [magnitude](https://www.wikidata.org/wiki/Q3317982)              |
 | `Ceil`   | $$\lceil x \rceil $$ | Rounds a number up to the next largest integer                                   |
 | `Floor`  | $$\lfloor x \rfloor$$ | Round a number to the greatest integer less than the input value                 |
-| `Chop`   |              | Replace real numbers that are very close to 0 (less than $$10^{-10}$$) with 0  |
+| `Chop`   |              | Replace the real and imaginary parts whose magnitude is at most the tolerance with 0. The tolerance is the optional second operand, `Chop(x, 0.01)`, or the engine's `tolerance` (default $$10^{-10}$$); a symbolic tolerance leaves the call unevaluated  |
 | `Round`  |              | Rounds a number to the nearest integer. `Round(x, step)` rounds to the nearest multiple of the step |
 
 </div>
@@ -45342,9 +45134,10 @@ derivative operator:
 | `f^{\prime}`          | `["Derivative", "f"]` |
 | `f''`                 | `["Derivative", "f", 2]` |
 | `f^{(n)}`             | `["Derivative", "f", n]` |
+| `f^{(1,0)}`           | `["Derivative", "f", 1, 0]` |
 
 A symbolic order (`f^{(n)}` with `n` unassigned) stays symbolic until `n` is
-assigned, and `["Derivative", "f", 0]` is `f` itself.
+assigned, and is written `f^{(n)}`. `["Derivative", "f", 0]` is `f` itself.
 
 On anything that is **not** a function — an undeclared symbol, a number-valued
 symbol, a subscripted name whose subscript does not fold into the symbol
@@ -45473,6 +45266,15 @@ A variable can be repeated to compute the second derivative of a function.
 ["D", "f", "x", "x"]
 ```
 
+`["D", f, ["List", "x", n]]` and `["D", f, ["Set", "x", n]]` are the `n`-th
+derivative of _f_ in `x`. A negative order is an error; a fractional or
+symbolic order, or an order above 1000, leaves the derivative unevaluated.
+
+```json example
+["D", ["Power", "x", 5], ["List", "x", 3]]
+// ➔ 60x^2
+```
+
 In the body of a sum or a product, a variable with the index as subscript
 follows the index, so each term differentiates with respect to its own
 variable. The variable `["Subscript", "x", 1]` is the symbol `x_1`.
@@ -45563,6 +45365,16 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 | `LambertW(x)` | `W(x)/(x·(1+W(x)))` | Lambert W function |
 | `PolyLog(s, z)` | `PolyLog(s-1, z)/z` | In `z`; `PolyLog(2, z)` gives `-ln(1-z)/z`. No closed form in `s` |
 | `Gamma(s, z)` | `-e^(-z)·z^(s-1)` | Upper incomplete gamma, in `z`. No closed form in `s` |
+| `ErfInv(x)` | `(√π/2)·e^(ErfInv(x)²)` | Inverse error function |
+| `Beta(a, b)` | `Beta(a, b)·(ψ(a) − ψ(a+b))` in `a`, `Beta(a, b)·(ψ(b) − ψ(a+b))` in `b` | |
+| `LogBarnesG(z)` | `(z−1)ψ(z) − z + ½(1 + ln 2π)` | |
+| `BarnesG(z)` | `BarnesG(z)·((z−1)ψ(z) − z + ½(1 + ln 2π))` | |
+| `HurwitzZeta(s, a)` | `−s·HurwitzZeta(s+1, a)` | In `a`. No closed form in `s` |
+| `LerchPhi(z, s, a)` | `(LerchPhi(z, s−1, a) − a·LerchPhi(z, s, a))/z` in `z`, `−s·LerchPhi(z, s+1, a)` in `a` | No closed form in `s` |
+| `EllipticK(m)` | `(E(m) − (1−m)K(m))/(2m(1−m))` | Complete, parameter `m` |
+| `EllipticE(m)` | `(E(m) − K(m))/(2m)` | Complete, parameter `m` |
+| `Hypergeometric2F1(a, b, c, z)` | `(ab/c)·Hypergeometric2F1(a+1, b+1, c+1, z)` | In `z`. No closed form in `a`, `b`, `c` |
+| `ClausenCl(n, θ)` | `−½cot(θ/2)` for `n = 1`; `ClausenCl(n−1, θ)` for an even `n`, `−ClausenCl(n−1, θ)` for an odd `n` | Literal order; `θ` in radians |
 | `Arctan2(y, x)` | `-y/(x²+y²)` in `x`, `x/(x²+y²)` in `y` | Divided by the unit factor in a non-radian angular unit |
 | **Bessel Functions** | | |
 | `BesselJ(n, x)` | `(J_{n-1}(x) - J_{n+1}(x))/2` | First kind |
@@ -45582,6 +45394,16 @@ functions** below), e.g. `D(f(x, y), x)` evaluates to
 :::info[Chain Rule]
 For all supported functions, the chain rule is automatically applied. For example,
 `d/dx sin(x²) = cos(x²)·2x`.
+:::
+
+:::info[Removable Points]
+The closed forms of the derivatives of `EllipticK`, `EllipticE`, `LambertW`,
+`PolyLog` (in `z`) and `LerchPhi` (in `z`) are `0/0` at 0. An application of
+the derivative at 0 gives the value from the Maclaurin series of the function:
+`["Apply", ["Derivative", "EllipticK"], 0]` evaluates to `π/8`, and
+`["Apply", ["Derivative", "EllipticK", 2], 0]` to `9π/64`. The closed form
+itself, `["D", ["EllipticK", "m"], "m"]`, is still `NaN` after the
+substitution `m = 0`.
 :::
 
 :::info[Definite Integrals]
@@ -45667,7 +45489,8 @@ $\partial^2 f / \partial x^2$. This follows the convention of Mathematica's
 `Derivative[n₁, n₂, …][f]`.
 
 When applied to plain symbols, a multi-index derivative serializes in Leibniz
-notation; unapplied it uses the parenthesized index list $f^{(1,0)}$.
+notation; unapplied it uses the parenthesized index list $f^{(1,0)}$, which
+parses back to the same `Derivative`.
 
 <Latex value="\frac{\partial}{\partial x} f(x, y)"/>
 
@@ -46058,6 +45881,20 @@ The general formulas used are:
 - $\int e^x \sin(ax+b) \, dx = \frac{e^x}{a^2+1}(\sin(ax+b) - a\cos(ax+b)) + C$
 - $\int e^x \cos(ax+b) \, dx = \frac{e^x}{a^2+1}(a\sin(ax+b) + \cos(ax+b)) + C$
 
+#### Powers of Sine and Cosine
+
+A product $c \sin^m(u) \cos^n(u)$ with a linear $u$ and integers $m$, $n$ is
+integrated with the odd-power substitution, or with the reduction formulas when
+both powers are even:
+
+```javascript
+ce.parse('\\int \\sin^3 x dx').evaluate()
+// → 1/3·cos(x)^3 - cos(x)
+
+ce.parse('\\int \\sin^3(2x)\\cos^2(2x) dx').evaluate()
+// → -1/6·cos(2x)^3 + 1/10·cos(2x)^5
+```
+
 #### Piecewise Integrands
 
 A definite integral over a finite real interval of an integrand that contains
@@ -46327,6 +46164,53 @@ ce.parse('\\operatorname{Series}(\\arctan x, x, +\\infty)').evaluate()
 // → π/2 - 1/x + 1/(3x^3) - 1/(5x^5) + O(1/x^7)
 ```
 
+At $-\infty$ the expansion holds for $x < 0$: $\sqrt{x^2}$ is $-x$ there.
+
+```javascript
+ce.parse('\\operatorname{Series}(\\frac{1}{\\sqrt{x^2}+1}, x, -\\infty, 3)').evaluate()
+// → -1/x - 1/x^2 - 1/x^3 + O(1/x^4)
+```
+
+At $\pm\infty$, `Series` stays unevaluated when _x_ is the operand of an
+absolute value, a step or another function that is not smooth (`Abs`, `Sign`,
+`Floor`, `Ceil`, `Round`, `Max`, …), as in
+$\operatorname{Series}(1/|x|, x, +\infty)$.
+
+`["DirectedInfinity", 1]` and `["DirectedInfinity", -1]` are the same points
+as $+\infty$ and $-\infty$. At `ComplexInfinity` or another direction, the
+expansion is given only when _f_ is built from analytic operations, so that it
+does not depend on the direction (a rational function such as $1/(x+1)$);
+otherwise `Series` stays unevaluated. `Series` of a library function whose
+derivatives the engine cannot evaluate (`Zeta`, `PolyLog`, `LambertW`) stays
+unevaluated. `Hypergeometric2F1` expands where it is a Taylor series, with
+the coefficients $(a)_k(b)_k/((c)_k\,k!)$; a terminating one (`a` or `b` a
+non-positive integer) is its polynomial, exact about any point, with no
+$O(\cdot)$ term. A non-terminating one stays unevaluated at an argument that
+is a real number $\ge 1$ (the branch point and the cut) and at $\pm\infty$.
+At 0, where the closed
+form of the derivative of some special functions is `0/0`, the coefficients
+come from the Maclaurin series of the function: `PolyLog(s, x)`,
+`LambertW(x)`, `LerchPhi(x, s, a)`, `EllipticK(m)` and `EllipticE(m)` expand
+there.
+
+```json example
+["Series", ["EllipticK", "m"], "m", 0, 3]
+// ➔ π/2 + π/8 m + 9π/128 m^2 + 25π/512 m^3 + O(m^4)
+```
+
+```json example
+["Series", ["Hypergeometric2F1", 1, 1, 3, "x"], "x", 0, 3]
+// ➔ 1 + x/3 + x^2/6 + x^3/10 + O(x^4)
+
+["Series", ["Hypergeometric2F1", -2, 3, 4, "x"], "x", 0, 5]
+// ➔ 1 - 3x/2 + 3x^2/5
+```
+
+```json example
+["Series", ["Divide", 1, ["Add", "x", 1]], "x", "ComplexInfinity", 3]
+// ➔ 1/x - 1/x^2 + 1/x^3 + O(1/x^4)
+```
+
 <Signature name="Series" returns="expression">_f_: expression, _x_: symbol, _x0_: value, _n_: integer</Signature>
 
 The fourth argument _n_ is the highest power retained (it defaults to `5`). The
@@ -46560,12 +46444,13 @@ to the independent variable _x_.
 
 ```json example
 ["DSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", "x"]
-// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", "c_1", ["Power", "ExponentialE", "x"]]]]
+// ➔ ["List", ["Equal", ["y", "x"], ["Multiply", ["ArbitraryConstant", 1], ["Power", "ExponentialE", "x"]]]]
 ```
 
 `DSolve` returns a `List` of solutions, each an `Equal` expression giving
-_y(x)_. Integration constants are introduced as needed, named `c_1`, `c_2`, …
-(different names are chosen if those are already in use).
+_y(x)_. A constant of integration is the call `["ArbitraryConstant", k]`: an
+arbitrary number, the _k_-th of the result. The tables below write it
+$c_k$. See [`ArbitraryConstant`](/compute-engine/reference/core/#arbitraryconstant).
 
 `DSolve` solves the following classes of equations.
 
@@ -47071,9 +46956,12 @@ In JavaScript, two properties of an expression tell different things:
 - `expr.isCollection` (and `expr.count`, `expr.each()`, `expr.at()`) tells
   whether a collection value is present that can be walked **now**.
 - `expr.staticShape` tells which collection shape the expression
-  **promises**, read from its type without evaluating it. It is
-  `{ indexed, count, elementType }`, or `undefined` when the expression
-  promises no collection.
+  **promises**. It is `{ indexed, count, elementType }`, or `undefined` when
+  the expression promises no collection. It reads a call or a symbol from its
+  type, without evaluating it. For a collection value it reads the
+  collection's own `count`: for a lazy view over a computed source, such as
+  `Join(f(1), [4])` or a `Filter`, that count evaluates the source, which
+  calls `f` or runs the filter's function once per element.
 
 A call of a function that returns a list has no value before it is evaluated,
 but its type gives its shape:
@@ -47643,6 +47531,8 @@ That form is now an `incompatible-type` error: write `Tabulate(f, m, n)`.
 
 <Signature name="Tabulate" returns="collection">_f_:function, _rows_:integer, _columns_:integer</Signature>
 
+<Signature name="Tabulate" returns="collection">_f_:function, _dimension_:integer, ...</Signature>
+
 Create a collection by applying a function to every index in the specified
 dimensions. Indices start at 1.
 
@@ -47658,6 +47548,10 @@ and the result is a nested list.
 ["Tabulate", ["Function", ["Add", "i", "j"], "i", "j"], 2, 3]
 // ➔ ["List", ["List", 2, 3, 4], ["List", 3, 4, 5]]
 ```
+
+Any number of dimensions is accepted: `["Tabulate", "Add", 2, 2, 3]` is a
+2×2×3 tensor, `[[[3, 4, 5], [4, 5, 6]], [[4, 5, 6], [5, 6, 7]]]`. A dimension
+of 0 gives an empty list: `["Tabulate", f, 2, 0]` is `[[], []]`.
 
 To give every element the same value, use [`Fill`](#fill).
 
@@ -48059,6 +47953,11 @@ Return the first element of the collection.
 
 It's equivalent to `["At", xs, 1]`.
 
+<Signature name="First">_xs_: indexed_collection, _default_</Signature>
+
+With a second operand, the value when the collection is empty:
+`["First", ["List"], 0]` is `0`.
+
 </FunctionDefinition>
 
 <nav className="hidden">
@@ -48117,6 +48016,11 @@ Return the last element of the collection.
 ```
 
 It's equivalent to `["At", xs, -1]`.
+
+<Signature name="Last">_xs_: indexed_collection, _default_</Signature>
+
+With a second operand, the value when the collection is empty:
+`["Last", ["List"], 0]` is `0`.
 
 </FunctionDefinition>
 
@@ -48749,6 +48653,17 @@ so `0.5` counts as an occurrence of `1/2`.
 // ➔ 0
 ```
 
+<Signature name="Count" returns="integer">_xs_: collection, _value_: any, _levels_</Signature>
+
+With a third argument, counts the parts equal to _value_ at the given levels:
+`n` is levels 1 to `n`, `[n]` level `n` only, `[from, to]` a range of levels,
+and `PositiveInfinity` every level.
+
+```json example
+["Count", ["List", ["List", 1, 1], 1], 1, 2]
+// ➔ 3
+```
+
 <Signature name="Count" returns="integer">_xs_: collection, _pred_: function</Signature>
 
 With a second argument that is a function, returns how many elements satisfy
@@ -48807,9 +48722,9 @@ Returns the symbol `True` if the collection has no elements.
 <FunctionDefinition name="Contains">
 <Signature name="Contains" returns="boolean">_xs_: collection, _value_: any</Signature>
 
-Returns `True` if the collection contains the given value, `False` otherwise. The value is compared using the `IsSame` function (structural identity, like the `Same` operator).
+Returns `True` if the collection contains the given value, `False` otherwise. Over a list or a tuple, the value is compared using the `IsSame` function (structural identity, like the `Same` operator); over a `Set`, see below.
 
-`Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
+Over a list or a tuple, `Contains(xs, v)` is the value-membership specialization of `Any`: it is equivalent to `Any(xs, (e) |-> e === v)`. To test an arbitrary predicate instead of a specific value, use **`Any`**.
 
 
 ```json example
@@ -48832,6 +48747,18 @@ number. With `a` and `b` declared `integer` and no value, `Contains` answers
 
 ["Element", 3, ["List", "a", "b"]]
 // ➔ ["Element", 3, ["List", "a", "b"]]
+```
+
+Over a `Set`, `Contains` is a membership test, as `Element` is: two numbers
+with no unknowns are compared by value (with the engine's tolerance when one
+of them is inexact), and a value with an unknown leaves the answer open:
+
+```json example
+["Contains", ["Set", 1, 2, 3], "ExponentialE"]
+// ➔ "False"
+
+["Contains", ["Set", 1, 2, 3], "x"]
+// ➔ ["Contains", ["Set", 1, 2, 3], "x"]
 ```
 
 `Contains` tests for **one element**. To test for a contiguous run of several
@@ -49904,6 +49831,16 @@ function-first form of a left fold.
 // ➔ 10
 ```
 
+<Signature name="Fold">_function_, _collection_</Signature>
+
+Without an initial value, start from the first element: `["Fold", f, xs]` is
+`["Reduce", xs, f]`.
+
+```json example
+["Fold", "Add", ["List", 1, 2, 3, 4]]
+// ➔ 10
+```
+
 </FunctionDefinition>
 
 
@@ -49932,6 +49869,17 @@ This is equivalent to the first element of the result of `Tally`:
 ```json example
 ["Unique", ["List", 5, 2, 10, 18, 5, 2, 5]]
 // ➔ ["List", 5, 2, 10, 18]
+```
+
+<Signature name="Unique" returns="collection">_xs_: collection, _test_: function</Signature>
+
+With a test, keeps an element unless the test holds between an earlier kept
+element and it. A string with a test gives a string.
+
+```json example
+["Unique", ["List", 1, 2, 3, 4],
+  ["Function", ["Equal", ["Mod", "a", 2], ["Mod", "b", 2]], "a", "b"]]
+// ➔ ["List", 1, 2]
 ```
 
 </FunctionDefinition>
@@ -50441,7 +50389,7 @@ are expressions that define how a sequence of expressions is evaluated.
 
 There are three kind of control structures:
 
-- **Sequential**: `Block`, the most common where expressions are evaluated one
+- **Sequential**: `Program` and `Block`, where expressions are evaluated one
   after the other
 - **Conditional** `If`, `Which` or `Match`, where expressions are evaluated
   depending on the value of a condition or the structure of a value
@@ -50449,6 +50397,40 @@ There are three kind of control structures:
   repeatedly
 
 ## Sequential Control Structure
+
+<FunctionDefinition name="Program">
+
+<Signature name="Program">_statement-1_, ..._statement-n_</Signature>
+
+A `["Program"]` evaluates statements in the caller's scope. Its declarations
+remain available after evaluation. Epsil parsing always returns a `Program`,
+including for empty source and single expressions; a braced local sequence
+uses `Block`.
+
+Canonicalization processes type and protocol declarations first, then global
+function statements and their paired signatures, then other statements in
+source order. The complete sequence is canonical before evaluation. Global
+function statements support forward calls and function clauses. A variable
+initialized with a function follows ordinary declaration order instead.
+
+A declaration establishes the variable's assignment contract. Without an
+annotation, a mutable numeric variable has type `number`, and a callable
+variable has type `function`. The stored function retains its own argument
+checks, defaults and closure. Replacing it does not make a new contract for
+later replacements. Explicit annotations remain contracts, and constants reject
+assignment. Two declarations in one Program are an error; a declaration in a
+later Program may replace an earlier declaration and establish a new type.
+
+The result is the last statement's value, or `Nothing` for an empty Program or
+one ending in a declaration or assignment. Ordinary statement errors are
+reported and evaluation continues; cancellation stops the Program.
+
+```json example
+["Program", ["Declare", "b", "'unknown'", 2], "b"]
+// ➔ 2, and b remains declared in the caller's scope
+```
+
+</FunctionDefinition>
 
 <FunctionDefinition name="Block">
 
@@ -50467,10 +50449,10 @@ The value of the `["Block"]` expression is the value of the last expression
 value of the block is `Nothing`: end the block with the name.
 
 ```json example
-["Block", ["Assign", "b", 2]]
+["Block", ["Declare", "b", "'unknown'", 2]]
 // ➔ Nothing
 
-["Block", ["Assign", "b", 2], "b"]
+["Block", ["Declare", "b", "'unknown'", 2], "b"]
 // ➔ 2
 ```
 
@@ -50485,35 +50467,63 @@ declared in an enclosing block updates that binding. A `["Declare"]` in the
 inner block instead introduces a new variable that shadows the outer one for
 the duration of the inner block.
 
-A local always has a value when it is read. These rules make that so, and each
-form that breaks one is a static error in the canonical form:
+A local of a block is made only by a `["Declare"]`. An `["Assign"]` writes the
+variable that is in scope and never makes one. Declaration and initialization
+are separate:
 
-- A declaration has a value: `["Declare", "x", "integer", 5]`, or the first
-  `["Assign", "x", 5]` of the name at the level of the block. A `["Declare"]`
-  with no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`) is the
-  error `declaration-without-value`, and a later `["Assign"]` does not repair
-  it. One exception: a `["Declare"]` of a function type with no value is valid
-  when a function definition of the same name is in the same block.
-- The first assignment of a name must not be in a branch of an `["If"]` or a
-  `["Which"]`, in the body of a `["Loop"]`, or in a case of a `["Match"]`. It
-  is the error `first-assignment-in-branch`. Assign a value to the name before
-  the branch. A name that is already declared is not a first assignment: the
-  assignment writes that name.
+- A declaration may supply a value or reserve an uninitialized slot. An explicit
+  annotation fixes its contract. Otherwise preparation uses its initializer, or
+  a unique later initialization in the same straight-line sequence before any
+  use. Branches, loops and calls are not searched. Without that evidence the
+  contract stays `unknown`; later writes never refine it. Runtime reads of an
+  uninitialized slot report `read-before-initialization`.
+- Mutable numeric initializers establish `number`. Lists lose fixed lengths and
+  widen their element types; tuples retain arity with widened components;
+  callable initializers establish `function`. An empty unannotated list has
+  unknown elements. Assignments validate against these fixed contracts.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+- A `["Declare"]` is a statement of the block itself. In a branch of an
+  `["If"]` or a `["Which"]`, in the body of a `["Loop"]` or in a case of a
+  `["Match"]`, it is the error `declaration-below-statement`: declare the name
+  before the branch.
+- An `["Assign"]` to a name that no scope declares is the error
+  `assignment-to-undeclared-variable`, at any depth of the block, in a
+  function body and in the body of a binder. An `["Assign"]` outside every
+  Block and Program (one that the host evaluates, or `ce.assign()`) declares the name in
+  the current scope.
 - A local is not read before its declaration. It is the error
-  `read-before-declaration`.
+  `read-before-declaration`. The initial value of a `["Declare"]` reads the
+  name outside the block: with a global `z` of value `9`,
+  `["Block", ["Declare", "z", "'unknown'", ["Add", "z", 1]], "z"]` is `10`.
+- A second declaration of a name in one block is the error
+  `variable-redeclaration`.
 - An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]`
   and `["Assign", "t", ["Assign", "u", 1]]` are the error
-  `assignment-in-operand`. Write `["Block", ["Assign", "a", 2], ["f", "a"]]`.
+  `assignment-in-operand`. Write
+  `["Block", ["Declare", "a", "'unknown'", 2], ["f", "a"]]`.
 - A later assignment keeps the type of the local: its declared type, or the
-  type of its first value (a number can become another number). Another type
-  is the error `assignment-type-mismatch`.
+  type of its initial value (a number can become another number). Another
+  type is the error `assignment-type-mismatch`.
 
 ```json example
-["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
-
-
+["Block", ["Declare", "c", "'unknown'", 5], ["Multiply", "c", 2]]
 // ➔ 10
+
+["Block", ["Assign", "c", 5], ["Multiply", "c", 2]]
+// ➔ the error assignment-to-undeclared-variable, when no "c" is declared
+//   outside the block. With a global "c", the block writes it, and is 10.
 ```
+
+A function statement (`["DefineFunction", "g", ...]`, the Epsil
+`function g(x) { … }`) in a block or a function body declares a local variable
+that holds the function, with the rules above: a call before the statement is
+`read-before-declaration`, and a second function statement or a `["Declare"]`
+of the same name is `variable-redeclaration`. The type of the local is the
+signature that the statement writes, or `function`.
 
 ### Translating simultaneous assignments
 
@@ -50527,13 +50537,13 @@ from before the tuple, translate it as:
 
 ```json example
 ["Block",
-  ["Assign", "_next_a", 1],
-  ["Assign", "_next_b", ["Add", "a", 1]],
+  ["Declare", "_next_a", "'unknown'", 1],
+  ["Declare", "_next_b", "'unknown'", ["Add", "a", 1]],
   ["Assign", "a", "_next_a"],
   ["Assign", "b", "_next_b"]]
 ```
 
-The temporary names must be fresh. The first pass evaluates every right-hand
+The temporary names must be fresh locals of the block. The first pass evaluates every right-hand
 side against the old state; the second pass commits the results. Commit order
 then does not matter because no temporary depends on a newly assigned value.
 
@@ -50641,7 +50651,7 @@ diagnostic.
 
 ```json example
 ["Block",
-  ["Assign", "n", -10],
+  ["Declare", "n", "'unknown'", -10],
   ["Which", ["Greater", "n", 0], "n", ["Less", "n", 0], ["Negate", "n"], "True", 0]
 ]
 // ➔ 10
@@ -51123,13 +51133,14 @@ Inside `body`:
 Bound names do not leak into the enclosing scope.
 
 A name that the body assigns must be declared with a value before the loop.
-The first assignment of a name in the body is the error
-`first-assignment-in-branch`. End the enclosing block with the name to use the
-result:
+An assignment in the body to a name that no scope declares is the error
+`assignment-to-undeclared-variable`, and a `["Declare"]` in the body is the
+error `declaration-below-statement`. End the enclosing block with the name to
+use the result:
 
 ```json example
 ["Block",
-  ["Assign", "s", 0],
+  ["Declare", "s", "'unknown'", 0],
   ["Loop", ["Assign", "s", ["Add", "s", "i"]], ["Element", "i", ["Range", 1, 4]]],
   "s"]
 // ➔ 10
@@ -51178,7 +51189,7 @@ The other compile targets decline the loop.
 
 ```json example
 ["Block",
-  ["Assign", "L", ["List", 0, 0]],
+  ["Declare", "L", "'unknown'", ["List", 0, 0]],
   ["ParallelLoop",
     ["AddTo", ["At", "L", ["Add", ["Mod", "i", 2], 1]], "i"],
     ["Element", "i", ["Range", 1, 5]]],
@@ -51228,7 +51239,7 @@ each position evaluated once, before `v`. In the body of a
 This is the MathJSON form of the Epsil `s += v` and `L[i] += v`.
 
 ```json example
-["Block", ["Assign", "L", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
+["Block", ["Declare", "L", "'unknown'", ["List", 1, 2, 3]], ["AddTo", ["At", "L", 2], 10], "L"]
 // ➔ [1, 12, 3]
 ```
 
@@ -51500,14 +51511,26 @@ that a variable is positive.
 
 Declare a new symbol in the current scope, with a type and a value.
 
-A declaration has a value. `Declare` evaluates to that value. A `Declare` with
-no value (`["Declare", "x"]`, `["Declare", "x", "integer"]`, or an
-_attributes_ dictionary with no `value` key) is the error
-`declaration-without-value`, and an `["Assign"]` after it does not repair it.
-Write `["Declare", "x", "integer", 5]`. One exception: a `Declare` of a
-function type with no value is valid when a function definition of the same
-name is in the same block (it gives the signature of that function). To
-declare a symbol with a type and no value, use `ce.declare()`.
+In a Program or Block, a declaration can reserve an uninitialized variable.
+An explicit annotation fixes its type. Otherwise preparation infers a contract
+from its initializer or a unique later initialization in the same straight-line
+sequence before any use. It does not search branches, loops or calls. Without
+that evidence the contract remains `unknown`, including after execution assigns
+a value. A read before initialization reports `read-before-initialization`.
+Later assignments validate against the fixed contract without widening it.
+
+Deferred initialization inference also stops at a runtime application, either
+between the declaration and the proposed initialization or inside its right side.
+For example, `let x; x=1` infers `number`, while `let x; x=1+2` keeps `unknown`.
+Use `let x=1+2` or an explicit annotation when that precision is needed.
+
+Outside those sequence routes, a `Declare` without a value still reports
+`declaration-without-value`; use `ce.declare()` to make an uninitialized host
+binding. A standalone `Declare` with a value evaluates to that value.
+
+In a `["Block"]`, a local is made only by a `Declare`, and a `Declare` is a
+statement of the block itself: in a branch of an `["If"]`, in a loop body or
+in a case of a `["Match"]`, it is the error `declaration-below-statement`.
 
 In a block, a second `["Declare"]` of a name that the block already declares
 is the error `variable-redeclaration`:
@@ -51664,15 +51687,18 @@ If a definition is found, change the value of the symbol to `value` if the
 value is compatible with the type of the symbol: once set, the type of
 a symbol cannot be changed.
 
-If there is no definition for the symbol, add a new definition in the
-current scope, and use the `value` to infer the type of the symbol. In a
-`["Block"]`, this first assignment of a name is its declaration, and it must
-be at the level of the block. In a branch of an `["If"]` or a `["Which"]`, in
-the body of a `["Loop"]` or in a case of a `["Match"]`, it is the error
-`first-assignment-in-branch`: assign a value to the name before the branch.
+If there is no definition for the symbol, and the assignment is outside every
+block (an `Assign` that the host evaluates, or `ce.assign()`), add a new
+definition in the current scope, and use the `value` to infer the type of the
+symbol. In a `["Block"]`, a function body or the body of a binder, an `Assign`
+never makes a variable: an `Assign` to a name that no scope declares is the
+error `assignment-to-undeclared-variable`. Declare the local with a
+`["Declare"]`:
+`["Block", ["Assign", "x", 5], "x"]` is that error, and
+`["Block", ["Declare", "x", "'unknown'", 5], "x"]` is `5`.
 
 A later assignment to a local keeps its type: the declared type, or the type
-of the first value (a number can become another number). A value of another
+of its initial value (a number can become another number). A value of another
 type is the error `assignment-type-mismatch`.
 
 An assignment is a statement, never an operand. `["f", ["Assign", "a", 2]]` and
@@ -51957,6 +51983,11 @@ Evaluate to the type of _expression_, as a type value.
 The result is the expression's **literal type** — the most precise claim
 available about the value, here the number itself. Its widening tier is
 `real`, which denotes a *finite* real.
+
+For a name with a declared type, `Type` gives that type. For a name with no
+declared type (an untyped parameter or local), it gives the type of the value
+the name holds, widened: in Epsil, `function f(x) { type(x) }` gives `integer`
+for `f(1)`, and `function f(x: list) { type(x) }` gives `list` for `f([1, 2])`.
 
 <ReadMore path="/compute-engine/guides/types" >Read more about the
 **type system**. </ReadMore>
@@ -52309,7 +52340,9 @@ reaches answers enumeration cannot: solving \\(x^2 - 29y^2 = 1\\) over
 
 When the unknowns are declared with an `integer` type and no domain is given,
 the result is the general **parametric family**, expressed with fresh integer
-parameters (`t`, `t_1`, …) that range over all integers:
+parameters (`t`, `t_1`, …) that range over all integers. A name that is
+declared, or that an expression already uses, is not taken: when `t` is in
+use, the first parameter is `t_1`.
 
 ```json example
 // with n and m declared as integers:
@@ -52400,8 +52433,8 @@ unevaluated.
 
 A trigonometric equation has infinitely many solutions. With no domain, or
 over the real or the complex numbers, the result is a list of families of
-solutions with the fresh integer parameter `t` (the names of the integer
-solver: `t`, `t_1`, …): `Solve(sin(x) = 1/2, x)` is
+solutions with an arbitrary integer, the call `["ArbitraryInteger", 1]`,
+written `t` in this paragraph: `Solve(sin(x) = 1/2, x)` is
 `[π/6 + 2πt, 5π/6 + 2πt]`, and each solution is a member of one family.
 Families with the same solutions become one family (`Solve(sin(x) = 0, x)` is
 `[πt]`), and the solution of each family is in `(−T/2, T/2]`, where `T` is its
@@ -52447,6 +52480,54 @@ When `Solve` stays unevaluated, you can:
 
 A list from `Solve` is never a part of the solutions. So when you need any
 solution, and not all of them, `FindRoot` is the right tool.
+
+</FunctionDefinition>
+
+<nav className="hidden">
+### ArbitraryConstant
+</nav>
+<FunctionDefinition name="ArbitraryConstant">
+
+<Signature name="ArbitraryConstant" returns="number">_k_: integer</Signature>
+
+<Signature name="ArbitraryInteger" returns="integer">_k_: integer</Signature>
+
+An arbitrary value in the result of `Solve`, `DSolve` or `RSolve`:
+`ArbitraryConstant(k)` is any number (a constant of integration, the free
+parameter of an identity), and `ArbitraryInteger(k)` is any integer (the
+parameter of a family of solutions). The index _k_ is a positive integer.
+
+```json example
+["Solve", ["Equal", ["Sin", "x"], 0], "x"]
+// ➔ ["List", ["Multiply", "Pi", ["ArbitraryInteger", 1]]]
+```
+
+Inside one result, two calls with the same index are the same value, and two
+calls with different indexes are independent: `C(1) − C(1)` is `0`, and
+nothing is known about `C(1) = C(2)`. A call has no value: it is not an
+unknown of the expression, it is not declared in any scope, and an expression
+that holds one does not compile.
+
+The indexes of a result start at the first index that its input does not use.
+Two results of two separate calls both use the index 1: before you combine
+them, replace the indexes of one.
+
+**To give a value to an arbitrary constant**, replace the call:
+
+```js
+const [family] = ce.box(["Solve", ["Equal", ["Sin", "x"], 0], "x"]).evaluate().ops;
+family.replace(
+  { match: ["ArbitraryInteger", 1], replace: 3 },
+  { recursive: true }
+).evaluate().json;
+// ➔ ["Multiply", 3, "Pi"]
+```
+
+In LaTeX, a call is written inside the command `\constant`, which shows only
+its argument: `\constant{c_{1}}` is `ArbitraryConstant(1)` and
+`\constant{n_{1}}` is `ArbitraryInteger(1)`. Without the command, `c_1` is an
+ordinary symbol. A renderer that does not know the command needs
+`\newcommand{\constant}[1]{#1}`.
 
 </FunctionDefinition>
 
@@ -53528,10 +53609,13 @@ operator that consumes a whole collection — `Mean`, `Median`, `Variance`,
 `StandardDeviation`, `Mode`, `Quartiles`, `Max`, `Min`, `Sum`, `Product`,
 `GCD`, `LCM`, `Flatten`, `ListFrom`, `SetFrom` or `TupleFrom` — a list
 argument binds whole. The parameter is followed through element-wise
-operators (`mean(v^2)`, `sin(v)`), through a local of the body assigned
-from it, and through a call to another function whose parameter binds whole,
-also when the body assigns that function to a local before the call
-(`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
+operators (`mean(v^2)`, `sin(v)`) and through a call to another function
+whose parameter binds whole, also when the body assigns that function to a
+local before the call (`h = t \mapsto \operatorname{mean}(t)`, then `h(v)`).
+Only a use of the parameter itself counts: a local of the body assigned
+from it (`w = v`, then `\operatorname{mean}(w)`) is not followed, and the
+function is applied to each element. Declare the parameter as a collection
+to take the list whole.
 
 ```js example
 ce.assign('h', ce.parse('v \\mapsto \\operatorname{mean}(v^2)'));
@@ -54299,6 +54383,10 @@ symbol with a collection type and no value stays unevaluated.
 // ➔ ["Tuple", 3]
 ```
 
+A regular nested list whose cells are not lists, including unevaluated
+applications of an unknown function, has the shape of its nesting:
+`["Shape", ["List", ["List", ["a", 1], ["a", 2]]]]` is `["Tuple", 1, 2]`.
+
 **Note:** The shape of a matrix is also sometimes called "dimensions".
 However, this terminology is ambiguous because the word "dimension" is also
 used to refer to the length of a matrix along a specific axis.
@@ -54370,6 +54458,17 @@ axes of a tensor.
 // ➔ 2
 
 ["MatrixRank", ["List", ["List", 1, 2], ["List", 2, 4]]]
+// ➔ 1
+```
+
+For a matrix of symbols, `MatrixRank` is the rank for generic values of the
+symbols. When the rank cannot be decided, `MatrixRank` stays unevaluated.
+
+```json example
+["MatrixRank", ["List", ["List", "a", "b"], ["List", "c", "d"]]]
+// ➔ 2
+
+["MatrixRank", ["List", ["List", "a", "b"], ["List", "a", "b"]]]
 // ➔ 1
 ```
 
@@ -54518,7 +54617,8 @@ depth.
 ```
 
 When a `depth` is given, only that many levels of nesting are flattened;
-without it, the collection is flattened completely.
+without it, or with a depth of `PositiveInfinity`, the collection is flattened
+completely.
 
 ```json example
 ["Flatten", ["List", ["List", 1, ["List", 2]], ["List", 3]], 1]
@@ -56714,6 +56814,13 @@ New sets can be defined using one of the following operators.
 
 </div>
 
+A chain `A \setminus B \setminus C` is `SetMinus(A, B, C)`, which removes
+`B` and then `C`. `\cup`, `\cap` and `\triangle` have the same precedence:
+they bind more tightly than a relation and less tightly than `\setminus`, and
+an unparenthesized mix nests to the right. `A \triangle B = C` is
+`Equal(SymmetricDifference(A, B), C)`, and `A \cup B \triangle C` is
+`Union(A, SymmetricDifference(B, C))`.
+
 The number of elements of a set is its
 [`Count`](/compute-engine/reference/collections/#count). In LaTeX it is
 written $$|\operatorname{A}|$$, `\#A` or `\operatorname{card}(A)`:
@@ -57019,6 +57126,16 @@ $$ \operatorname{erf} z = \frac{2}{\sqrt{\pi}} \int_0^z e^{-t^2} dt$$
 
 where $$z$$ is a complex number.
 
+<Signature name="Erf">_z0_, _z1_</Signature>
+
+With two arguments, the **generalized error function**
+$$ \operatorname{erf} z_1 - \operatorname{erf} z_0 $$.
+
+```json example
+["N", ["Erf", 0.1, 0.5]]
+// -> 0.408036961794761645479
+```
+
 </FunctionDefinition>
 
 <FunctionDefinition name="Erfc">
@@ -57043,6 +57160,16 @@ Outside that interval the value is not defined: `["ErfInv", 2]` and
 
 It is defined as $$ \operatorname{erf} \left(\operatorname{erf} ^{-1}x\right)
 = x $$.
+
+<Signature name="ErfInv">_z0_, _z_</Signature>
+
+With two arguments, the $$x$$ with $$ \operatorname{erf} x - \operatorname{erf} z_0 = z $$,
+that is `ErfInv(z + Erf(z0))`.
+
+```json example
+["N", ["ErfInv", 0.5, 0.2]]
+// -> 0.764695648017466677088
+```
 
 
 </FunctionDefinition>
@@ -57134,6 +57261,13 @@ $$
 // 24
 ```
 
+A half-integer argument gives a rational multiple of $$ \sqrt{\pi} $$:
+
+```json example
+["Gamma", ["Rational", 1, 2]]
+// -> √π
+```
+
 <Signature name="Gamma">_s_, _z_</Signature>
 
 <Latex value="\Gamma(s, z)"/>
@@ -57147,15 +57281,33 @@ $$
 $$
 
 The order `s` and the lower limit `z` may be real or complex, including negative
-and fractional orders. The two-argument form is evaluated numerically with
-`.N()` and otherwise stays symbolic; $$ \Gamma(s, 0) $$ reduces to $$ \Gamma(s) $$.
+and fractional orders. For a positive integer order the value is a closed form,
+and $$ \Gamma(\frac12, z) $$ is $$ \sqrt{\pi}\operatorname{erfc}\sqrt{z} $$.
+Other exact arguments stay symbolic and are evaluated numerically with `.N()`;
+$$ \Gamma(s, 0) $$ reduces to $$ \Gamma(s) $$.
 (This matches the `Gamma[s, z]` convention of Mathematica.)
 
 - NIST: http://dlmf.nist.gov/8.2.E2
 
 ```json example
+["Gamma", 2, 1]
+// -> 2/e
+
+["Gamma", 2, "x"]
+// -> (x + 1) e^(-x)
+
 ["N", ["Gamma", 2, 1]]
 // 0.7357588823428849
+```
+
+<Signature name="Gamma">_s_, _z0_, _z1_</Signature>
+
+With three arguments, the **generalized incomplete Gamma function**
+$$ \Gamma(s, z_0) - \Gamma(s, z_1) $$, the integral from $$z_0$$ to $$z_1$$.
+
+```json example
+["N", ["Gamma", 2, 1, 3]]
+// -> 0.536610608871428871274
 ```
 
 </FunctionDefinition>
@@ -57243,6 +57395,36 @@ Mathematica. `LogBarnesG(0)` is $$ -\infty $$.
 
 </FunctionDefinition>
 
+<FunctionDefinition name="HarmonicNumber">
+
+<Signature name="HarmonicNumber">_n_</Signature>
+<Signature name="HarmonicNumber">_n_, _r_</Signature>
+
+The harmonic number $$ H_n = \sum_{k=1}^{n} \frac{1}{k} $$, and the
+generalized harmonic number $$ H_n^{(r)} = \sum_{k=1}^{n} \frac{1}{k^r} $$.
+For a non-negative integer `n` and an integer `r` the value is an exact
+rational. For a rational `n` with a denominator from 2 to 4 (and `r = 1`)
+the value is exact, from $$ H_n = \psi(n+1) + \gamma $$; another rational
+stays unevaluated. Elsewhere `N()` gives the continuation
+$$ \psi(n+1) + \gamma $$, or $$ \zeta(r) - \zeta(r, n+1) $$ for
+$$ r \ne 1 $$. A negative integer `n` is a pole (`ComplexInfinity`).
+
+```json example
+["HarmonicNumber", 10]
+// -> 7381/2520
+
+["HarmonicNumber", 3, 2]
+// -> 49/36
+
+["HarmonicNumber", ["Rational", 1, 2]]
+// -> 2 - 2 ln(2)
+
+["N", ["HarmonicNumber", 0.5]]
+// -> 0.613705638880109381166
+```
+
+</FunctionDefinition>
+
 
 <FunctionDefinition name="Zeta">
 
@@ -57259,6 +57441,9 @@ $$
 
 and extended to other values by analytic continuation.
 
+At a complex `s`, `N()` gives a double. Above $$|\operatorname{Im} s| \approx
+12\,868$$ the call stays unevaluated.
+
 ```json example
 ["Zeta", 2]
 // ➔ π²/6
@@ -57273,10 +57458,19 @@ $$
 \zeta(s, a) = \sum_{n=0}^{\infty} \frac{1}{|n + a|^s}
 $$
 
-with the term where $n + a = 0$ omitted. For $a > 0$ it is equal to the
+with the term where $n + a = 0$ omitted, except at $s = 0$, where every term
+is 1 and $\zeta(0, a) = \frac12 - a$ for every numeric $a$. For $a > 0$ it is equal to the
 Hurwitz zeta function `HurwitzZeta(s, a)`, which sums $(n + a)^{-s}$ with the
 principal power. For $a \le 0$ the two differ: `Zeta(2.976, -2.664)` is the
 real `29.9024`, while `HurwitzZeta(2.976, -2.664)` is `22.6003 - 0.2754i`.
+
+```json example
+["Zeta", 2, -1]
+// ➔ 1 + π²/6
+
+["Zeta", 0, 3]
+// ➔ -5/2
+```
 
 - Wikidata: [Q187235](https://www.wikidata.org/wiki/Q187235)
 - NIST: http://dlmf.nist.gov/25.2
@@ -57476,9 +57670,27 @@ $$
 \operatorname{B}(a, b) = \int_0^1 t^{a-1}(1-t)^{b-1} \, dt
 $$
 
+At a complex operand, `N()` gives $$\Gamma(a)\Gamma(b)/\Gamma(a+b)$$ as a
+double.
+
 ```json example
 ["Beta", 2, 3]
 // ➔ 1/12
+
+["N", ["Beta", ["Complex", 1, 1], 2]]
+// ➔ 0.10000000000000012 - 0.3000000000000001i
+```
+
+<Signature name="Beta">_z_, _a_, _b_</Signature>
+<Signature name="Beta">_z0_, _z1_, _a_, _b_</Signature>
+
+The **incomplete beta function** $$ \operatorname{B}_z(a, b) $$, and the
+generalized form $$ \operatorname{B}_{z_1}(a, b) - \operatorname{B}_{z_0}(a, b) $$.
+For a rational `z` and positive integers `a`, `b` the value is exact.
+
+```json example
+["Beta", ["Rational", 1, 2], 2, 3]
+// ➔ 11/192
 ```
 
 - Wikidata: [Q192828](https://www.wikidata.org/wiki/Q192828)
@@ -57496,8 +57708,10 @@ $$
 Q(a, z) = \frac{\Gamma(a, z)}{\Gamma(a)} = \frac{1}{\Gamma(a)}\int_z^\infty t^{a-1}e^{-t} \, dt
 $$
 
-Exact arguments stay symbolic, and special values fold:
-`GammaRegularized(a, 0)` is $$1$$ and `GammaRegularized(1, z)` is $$e^{-z}$$.
+Special values fold: `GammaRegularized(a, 0)` is $$1$$ and
+`GammaRegularized(1, z)` is $$e^{-z}$$. For a positive integer `a` and an
+exact `z` the value is a closed form (`GammaRegularized(3, 5)` is
+$$\frac{37}{2e^5}$$); other exact arguments stay symbolic.
 Use `N()` for a numeric value, at machine or arbitrary precision.
 
 The cumulative distribution function of a Poisson distribution evaluates to
@@ -57507,6 +57721,15 @@ Q(k+1, \lambda)$$.
 ```json example
 ["N", ["GammaRegularized", 3, 5]]
 // ➔ 0.12465201948308115
+```
+
+<Signature name="GammaRegularized">_a_, _z0_, _z1_</Signature>
+
+With three arguments, $$ Q(a, z_0) - Q(a, z_1) $$.
+
+```json example
+["N", ["GammaRegularized", 3, 1, 5]]
+// ➔ 0.795046583445524662701
 ```
 
 - NIST: http://dlmf.nist.gov/8.2
@@ -57523,9 +57746,15 @@ $$
 I_x(a, b) = \frac{1}{\operatorname{B}(a, b)}\int_0^x t^{a-1}(1-t)^{b-1} \, dt
 $$
 
-Exact arguments stay symbolic, and the endpoints fold:
-`BetaRegularized(0, a, b)` is $$0$$ and `BetaRegularized(1, a, b)` is $$1$$.
+The endpoints fold: `BetaRegularized(0, a, b)` is $$0$$ and
+`BetaRegularized(1, a, b)` is $$1$$. For a rational `x` and positive integers
+`a`, `b` the value is an exact rational; other exact arguments stay symbolic.
 Use `N()` for a numeric value, at machine or arbitrary precision.
+
+Outside $$[0, 1]$$, `N()` gives the real value where it is a finite sum: for
+positive integers $$a$$ and $$b$$ at any real $$x$$
+(`BetaRegularized(2, 2, 3)` is `8`), and for $$x > 1$$ with an integer $$b$$
+up to 30. Elsewhere the call stays unevaluated.
 
 The cumulative distribution function of a binomial distribution evaluates to
 this function: $$\operatorname{CDF}(\operatorname{Binomial}(n, p), k) =
@@ -57534,6 +57763,18 @@ I_{1-p}(n-k, k+1)$$.
 ```json example
 ["N", ["BetaRegularized", 0.5, 2, 3]]
 // ➔ 0.6875
+
+["BetaRegularized", ["Rational", 1, 2], 2, 3]
+// ➔ 11/16
+```
+
+<Signature name="BetaRegularized">_z0_, _z1_, _a_, _b_</Signature>
+
+With four arguments, $$ I_{z_1}(a, b) - I_{z_0}(a, b) $$.
+
+```json example
+["N", ["BetaRegularized", 0.2, 0.5, 2, 3]]
+// ➔ 0.5067
 ```
 
 - NIST: http://dlmf.nist.gov/8.17
@@ -57684,7 +57925,10 @@ They arise in problems with cylindrical or spherical symmetry.
 numerically at a real or a complex argument under `.N()`, and under
 `evaluate()` when the argument is a float. On the negative real axis, their
 branch cut, `BesselY` and `BesselK` take the limit from above, as `Ln(-2)`
-does. A non-integer order stays symbolic. Compiled code computes these
+does. A real non-integer order evaluates at a positive real argument; at a
+negative or complex argument it stays symbolic. Above machine precision, a
+real argument gives `ce.precision` digits; a call that cannot reach them, such
+as `BesselI(0, 5000)`, stays unevaluated. Compiled code computes these
 functions for a real argument only.
 
 ```json example
@@ -57695,7 +57939,7 @@ functions for a real argument only.
 // ➔ 0.5103756726497453 + 0.44778155828247124i
 
 ["N", ["BesselJ", ["Rational", 1, 2], 1]]
-// ➔ ["BesselJ", 0.5, 1]  (non-integer order: stays symbolic)
+// ➔ 0.671396707141803090416
 ```
 
 
@@ -57814,6 +58058,10 @@ real or a complex argument under `.N()`, and under `evaluate()` when the
 argument is a float: `["N", ["AiryAi", ["Complex", 1, 1]]]` is
 `0.060458308371838146 - 0.15188956587718141i`. Compiled code computes them
 for a real argument only.
+
+Above machine precision, `AiryAi` and `AiryBi` of a real argument are
+computed to `ce.precision` digits; past $$|x| = 10^4$$, and for `AiryBi` past
+about $$x = 130$$, the call stays unevaluated.
 
 
 <FunctionDefinition name="AiryAi">
@@ -58018,7 +58266,8 @@ $K(m) = \frac{\pi}{2} \, {}_2F_1\big(\frac12, \frac12; 1; m\big)$.
 If $a$ or $b$ is a non-positive integer the series terminates and the
 function is a polynomial in $z$, evaluable for any $z$. Otherwise the
 function evaluates numerically for $z \le 1$ (real) and for complex $z$
-within the unit disk and the Pfaff-transform region.
+within the unit disk and the Pfaff-transform region. With a repeated
+parameter, `Hypergeometric2F1(a, b, b, z)` is $(1 - z)^{-a}$.
 
 ```json example
 ["Hypergeometric2F1", 1, 1, 2, 0.5]
@@ -58045,7 +58294,7 @@ $$
 $$
 
 It is an entire function of $z$ and evaluates numerically for any real or
-complex $z$.
+complex $z$. With a repeated parameter, `Hypergeometric1F1(a, a, z)` is $e^z$.
 
 ```json example
 ["Hypergeometric1F1", 1, 2, 2]
@@ -58111,9 +58360,13 @@ $$
 It is a modular form of weight $\frac12$, central to the theory of modular
 functions and integer partitions.
 
+Under `N()`, a complex $$\tau$$ with $$\operatorname{Im}\tau \ge 0.001$$ is
+computed to `ce.precision` digits. Above machine precision, a $$\tau$$ closer
+to the real axis stays unevaluated.
+
 ```json example
-["DedekindEta", "ImaginaryUnit"]
-// ➔ 0.768225422326057  (= Γ(1/4)/(2π^(3/4)))
+["N", ["DedekindEta", "ImaginaryUnit"]]
+// ➔ 0.768225422326056659003  (= Γ(1/4)/(2π^(3/4)))
 ```
 
 - Wikidata: [Q1187208](https://www.wikidata.org/wiki/Q1187208)
@@ -58675,6 +58928,17 @@ numeric approximation (`.N()`) works at machine or arbitrary precision.
 // 1/2 + Erf(x / sqrt(2)) / 2
 ```
 
+A float parameter or point gives a float. A discrete `CDF` reads a float point
+as its floor and stays exact.
+
+```json example
+["PDF", ["NormalDistribution", 0, 1], 0.5]
+// 0.352065326764299477774
+
+["CDF", ["PoissonDistribution", 2], 2.5]
+// 5/e^2
+```
+
 <nav className="hidden">
 ### NormalDistribution
 </nav>
@@ -58721,8 +58985,21 @@ when events occur independently at a mean rate of $$\lambda > 0$$.
 
 <Signature name="UniformDistribution">_a_, _b_</Signature>
 
+<Signature name="UniformDistribution">_[a, b]_</Signature>
+
+<Signature name="UniformDistribution"></Signature>
+
 A **continuous uniform distribution** on the interval $$[a, b]$$, with
-$$a < b$$.
+$$a < b$$. `UniformDistribution([a, b])` is `UniformDistribution(a, b)`, and
+`UniformDistribution()` is on $$[0, 1]$$.
+
+```json example
+["Mean", ["UniformDistribution", ["List", 2, 4]]]
+// 3
+
+["Variance", ["UniformDistribution"]]
+// 1/12
+```
 
 </FunctionDefinition>
 
@@ -58862,6 +59139,7 @@ See also: [Binomial coefficient - Wikipedia](https://en.wikipedia.org/wiki/Binom
 </nav>
 <FunctionDefinition name="Fibonacci">
 <Signature name="Fibonacci" returns="integer">n: integer</Signature>
+<Signature name="Fibonacci" returns="number">n: integer, x: number</Signature>
 Returns the <b>n<sup>th</sup> Fibonacci number</b>, a sequence defined by the sum of the two preceding numbers starting with 0 and 1. 
 
 For negative indices, the function returns <code>-Fibonacci(-n)</code>, following the standard extension of Fibonacci numbers to negative integers.
@@ -58878,6 +59156,13 @@ Hence, the 7th Fibonacci number is 13.
 // -> 13
 ```
 
+With a second operand, <code>Fibonacci(n, x)</code> is the <b>Fibonacci polynomial</b> $$F_n(x)$$, with $$F_n = x F_{n-1} + F_{n-2}$$, $$F_0 = 0$$, $$F_1 = 1$$. An index above 1000 stays unevaluated.
+
+```json
+["Fibonacci", 5, "x"]
+// -> x^4 + 3x^2 + 1
+```
+
 See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci_number)
 
 <Latex>{`
@@ -58890,7 +59175,7 @@ See also: [Fibonacci number - Wikipedia](https://en.wikipedia.org/wiki/Fibonacci
 </nav>
 <FunctionDefinition name="Binomial">
 <Signature name="Binomial" returns="integer">n: integer, k: integer</Signature>
-Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>.
+Calculates the <b>binomial coefficient</b> $$ C(n, k) $$, the number of ways to choose <b>k</b> elements from a set of <b>n</b> elements. Returns <b>0</b> if <code>k &lt; 0</code> or <code>k &gt; n</code>, and <b>1</b> if <code>k = 0</code> or <code>k = n</code>. For a symbolic <code>n</code>, <code>Binomial(n, n)</code> is <code>1</code> and <code>Binomial(n, n - 1)</code> is <code>n</code>.
 
 This function is similar to <code>Choose</code> but specialized for integer inputs and returns integer results. It is widely used in combinatorics, probability, and algebra.
 
@@ -59002,6 +59287,31 @@ See also: [Combination - Wikipedia](https://en.wikipedia.org/wiki/Combination)
 </FunctionDefinition>
 
 <nav className="hidden">
+### IntegerPartitions
+</nav>
+<FunctionDefinition name="IntegerPartitions">
+<Signature name="IntegerPartitions" returns="list&lt;list&lt;integer&gt;&gt;">n: integer, kspec?: any, parts?: list&lt;integer&gt;, m?: integer</Signature>
+Returns the <b>partitions</b> of <code>n</code>, each a list of positive parts in non-increasing order, in reverse lexicographic order.
+
+- <code>kspec</code>: <code>k</code> keeps the partitions of at most <code>k</code> parts, <code>[k]</code> exactly <code>k</code> parts, <code>[kmin, kmax]</code> or <code>[kmin, kmax, step]</code> a range of numbers of parts; <code>PositiveInfinity</code> or <code>All</code> is no limit.
+- <code>parts</code>: the allowed part sizes, positive integers.
+- <code>m</code>: keep the first <code>m</code> partitions.
+
+A non-integer bound or part size leaves the call unevaluated. The result is a lazy collection: <code>["Count", ["IntegerPartitions", 100]]</code> is <code>NPartition(100)</code>, 190569292, without enumerating the partitions, and <code>At</code> reads a position directly.
+
+```json
+["IntegerPartitions", 4]
+// -> [[4], [3, 1], [2, 2], [2, 1, 1], [1, 1, 1, 1]]
+
+["IntegerPartitions", 6, ["List", 2]]
+// -> [[5, 1], [4, 2], [3, 3]]
+```
+
+See also: [Integer partition - Wikipedia](https://en.wikipedia.org/wiki/Integer_partition)
+
+</FunctionDefinition>
+
+<nav className="hidden">
 ### Multinomial
 </nav>
 <FunctionDefinition name="Multinomial">
@@ -59052,6 +59362,7 @@ See also: [Derangement - Wikipedia](https://en.wikipedia.org/wiki/Derangement)
 </nav>
 <FunctionDefinition name="BellNumber">
 <Signature name="BellNumber" returns="integer">n: integer</Signature>
+<Signature name="BellNumber" returns="number">n: integer, x: number</Signature>
 Computes the <b>Bell number</b> $$ B(n) $$, which counts the number of ways to partition a set of <code>n</code> elements into any number of non-empty, disjoint subsets.
 
 Bell numbers appear in combinatorics and partition theory.
@@ -59062,6 +59373,13 @@ $$\{ \{1,2,3\}, \{1,2\},\{3\}, \{1,3\},\{2\}, \{2,3\},\{1\}, \{1\},\{2\},\{3\} }
 ```json
 ["BellNumber", 3]
 // -> 5
+```
+
+With a second operand, <code>BellNumber(n, x)</code> is the <b>Bell (Touchard) polynomial</b> $$\sum_k S(n, k)\, x^k$$.
+
+```json
+["BellNumber", 4, "x"]
+// -> x^4 + 6x^3 + 7x^2 + x
 ```
 
 See also: [Bell number - Wikipedia](https://en.wikipedia.org/wiki/Bell_number)
@@ -59219,9 +59537,9 @@ See also: [Prime number - Wikipedia](https://en.wikipedia.org/wiki/Prime_number)
 </nav>
 
 <FunctionDefinition name="NextPrime">
-<Signature name="NextPrime" returns="integer">n: integer</Signature>
-<Signature name="NextPrime" returns="integer">n: integer, k: integer</Signature>
-Returns the smallest prime number greater than $n$.
+<Signature name="NextPrime" returns="integer">n: real</Signature>
+<Signature name="NextPrime" returns="integer">n: real, k: integer</Signature>
+Returns the smallest prime number greater than $n$. A non-integer $n$ is allowed: `NextPrime(7/2)` is 5.
 
 With a second argument $k$, returns the $k$th prime after $n$. A negative $k$ returns the $|k|$th prime before $n$, so `NextPrime(n, -1)` is the largest prime less than $n$.
 
@@ -59245,7 +59563,7 @@ See also: [Prime number - Wikipedia](https://en.wikipedia.org/wiki/Prime_number)
 </nav>
 
 <FunctionDefinition name="FactorInteger">
-<Signature name="FactorInteger" returns="list<tuple<integer, integer>>">n: integer</Signature>
+<Signature name="FactorInteger" returns="list<tuple<integer, integer>>">n: rational</Signature>
 Returns the prime factorization of $n$ as a list of `[prime, exponent]` tuples, ordered by ascending prime.
 
 For example, $360 = 2^3 \times 3^2 \times 5$, so the factorization is the list of tuples $(2, 3)$, $(3, 2)$, and $(5, 1)$. The sign of a negative $n$ is carried in a leading $(-1, 1)$ tuple.
@@ -59255,6 +59573,13 @@ See also: [Integer factorization - Wikipedia](https://en.wikipedia.org/wiki/Inte
 ```json
 ["FactorInteger", 360]
 // ➔ [(2, 3), (3, 2), (5, 1)]
+```
+
+A rational $p/q$ is factored as $p$ and $q$, with negative exponents for the primes of $q$.
+
+```json
+["FactorInteger", ["Rational", 12, 35]]
+// ➔ [(2, 2), (3, 1), (5, -1), (7, -1)]
 ```
 </FunctionDefinition>
 
@@ -59335,17 +59660,17 @@ The floored-sign convention of `Mod` (the result follows the sign of the divisor
 
 ### Solving Congruences
 
-Passing a **linear congruence** to `solve` returns the parametric residue family with a fresh integer parameter $t ∈ ℤ$; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
+Passing a **linear congruence** to `solve` returns the parametric residue family with an arbitrary integer, `ArbitraryInteger(1)`, written $t$ below; an unsolvable congruence returns an empty result, and a gcd-divisible congruence is reduced:
 
 ```javascript
 ce.parse('6n \\equiv 4 \\pmod 7').solve('n');
-// ➔ [7t + 3]
+// ➔ [3 + 7t]   t = ["ArbitraryInteger", 1]
 
 ce.parse('2x \\equiv 1 \\pmod 4').solve('x');
 // ➔ []   (no solution)
 
 ce.parse('4x \\equiv 2 \\pmod 6').solve('x');
-// ➔ [3t + 2]
+// ➔ [2 + 3t]
 ```
 
 A **system of simultaneous congruences** in one unknown (an `And` of congruences) is combined via the Chinese Remainder Theorem — including non-coprime moduli — into a single family. An inconsistent system reports no solution.
@@ -59450,8 +59775,8 @@ See also: [Möbius function - Wikipedia](https://en.wikipedia.org/wiki/M%C3%B6bi
 </nav>
 
 <FunctionDefinition name="IsSquareFree">
-<Signature name="IsSquareFree" returns="boolean">n: integer</Signature>
-Returns `"True"` if $n$ is square-free, i.e. not divisible by any perfect square greater than 1.
+<Signature name="IsSquareFree" returns="boolean">n: rational</Signature>
+Returns `"True"` if $n$ is square-free, i.e. not divisible by any perfect square greater than 1. A rational is square-free when its numerator and denominator are: `IsSquareFree(2/3)` is `"True"`, `IsSquareFree(2/9)` is `"False"`.
 
 ```json
 ["IsSquareFree", 30]
@@ -59527,6 +59852,17 @@ See also: [Modular exponentiation - Wikipedia](https://en.wikipedia.org/wiki/Mod
 // ➔ 24
 ```
 
+<Signature name="PowerMod" returns="integer">a: rational, b: integer, m: integer</Signature>
+A rational base $p/q$ is read as $p$ times the inverse of $q$ modulo $m$; when $q$ has no inverse, the expression stays unevaluated. A list operand threads.
+
+```json
+["PowerMod", ["Rational", 1, 2], 2, 7]
+// ➔ 2
+
+["PowerMod", ["List", 2, 3], 2, 7]
+// ➔ [4, 2]
+```
+
 <Signature name="PowerMod" returns="integer">a: integer, e: rational, m: integer</Signature>
 With a rational exponent $e = s/r$, returns the least $x$ in $[0, m)$ such
 that $x^r ≡ a^s \pmod m$, as in the Wolfram Language. When there is no such
@@ -59557,6 +59893,13 @@ entries.
 ```json
 ["PowerModList", 3, ["Rational", 1, 2], 11]
 // ➔ [5, 6]
+```
+
+As for `PowerMod`, a rational base $p/q$ is read as $p$ times the inverse of $q$ modulo $m$, and a list operand threads.
+
+```json
+["PowerModList", ["List", 2, 3], 2, 7]
+// ➔ [[4], [2]]
 ```
 </FunctionDefinition>
 
@@ -59606,6 +59949,7 @@ See also: [Modular multiplicative inverse - Wikipedia](https://en.wikipedia.org/
 
 <FunctionDefinition name="ExtendedGCD">
 <Signature name="ExtendedGCD" returns="tuple<integer, integer, integer>">a: integer, b: integer</Signature>
+<Signature name="ExtendedGCD" returns="tuple">a: integer, b: integer, ...rest: integer</Signature>
 Returns the extended GCD of $a$ and $b$ as a tuple $(g, x, y)$, where $g = \gcd(a, b)$ is non-negative and $a·x + b·y = g$ (the Bézout coefficients).
 
 See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wiki/Extended_Euclidean_algorithm)
@@ -59613,6 +59957,13 @@ See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wi
 ```json
 ["ExtendedGCD", 12, 18]
 // ➔ (6, -1, 1)
+```
+
+With more than two operands, `ExtendedGCD(a₁, …, aₙ)` is $(g, x_1, …, x_n)$ with $\sum a_i x_i = g$.
+
+```json
+["ExtendedGCD", 12, 18, 27]
+// ➔ (3, 4, -4, 1)
 ```
 </FunctionDefinition>
 
@@ -59623,6 +59974,7 @@ See also: [Extended Euclidean algorithm - Wikipedia](https://en.wikipedia.org/wi
 
 <FunctionDefinition name="ChineseRemainder">
 <Signature name="ChineseRemainder" returns="integer">residues: collection, moduli: collection</Signature>
+<Signature name="ChineseRemainder" returns="integer">residues: collection, moduli: collection, d: integer</Signature>
 Returns the smallest non-negative integer $x$ such that $x ≡ \mathrm{residues}_i \pmod{\mathrm{moduli}_i}$ for every $i$. The moduli need not be coprime. Undefined if the system is inconsistent or the two lists differ in length.
 
 See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/Chinese_remainder_theorem)
@@ -59630,6 +59982,13 @@ See also: [Chinese remainder theorem - Wikipedia](https://en.wikipedia.org/wiki/
 ```json
 ["ChineseRemainder", [2, 3, 2], [3, 5, 7]]
 // ➔ 23
+```
+
+With a third argument $d$, returns the smallest solution that is at least $d$.
+
+```json
+["ChineseRemainder", [2, 3, 2], [3, 5, 7], 100]
+// ➔ 128
 ```
 </FunctionDefinition>
 
@@ -59754,8 +60113,10 @@ See also: [Lucas number - Wikipedia](https://en.wikipedia.org/wiki/Lucas_number)
 </nav>
 
 <FunctionDefinition name="CatalanNumber">
-<Signature name="CatalanNumber" returns="integer">n: integer</Signature>
+<Signature name="CatalanNumber" returns="number">n: real</Signature>
 Returns the $n$th Catalan number $C_n = \frac{(2n)!}{(n+1)!\,n!}$: 1, 1, 2, 5, 14, 42, … Defined for $n ≥ 0$.
+
+A positive half-integer gives an exact value (`CatalanNumber(1/2)` is $\frac{8}{3\pi}$); another positive real is evaluated numerically from $\frac{Γ(2n+1)}{Γ(n+1)\,Γ(n+2)}$. A negative non-integer stays unevaluated.
 
 See also: [Catalan number - Wikipedia](https://en.wikipedia.org/wiki/Catalan_number)
 
@@ -59784,21 +60145,50 @@ See also: [Bernoulli number - Wikipedia](https://en.wikipedia.org/wiki/Bernoulli
 
 
 <nav className="hidden">
+### EulerE
+</nav>
+
+<FunctionDefinition name="EulerE">
+<Signature name="EulerE" returns="integer">n: integer</Signature>
+<Signature name="EulerE" returns="number">n: integer, x: number</Signature>
+`EulerE(n)` is the $n$th Euler number $E_n$ (1, 0, -1, 0, 5, 0, -61, …): an exact integer for a non-negative integer $n$, 0 for an odd $n$.
+
+`EulerE(n, x)` is the Euler polynomial $E_n(x)$: exact at an exact $x$, a float at a float $x$ (real or complex in both cases), and the expanded polynomial otherwise. A negative $n$ stays unevaluated.
+
+See also: [Euler numbers - Wikipedia](https://en.wikipedia.org/wiki/Euler_numbers)
+
+```json
+["EulerE", 4]
+// ➔ 5
+
+["EulerE", 2, "x"]
+// ➔ x^2 - x
+
+["EulerE", 3, ["Complex", 1, 2]]
+// ➔ -25/4 - 8i
+```
+</FunctionDefinition>
+
+
+<nav className="hidden">
 ### ContinuedFraction
 </nav>
 
 <FunctionDefinition name="ContinuedFraction">
-<Signature name="ContinuedFraction" returns="list<integer>">x: number</Signature>
-<Signature name="ContinuedFraction" returns="list<integer>">x: number, n: integer</Signature>
+<Signature name="ContinuedFraction" returns="list<integer | list<integer>>">x: number</Signature>
+<Signature name="ContinuedFraction" returns="list<integer | list<integer>>">x: number, n: integer</Signature>
 Returns the continued-fraction expansion of $x$ as a list of integer terms $[a_0, a_1, …]$.
 
-An exact rational is expanded fully. For an inexact value the expansion is truncated to the optional $n$ terms (default 20); note that floating-point round-off can introduce spurious large terms in the tail.
+An exact rational is expanded fully. An exact quadratic irrational is expanded to its periodic form, whose last element is the period: `["ContinuedFraction", ["Sqrt", 2]]` is `[1, [2]]`; with $n$, to exactly $n$ terms (`[1, 2, 2, 2, 2]` for $n = 5$). Another exact real (`ExponentialE`, `Pi`) is expanded to $n$ terms (default 20), each checked at a doubled precision, or stays unevaluated. For an inexact value the expansion is truncated to the optional $n$ terms (default 20); note that floating-point round-off can introduce spurious large terms in the tail.
 
 See also: [Continued fraction - Wikipedia](https://en.wikipedia.org/wiki/Continued_fraction)
 
 ```json
 ["ContinuedFraction", ["Rational", 43, 19]]
 // ➔ [2, 3, 1, 4]
+
+["ContinuedFraction", ["Sqrt", 2]]
+// ➔ [1, [2]]
 ```
 </FunctionDefinition>
 
@@ -59809,7 +60199,7 @@ See also: [Continued fraction - Wikipedia](https://en.wikipedia.org/wiki/Continu
 
 <FunctionDefinition name="FromContinuedFraction">
 <Signature name="FromContinuedFraction" returns="number">terms: collection</Signature>
-Reconstructs the (rational) value of a continued fraction from its list of integer terms $[a_0, a_1, …]$.
+Reconstructs the value of a continued fraction from its list of integer terms $[a_0, a_1, …]$. A last element that is a list is the repeating period: `["FromContinuedFraction", ["List", 1, ["List", 2]]]` is $\sqrt{2}$.
 
 ```json
 ["FromContinuedFraction", [2, 3, 1, 4]]
@@ -59828,7 +60218,7 @@ Reconstructs the (rational) value of a continued fraction from its list of integ
 <Signature name="IntegerDigits" returns="list<integer>">n: integer, base: integer, length: integer</Signature>
 Returns the digits of $n$ in the given `base` (default 10), most-significant first. The sign of $n$ is ignored.
 
-With a third argument `length`, the result is zero-padded on the left (or truncated to its least-significant digits) to that length.
+With a third argument `length`, the result is zero-padded on the left (or truncated to its least-significant digits) to that length. `length` is at most 1,000,000; a larger length leaves the call unevaluated.
 
 ```json
 ["IntegerDigits", 255, 16]
@@ -59844,13 +60234,19 @@ With a third argument `length`, the result is zero-padded on the left (or trunca
 <FunctionDefinition name="DigitCount">
 <Signature name="DigitCount" returns="list<integer>">n: integer, base: integer</Signature>
 <Signature name="DigitCount" returns="integer">n: integer, base: integer, digit: integer</Signature>
+<Signature name="DigitCount" returns="integer">n: integer, base: integer, digit: integer, length: integer</Signature>
 Counts digits of $n$ in the given `base` (default 10); the sign of $n$ is ignored.
 
 With a third argument `digit`, returns how many times that digit occurs. Otherwise returns a list `[count of 1, count of 2, …, count of base-1, count of 0]`.
 
+With `length`, the digits are first padded with zeros on the left or cut to the last `length` digits. `length` is at most 1,000,000.
+
 ```json
 ["DigitCount", 122, 10, 2]
 // ➔ 2
+
+["DigitCount", 5, 2, 0, 8]
+// ➔ 6
 ```
 </FunctionDefinition>
 
@@ -59860,15 +60256,21 @@ With a third argument `digit`, returns how many times that digit occurs. Otherwi
 </nav>
 
 <FunctionDefinition name="FromDigits">
-<Signature name="FromDigits" returns="integer">digits: collection</Signature>
-<Signature name="FromDigits" returns="integer">digits: collection, base: integer</Signature>
+<Signature name="FromDigits" returns="number">digits: collection</Signature>
+<Signature name="FromDigits" returns="number">digits: collection, base: number</Signature>
 Reconstructs an integer from its list of digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`.
 
-Digits outside $[0, base)$ are combined positionally (Horner evaluation), so `FromDigits` is well-defined for any integer terms.
+Digits outside $[0, base)$ are combined positionally. The base may be any number or symbol: an integer base of any sign gives an exact integer, and another base gives the sum $\sum d_k\, base^k$ (exact under `evaluate()`, numeric under `N()`).
 
 ```json
 ["FromDigits", [1, 2, 3, 4]]
 // ➔ 1234
+
+["FromDigits", [1, 1, 0], -2]
+// ➔ 2
+
+["FromDigits", ["List", "a", "b", "c"], "x"]
+// ➔ a x^2 + b x + c
 ```
 </FunctionDefinition>
 
@@ -59880,11 +60282,17 @@ Digits outside $[0, base)$ are combined positionally (Horner evaluation), so `Fr
 <FunctionDefinition name="DigitSum">
 <Signature name="DigitSum" returns="integer">n: integer</Signature>
 <Signature name="DigitSum" returns="integer">n: integer, base: integer</Signature>
+<Signature name="DigitSum" returns="integer">n: integer, base: integer, k: integer</Signature>
 Returns the sum of the digits of $n$ in the given `base` (default 10). The sign of $n$ is ignored.
+
+With `k`, sums the first `k` digits, or the last $|k|$ digits when `k` is negative.
 
 ```json
 ["DigitSum", 1234]
 // ➔ 10
+
+["DigitSum", 1234, 10, 2]
+// ➔ 3
 ```
 </FunctionDefinition>
 
@@ -59894,8 +60302,8 @@ Returns the sum of the digits of $n$ in the given `base` (default 10). The sign 
 </nav>
 
 <FunctionDefinition name="DivisorSigma">
-<Signature name="DivisorSigma" returns="integer">k: integer, n: integer</Signature>
-Returns the divisor function $σ_k(n) = \sum_{d \mid n} d^k$ over the positive divisors of $n$. $σ_0$ counts divisors (like `Sigma0`) and $σ_1$ sums them (like `Sigma1`). Defined for $n ≥ 1$.
+<Signature name="DivisorSigma" returns="rational">k: integer, n: integer</Signature>
+Returns the divisor function $σ_k(n) = \sum_{d \mid n} d^k$ over the positive divisors of $n$. $σ_0$ counts divisors (like `Sigma0`) and $σ_1$ sums them (like `Sigma1`). The sign of $n$ is ignored; undefined for $n = 0$. A negative $k$ gives $σ_k(n) = σ_{-k}(n)/n^{-k}$, a rational: `DivisorSigma(-1, 12)` is 7/3.
 
 See also: [Divisor function - Wikipedia](https://en.wikipedia.org/wiki/Divisor_function)
 
@@ -60098,6 +60506,23 @@ See also: [Partition function (number theory) - Wikipedia](https://en.wikipedia.
 ["NPartition", -3]
 // ➔ 0
 ```
+
+To list the partitions themselves, see `IntegerPartitions` in the [combinatorics reference](/compute-engine/reference/combinatorics/).
+</FunctionDefinition>
+
+
+<nav className="hidden">
+### PartitionsQ
+</nav>
+
+<FunctionDefinition name="PartitionsQ">
+<Signature name="PartitionsQ" returns="integer">n: integer</Signature>
+Returns the number of partitions of $n$ into distinct parts, which by Euler's theorem is also the number of partitions of $n$ into odd parts (OEIS A000009). It is `0` for a negative $n$.
+
+```json
+["PartitionsQ", 10]
+// ➔ 10
+```
 </FunctionDefinition>
 
 
@@ -60202,7 +60627,7 @@ See also: [Centered square number - OEIS A001844](https://oeis.org/A001844)
 
 <FunctionDefinition name="IsPerfect">
 <Signature name="IsPerfect" returns="boolean">n: integer</Signature>
-Returns `"True"` if $n$ is a perfect number.
+Returns `"True"` if $n$ is a perfect number. For $n < 1$ the result is `"False"`: a perfect number is positive.
 
 A perfect number is one that equals the sum of its positive divisors excluding itself. For example, 28 is perfect since 1 + 2 + 4 + 7 + 14 = 28.
 
@@ -60559,18 +60984,15 @@ Grapheme segmentation is not available on every compilation target, so each
 target either implements a string operation grapheme-correctly or **fails
 closed** with a diagnostic — never by silently counting code units.
 
-| Operation | JavaScript | Python | GLSL |
-| :--- | :--- | :--- | :--- |
-| `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported | Not supported |
-| Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported | Not supported |
-| String-preserving operators (`Reverse`, `Take`, …) | Segment, operate, rejoin | Not supported | Not supported |
-| `character` values, `String(c)`, `==`, `<` | A one-character host string; equality is `===`, ordering by code point | Not supported | Not supported |
-| `CharacterFrom(x)` for a non-literal `x` | Not supported (needs a runtime cluster count) | Not supported | Not supported |
+| Operation | JavaScript | GLSL |
+| :--- | :--- | :--- |
+| `Length(s)`, `At(s, i)` / `s[i]` | Compiled grapheme-aware (never the host `.length`) | Not supported |
+| Iteration-derived (`Map`, `Filter`, `Reduce`, `Any`, `All`, `Contains`, `IndexOf`, … over a string) | Segmented, then the ordinary list lowering | Not supported |
+| String-preserving operators (`Reverse`, `Take`, …) | Segment, operate, rejoin | Not supported |
+| `character` values, `String(c)`, `==`, `<` | A one-character host string; equality is `===`, ordering by code point | Not supported |
+| `CharacterFrom(x)` for a non-literal `x` | Not supported (needs a runtime cluster count) | Not supported |
 
-Python has no grapheme segmentation in its standard library (`len()` counts
-code points), so string collection operations report a target-capability
-diagnostic rather than compiling to something subtly wrong. GLSL
-has no string support at all, and string-typed operands are rejected as
+GLSL has no string support at all, and string-typed operands are rejected as
 before.
 
 <ReadMore path="/compute-engine/guides/compiling/" >
@@ -61664,9 +62086,16 @@ ce.box(['Less', ce.string('\uE000'), ce.string('\u{1F600}')]).evaluate();
 
 <Signature name="IntegerString" returns="string">_n_:integer</Signature>
 <Signature name="IntegerString" returns="string">_n_:integer, _base_:integer</Signature>
+<Signature name="IntegerString" returns="string">_n_:integer, _base_:integer, _length_:integer</Signature>
 
 A string representation of the integer _n_ in the given _base_ (2 to 36,
-default 10). The sign is preserved.
+default 10). The sign is preserved. An integer past $2^{53}$ is kept exact.
+A symbol with no value, as _n_ or as _base_, leaves the call unevaluated. A
+base outside 2 to 36 is an `out-of-range` error.
+
+With _length_, the digits of $|n|$ are padded with zeros on the left, or cut
+to the last _length_ digits; the sign is dropped. _length_ is at most
+1,000,000; a larger length leaves the call unevaluated.
 
 ```json example
 ["IntegerString", 42]
@@ -61677,6 +62106,12 @@ default 10). The sign is preserved.
 
 ["IntegerString", -42]
 // ➔ "-42"
+
+["IntegerString", ["Factorial", 30]]
+// ➔ "265252859812191058636308480000000"
+
+["IntegerString", 5, 2, 8]
+// ➔ "00000101"
 ```
 
 `IntegerString` is broadcastable: applied to a list of integers it returns a
@@ -61699,7 +62134,7 @@ list of strings.
 The integer denoted by the digits of the string _s_, read in the given _base_
 (2 to 36, default 10). Leading and trailing whitespace is ignored, and a
 leading sign is honored. A `0x` or `0b` prefix selects base 16 or 2
-regardless of the _base_ argument.
+regardless of the _base_ argument. An integer past $2^{53}$ is kept exact.
 
 ```json example
 ["DigitsFrom", {str: "42"}]
@@ -62103,7 +62538,7 @@ string replacement compile to JavaScript. `StringMatch`, `StringMatchAll`, a
 function replacement and a computed pattern do not — they report character
 positions or records that compiled code has no representation for — and fail
 closed rather than answering differently from the interpreter. No regular
-expression compiles to Python or to the shader targets.
+expression compiles to the shader targets.
 
 <nav className="hidden">
 ### Annotated
@@ -62830,7 +63265,26 @@ ce.parse("\\operatorname{arsinh}(1+i)").N();
 ```
 
 Exact arguments remain symbolic with `evaluate()` unless an exact value is
-known.
+known. A hyperbolic function of `Ln(q)` is a rational function of `q`:
+`Cosh(Ln(2))` evaluates to `5/4`.
+
+A function of its own inverse is its argument: `Sin(Arcsin(x))` evaluates to
+`x`, for each circular and hyperbolic function. An inverse of its own function
+gives the principal value for an exact real argument: `Arcsin(Sin(3))`
+evaluates to `π - 3`; `Arcsin(Sin(x))` stays, as it is not `x` outside
+$[-\pi/2, \pi/2]$. `simplify()` also rewrites `Cos(Arcsin(x))` as
+`√(1 - x²)`, `Arccos(-x)` as `π - Arccos(x)` and `Arccot(-x)` as
+`π - Arccot(x)`.
+
+`Arccot` takes its values in $(0, \pi)$ on the real line: `Arccot(-1)` is
+$\frac{3\pi}{4}$ and `Arccot(0)` is $\frac{\pi}{2}$. For a complex argument,
+$\operatorname{Arccot}(z) = \frac{\pi}{2} - \operatorname{Arctan}(z)$. It is
+continuous across the real line (`N(Arccot(-3 + 10^{-12}i))` is
+`2.819842099193151 - 10^{-13}i`, next to `N(Arccot(-3))`), and its branch
+cuts are those of `Arctan`: the imaginary axis above $i$ and below $-i$. On
+the cut, `Arccot(2i)` is $-0.549i$ and `Arccot(-2i)` is $\pi + 0.549i$. Some
+systems (Mathematica, mpmath) use $\operatorname{Arctan}(1/z)$ instead, an odd
+function that differs from this one by $\pi$ when $\operatorname{Re} z < 0$.
 
 ## Trigonometric Functions
 

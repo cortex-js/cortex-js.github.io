@@ -51,7 +51,6 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Units and Quantities](https://mathlive.io/compute-engine/guides/units.md): The Compute Engine supports physical units and quantities. You can parse LaTeX
 - [Simplify](https://mathlive.io/compute-engine/guides/simplify.md): A complicated mathematical expression can often be transformed into a form that
 - [Compiling Expressions](https://mathlive.io/compute-engine/guides/compiling.md): The Compute Engine can compile LaTeX expressions to JavaScript functions!
-- [Python/NumPy Compilation Target](https://mathlive.io/compute-engine/guides/python-target.md): The Python compilation target generates NumPy-compatible Python code from mathematical expressions, enabling seamless integration with scientific Python workflows.
 - [Assumptions](https://mathlive.io/compute-engine/guides/assumptions.md): Assumptions are statements about symbols that are assumed to be true. For
 - [Patterns and Rules](https://mathlive.io/compute-engine/guides/patterns-and-rules.md): Recognizing patterns and applying rules is a powerful symbolic computing tool to
 - [Extended Rules — The Identities Library](https://mathlive.io/compute-engine/guides/identities.md): The Identities Library is an optional add-on that teaches the Compute

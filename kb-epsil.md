@@ -329,7 +329,14 @@ import { ComputeEngine, checkEpsil } from "@cortex-js/compute-engine/epsil";
 const ce = new ComputeEngine();
 const { diagnostics } = checkEpsil(ce, 'let b = "x" + 1');
 console.log(diagnostics[0].message[0]); // static-type-error
+console.log(diagnostics[0].code); // incompatible-type
 ```
+
+A static type error has the engine error code in its `code` field, so a host
+can tell one static error from another without reading the message. The
+`range` of a diagnostic is the `[start, end)` offsets of the source it is
+about: for a name that a statement reads before its `let`, the range of that
+name.
 
 An error that only a run finds, such as a division by zero in a loop, is not in
 these diagnostics.
@@ -1178,7 +1185,7 @@ into a string:
 ```epsil
 let x = 2^11 - 1
 "\(x) has type \(type(x))"
-// ➔ "2047 has type integer"
+// ➔ "2047 has type number"
 ```
 
 **A formatted table.** `\t` and `\n` escapes in a string literal are real
@@ -1862,10 +1869,9 @@ does not use a shadowed library operator. A call of a user function that
 shadows a library function, such as `function Gamma(x) { x + 100 }`, compiles
 as a call of the user function. These are interpreted instead: a user
 definition of an operator that the language builds by name, such as `+`, `<`,
-`and`, `If` and `Sum`; a multi-clause function; a function with its own
+`and`, `If` and `Sum`; a multi-clause function; and a function with its own
 `compile` handler, `derivative`, `lazy`, `broadcastable` or declared effects
-(the compiler uses its `compile` handler when it has one); and any call of a
-user function on the Python target.
+(the compiler uses its `compile` handler when it has one).
 
 The markers `Nothing` and `Missing` are the exception:
 they cannot be rebound, and a binding of one of them is an error
@@ -2483,9 +2489,10 @@ sum(m)
 ```
 
 An assigned generator with no last element (`filter(1..oo, k => k > n)`)
-stays a generator, and stores the value that `n` has at the assignment. A
-generator that is not assigned (an argument, an operand) reads variables at
-*materialization* time.
+stays a generator, and its function reads `n` when an element is computed,
+as a Python generator does. A generator that is not assigned (an argument,
+an operand) also reads variables at *materialization* time. To keep the
+elements of a given time, list them then (`listFrom(take(g, 3))`).
 
 ## Control Flow
 
@@ -3319,12 +3326,12 @@ World
 ```
 
 ```epsil
-hello2 = """
+let hello2 = """
 Hello
 World
 """ // Same as "Hello\nWorld"
 
-hello3 = """
+let hello3 = """
     Hello
     World
     """ // Same as "Hello\nWorld"
@@ -3473,20 +3480,20 @@ infinities and `NaN` are not in any of them: they have types of their own,
 
 ## When to write an annotation
 
-**The default is not to.** Epsil infers the type of anything you declare, and
-for a value used near where it is defined the inferred type is the one you
-would have written:
+**The default is not to.** Epsil infers a stable assignment contract for an
+unannotated variable. Numeric variables use `number`, so later numeric values
+can replace the initializer:
 
 ```epsil-live
 let radius = 2.5
 let area = pi * radius^2
 type(area)
-// ➔ TypeFrom("real")
+// ➔ TypeFrom("number")
 ```
 
-Writing `let radius: real = 2.5` adds a word and no information — the
-initializer already said it. Reach for an annotation in the five situations
-where it does something.
+Writing `let radius: real = 2.5` restricts later assignments to finite real
+values. Reach for an annotation when this restriction is part of the contract,
+or in the five situations below.
 
 ### 1. On the parameters of a function others will call
 
@@ -3510,7 +3517,7 @@ not show that it fits, the call stays unevaluated:
 ```epsil
 function twice(k: integer) { 2*k }
 let r = twice(m)   // twice(m)
-m = 1.5
+let m = 1.5
 r                  // Error(ErrorCode("incompatible-type", "integer", "1.5"), …)
 ```
 
@@ -3830,7 +3837,7 @@ A value built this way carries its type with it, wherever it goes:
 type point = tuple<x: number, y: number>
 let ps = [point(1, 2), point(3, 4)]
 type(ps)
-// ➔ TypeFrom("list<point^2>")
+// ➔ TypeFrom("list<point>")
 ```
 
 An **alias** constructor is a checked cast instead of a tag: it validates the
@@ -4652,115 +4659,137 @@ those an explicit lambda.
 ## Reassignment vs. declaration
 
 A bare `x = 5` — no `let`/`const` keyword, no type annotation — is not
-declaration syntax: it is an **assignment**:
+declaration syntax: it is an **assignment**, and it writes a variable that is
+already declared:
 
 ```epsil
+let x = 0
 x = 5
 ```
 
-Assigning to a name that was never declared does establish it, but `let` is
-the explicit and idiomatic way to introduce a mutable binding.
+An assignment never declares a name. An assignment to a name that no `let`,
+`const` or parameter declares, and that no earlier program or the host
+declared, is an error (`assignment-to-undeclared-variable`), at the top level
+of a program as in a block or a function body. `let` introduces a mutable
+binding.
 
-## The rules of block locals
+## Variable bindings {#the-rules-of-block-locals}
 
-Two rules make sure that a local always has a value when it is read:
+The same declaration and assignment rules apply to a program and to block
+locals. Two rules make sure a declared variable has a value when it is read:
 
-1. **A declaration has a value.** `let x = v`, `let x: integer = v`, or a
-   first assignment `x = v` at the own level of a block, declares `x` with
-   its value. `let x: integer` with no value is an error
-   (`declaration-without-value`). One declaration needs no value: a
-   function type, when a `function` statement (or a definition
-   `f(x) = …`) of the same name is in the same block. The definition gives
-   the name its value from the start of the block, so the declaration only
-   gives the signature of the function:
-   `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` is `3`. A
-   definition in an enclosing block does not count: with no definition in
-   the same block, the error asks to define `f` with a function statement
-   in the same block, or to give the declaration a value. A first assignment of a name in a branch of
-   an `if` or a `match`, or in the body of a loop, is an error too
-   (`first-assignment-in-branch`): declare the name with a value before the
+1. **A declaration has a value.** `let x = v` or `let x: integer = v`
+   declares `x` with its value. `let x: integer` with no value is an error
+   (`declaration-without-value`). One declaration needs no value: at the
+   top level of a program, a function type, when a `function` statement (or
+   a definition `f(x) = …`) of the same name is in the program. The
+   definition gives the name its value from the start of the program, so
+   the declaration only gives the signature of the function:
+   `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` is `3`. In
+   a function body or a block, a function statement declares a local
+   ([local functions](/control-flow#local-functions)), so the two
+   statements are two declarations of `f` (`variable-redeclaration`): give
+   the type with the value, `let f: (integer) -> integer = (x) => x + 1`.
+   An assignment to
+   a name that is not declared is an error
+   (`assignment-to-undeclared-variable`), also in a branch of an `if` or a
+   `match` and in the body of a loop: declare the name with a value before
+   the branch. A `let` in a branch declares a local of the block of that
    branch. A use of a local in a statement before the statement that
    declares it is an error (`read-before-declaration`). A use of the local
    in the body of a function literal is not checked, because the body runs
-   when the function is called, and the check does not follow calls: in `function g() { f = () => t; v = f(); t = 1; v }`, the call
-   `f()` reads `t` before its declaration, and `g()` gives `1`.
+   when the function is called, and the check does not follow calls: in
+   `function g() { let f = () => t; let v = f(); let t = 1; v }`, the call
+   `f()` reads `t` before its declaration.
 2. **An assignment is a statement, not a value.** `f(a := 2)` is an error
    (`assignment-in-operand`), and `a := b := 5` is a syntax error
    (`chained-assignment`): write two statements. A block whose last statement
    is an assignment or a declaration has the value `Nothing`; end the block
    with the name to give its value.
 
-A local can be assigned again after its declaration, also in a branch, a
-loop body or a nested block. The type of the new value must be able to be
-the type of the local: its declared type, or else the type of its first
-value, widened. A number
-widens to `number`, a string or a character to `string`, a boolean to
-`boolean`, and the elements of a list, a set or a tuple widen the same way.
-So `s = 0` then `s = s + 0.5` is valid, and `s = 0` then `s = "x"` is an
-error (`assignment-type-mismatch`). A local whose first value has no known
-type (an untyped parameter) accepts a value of any type.
+A mutable variable can be assigned again after its declaration, also in a
+branch, a loop body or a nested block. Assignment preserves the binding's
+type. An explicit annotation is its contract; otherwise the initializer's
+type is widened: a number gives `number`, a string or character gives
+`string`, a boolean gives `boolean`, and the elements of a list, set or
+tuple widen the same way. So `let s = 0` then `s = s + 0.5` is valid, while
+`let s = 0` then `s = "x"` is `assignment-type-mismatch`. A variable whose
+initializer has no known type keeps `unknown`.
 
-All these errors are found before the program runs: `epsil check` reports
-them, and a statement that holds one gives the error as its value.
+An unannotated variable initialized with a function, or with a name known to
+hold a function, has type `function`. Each function value retains its own
+parameter annotations, defaults, closure and effects. Those properties do
+not become a permanent contract for the variable:
 
-The top level of a program is not a block: its statements run one at a
-time, and a name assigned there is a name of the session. A first
-assignment in a branch or a loop body is an error at the top level too:
-`if c { a = 1 }; a` is `first-assignment-in-branch`. An assignment in a
-branch to a name of the session (assigned by an earlier top-level
-statement, or declared by the host) is not a first assignment:
-`a = 1; if c { a = 2 }; a` is valid. The rules of a use before the
-declaration and of the type of a new value apply only in a block
-(`do { … }`) and in a function body: at the top level, `a = 1; a = "x"; a`
-is valid and gives `"x"`.
+```epsil
+let f = (n: integer) => n + 1
+f = (s: string) => s
+f("a")
+// ➔ "a"
+```
+
+A later function assignment is checked against `function`, and a call is
+checked against the function value being called. A nonfunction value cannot
+replace it. To require one signature for every replacement, annotate the
+variable explicitly, for example `let f: (integer) -> integer = (x) => x + 1`.
+A `const` still rejects every assignment, including a replacement function.
+
+`epsil check` reports declaration errors and statically known incompatible
+writes before evaluation. It does not run a program to discover an unknown
+value. A statement rejected during preparation gives an error value.
+
+At the top level, `let` and `const` create names in the session scope. All
+statements are prepared before any executes: types and protocols come
+first, then function definitions with their paired signature declarations,
+then the remaining statements in source order. A direct use before a later
+`let` or `const` is an error here too. Assignment preserves the declared
+contract: `let a = 1; a = "x"; a` reports `assignment-type-mismatch` and
+finishes with `1`, because the failed assignment leaves `a` unchanged.
 
 | Program                                    | Result                                 |
 | ------------------------------------------ | -------------------------------------- |
-| `let a = 1; b = a + 1; b`                  | `2`                                    |
-| `s = 0; for i in 1..3 { s = s + i }; s`    | `6`                                    |
-| `a = 1; if c { a = 2 }; a`                 | `2` when `c` is true, else `1`         |
+| `let a = 1; let b = a + 1; b`              | `2`                                    |
+| `let a = 1; b = a + 1; b`                  | error: `assignment-to-undeclared-variable` |
+| `let s = 0; for i in 1..3 { s = s + i }; s` | `6`                                   |
+| `let a = 1; if c { a = 2 }; a`             | `2` when `c` is true, else `1`         |
 | `let a: integer; if c { a = 1 }; a`        | error: `declaration-without-value`     |
 | `let f: (integer) -> integer; function f(x) { x + 1 }; f(2)` | `3` |
 | `let f: (integer) -> integer; f(2)`        | error: `declaration-without-value`     |
-| `if c { a = 1 }; a`                        | error: `first-assignment-in-branch`    |
-| `do { if c { a = 1 }; a }`                 | error: `first-assignment-in-branch`    |
-| `do { a = 1; a = "x"; a }`                 | error: `assignment-type-mismatch`      |
-| `f(a := 2) + a`                            | error: `assignment-in-operand`         |
-| `do { b = 2 }`                             | `Nothing`                              |
+| `if c { a = 1 }; a`                        | error: `assignment-to-undeclared-variable` |
+| `do { if c { a = 1 }; a }`                 | error: `assignment-to-undeclared-variable` |
+| `do { let a = 1; a = "x"; a }`             | error: `assignment-type-mismatch`      |
+| `let a = 0; f(a := 2) + a`                 | error: `assignment-in-operand`         |
+| `do { let b = 2 }`                         | `Nothing`                              |
 
-What an assignment writes depends on where it is written, and on what is
-declared when the function around it is defined. In a function body, an
-assignment to a name that no enclosing scope declares, at the own level of
-the body or of a nested block, declares a local of that block, as a `let`
-does. Which scope a name belongs to is decided where the function is
-**defined**, not where it is called: each call of the function gets its own
-local, and a declaration of the same name made later does not change what
-the function writes. Such an assignment does not write a variable outside
-the function, so it is not the `scope` effect, and the function needs no
-effect specifier:
+An assignment in a function body writes the variable that is in scope where
+the function is **defined**: a parameter, a local of the body, a local of an
+enclosing function, or a name of the program. A local of a function body is
+declared with `let` or `const`, and each call of the function gets its own
+local. Such a local is not a variable outside the function, so a write to it
+is not the `scope` effect, and the function needs no effect specifier:
 
 ```epsil
-function g(k) { t = k + 1; t }
+function g(k) { let t = k + 1; t }
 let t = 0
 [g(1), g(2), t]
 // ➔ [2, 3, 0]
 ```
 
-A use of such a local before its first assignment is an error that is found
+A use of such a local before its declaration is an error that is found
 before the program runs:
 
 ```epsil
-function g(k) { u = t; t = k; u }
+function g(k) { let u = t; let t = k; u }
 ```
 
 A closure that reads a local reads it when it is called, so
-`f = () => t; t = 1; f()` gives `1`. The body of a loop keeps the locals of
-an enclosing block from one iteration to the next, so the second iteration
-reads the value that the first one assigned.
+`do { let f = () => t; let t = 1; f() }` gives `1`. The body of a loop keeps
+the locals of an enclosing block from one iteration to the next, so the
+second iteration reads the value that the first one assigned.
 
 An assignment to a name that an enclosing scope declares when the function
-is defined — a top-level `let` or assignment written before the function, a
-parameter or a local of an enclosing function — writes that binding. In a
+is defined — a top-level `let`, a parameter or a
+local of an enclosing function — writes that binding. In a
 function body, this is the `scope` effect, which must be declared (see
 [Effect specifiers](/control-flow#effect-specifiers)):
 
@@ -4771,9 +4800,18 @@ function bump() scope { n = n + 1; n }
 // ➔ [1, 2, 2]
 ```
 
-The same rule holds for an anonymous function that a top-level `let` or
-`const` names: the type states the effect. Without `scope` in the type, the
-statement gives an `incompatible-type` error and declares nothing:
+The declarations of a program are known when its function bodies are
+prepared, including variables declared later in the text. A function can
+therefore assign such a variable when called after its initialization:
+
+```epsil
+function g(k) scope { t = k + 1; t }
+let t = 0
+[g(1), t]
+// ➔ [2, 2]
+```
+
+An explicit function-type annotation must admit the function's effects:
 
 ```epsil
 let n = 0
@@ -4782,9 +4820,16 @@ let bump: () scope -> number = () => do { n = n + 1; n }
 // ➔ [1, 2, 2]
 ```
 
-A `let` in a block does not need the specifier, and neither does a `let` whose
-value is computed, such as the closure that a call returns
-(`let c1 = counter()`).
+An unannotated function-valued variable has type `function`; the value
+carries its inferred effects. It does not need a separate `scope`
+annotation on the variable, whether it is declared in a program or a block:
+
+```epsil
+let n = 0
+let bump = () => do { n = n + 1; n }
+[bump(), bump(), n]
+// ➔ [1, 2, 2]
+```
 
 Reassigning a symbol that was declared `const` produces an
 [error value](/evaluation/#errors-are-values), not a parse error or a
@@ -4803,20 +4848,13 @@ body or a function body. This holds for a `const` at any depth, and for each
 name of a destructuring `const`. A function defined before a `const` of the
 same block is included, because the `const` of a block is declared when the
 block starts: an assignment in the function writes the constant when the
-call comes after the `const`. A function defined before a top-level `const`
-does not write it: the assignment makes a local of the function body (see
-above). An assignment to a `let` or a parameter that shadows
+call comes after the `const`. An assignment to a `let` or a parameter that shadows
 the constant is not reported.
 
-A declaration with no initializer declares the name without giving it a value:
-
-```epsil
-let x: real
-let y
-```
-
-Without an annotation, the type is inferred from the initializer — `let x = 5`
-declares `x` as an `integer`.
+A declaration without an initializer is an error, except for the paired
+top-level function signature described above. For a mutable variable
+without an annotation, the initializer determines a widened binding type:
+`let x = 5` declares `x` as `number`, allowing later numeric assignments.
 
 Constness is a property of the **binding**, not of the type: `const` says that
 *this name* will not be written again, and says nothing about the value it
@@ -4832,9 +4870,10 @@ introduced by `if`/`else`/`while`/`for`, or a function body, pushes its own
 lexical scope, so a `let`/`const` inside a block does not leak into the
 enclosing scope.
 
-A `function` statement defines its name for the **whole** program or block
-it is written in, including the statements before it: a call written before
-the definition runs the function.
+A top-level `function` statement defines its name for the **whole program**,
+including statements before its definition. In a block or function body,
+a function statement declares a local from that statement onward; see
+[Local functions](/control-flow/#local-functions).
 
 ```epsil
 let a = g(3)
@@ -4843,24 +4882,21 @@ a
 // ➔ 9
 ```
 
-An assignment of a function literal (`g = (k) => k^2`, `let g = (k) => k^2`)
-takes effect when it runs. A call before it stays the symbolic `g(3)`. A
-value that holds such a call is resolved again when a later statement reads
-it, so the same program with `g = (k) => k^2` in place of the `function`
-statement also answers `9`. Within one statement, the result is not resolved
-again: `do { u = h(1); h = (x) => x; u }` answers `h(1)`, because the
-assignment of `h` runs in the same evaluation as the call.
+A variable initialized with a function follows the ordinary declaration
+order. In `let a = h(1); let h = (x) => x + 1; a`, the first statement is
+`read-before-declaration`; a later function-valued initializer does not make
+that earlier call valid. Reassigning an already declared function variable
+takes effect when the assignment executes.
 
 A call reads the function that its name denotes **where the call is
 written**. A function of the same name defined in another scope does not
 change which function the call runs; assigning another function to that same
 name does.
 
-A name is declared **once per scope**. A `let`/`const` of a name that the same
-scope already declares — an earlier `let`/`const` of the same block or
-program, a parameter of the function whose body this is, or the index of the
-loop whose body this is — is the `variable-redeclaration` error, reported
-before the program runs:
+A name is declared **once within a program or block**. A second `let` or
+`const` of the same name, or a declaration that repeats a parameter or loop
+index of the same scope, is `variable-redeclaration`. At the top level the
+first declaration stands and later sibling statements still run:
 
 ```epsil
 function f(x) {
@@ -4884,8 +4920,12 @@ for k in 1..3 {
 }
 ```
 
-Across programs — a re-run notebook cell, a later REPL line — a top-level
-`let` re-declares legally; only a repeat within one program is reported.
+Across programs — a rerun notebook cell or a later REPL line — a top-level
+`let` or `const` may replace an earlier declaration and establish a new
+type. For example, a later `let value = "text"` can replace an earlier
+`let value = 1`. A subsequent assignment `value = 2` keeps the new `string`
+contract, fails, and leaves `value` equal to `"text"`. Redeclaration creates
+a new contract; assignment writes a value under the existing contract.
 
 [Type declarations](/types/) are the exception: types (and their
 constructors) are **global** — a `type` statement is only allowed at the top
@@ -5140,7 +5180,7 @@ operators (Elixir-style). It is left-associative, so `a |> f |> g` is `g(f(a))`:
 ```epsil
 a + b |> f       // (a + b) |> f
 a || b |> f      // (a || b) |> f
-x = a |> f       // x = (a |> f)
+let x = a |> f   // let x = (a |> f)
 ```
 
 <ReadMore path="/control-flow/#pipelines">
@@ -5232,7 +5272,7 @@ operator run is one token: write `x?! + 1`, not `x?!+1` (as `3! + 1`, not
 serialized: `(n!)?!`, `(x?!)!`.
 
 Compiled code raises on the absent branch (JavaScript, the interval
-JavaScript target, Python) with the
+JavaScript target) with the
 message `expected-present: <operand> is absent`; the check is left out when
 the operand's type already excludes absence (a declared length with a literal
 index, a type without `nan`). A shader target (GLSL) cannot raise:
@@ -5758,7 +5798,8 @@ Three spellings, two meanings:
 So a statement assigns:
 
 ```epsil
-x = 5
+let count = 0
+count = 5
 count = count + 1
 ```
 
@@ -5790,6 +5831,7 @@ line is the equation, because `x^2` is not a name. A bare name always assigns,
 so write `==` when you mean the equation:
 
 ```epsil
+let y = 0
 y == 2 * x + 1           // the equation
 y = 2 * x + 1            // assigns to y
 ```
@@ -5864,8 +5906,11 @@ Source: https://epsil.dev/evaluation/
 
 # Evaluation
 
-A program's top-level statements are evaluated **sequentially**, and the
-program's value is the **last statement's** value:
+A whole program is prepared before any statement executes. Types and
+protocols come first, then function definitions with their paired signature
+declarations, then all remaining statements in source order. Statements are
+evaluated **sequentially** in that canonical order, and the program's value
+is the **last statement's** value:
 
 ```epsil
 let x = 5
@@ -5877,7 +5922,9 @@ x
 No scope is pushed around the whole program: declarations persist across
 statements, and across cells in a notebook or inputs in a REPL that share one
 session. Blocks and function bodies still push their own lexical scopes (see
-[Control Flow](/control-flow/)).
+[Control Flow](/control-flow/)). A later program may redeclare a
+session name and establish a new type; assignment keeps the existing
+binding's contract. See [Declarations](/declarations/).
 
 ## Symbolic by default
 
@@ -6024,28 +6071,25 @@ let c2 = counter()
 `bump` itself. Writing to a binding outside the function is the `scope`
 effect, and it must be declared — without the specifier the definition is
 rejected and `counter()` never produces a callable. See
-[Effect specifiers](/control-flow#effect-specifiers). An assignment to
-a name that no enclosing scope declares when the function is defined makes a
-local of the function body instead, also when the assignment is in a branch
-of an `if`, a loop body or a `do` block of the body: each call gets its own
-binding, a later
-declaration of the same name is not written, and it is not the `scope`
-effect (see
+[Effect specifiers](/control-flow#effect-specifiers). A local of the
+function body is declared with `let`: each call gets its own binding, a later
+declaration of the same name is not written, and it is not the `scope` effect
+(see
 [Reassignment vs. declaration](/declarations/#reassignment-vs-declaration)):
 
 ```epsil
-function step(k) { s = k * 2; s + 1 }
-s = 10
+function step(k) { let s = k * 2; s + 1 }
+let s = 10
 (step(1), step(2), s)
 // ➔ (3, 5, 10)
 ```
 
-A read of such a local before its first assignment in the function body
-(`function step(k) { r = s; s = k; r }`) is the `read-before-declaration`
-error, which `epsil check` reports before the program runs. A first
-assignment in a branch (`function g(c) { if c { t = 1 }; t }`) is the
-`first-assignment-in-branch` error: declare the local with a value before
-the branch.
+A read of such a local before its declaration in the function body
+(`function step(k) { let r = s; let s = k; r }`) is the
+`read-before-declaration` error, and an assignment to a name that is not
+declared (`function g(c) { if c { t = 1 }; t }`) is the
+`assignment-to-undeclared-variable` error; `epsil check` reports both before
+the program runs.
 
 Reach for `const` when a name should not move at all. Constness is a property
 of the *binding*, not of the value it holds — every value is immutable
@@ -6125,28 +6169,32 @@ xs = filter(xs, c => c > 2)
 Two lazy collections stay lazy when they are assigned: one with no last
 element (`filter(1..oo, p)`), which cannot be listed, and one that reads no
 variable (`map(f, 1..1000000)`), which nothing can change. A `filter` over a
-dictionary also stays lazy. When such a collection reads a variable, also
-in an inline function, the statement stores it with the value that the
-variable has at that statement, so a later assignment of the variable does
-not change it:
+dictionary also stays lazy. Such a collection is made as a call is: a
+variable that is one of its operands (`xs` in `filter(xs, p)`, `f` in
+`map(f, xs)`) gives the value that it holds at that statement, and its inline
+function is a closure. The closure reads a local of the block or the
+function that made the collection, and a global, when an element is
+computed, so a later assignment of the variable is seen:
 
 ```epsil
 let k = 3
 let big = filter(1..oo, c => c > k)
 k = 10
 first(big)
-// ➔ 4
+// ➔ 11
 ```
 
-A variable that the collection assigns, in its callback or through a
-function with the `scope` effect that it calls, is not replaced: the
-collection reads and writes that variable when its elements are read. A
-variable that holds a function is replaced with that function, and the
-function is a closure: it reads the later values of its own variables. With
-`let p = c => c > k` and `let big = filter(1..oo, p)`, `first(big)` gives
-`11` after `k = 10`. A finite collection made from such a stored collection
-(`take(big, 2)`) reads no variable, so it also stays lazy when it is
-assigned, and its callback runs each time its elements are read.
+To keep the elements that the collection has at a statement, list them
+there: a finite part of it is listed by `listFrom`.
+
+```epsil
+let k = 3
+let big = filter(1..oo, c => c > k)
+let firsts = listFrom(take(big, 3))
+k = 10
+firsts
+// ➔ [4, 5, 6]
+```
 
 A lazy collection that is not assigned (an argument, an operand) still reads
 program state **at materialization time**, like a generator in Python.
@@ -6158,7 +6206,7 @@ flowchart TD
   lit -- "no: a lazy collection" --> reads{"reads a variable, as written?<br/>(an inline function counts;<br/>a named function is not inspected)"}
   reads -- "no, as map(f, 1..1000000)" --> lazy["stays lazy: enumerated when materialized"]
   reads -- yes --> fin{"has a last element?"}
-  fin -- "no, as filter(1..oo, c => c > k)" --> bound["stays lazy, with the values<br/>of its variables at this statement"]
+  fin -- "no, as filter(1..oo, c => c > k)" --> bound["stays lazy: its variable operands<br/>are read now, its function<br/>when an element is computed"]
   fin -- yes --> snap2["stored as the list of its elements,<br/>computed with the values at this statement"]
 ```
 
@@ -6196,7 +6244,19 @@ Per [Principles](/principles/), "errors are values": a *runtime*
 problem — a type error, an out-of-domain argument, reassigning a `const` —
 becomes an `Error` value that propagates outward through the enclosing
 expressions and becomes their result, not a thrown exception. A program never
-throws to its host for a runtime problem.
+throws to its host for an ordinary runtime problem. Each top-level statement
+fails on its own, so an invalid statement or a thrown runtime error does not
+prevent later siblings from running:
+
+```epsil
+let z = "a" + 1
+5
+// ➔ 5, with diagnostics for the invalid statement
+```
+
+A nested block or function body stops at its error instead of continuing its
+remaining statements. Cancellation stops the program; it is not an ordinary
+statement failure.
 
 *Parse*-time problems are different: a malformed program surfaces as a
 **diagnostic**, not as a value. So do the few execution-time problems that are
@@ -6209,9 +6269,8 @@ value produced by an earlier statement would otherwise vanish silently. Each
 a `runtime-error` diagnostic — for example an assignment to an element past
 the end of a list (`xs[5] = 9` when `xs` has three elements), or reassigning
 a library constant such as
-`Pi`. A problem that the static check
-already reported before the program ran, such as reassigning a `const` of the
-same program, is not reported a second time.
+`Pi`. A same-program `const` write rejected during preparation is already
+reported by the static check and is not reported a second time at runtime.
 
 The same applies inside a block: a statement of a loop body, a function body
 or an `if` branch whose value is discarded and holds an error is reported, once
@@ -6337,7 +6396,7 @@ evaluates afterwards, so that a lazy collection the program returns can be
 read in full.
 
 ```epsil
-total = 0
+let total = 0
 for i in 1..5000 { total = total + i * 2 }
 total
 // ➔ 25005000
@@ -6446,8 +6505,9 @@ A default value is one of:
 A default is a constant. A symbol that names a variable (a `let` of the
 program), or a symbol that is not declared and that no `symbol<…>` parameter
 type lists, is not a default value: write a constant, or pass the argument.
-A function statement is defined before the statements of its block run, so a
-`const` written after it is not a constant for its defaults:
+At the top level of a program, a function statement is defined before the
+other statements run, so a `const` written after it is not a constant for its
+defaults:
 `function f(k = W) { k + 1 }; const W = 5` is an error. A known limitation:
 a constant declaration that the host canonicalizes and does not run makes its
 name a constant for a later default. On an engine where `W` is a variable,
@@ -6486,6 +6546,53 @@ body:
 An anonymous function can have a multi-statement body too, by making that body
 a [`do` block](#do-block-expressions) — but at that point a named `function` is
 usually clearer.
+
+### Local functions {#local-functions}
+
+A function statement in a function body or a block declares a **local** of
+that block, as `let` does: a variable whose value is the function, from the
+statement on. It can be called after its statement, and two local functions
+can call each other, since a call in a body runs when the function is called:
+
+```epsil
+function area(r) {
+  function sq(x) { x * x }
+  3 * sq(r)
+}
+area(2)
+// ➔ 12
+```
+
+```epsil
+function parity(n) {
+  function isEven(k) { if k == 0 { true } else { isOdd(k - 1) } }
+  function isOdd(k) { if k == 0 { false } else { isEven(k - 1) } }
+  isEven(n)
+}
+parity(10)
+// ➔ True
+```
+
+A call of a local function before its statement is the error
+`read-before-declaration`, as a read of a `let` before its declaration. A
+second function statement of the same name in the block, or a `let` of that
+name, is the error `variable-redeclaration`: a local function has one clause,
+and the [clauses](#multiple-clauses-literal-parameters) of a function, and a
+signature declared before its definition (`let f: (integer) -> integer`
+then `function f(x) { … }`), are for the top level of a program. In a block,
+give the type with the value:
+
+```epsil
+function g() {
+  let h: (integer) -> integer = (x) => x + 1
+  h(2)
+}
+g()
+// ➔ 3
+```
+
+The type of a local function is its declared type, or `function` when it has
+none, and a call of it is typed from that type.
 
 ### Effect specifiers
 
@@ -6722,7 +6829,7 @@ A mapsto binds loosely enough to sit on the right-hand side of an
 assignment:
 
 ```epsil
-f = x => x + 1
+let f = x => x + 1
 ```
 
 A lambda can take **no** parameters — an empty parameter list `()` before the
@@ -7337,6 +7444,13 @@ Value-producing iteration over a collection belongs to the library functions
 while x > 0 { x }
 ```
 
+A condition that is neither `true` nor `false` ends the loop with an
+`incompatible-type` error, reported as a runtime error: in
+`let i = 1; while i <= n { i = i + 1 }` with `n` free, `i <= n` has no
+value, and the loop stops with `i` still `1`. The condition must be decided at
+each turn, the first one included: the body does not run to give a name its
+value, so initialize each variable that the condition reads.
+
 `while let pattern = subject { … }` is the loop form of [`if let`](#if-let):
 each turn matches the subject against the pattern and runs the body with the
 pattern's bindings in scope, and the first turn on which the subject does not
@@ -7456,7 +7570,8 @@ these rules. `epsil check` reports each one with its own code:
   function it holds. So `function run(fs) { parallel for f in fs { f() } }`
   is accepted. Annotate the parameter with the effects that it admits
   (`function run(fs: list<() any -> any>) { … }`) to have the loop refused.
-  A function that the program defines after the loop is not seen either.
+  A top-level `function` statement is prepared before the loop, even when
+  its definition is written after it, so its effects are checked too.
 - No `break`, `continue` or `return` leaves the loop (`parallel-exit`). An
   inner loop of the body can use `break` and `continue`.
 
@@ -7671,7 +7786,7 @@ pipeline is the whole right-hand side of an assignment:
 ```epsil
 a + b |> f        // (a + b) |> f
 a || b |> f       // (a || b) |> f
-x = a |> f        // x = (a |> f)
+let x = a |> f    // let x = (a |> f)
 ```
 
 It is left-associative, so `a |> f |> g` is `g(f(a))`, which is what reading it
@@ -7688,7 +7803,10 @@ introducing keyword is always the collection grammar, so `{ 1, 2 }` on its own
 is a set.
 
 Each block pushes its own lexical scope. A block's value is its last
-expression; an empty block's value is `nothing`:
+expression; an empty block's value is `nothing`. An error stops the block.
+A whole program uses `Program` instead: it stays in its caller's scope,
+prepares types/protocols and functions first, and continues with the next
+top-level statement after an ordinary error:
 
 ```epsil
 if a { }
@@ -9172,7 +9290,7 @@ In `f(1000, principal: 2000)` the first positional argument already occupies `pr
 
 ## `argument-names-unavailable`
 
-A call passed arguments by name, but the called function has no declaration the engine can read parameter names from — it is undefined, defined later in the program, or held in a variable whose declared type gives no parameter names (`function`, or a signature such as `(number, number) -> number`).
+A call passed arguments by name, but the called function has no declaration the engine can read parameter names from — it is undefined, a local function not yet declared, or held in a variable whose declared type gives no parameter names (`function`, or a signature such as `(number, number) -> number`).
 
 Named arguments are checked against the declaration the call resolves through; with no declaration visible there is nothing to check the names against. For a variable, only its declared type counts, never the function it holds now: that function can change after the call is written. Call it positionally, move the definition before the call, or declare the variable with a signature that names its parameters (`let g: (x: number, y: number) -> number = …`).
 
@@ -9263,7 +9381,7 @@ No warning does not make the `match` total. A `boolean` subject that stays symbo
 
 In expression position `=` is an equation, and only a statement assigns. So in `let a = 0; match 1 { 1 => a = 2 }; a` the case body compares `a` with `2`, nothing reads the result, and `a` stays `0`.
 
-Write `1 => do { a = 2 }` to assign, or `1 => a == 2` if the comparison was meant. The same applies to `{ a = 2 }` as a body, which is a set that holds an equation. In a function, a body that writes a variable also needs the `scope` effect when the function has a name: `let f: (number) scope -> nothing = x => do { a = 2 }`.
+Write `1 => do { a = 2 }` to assign, or `1 => a == 2` if the comparison was meant. The same applies to `{ a = 2 }` as a body, which is a set that holds an equation. A named `function` statement that writes an outer variable must declare the `scope` effect. An explicit function-type annotation on a variable must admit that effect too: `let f: (number) scope -> nothing = x => do { a = 2 }`. An unannotated function-valued variable keeps type `function`; its value carries its effects.
 
 The warning applies to the whole body of a `match` case, of a branch of a conditional expression and of a function, when the left side is a variable that the program declares, other than a constant, and nothing reads the value of the body. The body of a function counts as unread when each read of the function's name is a call whose value is discarded. A body whose value is read (`let r = match k { 1 => a = 2 }`, a lambda passed to `map` or `solve`, the last statement of the program) and an equation of a free name, of a constant, of a parameter or of a pattern variable get no warning. It is a warning: the program still runs.
 
@@ -9317,21 +9435,25 @@ A `let` or `const` declares a name that the same scope already declares: an earl
 
 A second declaration in one scope is a mistake in practice — a `let` where an assignment was meant, or a copied line — and the language cannot tell it from a legitimate second run of the same statement (a loop body on its next turn), so it used to overwrite the binding without a word. To update a binding, assign to it: `x = x + 1`. To hold a second value, choose another name.
 
-A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k = 1 … } }` and a closure body that declares a name its enclosing scope also has are ordinary shadowing, and stay legal. The initializer of such a shadowing `let` reads the OUTER name. Across programs — a re-run notebook cell, a later REPL line — a top-level `let` re-declares legally; only a repeat within one program is reported.
+A `let` in a NESTED block is not a re-declaration: `for k in xs { if c { let k = 1 … } }` and a closure body that declares a name its enclosing scope also has are ordinary shadowing, and stay legal. The initializer of such a shadowing `let` reads the OUTER name. Across programs — a rerun notebook cell or a later REPL line — a top-level `let` or `const` may replace an earlier declaration and establish a new type. Assignment instead preserves the current binding and its contract. Only a repeat within one program is reported.
 
 ## `read-before-declaration`
 
-A statement of a block uses a local of the block before the statement that declares it. A local is declared by a `let` or a `const`, or by the first assignment of the name at the own level of the block. In `do { let a = k; let k = 2; a }` the first statement reads `k`, which the block declares only in the next statement. In `do { k = 5; let k = 2 }` the first statement assigns it. In `function g(k) { u = t; t = k; u }` the first statement reads `t`.
+A statement of a program or block uses a variable before the statement that declares it. A variable is declared by a `let` or a `const`. This includes a variable initialized with a function: `let a = h(1); let h = (x) => x + 1; a` uses `h` too early. A top-level `function` statement is different: it is prepared before the other statements and can be called above its definition. In `do { let a = k; let k = 2; a }` the first statement reads `k`, which the block declares only in the next statement. In `do { k = 5; let k = 2 }` the first statement assigns it.
 
-The error is found before the program runs. Move the declaration before the first use, or give the local another name. The initializer of a `let` is not such a use: `let t = t * 2` in a nested block reads the OUTER `t`. The value of a first assignment is not such a use either: `t = t + 1` as the first assignment of `t` reads the `t` of an enclosing scope, as `let t = t + 1` does. A use in a function literal is not such a use either, because it runs when the function is called: a function can read a local that a later statement of the block declares.
+The error is found before the program runs. Move the declaration before the first use, or give the local another name. The initializer of a `let` is not such a use: `let t = t * 2` in a nested block reads the OUTER `t`. A use in a function literal is not such a use either, because it runs when the function is called: a function can read a variable that a later statement of the program or block declares.
 
 ## `declaration-without-value`
 
-A `let` or a `const` declares a name without a value: `let x: integer`. A declaration gives the name its value, so that a read of the name never finds a local with no value. Write the value in the declaration: `let x: integer = 0`. To give the value later in a branch, declare the name with a first value before the branch: `let t = 0; if c { t = 1 }`. One declaration needs no value: the signature of a function that a `function` statement of the same name in the same block defines, `let f: (integer) -> integer; function f(x) { x + 1 }`.
+A `let` or a `const` declares a name without a value: `let x: integer`. A declaration gives the name its value, so that a read of the name never finds a local with no value. Write the value in the declaration: `let x: integer = 0`. To give the value later in a branch, declare the name with a first value before the branch: `let t = 0; if c { t = 1 }`. One declaration needs no value: at the top level of a program, the signature of a function that a `function` statement of the same name defines, `let f: (integer) -> integer; function f(x) { x + 1 }`. In a function body or a block, a function statement declares a local, so give the type with the value: `let f: (integer) -> integer = (x) => x + 1`.
 
-## `first-assignment-in-branch`
+## `declaration-below-statement`
 
-The first assignment of a name is in a branch of an `if`, in a branch of a `match` or in the body of a loop. In `if c { t = 1 }; t`, the name `t` has no value when `c` is false. A first assignment declares a local only at the own level of a block that is not in a branch or a loop body. Declare the name with a value before the branch, `let t = 0; if c { t = 1 }; t`, or with a `let` in the branch when the name is a local of the branch only.
+A `let` or a `const` is in a branch of an `if` or a `match`, or in the body of a loop, without a block around it. A local is declared by a statement of a block or of a function body, and is a local of that block in all of it. Write the declaration as a statement of the block: `let t = 0; if c { t = 1 }; t`, or put the branch in a block when the name is a local of the branch only: `if c { let t = 1; f(t) }`.
+
+## `assignment-to-undeclared-variable`
+
+An assignment writes a variable that is declared, and never declares one. In `do { t = 1; t }`, `t` has no declaration. Declare the variable with `let` or `const` in the block, or at the top level of the program, before the assignment: `do { let t = 1; t }`. A name declared by an earlier program on the same engine, or by the host, is declared.
 
 ## `assignment-to-library-function`
 
@@ -9401,13 +9523,13 @@ An assignment is a statement, not a value. In `f(a := 2)` and in `x = (a := 2) +
 
 ## `assignment-type-mismatch`
 
-An assignment gives a local a value whose type cannot be the type of the local. The type of a local is its declared type (`let n: integer = 0`), or else the type of its first value, widened: a number gives `number`, a string gives `string`, a boolean gives `boolean`, and the elements of a list, a set or a tuple widen the same way. So `s = 0` then `s = s + 0.5` is valid, and `s = 0` then `s = "x"` is this error. Use another name for a value of another type.
+An assignment gives a variable a value outside its binding type, at the top level as in a block. The type is its explicit annotation (`let n: integer = 0`), or else the type of its first value, widened: a number gives `number`, a string gives `string`, a boolean gives `boolean`, and the elements of a list, a set or a tuple widen the same way. So `let s = 0` then `s = s + 0.5` is valid, and `let s = 0` then `s = "x"` is this error. An unannotated function initializer gives the variable type `function`, rather than fixing the initializer’s full signature: another function value is allowed, but a nonfunction is not. Each function value keeps its own annotations and checks its arguments when called. Use another name for a value of another type, or redeclare the name in a later program to establish a new contract.
 
 ## `constant-assignment`
 
 A value was assigned to a constant: a name bound by `const`, or a constant of the library such as `Pi`. In `const c = 1` followed by `c = 2`, the assignment is refused and `c` keeps the value `1`. The same holds for an assignment of a function literal (`const k = (n) => n + 1` then `k = (s) => s`) and for each name of a destructuring assignment (`(a, c) := (3, 4)` writes neither `a` nor `c`).
 
-`epsil check` reports an assignment to a `const` of the same program (at any depth, and each name of a destructuring `const`) before anything runs, wherever the assignment is: at the top level, in a block, a loop body or a function body. The run does not report it a second time. A function defined before a `const` of the same block is included, because the `const` of a block is declared when the block starts: an assignment in the function writes the constant when the call comes after the `const`. A function defined before a top-level `const` does not write it: an assignment in a function body to a name that no enclosing scope declares when the function is defined makes a local of the body. A constant that the check cannot see — one declared by an earlier program on the same engine, or a library constant — is reported when the assignment runs, as a `runtime-error` with this code.
+`epsil check` reports an assignment to a `const` of the same program (at any depth, and each name of a destructuring `const`) before anything runs, wherever the assignment is: at the top level, in a block, a loop body or a function body. The run does not report it a second time. A function defined before a `const` of the same block is included, because the `const` of a block is declared when the block starts: an assignment in the function writes the constant when the call comes after the `const`. The declarations of a program are prepared together, so a function defined before a top-level `const` resolves that binding too. Moving the function above the declaration does not make the constant writable. A constant write that is not reported statically is reported when the assignment runs, as a `runtime-error` with this code.
 
 To change the value, declare the name with `let` instead of `const`. To hold a second value, choose another name, or declare a local that shadows the constant: `let c = 2` in a function body or a block makes a new binding, and an assignment to it is valid. An indexed assignment such as `c[1] = 2` is the rebinding `c = replaceAt(c, 1, 2)`, so it is an assignment to `c` too, and gives this error.
 
@@ -9421,7 +9543,7 @@ Only replacement is refused. Clauses that dispatch on genuinely different domain
 
 The boundary is the program (one file, one cell). Within it, a same-domain redefinition is a mistake with no possible intent. Interactively, re-running an edited definition as a SEPARATE program — a later notebook cell, the next REPL line — replaces the earlier one; that is the intended redefinition gesture, and is legal.
 
-The rule applies in a function body and in a block too: two clauses with the same domain in one block are this error, as two `let` of one name are `variable-redeclaration`. `epsil check` reports it, and the block is invalid: in `function g() { f(y) = 1; f(x) = 3; f(0) }`, `g` is not defined. A clause in a nested block, or in a function body, with the domain of a clause of an enclosing scope is not a redefinition: it makes a local function that shadows the outer one. A statement that runs more than once, such as a definition in a loop body, does not collide with itself.
+In a function body or a block, a function statement declares a local, a variable that holds one function: a second definition of the name in the same block, with any domain, is the error `variable-redeclaration`, as two `let` of one name are. `epsil check` reports it, and the block is invalid: in `function g() { f(y) = 1; f(x) = 3; f(0) }`, `g` is not defined. A definition in a nested block, or in a function body, of a name of an enclosing scope is not a redefinition: it makes a local function that shadows the outer one. A statement that runs more than once, such as a definition in a loop body, does not collide with itself.
 
 ## `type-redefinition`
 
@@ -9535,7 +9657,7 @@ Source: https://epsil.dev/library/
 
 # Epsil Standard Library
 
-The 718 functions and constants of the standard library, by category.
+The 725 functions and constants of the standard library, by category.
 Each row gives a name, its signature (for a function) or its kind and type
 (for a constant or variable), and the first sentence of its description —
 the same description `epsil doc <name>` prints in full and the editor
@@ -9546,20 +9668,20 @@ To search the library by concept rather than by name, use
 `epsil doc <keywords>` (see the [CLI](/cli/)); the
 [guide for agents](/for-agents/) lists the names most often needed.
 
-- [Core](#core) — 118 definitions · [full reference](/reference/core/)
+- [Core](#core) — 121 definitions · [full reference](/reference/core/)
 - [Control structures](#control-structures) — 16 definitions · [full reference](/reference/control-structures/)
 - [Logic](#logic) — 27 definitions · [full reference](/reference/logic/)
 - [Collections](#collections) — 125 definitions · [full reference](/reference/collections/)
 - [Colors](#colors) — 20 definitions · [full reference](/reference/colors/)
 - [Regular expressions](#regular-expressions) — 4 definitions · [full reference](/reference/regexp/)
 - [Relations](#relations) — 30 definitions · [full reference](/reference/relop/)
-- [Arithmetic](#arithmetic) — 103 definitions · [full reference](/reference/arithmetic/)
+- [Arithmetic](#arithmetic) — 104 definitions · [full reference](/reference/arithmetic/)
 - [Fractals](#fractals) — 2 definitions · [full reference](/reference/fractals/)
 - [Trigonometry](#trigonometry) — 42 definitions · [full reference](/reference/trigonometry/)
 - [Calculus](#calculus) — 24 definitions · [full reference](/reference/calculus/)
 - [Polynomials](#polynomials) — 18 definitions · [full reference](/reference/polynomials/)
-- [Combinatorics](#combinatorics) — 11 definitions · [full reference](/reference/combinatorics/)
-- [Number theory](#number-theory) — 60 definitions · [full reference](/reference/number-theory/)
+- [Combinatorics](#combinatorics) — 12 definitions · [full reference](/reference/combinatorics/)
+- [Number theory](#number-theory) — 62 definitions · [full reference](/reference/number-theory/)
 - [Special functions](#special-functions) — 19 definitions · [full reference](/reference/special-functions/)
 - [Linear algebra](#linear-algebra) — 46 definitions · [full reference](/reference/linear-algebra/)
 - [Statistics](#statistics) — 35 definitions · [full reference](/reference/statistics/)
@@ -9577,6 +9699,8 @@ The [Core reference](/reference/core/) has the full description and the examples
 | — | `Annotated` | `(expression, dictionary<any>) -> expression` | Attach metadata or style annotations to an expression. |
 | `apply` | `Apply` | `(name: any, arguments: any*) -> unknown` | Apply a function to a list of arguments |
 | `applyWhole` | `ApplyWhole` | `(name: any, arguments: any*) -> unknown` | Apply a function to arguments, each bound whole (engine-internal). |
+| `arbitraryConstant` | `ArbitraryConstant` | `(integer) -> number` | ArbitraryConstant(k): an arbitrary number, the k-th of a result: a |
+| `arbitraryInteger` | `ArbitraryInteger` | `(integer) -> integer` | ArbitraryInteger(k): an arbitrary integer, the k-th of a result: the |
 | `arc` | `Arc` | `(any+) -> number` | Arc / wide-hat accent measure (`\widehat{ABC}`) — opaque typed head; not evaluated. |
 | — | `AssertPresent` | `(any) -> unknown` | Assert that a value is present: return it unchanged, or an `expected-present` error when it is ABSENT (`Missing`, `NaN`, or a point whose coordinates are all `NaN`). |
 | — | `Assign` | `(expression \| symbol, any) scope -> any` | Assign a value to a symbol or define a sequence. |
@@ -9615,7 +9739,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `identity` | `Identity` | `(T) -> T where T` | Return the argument unchanged |
 | — | `IndexedSequence` | `(any, symbol, any, any?) -> expression` | Indexed sequence `\{a_n\}_{n=1}^{\infty}` — inert head `IndexedSequence(term, index, lower, upper?)`; not evaluated. |
 | `input` | `Input` | `(prompt: string?) console -> nothing \| string` | Read one line of text from the host: the terminal in a command-line host, the `prompt()` dialog in a browser. |
-| `integerString` | `IntegerString` | `(integer, integer?) -> string` | `IntegerString(n, base=10)` return a string representation of the integer `n` in base `base`. |
+| `integerString` | `IntegerString` | `(integer, integer?, integer?) -> string` | `IntegerString(n, base=10, length)` return a string representation of the integer `n` in base `base`. |
 | — | `InvisibleOperator` | `function` | Implicit operator used for juxtapositions such as function application or multiplication. |
 | `isError` | `IsError` | `(any) -> boolean` | True if the expression is an `Error` value, or a frozen expression embedding one (`"a" + 1`). |
 | `isMissing` | `IsMissing` | `(any) -> boolean` | True for `Missing`, `NaN`, or a point whose coordinates are all `NaN`, regardless of provenance. |
@@ -9642,6 +9766,7 @@ The [Core reference](/reference/core/) has the full description and the examples
 | `polygon` | `Polygon` | `(any+) -> expression` | Polygon primitive — opaque typed head. |
 | `prime` | `Prime` | `(T, integer?) -> T where T` | Derivative or prime notation (`f'`, `f^{(n)}`) — opaque typed head until a derivative library handler runs. |
 | `print` | `Print` | `(any*) console -> nothing` | Print the operands to the host console, separated by spaces and followed by a newline. |
+| `program` | `Program` | `(unknown*) -> unknown` | Evaluate a program in the caller scope, continuing after statement errors. |
 | — | `ProtocolMember` | `(protocol: string, member: string, arguments: any*) -> unknown` | Invoke a protocol member on a value — the lowering of a QUALIFIED protocol call (`Comparable.compare(x, y)` in Epsil, whose parse, a `MemberCall` on the protocol name, canonicalizes to `Apply(Field(Comparable, "compare"), x, y)`). |
 | — | `ProtocolProperty` | `(protocol: string, property: string, receiver: any, value: any?) -> unknown` | Read (or write) a protocol PROPERTY through a NAMED protocol — the lowering of the qualified field form `person.(Nameable.name)` (protocols design P6, amending the D16 field grammar). |
 | `quadrilateral` | `Quadrilateral` | `(any+) -> expression` | Quadrilateral mark (`\square ABCD`) — opaque typed head; not evaluated. |
@@ -9768,7 +9893,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `complexNumbers` | `ComplexNumbers` | constant `set<complex>` | The set of all finite complex numbers. |
 | `contains` | `Contains` | `(collection<any>, element: any) -> boolean` | Return True if the collection contains the given element (structural identity, like `===`), False otherwise. |
 | `containsSequence` | `ContainsSequence` | `(indexed_collection<T>, indexed_collection<T>) -> boolean where T` | Return `True` when `needle` occurs as a contiguous subsequence of the indexed collection. |
-| `count` | `Count` | `(collection<any>, any?) -> infinity \| integer` | `Count(xs)`: the number of elements in the collection. |
+| `count` | `Count` | `(collection<any>, any?, any?) -> infinity \| integer` | `Count(xs)`: the number of elements in the collection. |
 | `countIf` | `CountIf` | `(collection<T>, predicate: (T) any -> boolean) -> integer where T` | Return the number of elements in the collection satisfying the predicate. |
 | `cycle` | `Cycle` | `(list<any>) -> list` | Produce an infinite sequence by cycling through the elements of a finite collection. |
 | `dedup` | `Dedup` | `(collection<any>) -> collection` | Return the collection with consecutive duplicate elements collapsed to a single element. |
@@ -9788,7 +9913,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `field` | `Field` | `(value: any, field: string) -> unknown` | Access a named field of a value: `p.x` in Epsil. |
 | `filter` | `Filter` | `(collection<T>, predicate: (T) any -> boolean) -> collection where T` | Return the elements of the collection for which the predicate function returns True. |
 | `find` | `Find` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> any where T: any` | Return the first element of the collection satisfying the predicate. |
-| `first` | `First` | `(xs: indexed_collection<any>) -> any` | The first element of a collection. |
+| `first` | `First` | `(xs: indexed_collection<any>, default: any?) -> any` | The first element of a collection. |
 | `flatMap` | `FlatMap` | `(collection<T>, mapping: (T) any -> U) -> list where T, U` | Map a function over a collection and concatenate the results into a single list, splicing collection-valued results and keeping scalar results as single elements. |
 | `fold` | `Fold` | `(reducer: (unknown, T) any -> unknown, initial: value, collection<T>) -> value where T` | Fold a collection to a single value, applying a binary function f(accumulator, element) left to right from an initial value. |
 | `groupBy` | `GroupBy` | `(collection<T>, key: (T) any -> unknown) -> dictionary<list> where T` | Partition the collection into a dictionary of lists based on the key returned by the function. |
@@ -9804,7 +9929,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | `join` | `Join` | `((T+) -> T where T: string) & ((collection<any>*) -> collection)` | Join the elements of some collections into a flat collection. |
 | — | `KeyValuePair` | `(key: string, value: T) -> tuple<string, T> where T` | A key/value pair |
 | `keys` | `Keys` | `(dictionary<any>) -> list<string>` | Return a list of the keys of a dictionary. |
-| `last` | `Last` | `(xs: indexed_collection<any>) -> any` | The last element of a collection. |
+| `last` | `Last` | `(xs: indexed_collection<any>, default: any?) -> any` | The last element of a collection. |
 | `length` | `Length` | `(any) -> infinity \| integer` | Number of elements in a collection. |
 | `linspace` | `Linspace` | `(start: number, end: number?, count: number?) -> list<number>` | A sequence of evenly spaced numbers between a start and end value, both endpoints included. |
 | — | `List` | `(any*) -> list` | An ordered collection of elements (a list). |
@@ -9866,8 +9991,8 @@ The [Collections reference](/reference/collections/) has the full description an
 | `superset` | `Superset` | `(any, any*) -> boolean` | Test whether the first collection is a strict superset of the second. |
 | `supersetEqual` | `SupersetEqual` | `(any, any*) -> boolean` | Test whether the first collection is a superset (possibly equal) of the second. |
 | `symmetricDifference` | `SymmetricDifference` | `(set<any>, set<any>) -> set` | Return the symmetric difference of two sets (elements in either set but not both). |
-| `table` | `Table` | `(function, integer, integer?) -> collection` | An alias for `Tabulate` (the preferred name) that additionally accepts |
-| `tabulate` | `Tabulate` | `(generator: function, integer, integer?) -> list` | Create a collection by applying a function to each index in the specified dimensions. |
+| `table` | `Table` | `(function, integer+) -> collection` | An alias for `Tabulate` (the preferred name) that additionally accepts |
+| `tabulate` | `Tabulate` | `(generator: function, integer+) -> list` | Create a collection by applying a function to each index in the specified dimensions. |
 | `take` | `Take` | `((xs: T, count: number) -> T where T: string) & ((xs: indexed_collection<T>, count: number) -> list<T> where T: any)` | Return the first `n` elements of an indexed collection. |
 | `takeWhile` | `TakeWhile` | `(indexed_collection<T>, predicate: (T) any -> boolean) -> indexed_collection where T` | Return the leading elements of the collection for which the predicate returns True, stopping at the first element that does not. |
 | `tally` | `Tally` | `(collection<T>) -> tuple<list<T>, list<integer>> where T` | Return a tuple with the unique elements of the collection and their respective counts. |
@@ -9876,7 +10001,7 @@ The [Collections reference](/reference/collections/) has the full description an
 | — | `Tuple` | `(any*) -> tuple` | A fixed number of heterogeneous elements. |
 | `tupleFrom` | `TupleFrom` | `(value*) -> tuple` | Create a tuple from the elements of a collection. |
 | `union` | `Union` | `(any+) -> set` | Return the union of two or more collections as a set. |
-| `unique` | `Unique` | `((T) -> T where T: string) & ((collection<T>) -> list<T> where T: any)` | Return a list of the unique elements of the collection. |
+| `unique` | `Unique` | `((T) -> T where T: string) & ((T, test: (character, character) any -> boolean) -> T where T: string) & ((collection<T>) -> list<T> where T: any) & ((collection<T>, test: (T, T) any -> boolean) -> list<T> where T: any)` | Return a list of the unique elements of the collection. |
 | `values` | `Values` | `(dictionary<any>) -> list` | Return a list of the values of a dictionary. |
 | `zip` | `Zip` | `(indexed_collection<any>+) -> list` | Combine multiple collections element-wise into a list of tuples. |
 
@@ -9974,10 +10099,10 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `besselJ` | `BesselJ` | `(order: complex, complex \| infinity) -> number` | Bessel function of the first kind |
 | `besselK` | `BesselK` | `(order: complex, complex \| infinity) -> number` | Modified Bessel function of the second kind (Macdonald function) |
 | `besselY` | `BesselY` | `(order: complex, complex \| infinity) -> number` | Bessel function of the second kind (Neumann function) |
-| `beta` | `Beta` | `(complex \| infinity, complex \| infinity) -> number` | Euler beta function |
+| `beta` | `Beta` | `(complex \| infinity, complex \| infinity, (complex \| infinity)?, (complex \| infinity)?) -> number` | Euler beta function |
 | `catalanConstant` | `CatalanConstant` | constant `real<0.915965594177219..0.9159655941772191>` = `0.915965594177219015055` | Catalan's constant G ≈ 0.9160. |
 | `ceil` | `Ceil` | `(x: real \| signed_infinity \| ~oo, step: real?) -> real \| signed_infinity \| ~oo` | Rounds a number up to the next largest integer, or with a step to the least multiple of the step that is at least the number. |
-| `chop` | `Chop` | `(T) -> T where T: number` | Replace tiny numeric values with zero. |
+| `chop` | `Chop` | `(T, real<0..>?) -> T where T: number` | Replace tiny numeric values with zero. |
 | `clamp` | `Clamp` | `(real \| signed_infinity, real \| signed_infinity, real \| signed_infinity) -> real \| signed_infinity` | Clamp a value to the range [lo, hi] = min(max(x, lo), hi). |
 | `complex` | `Complex` | `(real: number, imaginary: number) -> complex` | Construct a complex number from real and imaginary parts. |
 | `complexInfinity` | `ComplexInfinity` | constant `number` = `~oo` | Complex infinity, a single unsigned infinity in the complex plane. |
@@ -10002,10 +10127,11 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `floor` | `Floor` | `(x: real \| signed_infinity \| ~oo, step: real?) -> real \| signed_infinity \| ~oo` | Rounds a number down to the nearest integer, or with a step to the greatest multiple of the step that is at most the number. |
 | `fract` | `Fract` | `(real \| signed_infinity \| ~oo) -> real<0..1>` | Fractional part of a number: x - floor(x) |
 | `gcd` | `GCD` | `(any*) -> number` | Greatest Common Divisor |
-| `gamma` | `Gamma` | `(complex \| infinity, (complex \| infinity)?) -> number` | Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt. |
+| `gamma` | `Gamma` | `(complex \| infinity, (complex \| infinity)?, (complex \| infinity)?) -> number` | Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt; with three, Γ(s, z0) − Γ(s, z1). |
 | `gammaLn` | `GammaLn` | `(complex \| infinity) -> number` | Natural logarithm of the gamma function. |
 | `goldenRatio` | `GoldenRatio` | constant `real<1.618033988749894..1.618033988749895>` = `1/2 * (1 + sqrt(5))` | The golden ratio φ = (1+√5)/2 ≈ 1.618. |
 | `half` | `Half` | constant `rational` = `1/2` | The rational number one half (1/2). |
+| `harmonicNumber` | `HarmonicNumber` | `(complex \| infinity, (complex \| infinity)?) -> number` | Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer and continued by ψ(n+1) + γ; with a second argument r, the generalized H_n^(r) = Σ_&#123;k=1&#125;^n 1/k^r = ζ(r) − ζ(r, n+1). |
 | `heaviside` | `Heaviside` | `(real \| signed_infinity) -> rational<0..1>` | Heaviside step function. |
 | `hurwitzZeta` | `HurwitzZeta` | `(complex \| infinity, complex \| infinity, integer?) -> number` | Hurwitz zeta function ζ(s,a) = Σ_&#123;n=0&#125;^∞ (n+a)^&#123;-s&#125; |
 | `im` | `Im` | `(complex \| infinity) -> number` | `Im` is an alias for `Imaginary`, which is the preferred name. |
@@ -10061,7 +10187,7 @@ The [Arithmetic reference](/reference/arithmetic/) has the full description and 
 | `supremum` | `Supremum` | `(value*) -> number` | Like Max, but defined for open sets. |
 | `trigamma` | `Trigamma` | `(complex \| infinity) -> number` | Trigamma function, the derivative of the digamma function |
 | `truncate` | `Truncate` | `(x: real \| signed_infinity \| ~oo, step: real?) -> real \| signed_infinity \| ~oo` | Rounds a number towards zero (removes the fractional part), or with a step to the multiple of the step nearest to the number in the direction of zero. |
-| `zeta` | `Zeta` | `(complex \| infinity, (complex \| infinity)?) -> number` | Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ \|n+a\|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum. |
+| `zeta` | `Zeta` | `(complex \| infinity, (complex \| infinity)?) -> number` | Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ \|n+a\|^&#123;-s&#125; (a term with n+a = 0 omitted, except at s = 0, where ζ(0,a) = 1/2 - a), which is HurwitzZeta(s,a) for a &gt; 0; for a complex… |
 | — | `e` | constant `real<2.718281828459045..2.718281828459046>` = `e` | Euler's number e ≈ 2.71828, the base of the natural logarithm. |
 | — | `i` | constant `imaginary` = `i` | The imaginary unit, whose square is −1. |
 
@@ -10185,12 +10311,13 @@ The [Combinatorics reference](/reference/combinatorics/) has the full descriptio
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `bellNumber` | `BellNumber` | `(integer) -> integer` | Compute the Bell number B(n), the number of partitions of a set of n elements. |
+| `bellNumber` | `BellNumber` | `(integer, number?) -> number` | Compute the Bell number B(n), the number of partitions of a set of n elements. |
 | `binomial` | `Binomial` | `(complex \| infinity, complex \| infinity) -> number` | Compute the binomial coefficient C(n, k) = n! / (k! |
 | `cartesianProduct` | `CartesianProduct` | `(set<any>+) -> set` | Return the Cartesian product of input sets. |
 | `choose` | `Choose` | `(n: complex \| infinity, m: complex \| infinity) -> number` | Binomial coefficient: number of ways to choose k items from n. |
 | `combinations` | `Combinations` | `((S, integer) -> list<string> where S: string) & ((collection, integer) -> list<list>)` | Return all k-element combinations of a collection. |
-| `fibonacci` | `Fibonacci` | `(integer) -> integer` | Compute the nth Fibonacci number. |
+| `fibonacci` | `Fibonacci` | `(integer, number?) -> number` | Compute the nth Fibonacci number. |
+| `integerPartitions` | `IntegerPartitions` | `(integer, any?, list<integer>?, integer?) -> list<list<integer>>` | Return the partitions of n, each a list of its positive parts in non-increasing order, in reverse lexicographic order. |
 | `multinomial` | `Multinomial` | `(integer+) -> integer` | Compute the multinomial coefficient for multiple integers. |
 | `permutations` | `Permutations` | `((S, integer?) -> list<string> where S: string) & ((collection, integer?) -> list<list>)` | Return all permutations of length k (default full length) of a collection. |
 | `pochhammer` | `Pochhammer` | `(complex \| infinity, complex \| infinity) -> number` | Rising factorial (Pochhammer symbol) (a)_k = a(a+1)…(a+k-1). |
@@ -10205,22 +10332,23 @@ The [Number theory reference](/reference/number-theory/) has the full descriptio
 |:------|:---------|:----------|:--------|
 | `bernoulliB` | `BernoulliB` | `(integer) -> rational` | Return the nth Bernoulli number Bₙ as an exact rational, using the convention B₁ = -1/2. |
 | `carmichaelLambda` | `CarmichaelLambda` | `(integer) -> integer` | Return the Carmichael function λ(n) (the reduced totient): the smallest positive integer `m` such that `a^m ≡ 1 (mod n)` for every `a` coprime to `n`. |
-| `catalanNumber` | `CatalanNumber` | `(integer) -> integer` | Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`. |
-| `chineseRemainder` | `ChineseRemainder` | `(collection<any>, collection<any>) -> integer` | Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. |
-| `continuedFraction` | `ContinuedFraction` | `(real, integer?) -> list<integer>` | Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. |
-| `digitCount` | `DigitCount` | `(integer, integer?, integer?) -> integer \| list<integer>` | Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. |
-| `digitSum` | `DigitSum` | `(integer, integer?) -> integer` | Return the sum of the digits of `n` in the given `base` (default 10). |
+| `catalanNumber` | `CatalanNumber` | `(real) -> number` | Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`. |
+| `chineseRemainder` | `ChineseRemainder` | `(collection<any>, collection<any>, integer?) -> integer` | Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. |
+| `continuedFraction` | `ContinuedFraction` | `(real, integer?) -> list<integer \| list<integer>>` | Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. |
+| `digitCount` | `DigitCount` | `(integer, integer?, integer?, integer?) -> integer \| list<integer>` | Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. |
+| `digitSum` | `DigitSum` | `(integer, integer?, integer?) -> integer` | Return the sum of the digits of `n` in the given `base` (default 10). |
 | `dirichletCharacter` | `DirichletCharacter` | `(integer, integer, integer) -> number` | The Dirichlet character χ_j(n) modulo `k`, the `j`-th of the φ(k) characters (Wolfram's indexing, `j = 1` the principal character). |
 | `dirichletL` | `DirichletL` | `(integer, integer, number) -> number` | The Dirichlet L-function L(s, χ) = Σ χ(n)/nˢ (n ≥ 1) of the character χ_j modulo `k` (`DirichletCharacter(k, j, ·)`): `k^(−s) Σ_{r=1}^{k} χ(r) ζ(s, r/k)`. |
 | `divides` | `Divides` | `(integer, integer) -> boolean` | `Divides(a, b)` returns `True` if `a` divides `b` (i.e. |
-| `divisorSigma` | `DivisorSigma` | `(integer, integer) -> integer` | The divisor function σ_k(n) = Σ_&#123;d \| n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. |
+| `divisorSigma` | `DivisorSigma` | `(integer, integer) -> rational` | The divisor function σ_k(n) = Σ_&#123;d \| n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. |
 | `divisors` | `Divisors` | `(integer) -> list<integer>` | Return the sorted list of positive divisors of an integer `n`. |
+| `eulerE` | `EulerE` | `(integer, number?) -> number` | Return the nth Euler number Eₙ (1, 0, -1, 0, 5, 0, -61, …) for `EulerE(n)`, or the Euler polynomial Eₙ(x) for `EulerE(n, x)`. |
 | `eulerPhi` | `EulerPhi` | `(integer) -> integer` | `EulerPhi` is an alias for `Totient`, which is the preferred name. |
 | `eulerian` | `Eulerian` | `(integer, integer) -> integer` | Eulerian number A(n, m): number of permutations of &#123;1..n&#125; with exactly m ascents. |
-| `extendedGCD` | `ExtendedGCD` | `(integer, integer) -> tuple<integer, integer, integer>` | Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients). |
-| `factorInteger` | `FactorInteger` | `(integer) -> list<tuple<integer, integer>>` | Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. |
-| `fromContinuedFraction` | `FromContinuedFraction` | `(collection<any>) -> number` | Reconstruct the (rational) value of a continued fraction given its list of integer terms `[a0, a1, …]`. |
-| `fromDigits` | `FromDigits` | `(collection<any>, integer?) -> integer` | Reconstruct an integer from its list of digits (most-significant first) in the given `base` (default 10). |
+| `extendedGCD` | `ExtendedGCD` | `(integer, integer, integer*) -> tuple` | Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients). |
+| `factorInteger` | `FactorInteger` | `(rational) -> list<tuple<integer, integer>>` | Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. |
+| `fromContinuedFraction` | `FromContinuedFraction` | `(collection<any>) -> number` | Reconstruct the value of a continued fraction given its list of integer terms `[a0, a1, …]`. |
+| `fromDigits` | `FromDigits` | `(collection<any>, number?) -> number` | Reconstruct a number from its digits (most-significant first) in the given `base` (default 10). |
 | `integerDigits` | `IntegerDigits` | `(integer, integer?, integer?) -> list<integer>` | Return the digits of `n` in the given `base` (default 10), most-significant first. |
 | `integerSqrt` | `IntegerSqrt` | `(integer) -> integer` | Return the integer square root of `n`, i.e. the largest integer `m` such that `m² ≤ n`. |
 | `isAbundant` | `IsAbundant` | `(integer) -> boolean` | True if n is an abundant number (sum of divisors &gt; 2n). |
@@ -10230,7 +10358,7 @@ The [Number theory reference](/reference/number-theory/) has the full descriptio
 | `isPerfect` | `IsPerfect` | `(integer) -> boolean` | Returns "True" if n is a perfect number, a positive integer which equals the sum of all its divisors. |
 | `isPerfectPower` | `IsPerfectPower` | `(integer) -> boolean` | Return `"True"` if `n` is a perfect power `a^b` for integers `a` and `b ≥ 2` (a negative `n` requires an odd exponent). |
 | `isSquare` | `IsSquare` | `(integer) -> boolean` | True if n is a perfect square. |
-| `isSquareFree` | `IsSquareFree` | `(integer) -> boolean` | Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). |
+| `isSquareFree` | `IsSquareFree` | `(rational) -> boolean` | Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). |
 | `isTriangular` | `IsTriangular` | `(integer) -> boolean` | True if n is a triangular number. |
 | `jacobiSymbol` | `JacobiSymbol` | `(integer, integer) -> integer` | The Jacobi symbol (a/n) for an odd `n > 0`. |
 | `legendreSymbol` | `LegendreSymbol` | `(integer, integer) -> integer` | The Legendre symbol (a/p) for an odd prime `p`. |
@@ -10240,12 +10368,13 @@ The [Number theory reference](/reference/number-theory/) has the full descriptio
 | `moebiusMu` | `MoebiusMu` | `(integer) -> integer` | Return the Möbius function μ(n): 0 if `n` is divisible by a perfect square &gt; 1, otherwise (-1) raised to the number of distinct prime factors. |
 | `multiplicativeOrder` | `MultiplicativeOrder` | `(integer, integer, list<integer>?) -> integer` | The multiplicative order of `a` modulo `n`: the smallest `k > 0` such that `a^k ≡ 1 (mod n)`. |
 | `nPartition` | `NPartition` | `(integer) -> integer` | Number of integer partitions of n, for n ≥ 0; it is 0 for n &lt; 0. |
-| `nextPrime` | `NextPrime` | `(integer, integer?) -> integer` | Return the smallest prime greater than `n`. |
+| `nextPrime` | `NextPrime` | `(real, integer?) -> integer` | Return the smallest prime greater than `n`. |
 | `notDivides` | `NotDivides` | `(integer, integer) -> boolean` | `NotDivides(a, b)` returns `True` if `a` does not divide `b`, corresponding to the notation `a ∤ b`. |
 | `nthPrime` | `NthPrime` | `(integer) -> integer` | Return the nth prime number (1-based): `NthPrime(1)` is 2, `NthPrime(2)` is 3, … |
 | `partitionsP` | `PartitionsP` | `(integer) -> integer` | `PartitionsP` is an alias for `NPartition`, which is the preferred name. |
-| `powerMod` | `PowerMod` | `(integer, rational, integer) -> integer` | Return `a^b mod m` (modular exponentiation). |
-| `powerModList` | `PowerModList` | `(integer, rational, integer) -> list<integer>` | Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. |
+| `partitionsQ` | `PartitionsQ` | `(integer) -> integer` | Number of partitions of n into distinct parts (equivalently, into odd parts), q(n); it is 0 for n &lt; 0. |
+| `powerMod` | `PowerMod` | `(list<rational> \| rational, list<rational> \| rational, integer \| list<integer>) -> integer \| list<integer>` | Return `a^b mod m` (modular exponentiation). |
+| `powerModList` | `PowerModList` | `(list<rational> \| rational, list<rational> \| rational, integer \| list<integer>) -> list<integer> \| list<list<integer>>` | Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. |
 | `primeFactors` | `PrimeFactors` | `(integer) -> list<integer>` | Return the sorted list of distinct prime factors of an integer `n`. |
 | `primeNu` | `PrimeNu` | `(integer) -> integer` | Return ω(n), the number of distinct prime factors of `n`. |
 | `primeNumber` | `PrimeNumber` | `(integer) -> integer` | The nth prime number. |
@@ -10311,7 +10440,7 @@ The [Linear algebra reference](/reference/linear-algebra/) has the full descript
 | `eigenvalues` | `Eigenvalues` | `(matrix) -> list` | Eigenvalues of a square matrix. |
 | `eigenvectors` | `Eigenvectors` | `(matrix) -> list` | Eigenvectors of a square matrix. |
 | `fill` | `Fill` | `(value: any, integer+) -> list` | List or tensor with each element equal to a value. |
-| `flatten` | `Flatten` | `(value, integer?) -> list` | Flatten a tensor or collection into a list. |
+| `flatten` | `Flatten` | `(value, (+oo \| integer)?) -> list` | Flatten a tensor or collection into a list. |
 | `hadamardProduct` | `HadamardProduct` | `(matrix \| vector, matrix \| vector) -> matrix \| vector` | Hadamard (element-wise) product of two vectors or matrices of the same shape. |
 | `hom` | `Hom` | `(value*) -> value` | Hom-set of morphisms between objects |
 | `identityMatrix` | `IdentityMatrix` | `(integer) -> matrix` | n-by-n identity matrix. |
@@ -10349,19 +10478,19 @@ The [Statistics reference](/reference/statistics/) has the full description and 
 
 | Epsil | MathJSON | Signature | Summary |
 |:------|:---------|:----------|:--------|
-| `betaRegularized` | `BetaRegularized` | `(complex \| infinity, complex \| infinity, complex \| infinity) -> number` | Regularized incomplete beta function I_x(a, b) |
+| `betaRegularized` | `BetaRegularized` | `(complex \| infinity, complex \| infinity, complex \| infinity, (complex \| infinity)?) -> number` | Regularized incomplete beta function I_x(a, b); with four arguments, I_z1(a, b) − I_z0(a, b) |
 | `binCounts` | `BinCounts` | `(collection<number>, list<number> \| number) -> list<number>` | Count the number of elements falling into each bin. |
 | `binomialDistribution` | `BinomialDistribution` | `(integer<0..>, real<0..1>) -> expression<BinomialDistribution>` | Binomial distribution: number of successes in n independent trials, each with success probability p. |
 | `cdf` | `CDF` | `(distribution, real \| signed_infinity) -> nan \| real<0..1>` | Cumulative distribution function P(X ≤ x) of a distribution. |
 | `correlation` | `Correlation` | `(collection<number \| tuple>, collection<number>?) -> nan \| real<-1..1>` | Pearson's correlation coefficient of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
 | `covariance` | `Covariance` | `(collection<number \| tuple>, collection<number>?) -> nan \| real` | Sample covariance (n − 1 denominator) of paired data, given as two equal-length collections or one collection of (x, y) pairs. |
-| `erf` | `Erf` | `(complex \| signed_infinity) -> complex` | Gauss error function |
-| `erfInv` | `ErfInv` | `(complex \| infinity) -> number` | Inverse of the error function |
+| `erf` | `Erf` | `(complex \| signed_infinity, (complex \| signed_infinity)?) -> complex` | Gauss error function; with two arguments, Erf(z1) − Erf(z0) |
+| `erfInv` | `ErfInv` | `(complex \| infinity, (complex \| infinity)?) -> number` | Inverse of the error function; with two arguments, the x with Erf(z0, x) = z, that is ErfInv(z + Erf(z0)) |
 | `erfc` | `Erfc` | `(complex \| signed_infinity) -> complex` | Complementary error function: 1 - Erf(x) |
 | `erfi` | `Erfi` | `(complex \| signed_infinity) -> complex \| signed_infinity` | Imaginary error function: -i·Erf(i·x) |
 | `exponentialDistribution` | `ExponentialDistribution` | `(real<0<..>) -> expression<ExponentialDistribution>` | Exponential distribution with rate parameter λ. |
 | `findFit` | `FindFit` | `(any, any, any, any, dictionary?) -> dictionary` | Nonlinear least-squares fit of a model to data. |
-| `gammaRegularized` | `GammaRegularized` | `(complex \| infinity, complex \| infinity) -> number` | Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a) |
+| `gammaRegularized` | `GammaRegularized` | `(complex \| infinity, complex \| infinity, (complex \| infinity)?) -> number` | Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a); with three arguments, Q(a, z0) − Q(a, z1) |
 | `histogram` | `Histogram` | `(collection<number>, list<number> \| number) -> list<tuple<number, integer>>` | Compute a histogram of the values in a collection. |
 | `interquartileRange` | `InterquartileRange` | `((collection<number> \| number)+) -> +oo \| nan \| real<0..>` | Interquartile range (Q3 - Q1) of a collection. |
 | `kurtosis` | `Kurtosis` | `((collection<number> \| number)+) -> nan \| real` | Kurtosis of a collection of numbers. |
@@ -10787,6 +10916,18 @@ MathJSON `ApplyWhole` · `(name: any, arguments: any*) -> unknown`
 
 Apply a function to arguments, each bound whole (engine-internal).
 
+### arbitraryConstant
+
+MathJSON `ArbitraryConstant` · `(integer) -> number`
+
+ArbitraryConstant(k): an arbitrary number, the k-th of a result: a constant of integration, the free parameter of an identity. Inside one result, two calls with the same index are the same value, and two calls with different indexes are independent. It has no value.
+
+### arbitraryInteger
+
+MathJSON `ArbitraryInteger` · `(integer) -> integer`
+
+ArbitraryInteger(k): an arbitrary integer, the k-th of a result: the parameter of a family of roots, of a diophantine or a congruence solution. Inside one result, two calls with the same index are the same value, and two calls with different indexes are independent. It has no value.
+
 ### arc
 
 MathJSON `Arc` · `(any+) -> number`
@@ -10950,7 +11091,6 @@ True iff the subject conforms to EVERY named protocol. A `type` VALUE subject as
 protocol Copyable {}
 type string is Copyable
 conforms("abc", "Copyable")
-// ➔ "True"
 ```
 
 ### Declare
@@ -10974,7 +11114,6 @@ Declare that a type CONFORMS to one or more protocols — the lowering of the Ep
 protocol Copyable {}
 type string is Copyable
 "abc" is Copyable
-// ➔ "True"
 ```
 
 ### DeclareProtocol
@@ -11230,9 +11369,9 @@ Read one line of text from the host: the terminal in a command-line host, the `p
 
 ### integerString
 
-MathJSON `IntegerString` · `(integer, integer?) -> string`
+MathJSON `IntegerString` · `(integer, integer?, integer?) -> string`
 
-`IntegerString(n, base=10)`       return a string representation of the integer `n` in base `base`.
+`IntegerString(n, base=10, length)`       return a string representation of the integer `n` in base `base`.       With `length`, the digits of |n| are padded on the left with zeros,       or cut to the last `length` digits.
 
 ```epsil
 integerString(255, 16)
@@ -11242,6 +11381,11 @@ integerString(255, 16)
 ```epsil
 integerString(10, 2)
 // ➔ "1010"
+```
+
+```epsil
+integerString(5, 2, 8)
+// ➔ "00000101"
 ```
 
 ### InvisibleOperator
@@ -11565,6 +11709,12 @@ Print the operands to the host console, separated by spaces and followed by a ne
 print("Hello", 42)
 ```
 
+### program
+
+MathJSON `Program` · `(unknown*) -> unknown`
+
+Evaluate a program in the caller scope, continuing after statement errors.
+
 ### ProtocolMember
 
 `(protocol: string, member: string, arguments: any*) -> unknown`
@@ -11575,7 +11725,6 @@ Invoke a protocol member on a value — the lowering of a QUALIFIED protocol cal
 protocol Negatable { function negated(self: Self) -> Self }
 type number is Negatable { function negated(self) -> number { -self } }
 Negatable.negated(5)
-// ➔ -5
 ```
 
 ### ProtocolProperty
@@ -12047,7 +12196,7 @@ trimStart("007", "0")
 
 MathJSON `Type` · `(any) -> type`
 
-The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. The observer does not evaluate its operand. Recover the text with `StringFrom(Type(x))`; in a string interpolation a type value renders as its text directly. BREAKING (2026-08-19, ruling R3 of `docs/TYPE-SYSTEM.md`): the result used to be a STRING, and `Type(x) == "some text"` is now always `False` — use `x is T`, `Subtype(Type(x), u)`, or compare `StringFrom` text.
+The STATIC type of an expression, as a type value: `Type(3)` is `TypeFrom("integer")`. The observer does not evaluate its operand, except a name with no declared type, which gives the widened type of the value it holds. Recover the text with `StringFrom(Type(x))`; in a string interpolation a type value renders as its text directly. BREAKING (2026-08-19, ruling R3 of `docs/TYPE-SYSTEM.md`): the result used to be a STRING, and `Type(x) == "some text"` is now always `False` — use `x is T`, `Subtype(Type(x), u)`, or compare `StringFrom` text.
 
 ```epsil
 type("hi")
@@ -12946,7 +13095,7 @@ containsSequence([1, 2, 3, 4], [2, 3])
 
 ### count
 
-MathJSON `Count` · `(collection<any>, any?) -> infinity | integer`
+MathJSON `Count` · `(collection<any>, any?, any?) -> infinity | integer`
 
 `Count(xs)`: the number of elements in the collection.
 
@@ -13215,7 +13364,7 @@ find([1, 4, 9, 16], x => x > 5)
 
 ### first
 
-MathJSON `First` · `(xs: indexed_collection<any>) -> any`
+MathJSON `First` · `(xs: indexed_collection<any>, default: any?) -> any`
 
 The first element of a collection.
 
@@ -13410,7 +13559,7 @@ keys({"a" -> 1, "b" -> 2})
 
 ### last
 
-MathJSON `Last` · `(xs: indexed_collection<any>) -> any`
+MathJSON `Last` · `(xs: indexed_collection<any>, default: any?) -> any`
 
 The last element of a collection.
 
@@ -14178,7 +14327,7 @@ symmetricDifference({1, 2, 3}, {2, 3, 4})
 
 ### table
 
-MathJSON `Table` · `(function, integer, integer?) -> collection`
+MathJSON `Table` · `(function, integer+) -> collection`
 
 An alias for `Tabulate` (the preferred name) that additionally accepts Mathematica-style iterator specs, e.g. `Table(i^2, {i, n})` (`i` from 1 to `n`), `Table(i^2, {i, 1, n})` or `Table(i, {i, lo, hi, step})`, and the equivalent tuple spelling `Table(i^2, (i, 1, n))`.
 
@@ -14189,7 +14338,7 @@ table(i^2, (i, 1, 5))
 
 ### tabulate
 
-MathJSON `Tabulate` · `(generator: function, integer, integer?) -> list`
+MathJSON `Tabulate` · `(generator: function, integer+) -> list`
 
 Create a collection by applying a function to each index in the specified dimensions.
 
@@ -14297,7 +14446,7 @@ union({1, 2}, {2, 3})
 
 ### unique
 
-MathJSON `Unique` · `((T) -> T where T: string) & ((collection<T>) -> list<T> where T: any)`
+MathJSON `Unique` · `((T) -> T where T: string) & ((T, test: (character, character) any -> boolean) -> T where T: string) & ((collection<T>) -> list<T> where T: any) & ((collection<T>, test: (T, T) any -> boolean) -> list<T> where T: any)`
 
 Return a list of the unique elements of the collection.
 
@@ -15051,7 +15200,7 @@ Airy function of the first kind
 
 ```epsil
 N(airyAi(1))
-// ➔ 0.13529241631288141
+// ➔ 0.135292416312881415524
 ```
 
 ### airyAiPrime
@@ -15073,7 +15222,7 @@ Airy function of the second kind
 
 ```epsil
 N(airyBi(0))
-// ➔ 0.6149266274460007
+// ➔ 0.614926627446000735151
 ```
 
 ### airyBiPrime
@@ -15117,7 +15266,7 @@ Modified Bessel function of the first kind
 
 ```epsil
 N(besselI(0, 1))
-// ➔ 1.2660658777520084
+// ➔ 1.2660658777520083356
 ```
 
 ### besselJ
@@ -15128,7 +15277,7 @@ Bessel function of the first kind
 
 ```epsil
 N(besselJ(0, 1))
-// ➔ 0.7651976865579666
+// ➔ 0.76519768655796655145
 ```
 
 ### besselK
@@ -15139,7 +15288,7 @@ Modified Bessel function of the second kind (Macdonald function)
 
 ```epsil
 N(besselK(0, 1))
-// ➔ 0.42102443824070834
+// ➔ 0.421024438240708333336
 ```
 
 ### besselY
@@ -15150,18 +15299,28 @@ Bessel function of the second kind (Neumann function)
 
 ```epsil
 N(besselY(0, 1))
-// ➔ 0.088256964215677
+// ➔ 0.0882569642156769579829
 ```
 
 ### beta
 
-MathJSON `Beta` · `(complex | infinity, complex | infinity) -> number`
+MathJSON `Beta` · `(complex | infinity, complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
 Euler beta function
 
 ```epsil
 [beta(2, 3), N(beta(1/2, 1/2))]
 // ➔ [1/12,3.14159265358979323846]
+```
+
+```epsil
+beta(1/2, 2, 3)
+// ➔ 11/192
+```
+
+```epsil
+beta(1/4, 1/2, 2, 3)
+// ➔ 109/3072
 ```
 
 ### catalanConstant
@@ -15188,12 +15347,17 @@ Rounds a number up to the next largest integer, or with a step to the least mult
 
 ### chop
 
-MathJSON `Chop` · `(T) -> T where T: number`
+MathJSON `Chop` · `(T, real<0..>?) -> T where T: number`
 
 Replace tiny numeric values with zero.
 
 ```epsil
 chop([1e-20, 0.5, 3 + 1e-15i])
+// ➔ [0,0.5,3]
+```
+
+```epsil
+chop([0.004, 0.5, 3 + 0.002i], 0.01)
 // ➔ [0,0.5,3]
 ```
 
@@ -15287,7 +15451,7 @@ Digamma function, the logarithmic derivative of the gamma function
 
 ```epsil
 [digamma(1), N(digamma(1))]
-// ➔ [Digamma(1),-0.577215664901532860607]
+// ➔ [-"EulerGamma",-0.577215664901532860607]
 ```
 
 ### dirichletBeta
@@ -15478,18 +15642,23 @@ Greatest Common Divisor
 
 ### gamma
 
-MathJSON `Gamma` · `(complex | infinity, (complex | infinity)?) -> number`
+MathJSON `Gamma` · `(complex | infinity, (complex | infinity)?, (complex | infinity)?) -> number`
 
-Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt.
+Gamma function Γ(z); with two arguments, the upper incomplete gamma Γ(s, z) = ∫_z^∞ tˢ⁻¹ e⁻ᵗ dt; with three, Γ(s, z0) − Γ(s, z1).
 
 ```epsil
 [gamma(1/2), N(gamma(1/2)), N(gamma(5))]
-// ➔ [Gamma(1/2),1.7724538509055160273,24]
+// ➔ [sqrt(pi),1.7724538509055160273,24]
 ```
 
 ```epsil
 N(gamma(2, 1))
 // ➔ 0.735758882342884643191
+```
+
+```epsil
+N(gamma(2, 1, 3))
+// ➔ 0.536610608871428871274
 ```
 
 ### gammaLn
@@ -15523,6 +15692,17 @@ The rational number one half (1/2).
 ```epsil
 [half, half + 1]
 // ➔ [1/2,3/2]
+```
+
+### harmonicNumber
+
+MathJSON `HarmonicNumber` · `(complex | infinity, (complex | infinity)?) -> number`
+
+Harmonic number H_n = Σ_&#123;k=1&#125;^n 1/k, exact at a non-negative integer and continued by ψ(n+1) + γ; with a second argument r, the generalized H_n^(r) = Σ_&#123;k=1&#125;^n 1/k^r = ζ(r) − ζ(r, n+1).
+
+```epsil
+[harmonicNumber(10), harmonicNumber(10, 2), N(harmonicNumber(1/2))]
+// ➔ [7381/2520,1968329/1270080,0.613705638880109381166]
 ```
 
 ### heaviside
@@ -15909,6 +16089,11 @@ N(polyGamma(2, 1))
 // ➔ -2.4041138063191885708
 ```
 
+```epsil
+N(polyGamma(1))
+// ➔ -0.577215664901532860607
+```
+
 ### positiveInfinity
 
 MathJSON `PositiveInfinity` · constant `+oo` = `+oo`
@@ -16159,7 +16344,7 @@ Rounds a number towards zero (removes the fractional part), or with a step to th
 
 MathJSON `Zeta` · `(complex | infinity, (complex | infinity)?) -> number`
 
-Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
+Riemann zeta function; with two arguments, Wolfram's generalized zeta: for a real a, ζ(s,a) = Σ_&#123;n=0&#125;^∞ |n+a|^&#123;-s&#125; (a term with n+a = 0 omitted, except at s = 0, where ζ(0,a) = 1/2 - a), which is HurwitzZeta(s,a) for a &gt; 0; for a complex a, the Hurwitz sum.
 
 ```epsil
 [zeta(2), zeta(-1), N(zeta(3))]
@@ -17363,7 +17548,7 @@ Source: https://epsil.dev/reference/combinatorics/
 
 # Combinatorics
 
-The 11 definitions of the combinatorics library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The 12 definitions of the combinatorics library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
@@ -17374,9 +17559,9 @@ category.
 
 ### bellNumber
 
-MathJSON `BellNumber` · `(integer) -> integer`
+MathJSON `BellNumber` · `(integer, number?) -> number`
 
-Compute the Bell number B(n), the number of partitions of a set of n elements.
+Compute the Bell number B(n), the number of partitions of a set of n elements. With a second operand, `BellNumber(n, x)` is the Bell (Touchard) polynomial `B_n(x)`, with `B_n(1) = BellNumber(n)`.
 
 ### binomial
 
@@ -17404,9 +17589,30 @@ Return all k-element combinations of a collection.
 
 ### fibonacci
 
-MathJSON `Fibonacci` · `(integer) -> integer`
+MathJSON `Fibonacci` · `(integer, number?) -> number`
 
-Compute the nth Fibonacci number.
+Compute the nth Fibonacci number. With a second operand, `Fibonacci(n, x)` is the Fibonacci polynomial `F_n(x)`, with `F_n(1) = Fibonacci(n)`.
+
+### integerPartitions
+
+MathJSON `IntegerPartitions` · `(integer, any?, list<integer>?, integer?) -> list<list<integer>>`
+
+Return the partitions of n, each a list of its positive parts in non-increasing order, in reverse lexicographic order. The second operand limits the number of parts: `IntegerPartitions(n, k)` keeps those of at most k parts, a list `[k]` exactly k parts, and `[kmin, kmax]` or `[kmin, kmax, step]` a range of numbers of parts (kmax may be `Infinity`, and `All` is no limit). `IntegerPartitions(n, kspec, [s1, s2, ...])` draws the parts from the given positive integers, and a fourth operand m keeps the first m partitions. There is no partition of a negative n, and the only one of 0 is the empty list.
+
+```epsil
+integerPartitions(4)
+// ➔ [[4],[3,1],[2,2],[2,1,1],[1,1,1,1]]
+```
+
+```epsil
+integerPartitions(8, [3])
+// ➔ [[6,1,1],[5,2,1],[4,3,1],[4,2,2],[3,3,2]]
+```
+
+```epsil
+count(integerPartitions(100, 100, [1, 5, 10, 25, 50]))
+// ➔ 292
+```
 
 ### multinomial
 
@@ -17446,7 +17652,7 @@ Source: https://epsil.dev/reference/number-theory/
 
 # Number theory
 
-The 60 definitions of the number theory library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
+The 62 definitions of the number theory library, each with its Epsil spelling, its MathJSON name, its signature and its full description.
 
 Each definition is listed under its Epsil spelling (the MathJSON name when
 it has none), with its signature in the engine's type syntax. The
@@ -17479,57 +17685,82 @@ carmichaelLambda(15)
 
 ### catalanNumber
 
-MathJSON `CatalanNumber` · `(integer) -> integer`
+MathJSON `CatalanNumber` · `(real) -> number`
 
-Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`.
+Return the nth Catalan number `C(n) = (2n)! / ((n+1)! · n!)`: 1, 1, 2, 5, 14, 42, … Defined for `n ≥ 0`. A positive rational `n` is taken through the Gamma function, `C(n) = Γ(2n+1) / (Γ(n+1) Γ(n+2))`: `CatalanNumber(1/2)` is `8/(3π)`.
 
 ```epsil
 catalanNumber(5)
 // ➔ 42
 ```
 
+```epsil
+catalanNumber(1/2)
+// ➔ 8 / (3pi)
+```
+
 ### chineseRemainder
 
-MathJSON `ChineseRemainder` · `(collection<any>, collection<any>) -> integer`
+MathJSON `ChineseRemainder` · `(collection<any>, collection<any>, integer?) -> integer`
 
-Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. Undefined if the system is inconsistent or the two lists differ in length.
+Solve a system of simultaneous congruences: return the smallest non-negative integer `x` such that `x ≡ residues[i] (mod moduli[i])` for every `i`. With a third argument `d`, return the smallest solution `x ≥ d`. Undefined if the system is inconsistent or the two lists differ in length.
 
 ```epsil
 chineseRemainder([2, 3, 2], [3, 5, 7])
 // ➔ 23
 ```
 
+```epsil
+chineseRemainder([2, 3, 2], [3, 5, 7], 100)
+// ➔ 128
+```
+
 ### continuedFraction
 
-MathJSON `ContinuedFraction` · `(real, integer?) -> list<integer>`
+MathJSON `ContinuedFraction` · `(real, integer?) -> list<integer | list<integer>>`
 
-Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. An exact rational is expanded fully; an inexact value is expanded as its best rational approximation at working precision (see `Rationalize`), truncated to the optional `n` terms (default 20).
+Return the continued-fraction expansion of `x` as a list of integer terms `[a0, a1, …]`. An exact rational is expanded fully. An exact quadratic irrational (`Sqrt(2)`) is expanded to its periodic form `[a0, …, [period]]` (`[1, [2]]`), or to the optional `n` terms. Another exact real (`ExponentialE`) is expanded to `n` terms (default 20), each computed at a precision that vouches for it. An inexact value is expanded as its best rational approximation at working precision (see `Rationalize`), truncated to `n` terms (default 20).
 
 ```epsil
 continuedFraction(43/19)
 // ➔ [2,3,1,4]
 ```
 
+```epsil
+continuedFraction(sqrt(2))
+// ➔ [1,[2]]
+```
+
 ### digitCount
 
-MathJSON `DigitCount` · `(integer, integer?, integer?) -> integer | list<integer>`
+MathJSON `DigitCount` · `(integer, integer?, integer?, integer?) -> integer | list<integer>`
 
-Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. With a third argument `digit`, return how many times that digit occurs. Otherwise return a list `[count of 1, count of 2, …, count of base-1, count of 0]`.
+Count digits of `n` in the given `base` (default 10); the sign of `n` is ignored. With a third argument `digit`, return how many times that digit occurs. Otherwise return a list `[count of 1, count of 2, …, count of base-1, count of 0]`. With a fourth argument `length`, the digits are first zero-padded on the left (or cut to their last `length`), so `DigitCount(5, 2, 0, 8)` is 6.
 
 ```epsil
 digitCount(122, 10, 2)
 // ➔ 2
 ```
 
+```epsil
+digitCount(5, 2, 0, 8)
+// ➔ 6
+```
+
 ### digitSum
 
-MathJSON `DigitSum` · `(integer, integer?) -> integer`
+MathJSON `DigitSum` · `(integer, integer?, integer?) -> integer`
 
-Return the sum of the digits of `n` in the given `base` (default 10). The sign of `n` is ignored.
+Return the sum of the digits of `n` in the given `base` (default 10). The sign of `n` is ignored. With a third argument `k`, sum only the first `k` digits (most-significant first), or the last `|k|` when `k` is negative; `k` past the digit count sums them all.
 
 ```epsil
 digitSum(1234)
 // ➔ 10
+```
+
+```epsil
+digitSum(1234, 10, 2)
+// ➔ 3
 ```
 
 ### dirichletCharacter
@@ -17582,13 +17813,18 @@ divides(3, 12)
 
 ### divisorSigma
 
-MathJSON `DivisorSigma` · `(integer, integer) -> integer`
+MathJSON `DivisorSigma` · `(integer, integer) -> rational`
 
-The divisor function σ_k(n) = Σ_&#123;d | n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. The sign of `n` is ignored, as for `Divisors` and `PrimeOmega`; `DivisorSigma(k, 0)` is undefined.
+The divisor function σ_k(n) = Σ_&#123;d | n&#125; dᵏ over the positive divisors of `n`. σ₀ counts divisors, σ₁ sums them. A negative `k` sums reciprocal powers, a rational: `DivisorSigma(-1, 12)` is 7/3. The sign of `n` is ignored, as for `Divisors` and `PrimeOmega`; `DivisorSigma(k, 0)` is undefined.
 
 ```epsil
 divisorSigma(2, 6)
 // ➔ 50
+```
+
+```epsil
+divisorSigma(-1, 12)
+// ➔ 7/3
 ```
 
 ### divisors
@@ -17600,6 +17836,22 @@ Return the sorted list of positive divisors of an integer `n`. The sign of `n` i
 ```epsil
 divisors(12)
 // ➔ [1,2,3,4,6,12]
+```
+
+### eulerE
+
+MathJSON `EulerE` · `(integer, number?) -> number`
+
+Return the nth Euler number Eₙ (1, 0, -1, 0, 5, 0, -61, …) for `EulerE(n)`, or the Euler polynomial Eₙ(x) for `EulerE(n, x)`. Odd-index Euler numbers are 0. Eₙ = 2ⁿ·Eₙ(1/2). A negative or non-integer `n` stays symbolic.
+
+```epsil
+eulerE(4)
+// ➔ 5
+```
+
+```epsil
+eulerE(2, x)
+// ➔ x^2 - x
 ```
 
 ### eulerPhi
@@ -17621,46 +17873,71 @@ Eulerian number A(n, m): number of permutations of &#123;1..n&#125; with exactly
 
 ### extendedGCD
 
-MathJSON `ExtendedGCD` · `(integer, integer) -> tuple<integer, integer, integer>`
+MathJSON `ExtendedGCD` · `(integer, integer, integer*) -> tuple`
 
-Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients).
+Return the extended GCD of `a` and `b` as a tuple `(g, x, y)` where `g = gcd(a, b)` is non-negative and `a·x + b·y = g` (Bézout coefficients). With more operands, `ExtendedGCD(a₁, …, aₙ)` is the tuple `(g, x₁, …, xₙ)` with `g = gcd(a₁, …, aₙ)` and `Σ aᵢ·xᵢ = g`.
 
 ```epsil
 extendedGCD(12, 18)
 // ➔ (6, -1, 1)
 ```
 
+```epsil
+extendedGCD(12, 18, 27)
+// ➔ (3, 4, -4, 1)
+```
+
 ### factorInteger
 
-MathJSON `FactorInteger` · `(integer) -> list<tuple<integer, integer>>`
+MathJSON `FactorInteger` · `(rational) -> list<tuple<integer, integer>>`
 
-Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. For a negative `n`, a leading `[-1, 1]` tuple carries the sign.
+Return the prime factorization of an integer `n` as a list of `[prime, exponent]` tuples, ordered by ascending prime. For a negative `n`, a leading `[-1, 1]` tuple carries the sign. A rational `p/q` is factored as `p` and `q`, the exponents of the primes of `q` being negative.
 
 ```epsil
 factorInteger(360)
 // ➔ [(2, 3),(3, 2),(5, 1)]
 ```
 
+```epsil
+factorInteger(12/35)
+// ➔ [(2, 2),(3, 1),(5, -1),(7, -1)]
+```
+
 ### fromContinuedFraction
 
 MathJSON `FromContinuedFraction` · `(collection<any>) -> number`
 
-Reconstruct the (rational) value of a continued fraction given its list of integer terms `[a0, a1, …]`.
+Reconstruct the value of a continued fraction given its list of integer terms `[a0, a1, …]`. A last element that is a list is the repeating period, `[1, [2]]`: the quadratic irrational `Sqrt(2)`.
 
 ```epsil
 fromContinuedFraction([2, 3, 1, 4])
 // ➔ 43/19
 ```
 
+```epsil
+fromContinuedFraction([1, [2]])
+// ➔ sqrt(2)
+```
+
 ### fromDigits
 
-MathJSON `FromDigits` · `(collection<any>, integer?) -> integer`
+MathJSON `FromDigits` · `(collection<any>, number?) -> number`
 
-Reconstruct an integer from its list of digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`. Digits outside `[0, base)` are combined positionally (Horner evaluation).
+Reconstruct a number from its digits (most-significant first) in the given `base` (default 10). The inverse of `IntegerDigits`. Digits outside `[0, base)` are combined positionally, and the base may be any number or symbol: `FromDigits([1, 1, 0], -2)` is 2 and `FromDigits([a, b, c], x)` is `a x^2 + b x + c`.
 
 ```epsil
 fromDigits([1, 2, 3, 4])
 // ➔ 1234
+```
+
+```epsil
+fromDigits([1, 1, 0], -2)
+// ➔ 2
+```
+
+```epsil
+fromDigits([a, b, c], x)
+// ➔ a * x^2 + b * x + c
 ```
 
 ### integerDigits
@@ -17734,12 +18011,17 @@ True if n is a perfect square.
 
 ### isSquareFree
 
-MathJSON `IsSquareFree` · `(integer) -> boolean`
+MathJSON `IsSquareFree` · `(rational) -> boolean`
 
-Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). The sign of `n` is ignored.
+Return `"True"` if `n` is square-free (not divisible by any perfect square &gt; 1). The sign of `n` is ignored. A rational is square-free when its numerator and denominator are.
 
 ```epsil
 isSquareFree(30)
+// ➔ "True"
+```
+
+```epsil
+isSquareFree(6/35)
 // ➔ "True"
 ```
 
@@ -17839,9 +18121,9 @@ Number of integer partitions of n, for n ≥ 0; it is 0 for n &lt; 0.
 
 ### nextPrime
 
-MathJSON `NextPrime` · `(integer, integer?) -> integer`
+MathJSON `NextPrime` · `(real, integer?) -> integer`
 
-Return the smallest prime greater than `n`. With a second argument `k`, return the kth prime after `n` (`k < 0` returns the |k|th prime before `n`).
+Return the smallest prime greater than `n`. With a second argument `k`, return the kth prime after `n` (`k < 0` returns the |k|th prime before `n`). A non-integer real or rational `n` is allowed: `NextPrime(7/2)` is 5.
 
 ```epsil
 nextPrime(10)
@@ -17851,6 +18133,11 @@ nextPrime(10)
 ```epsil
 nextPrime(10, -1)
 // ➔ 7
+```
+
+```epsil
+nextPrime(7/2)
+// ➔ 5
 ```
 
 ### notDivides
@@ -17881,11 +18168,22 @@ partitionsP(5)
 // ➔ 7
 ```
 
+### partitionsQ
+
+MathJSON `PartitionsQ` · `(integer) -> integer`
+
+Number of partitions of n into distinct parts (equivalently, into odd parts), q(n); it is 0 for n &lt; 0. The Wolfram Language `PartitionsQ`.
+
+```epsil
+partitionsQ(10)
+// ➔ 10
+```
+
 ### powerMod
 
-MathJSON `PowerMod` · `(integer, rational, integer) -> integer`
+MathJSON `PowerMod` · `(list<rational> | rational, list<rational> | rational, integer | list<integer>) -> integer | list<integer>`
 
-Return `a^b mod m` (modular exponentiation). A negative `b` uses the modular inverse of `a`; the result is undefined when that inverse does not exist (i.e. when `a` and `m` are not coprime). The result is in the range [0, m). A rational exponent `s/r` gives the least `x` with `x^r ≡ a^s (mod m)`, the first entry of `PowerModList(a, s/r, m)`. It is undefined when there is none, when `m` cannot be factored, or when there are too many roots to list and none of them is less than 100000.
+Return `a^b mod m` (modular exponentiation). A negative `b` uses the modular inverse of `a`; the result is undefined when that inverse does not exist (i.e. when `a` and `m` are not coprime). The result is in the range [0, m). A rational base `p/q` is `p` times the modular inverse of `q`, so `PowerMod(1/2, 2, 7)` is 2. A rational exponent `s/r` gives the least `x` with `x^r ≡ a^s (mod m)`, the first entry of `PowerModList(a, s/r, m)`. It is undefined when there is none, when `m` cannot be factored, or when there are too many roots to list and none of them is less than 100000. A list operand threads: `PowerMod([2, 3], 2, 7)` is `[4, 2]`.
 
 ```epsil
 powerMod(2, 10, 1000)
@@ -17897,11 +18195,16 @@ powerMod(4, 1/2, 7)
 // ➔ 2
 ```
 
+```epsil
+powerMod(1/2, 2, 7)
+// ➔ 2
+```
+
 ### powerModList
 
-MathJSON `PowerModList` · `(integer, rational, integer) -> list<integer>`
+MathJSON `PowerModList` · `(list<rational> | rational, list<rational> | rational, integer | list<integer>) -> list<integer> | list<list<integer>>`
 
-Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. An integer exponent gives the single value `a^s mod m`, a negative one using the modular inverse of `a`. The list is empty when `a^s` is not an `r`-th power mod `m`. Undefined for a modulus `m < 1`, when the inverse of `a` does not exist, or when `m` cannot be factored or there are too many roots to list.
+Return the sorted list of every `x` in [0, m) with `x^r ≡ a^s (mod m)`, for the exponent `s/r`. An integer exponent gives the single value `a^s mod m`, a negative one using the modular inverse of `a`. A rational base is read as `p` times the inverse of `q`. A list operand threads: `PowerModList([2, 3], 2, 7)` is `[[4], [2]]`. The list is empty when `a^s` is not an `r`-th power mod `m`. Undefined for a modulus `m < 1`, when the inverse of `a` does not exist, or when `m` cannot be factored or there are too many roots to list.
 
 ```epsil
 powerModList(3, 1/2, 11)
@@ -18714,7 +19017,7 @@ fill(7, 2, 3)
 
 ### flatten
 
-MathJSON `Flatten` · `(value, integer?) -> list`
+MathJSON `Flatten` · `(value, (+oo | integer)?) -> list`
 
 Flatten a tensor or collection into a list.
 
@@ -19087,9 +19390,9 @@ category.
 
 ### betaRegularized
 
-MathJSON `BetaRegularized` · `(complex | infinity, complex | infinity, complex | infinity) -> number`
+MathJSON `BetaRegularized` · `(complex | infinity, complex | infinity, complex | infinity, (complex | infinity)?) -> number`
 
-Regularized incomplete beta function I_x(a, b)
+Regularized incomplete beta function I_x(a, b); with four arguments, I_z1(a, b) − I_z0(a, b)
 
 ### binCounts
 
@@ -19128,15 +19431,15 @@ Sample covariance (n − 1 denominator) of paired data, given as two equal-lengt
 
 ### erf
 
-MathJSON `Erf` · `(complex | signed_infinity) -> complex`
+MathJSON `Erf` · `(complex | signed_infinity, (complex | signed_infinity)?) -> complex`
 
-Gauss error function
+Gauss error function; with two arguments, Erf(z1) − Erf(z0)
 
 ### erfInv
 
-MathJSON `ErfInv` · `(complex | infinity) -> number`
+MathJSON `ErfInv` · `(complex | infinity, (complex | infinity)?) -> number`
 
-Inverse of the error function
+Inverse of the error function; with two arguments, the x with Erf(z0, x) = z, that is ErfInv(z + Erf(z0))
 
 ### erfc
 
@@ -19164,9 +19467,9 @@ Nonlinear least-squares fit of a model to data. FindFit(data, model, params, var
 
 ### gammaRegularized
 
-MathJSON `GammaRegularized` · `(complex | infinity, complex | infinity) -> number`
+MathJSON `GammaRegularized` · `(complex | infinity, complex | infinity, (complex | infinity)?) -> number`
 
-Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a)
+Regularized upper incomplete gamma function Q(a, z) = Γ(a, z)/Γ(a); with three arguments, Q(a, z0) − Q(a, z1)
 
 ### histogram
 
@@ -19322,7 +19625,7 @@ Sample Standard Deviation of a collection of numbers.
 
 MathJSON `UniformDistribution` · `(real, real) -> expression<UniformDistribution>`
 
-Continuous uniform distribution on the interval [a, b].
+Continuous uniform distribution on the interval [a, b]. `UniformDistribution([a, b])` is the same, and `UniformDistribution()` is on [0, 1].
 
 ### variance
 
@@ -20193,7 +20496,7 @@ and monitoring.
 | `doc`       | Look up a library function by name, or search the library by keywords |
 | `parse`     | Convert Epsil source, or LaTeX with `format: "latex"`, to MathJSON |
 | `serialize` | Convert MathJSON to Epsil source, or to LaTeX with `format: "latex"`; `fancySymbols: true` for the Unicode notations |
-| `compile`   | Show the code a compilation target (JavaScript, GLSL, Python, interval JavaScript) generates for a program or a LaTeX expression, or why the target declines it |
+| `compile`   | Show the code a compilation target (JavaScript, GLSL, interval JavaScript) generates for a program or a LaTeX expression, or why the target declines it |
 
 The server also publishes the [language card for AI agents](/for-agents/)
 as a resource (`epsil://docs/for-agents`), and its setup instructions tell
@@ -20246,7 +20549,7 @@ The result has `ok`, the generated `code` (`atan(z.y, z.x) + 1.0`), and
 it as (here `vec2`, the uniform to declare), and whether it was declared or
 inferred. When the target declines, `ok` is `false`, there is no `code`, and
 `error` and `diagnostic` give the reason. `to` is `javascript` (the default),
-`glsl`, `python` or `interval-js`, and `mode` selects the arithmetic
+`glsl` or `interval-js`, and `mode` selects the arithmetic
 discipline: `strict` (the default), `complex` or, on `javascript` only,
 `bigint`.
 
@@ -20385,7 +20688,7 @@ let x = 5                 // mutable declaration
 const tau = 6.28          // immutable; reassigning yields an Error value
 x = x + 3                 // assignment: a bare `=` assigns only as a STATEMENT
 f(x) = x^2                // function definition, math style
-square = x => x^2        // anonymous function ("=>" is the lambda arrow)
+let square = x => x^2    // anonymous function ("=>" is the lambda arrow)
 cube : (x: number) -> number = x^3   // a named function-type annotation binds x
 function g(n) {           // function definition, block style
   let t = n + 1           // blocks are lexically scoped
@@ -20638,8 +20941,10 @@ sort([3, 1, 4, 1, 5], (a, b) => a > b)
   immediately, and so does an **assignment**: `let ys = filter(xs, p)` and
   `xs = filter(xs, p)` store the list of the elements when the generator is
   finite and reads a variable. A generator with no last element
-  (`filter(1..oo, p)`) stays lazy when it is assigned, and stores the values
-  that the variables it reads have at the assignment.
+  (`filter(1..oo, p)`) stays lazy when it is assigned: a variable operand
+  gives its value at the assignment, and the inline function reads its
+  variables when an element is computed. List a finite part with `listFrom`
+  to keep the elements of that time.
 - **Output is the engine's textual form**: strings and booleans print
   *quoted* (`"True"`, `"florb"`) — that quoted `"True"` is a boolean, not a
   string. Derived collections (`Range`, `map`/`filter` results, loop-built
@@ -20765,10 +21070,11 @@ flowchart TD
   latex["$…$ LaTeX islands"] -. "parseLatex" .-> parse
   pragmas["pragma values"] -. "computed at parse time" .-> parse
   parse --> diag1["diagnostics"]
-  parse --> json["MathJSON<br/>(spellings as written: sin, pi)"]
+  parse --> json["Program MathJSON<br/>(spellings as written: sin, pi)"]
   json --> resolve["resolveLibraryNames()"]
   resolve --> bound["MathJSON<br/>(library names: Sin, Pi)"]
-  bound --> ce["Compute Engine<br/>evaluates each statement"]
+  bound --> canonical["Compute Engine<br/>prepares the whole Program"]
+  canonical --> ce["evaluates the Program statements"]
   ce --> value["value of the last statement"]
   ce --> diag2["runtime diagnostics"]
   bound -. "serializeEpsil()" .-> out["Epsil source, regenerated"]
@@ -20793,8 +21099,8 @@ import {
 
 ### Parsing
 
-`parseEpsil(source, url?, options?)` returns a MathJSON expression and an
-array of diagnostics:
+`parseEpsil(source, url?, options?)` returns a MathJSON `Program` and an
+array of diagnostics, including for empty or single-statement source:
 
 ```js
 const [expression, diagnostics] = parseEpsil("2x + 1");
@@ -20803,11 +21109,11 @@ const [expression, diagnostics] = parseEpsil("2x + 1");
 Ignoring source-location metadata, the expression is:
 
 ```json
-["Add", ["Multiply", 2, "x"], 1]
+["Program", ["Add", ["Multiply", 2, "x"], 1]]
 ```
 
-The parser recovers from most syntax errors and returns a partial expression
-alongside its diagnostics. Every parsed node also carries source offsets so a
+Empty source gives `["Program"]`. The parser recovers from most syntax errors
+and returns a partial expression alongside its diagnostics. Every parsed node also carries source offsets so a
 host can associate a diagnostic or expression with the original text.
 
 The tree is exactly what was written: the lowercase spelling of a library
@@ -20832,10 +21138,12 @@ import {
   binderSitesOf,
   parseEpsil,
 } from "@cortex-js/compute-engine/epsil";
+import { operand } from "@cortex-js/compute-engine/math-json";
 
 const ce = new ComputeEngine();
 const source = "sum(k^2, k, 1, n)";
-const [call] = parseEpsil(source);
+const [program] = parseEpsil(source);
+const call = operand(program, 1);
 binderSitesOf(ce, call, source);
 // ➔ [{ name: "k", operands: [0, 1, 2, 3] }]
 ```
@@ -20847,10 +21155,10 @@ bindings of the program: call it only for a call whose callee the program
 does not define. A `limit`, `nLimit`, `nd` or `nIntegrate` that does not
 write its variable binds the variable that the engine chooses, in its first
 operand only: `limit(sin(h)/h, 0)` gives `[{ name: "h", operands: [0] }]`.
-The engine reads the value of a name that the program binds, so its choice
-can depend on that value: after `let L = [1, 2]`, the variable of
-`limit(total(L)*t, 0)` is `t`, because `L` is a list, and the engine does not
-choose a `const` name. A host that knows the names the program binds at the
+The engine can read values already installed by an earlier program or the
+host, so its choice can depend on that state. When `L` already holds
+`[1, 2]`, the variable of `limit(total(L)*t, 0)` is `t`, because `L` is a
+list. The engine does not choose a `const` name. A host that knows the names the program binds at the
 call gives them as a fifth argument,
 `binderSitesOf(ce, call, source, undefined, (name) => …)`: when such a name
 comes first and other names follow, the result is `[]`. Without it, the
@@ -20861,21 +21169,24 @@ function that returns a `ProgramDeclaration` for the name, or `undefined`:
 top level of the program that no other statement writes. `constant` is
 `true` for a `const`, `annotated` is `true` when the statement has a type
 annotation, `value` is the raw initializer, and `boxedEarly` is `true` when
-the call is in the body of a `function` statement that the program can call
-above that statement. With it, a `let` whose initializer is a number, a
-string, a list or a function literal, and a `const`, give the variable that
-the engine chooses: after `let L = [1, 2]` the result for
-`limit(total(L)*t, 0)` is `[{ name: "t", operands: [0] }]`, and after
-`const h = 5` the result for `limit(sin(h)/h, 0)` is `[]`. In the body of a
-function that the program can call above its `function` statement, the
-engine can box the body before the declaration runs, so a `const` whose
-initializer is a number, and a name with a type annotation, are not decided
-there.
+the call is boxed before value declarations have executed. Every occurrence
+in a `Program` has this timing, including direct top-level statements and
+function bodies: the whole program is prepared before its first statement
+runs. Constness is already known, so the helper excludes a `const` name
+without evaluating its initializer. A mutable variable's execution value is
+unavailable during that preparation, even when its declaration appears
+earlier in the text; an annotation does not supply that value. The helper
+leaves a value-dependent choice undecided rather than predicting execution.
+For a host that really boxes a call after the relevant declarations have
+executed, `boxedEarly: false` allows the later-value evidence instead.
 
 ### Execution
 
-`executeEpsil(ce, source, options?)` parses a program and evaluates its
-top-level statements sequentially in the current scope of `ce`:
+`executeEpsil(ce, source, options?)` parses, resolves and boxes one `Program`,
+then evaluates it in the current scope of `ce`. Boxing prepares every
+statement before the first runs. The canonical order is types and protocols,
+then function definitions with their paired signatures, then the other
+statements in source order:
 
 ```js
 const ce = new ComputeEngine();
@@ -20994,7 +21305,9 @@ serializeEpsil(["Sin", "x"], { libraryNames: "mathjson" });
 ## How Epsil lowers to MathJSON
 
 The examples in this section omit the `sourceOffsets` metadata that every
-parsed node carries.
+parsed node carries. Except in [Blocks and programs](#blocks-and-programs),
+they show individual statements or nested expressions inside the outer
+`Program`, rather than the whole return value of `parseEpsil()`.
 
 ### Heads at a glance
 
@@ -21012,7 +21325,8 @@ parsed node carries.
 | `p₁ \| p₂` in a pattern | `Alternatives` |
 | `while`, `for … in …` | `Loop` |
 | `break`, `continue` | `Break()`, `Continue()` |
-| `{ … }` after a keyword, `do { … }`, a multi-statement program | `Block` |
+| A whole program, including empty or single-statement source | `Program` |
+| `{ … }` after a keyword, `do { … }` | `Block` |
 | `[a, b]` | `List` |
 | `{a, b}` | `Set` |
 | `(a, b)` | `Tuple` |
@@ -21051,9 +21365,12 @@ let x = 5
 ["Declare", "x", ["Dictionary", ["KeyValuePair", "value", 5]]]
 ```
 
-The type is inferred (`integer`, here) when no annotation is given. With an
-annotation, the type appears as a positional argument before the attributes
-dictionary:
+For a mutable variable without an annotation, the initializer determines a
+widened binding type (`number`, here). A function initializer or an alias
+known to hold a function gives `function`; the value retains its own
+annotations without making them a permanent variable contract. With an
+annotation, that contract appears as a positional argument before the
+attributes dictionary:
 
 ```epsil
 let x: real = 5
@@ -21686,8 +22003,10 @@ to `v` — has no Epsil spelling yet.
 
 ### Blocks and programs
 
-A statement block is the engine's `Block`. A multi-statement program is wrapped
-in one; a program consisting of a single statement is returned unwrapped:
+A whole source file is always a `Program`. It has no scope of its own: its
+declarations stay in the caller's scope. A statement block is a nested
+`Block`, with its own lexical scope. These examples show the complete parser
+result, omitting source metadata:
 
 ```epsil
 a
@@ -21695,7 +22014,7 @@ a
 ```
 
 ```json
-["Block", "a", 2]
+["Program", "a", 2]
 ```
 
 ```epsil
@@ -21703,7 +22022,7 @@ a; 2
 ```
 
 ```json
-["Block", "a", 2]
+["Program", "a", 2]
 ```
 
 A `{ … }` that follows a keyword is a `Block`, while a bare `{ … }` is the
@@ -21714,7 +22033,7 @@ collection grammar:
 ```
 
 ```json
-["Set", 1, 2]
+["Program", ["Set", 1, 2]]
 ```
 
 ```epsil
@@ -21722,7 +22041,7 @@ if a { }
 ```
 
 ```json
-["If", "a", ["Block"]]
+["Program", ["If", "a", ["Block"]]]
 ```
 
 ```epsil
@@ -21730,7 +22049,7 @@ if a { if b { 1 } }
 ```
 
 ```json
-["If", "a", ["Block", ["If", "b", ["Block", 1]]]]
+["Program", ["If", "a", ["Block", ["If", "b", ["Block", 1]]]]]
 ```
 
 `do { … }` produces the same `Block` in expression position, so a `let` bound
@@ -21741,9 +22060,9 @@ let y = do { let t = 3; t + 1 }
 ```
 
 ```json
-["Declare", "y", ["Dictionary", ["KeyValuePair", "value",
+["Program", ["Declare", "y", ["Dictionary", ["KeyValuePair", "value",
   ["Block", ["Declare", "t", ["Dictionary", ["KeyValuePair", "value", 3]]],
-    ["Add", "t", 1]]]]]
+    ["Add", "t", 1]]]]]]
 ```
 
 ### Collections, calls, indexing and field access
@@ -21868,8 +22187,11 @@ place. See [Errors are values](/evaluation/#errors-are-values).
 
 `serializeEpsil` and `parseEpsil` are inverses over the MathJSON the grammar
 can produce, up to a small set of documented normalizations.
-`parseEpsil(serializeEpsil(e))` is **structurally** equal to `e` after
-applying:
+A parser-produced `Program` keeps its outer `Program` when serialized and
+parsed again. Serializing a standalone expression instead gives source whose
+parsed result wraps that expression in `Program`; compare its first operand
+when checking an expression-only round trip. Within that outer form, the
+round trip is **structurally** equal after applying:
 
 - **Number formatting** — `2`, `{num: "2"}` and `"2"` are the same number;
   the serializer emits a single canonical spelling (with `_` digit grouping),
@@ -21909,7 +22231,8 @@ do not have a special surface form serialize as ordinary function calls.
 Epsil is a **programming-language** syntax. The Compute Engine also ships a
 *loose math parser* (`ce.parse(src, { canonical: false })`) that reads
 LaTeX/ASCII-math notation. The two share a few surface forms but are **not** the
-same language, and they overlap only partially:
+same language, and they overlap only partially. The Epsil column below shows
+the statement inside its outer `Program`:
 
 | Source     | Epsil `parseEpsil`                | Loose `ce.parse` (non-canonical)              | Agree? |
 | ---------- | ----------------------------------- | --------------------------------------------- | ------ |
