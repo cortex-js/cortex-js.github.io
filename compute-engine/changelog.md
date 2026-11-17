@@ -65,14 +65,53 @@ import ChangeLog from '@site/src/components/ChangeLog';
   is now unchanged. A host that computes with `BigDecimal` directly at the
   precision of an engine passes it: `x.div(y, ce.precision)`. Setting
   `BigDecimal.precision` does not change the results of any engine.
+- **`Repeat` evaluates a value that is not pure once per element, in every
+  position.** `Repeat(Random(), 3)` was three copies of one random number,
+  and so were `Max` of it and its sum with `[1, 2, 3]`, while its `Sum` and
+  its sum with `1` used three random numbers. It is now three random numbers
+  in every case, as `Map(_ ↦ Random(), Range(1, 3))` is. With `c` set to 1,
+  `Repeat(Block(Assign(c, c + 1), c), 3)` was `[2, 2, 2]` and left `c` at 2;
+  it is now `[2, 3, 4]` and leaves `c` at 4. A count of 0 evaluates nothing,
+  and the unbounded `Repeat(Random())` evaluates the value at each element
+  read. Above `maxCollectionSize` elements, such a `Repeat` evaluates to the
+  lazy `Map(_ ↦ v, Range(1, n))` of its value. The count is now evaluated
+  before the value. A pure value is evaluated once, as before. The
+  experimental profile `'ir'` of `compile()` gives the same values, where it declined; the default
+  JavaScript compiler declines such a `Repeat`, so the interpreter runs it.
 - **Runtime-local self-quotients evaluate before cancellation.**
   `const x = 0; x/x` returned `1`; it now returns `NaN`. Nonzero library
   constants retain their ordinary self-quotient simplification.
+
+- **A boolean mask of `At` can have another length than the collection.**
+  `At(L, M)` keeps `L[k]` where `M[k]` is `True`, for the positions up to the
+  shorter of the two lengths: with `L = [1, 2, 3, 4, 5]` and `K = [1, 0, 1]`,
+  `L[K = 1]` is `[1, 3]`, where it was the error "The mask (length 3) must
+  have the same length as the collection (length 5)"; a longer mask is read
+  only as far as the collection goes. A `Missing` or `NaN` member of the mask
+  keeps nothing, as `False` does: `At([1, 2, 3], [True, Missing, True])` is
+  `[1, 3]`, where it stayed unevaluated. Compiled JavaScript gives the same
+  list, where it gave `NaN`. In the experimental profile `'ir'`, a mask that
+  is a list of booleans by its static type (an input `list<boolean>`, `L > 2`,
+  `K = 1`, a `Map` to booleans) compiles on JavaScript and in the interval
+  mode, over a list of numbers or of points, where it declined; GLSL
+  declines. For this, `Equal` and `NotEqual` of a list and a scalar, and
+  `Not`, `And` and `Or` of lists, compile in the profile and thread over the
+  list, as in the interpreter (`Equal(K, 1)` is a list of booleans; `Equal`
+  of two lists still declines).
 
 - **A limit with no eligible numeric variable keeps nonnumeric bindings
   constant.** `function f() { let L = [1, 2]; limit(sum(L), 1) }; f()`
   returned `1`; it now returns `3`.
 
+- **In the experimental profile `'ir'`, a colour constructor of a list
+  compiles on JavaScript, and a constant colour is computed once.**
+  `Hsv(210, Range(1, 10)/40, 1)` and `AsOklab(Hsv(0, 0, D))` of a list `D`
+  give the array of colours that the default compiler gives, where they
+  declined; a list of colours declines on GLSL. A colour that reads no input
+  (`AsOklab(C)` of a name `C = Hsv(270, 0.4, 0.95)`) is computed when the code
+  is loaded, and every call returns that one object. Measured on the programs
+  of a host's documents: such a colour took 1.7 to 3.5 times the default
+  compiler's time and now takes at most 1.1 times.
 - **In the experimental profile `'ir'`, a list or tuple result on JavaScript
   is no longer a copy.** `run()` returns the value as the code built it, as
   the default compiler does and as the contract of `run()` states (results
@@ -106,6 +145,33 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Bug Fixes
 
+- **The `epsil` command line tool writes booleans and symbols without
+  quotes.** A result printed a symbol of more than one letter in quotes, so it
+  looked like a string: `epsil -e '[1 == 1, x, "s", a1]'` printed
+  `["True",x,"s","a1"]`. It now prints `[true,x,"s",a1]`. `Nothing` and
+  `Missing` print as `nothing` and `missing`, and a library constant prints
+  with its Epsil spelling (`integers`). The name of a function keeps the
+  engine's form (`QuotientRing(integers, 3)`). The examples of the Epsil library
+  reference show the same form.
+- **`NDSolve` and `NDSolveFunction` evaluate on a fresh engine.** Before,
+  `["NDSolve", ["Equal", ["D", ["y", "x"], "x"], ["y", "x"]], "y", ["Limits", "x", 0, 1], 1, 100]` stayed unevaluated unless the caller
+  declared the independent variable and internal names such as
+  `ndsolveystate` as `real`. It now gives the list of 101 samples, without
+  a declaration. A value assigned to the independent variable no longer
+  replaces it in the right-hand side: with `x := 5`, `y' = x·y`, `y(0) = 1`
+  on `[0, 1]` gave `y(1) = 148.41…` (`e^5`), and now gives `1.6487…`
+  (`e^0.5`).
+
+- **The compiled square of the square root of a sum keeps the sum grouped.**
+  Since 0.128.0, the JavaScript code of `1 - \sqrt{x^2+y^2}^2` was
+  `-(_.x * _.x) + (_.y * _.y) + 1`, which gives `0.8125` at `x = 0.5`,
+  `y = 0.25`; it is now `-((_.x * _.x) + (_.y * _.y)) + 1`, which gives
+  `0.6875`, as `evaluate()` does. A negation, a product or a difference of
+  `\sqrt{X}^2`, where `X` is a sum that cannot be negative, had this defect:
+  `2\sqrt{x^2+1}^2` gave `19` at `x = 3`, and now gives `20`. The same
+  defect affected `Abs`, `Real` and `Conjugate` of a `Block` of one
+  expression: `2·Abs(Block(x^2 + 1))` compiled to `2 * (_.x * _.x) + 1`,
+  and now compiles to `2 * ((_.x * _.x) + 1)`.
 - **`bignumLcm` is exact.** It rounded the product of its operands to the
   precision of the big decimals, so the least common multiple of two 41-digit
   integers lost its last digits: `bignumLcm(10^40 + 7, 3·10^40 + 1)` was
@@ -280,6 +346,18 @@ import ChangeLog from '@site/src/components/ChangeLog';
 
 ### Improvements
 
+- **A `compile` handler of an operator definition can return an
+  expression.** The expression is compiled in place of the node, with the
+  library's definitions: a node that the handler created is compiled with
+  no handler consulted, and the operands it received, reused as the same
+  objects, are compiled as usual. For example, a handler of `At` that
+  returns `ce.function('At', [args[0], ce.function('Max', [ce.function('Floor', [args[1]]), ce.number(0)])])` compiles
+  `At([10, 20, 30], i)` to a read at `Max(Floor(i), 0)` on every target,
+  with no text written for any of them. The profile `'ir'` now calls a
+  handler: a handler that returns `undefined` or an expression no longer
+  makes that profile decline; one that returns text or calls `compile`
+  still does. `OperatorCompileHandler` returns
+  `string | Expression | undefined`.
 - **`BigDecimal` operations take an optional precision argument.** Each
   operation that rounds (`div`, `inv`, `pow`, `sqrt`, `cbrt`, `nthRoot`,
   `exp`, `ln`, `log`, and the trigonometric and hyperbolic functions) or
@@ -356,6 +434,37 @@ import ChangeLog from '@site/src/components/ChangeLog';
   together, and a scalar argument is passed to each call. A nested list, lists
   of different lengths, a list for a function whose result is a list, and a
   recursive call with a list argument are not compiled by the profile.
+- **The experimental profile `'ir'` compiles a user function whose result is
+  a list of elements of no stated type**, as the engine infers it for
+  parameters of no stated type: with `v(a, b) := List(a, b)`, whose result is
+  `list<unknown>`, `Sum(v(x, y)·List(0.64, 0.768))` gives 2.176 at `x = 1`,
+  `y = 2` on JavaScript, and compiles for GLSL and for `interval-js`. The
+  result has the shape of the body, a list of numbers or a list of points; a
+  recursive call and elements that can be a number or a list are not
+  compiled by the profile. A parameter that
+  the body reads as a list (`Sum(p·List(Cos(φ), Sin(φ)))`) takes a list
+  argument of a length known at compile time whole, as the interpreter binds
+  it. A body whose length is known at compile time, as `PointX` of a list of
+  three points, gives a call of that length, so a function whose body maps
+  over such a call (`Map(f, d(x, y))`) compiles.
+- **The experimental profile `'ir'` compiles a recursive user function
+  whose result is not declared**, as a function assigned with no declaration:
+  with `s(x, n) := Which(n = 1, Sin(x), True, Sin(s(x, n − 1)))`, `s(x, 3)`
+  gives 0.5651… at `x = 0.7` on JavaScript, and compiles for `interval-js`.
+  When the result is neither declared nor inferred, it is taken as a real
+  number, and such a function whose body is a complex number, a boolean, a
+  list or a tuple is not compiled by the profile; GLSL declines a recursive
+  function. A recursive function can read an input of the compilation, also
+  through a function that it calls (`J(n, x) := Which(n = 0, x, True, I(x, J(n − 1, x)))` with `I(u, v) := a·u + Sin(v)`); two functions that call
+  each other and read an input are not compiled by the profile. As with the
+  existing compiler, a
+  recursion that does not reach its base case (`s(x, 2.5)`) throws a
+  `RangeError` at the end of the JavaScript stack, where the interpreter
+  throws a `CancellationError` at its recursion limit; a depth past that
+  limit (`s(x, 200)`) gives a value where the interpreter throws. Two equal
+  calls of a recursive function that draws no random number are one call:
+  `R(i, x) = R(i − 1, x) + S(R(i − 1, x))` makes 20 calls for `R(20, x)`,
+  not 2^20.
 - **Code of the experimental profile `'ir'` runs lists and loops faster.**
   A list is built in one preallocated array, two element-wise operations
   in a row are one loop, and a loop checks its deadline once per 1,024
@@ -398,11 +507,18 @@ import ChangeLog from '@site/src/components/ChangeLog';
   `compile(expr, { to: 'interval-js', profile: 'ir' })` compiles scalar
   arithmetic, the elementary functions, powers, comparisons, `If`, `Which`,
   `And`, `Or`, `Not`, locals of a `Block`, `Sum` and `Product` with `Limits`,
-  `Random()` (the interval `[0, 1]`) and calls of user functions that are
-  not recursive, with the result shapes of the target (an `IntervalResult`,
-  or the verdict `'true'`, `'false'` or `'maybe'`). Where a condition is
-  undecided over the input box, both arms are evaluated and the result is
-  their hull; a local assigned in both arms has the hull of both values.
+  `Random()` (the interval `[0, 1]`) and calls of user functions, with the
+  result shapes of the target (an `IntervalResult`, or the verdict `'true'`,
+  `'false'` or `'maybe'`). Where a condition is undecided over the input
+  box, both arms are evaluated and the result is their hull; a local
+  assigned in both arms has the hull of both values. An operand of `And`
+  or `Or` after the first, and the arm of a boolean `If` with no else arm,
+  is evaluated only where the operands before it do not decide the result,
+  as the interpreter evaluates them: `If(0 < x, 0 < R·T^⌊x⌋ + K)` computes
+  no power where `x ≤ 0`. In a recursive
+  function (a function on a cycle of calls) a condition must be decided, so
+  that the recursion ends: where it is undecided, and where the recursion
+  does not reach its base case, the result is `entire`.
   Lists and tuples compile too, as arrays of such values: `At` (an index
   that is an interval gives the hull of the elements it can select),
   element-wise operations, `Sum`, `Product`, `Max`, `Min` and `Length` of a
@@ -415,7 +531,12 @@ import ChangeLog from '@site/src/components/ChangeLog';
   a negative `x`, `x^1.5` has no value there. A difference is one
   `_IA.sub`, and a rational exponent whose denominator is a power of 2
   (`x^(3/2)`) is the power of its double, as on the existing target, with
-  its bounds. `Binomial` and `Choose` of
+  its bounds. An exponent known at run time over a base whose enclosure
+  cannot be negative (`2^y`, `|x|^y`, `(x^2)^y`) is `_IA.powInterval`, as on
+  the existing target, without the reading of the exponent, which cannot
+  apply there. As on the existing target, a quotient of a negation is one
+  `_IA.negDiv`, `(2/3)·π·x` multiplies `x` by the constant `2π/3`, and an
+  addition of an exact 0 (`x + 0/3`) is not written. `Binomial` and `Choose` of
   real operands compile (`_IA.binomial`). A comparison that the engine
   decides for every value of its inputs (`(x + 1)^2 < 0` or `Equal(x, x)`
   of a real `x`) is that verdict, as on the existing target. A value that
@@ -428,12 +549,24 @@ import ChangeLog from '@site/src/components/ChangeLog';
   computed once: `2/π · Sum((-1)^i/i · sin(i·x), i = 1..100) + 3` takes 34 µs per
   call, where it took 75 µs in a loop (the existing target: 32 µs). A body
   with a random draw, with a `Loop` or with a call of a recursive function
-  keeps the loop. An integral of one
+  keeps the loop. A list of a constant length of at most 16 elements is
+  written out the same way, in its reductions, its element-wise operations
+  and the calls of a user function that return it, so that only the
+  elements that are read are computed: `At(S(x), 2)` of
+  `S(t) = Cos(t + List(0, 1, 2))` is one cosine. An integral of one
   variable (`Integrate` with one `Limits`, `NIntegrate`) is the enclosure
   of the existing target, with the same number of pieces, or the closed
   form of the engine's antiderivative where the existing target uses one
   (an indefinite integral is its closed form); with an angular unit other
-  than radians it is the enclosure only. A `Loop` over a `Range` or a list
+  than radians it is the enclosure only. With a random draw in a bound it is
+  the enclosure only too, because the engine's closed form would hold one
+  draw made at compile time; an indefinite integral of an integrand with a
+  draw declines. With a bound `+∞` or `−∞` in the program, the parts of the
+  integrand that do not read its variable are not computed before the
+  integral, where the enclosure answers `entire` without calling the
+  integrand, and the closed form computes what it reads. The result
+  has `freeSymbols`, `freeSymbolTypes`, `unsupported` and `mode`, as on the
+  existing target. A `Loop` over a `Range` or a list
   compiles: a local that its passes assign holds the hull of both arms of
   an undecided `If` (the existing target answers `entire`), a bound that is
   not one integer over the box gives `entire`, and with an
@@ -1817,6 +1950,8 @@ This is the content first numbered 0.191.0, a version that was not published.
   compiler; it can change or be removed without notice. A program or an
   option outside the profile declines with `outside-profile`, and `fallback`
   applies as for any other decline; without the option, nothing changes.
+  A user function declared with the bare type `function` whose body is a list
+  compiles, with the shape of its body, as one whose result is `list<unknown>`.
 
 - **`ce.temporaryName(hint, ...avoid)` gives a name for a temporary symbol.**
   It returns `<hint>_tmp<n>`, with `n` the smallest integer from 1 for which

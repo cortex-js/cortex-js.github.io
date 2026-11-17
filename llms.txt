@@ -60,24 +60,24 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Compute Engine API Reference](https://mathlive.io/compute-engine/api.md): Complete API reference for the Compute Engine: the ComputeEngine and BoxedExpression classes, their properties and methods, and the supporting types.
 - [MathJSON Standard Library](https://mathlive.io/compute-engine/standard-library.md): The MathJSON standard library defines the vocabulary used by a MathJSON
 - [Arithmetic](https://mathlive.io/compute-engine/reference/arithmetic.md)
-- [Calculus](https://mathlive.io/compute-engine/reference/calculus.md): Calculus is the mathematical study of continuous change.
-- [Collections](https://mathlive.io/compute-engine/reference/collections.md): In the Compute Engine, collections group together multiple elements
-- [Colors](https://mathlive.io/compute-engine/reference/colors.md): The colors library provides functions for color manipulation,
+- [Calculus](https://mathlive.io/compute-engine/reference/calculus.md)
+- [Collections](https://mathlive.io/compute-engine/reference/collections.md)
+- [Colors](https://mathlive.io/compute-engine/reference/colors.md)
 - [Complex](https://mathlive.io/compute-engine/reference/complex.md): Complex numbers in the Compute Engine: the ImaginaryUnit constant and the Real, Imaginary, Conjugate, Abs, Arg and ComplexRoots functions.
-- [Control Structures](https://mathlive.io/compute-engine/reference/control-structures.md): Control Structures define how a sequence of expressions is evaluated.
-- [Core](https://mathlive.io/compute-engine/reference/core.md): The functions described in this section are part of the core of the Compute
-- [Functions](https://mathlive.io/compute-engine/reference/functions.md): Functions are first-class values in the Compute Engine. This means that
-- [Linear Algebra](https://mathlive.io/compute-engine/reference/linear-algebra.md): Linear algebra is the branch of
+- [Control Structures](https://mathlive.io/compute-engine/reference/control-structures.md)
+- [Core](https://mathlive.io/compute-engine/reference/core.md)
+- [Functions](https://mathlive.io/compute-engine/reference/functions.md)
+- [Linear Algebra](https://mathlive.io/compute-engine/reference/linear-algebra.md)
 - [Logic](https://mathlive.io/compute-engine/reference/logic.md): Boolean logic in the Compute Engine: the True and False constants and the And, Or, Not, implication and equivalence operators, with their LaTeX notation.
 - [Sets](https://mathlive.io/compute-engine/reference/sets.md): A set is a collection of distinct elements.
 - [Special Functions](https://mathlive.io/compute-engine/reference/special-functions.md): Special functions in the Compute Engine: error and Gamma functions, Zeta, Beta, Lambert W, Fresnel integrals, Bessel and Airy functions, and elliptic integrals.
-- [Statistics](https://mathlive.io/compute-engine/reference/statistics.md): For the following functions, when the input is a collection, it can take the
-- [Combinatorics](https://mathlive.io/compute-engine/reference/combinatorics.md): Combinatorics functions in the Compute Engine provide essential tools for counting and enumerating discrete structures. These functions enable computation of binomial and multinomial coefficients,…
-- [Number Theory](https://mathlive.io/compute-engine/reference/number-theory.md): The functions in this section provide tools for number-theoretic computations:
+- [Statistics](https://mathlive.io/compute-engine/reference/statistics.md)
+- [Combinatorics](https://mathlive.io/compute-engine/reference/combinatorics.md)
+- [Number Theory](https://mathlive.io/compute-engine/reference/number-theory.md)
 - [Strings and Text](https://mathlive.io/compute-engine/reference/strings.md): Strings and text in the Compute Engine: strings as indexed collections of characters, the character type, grapheme clusters, Unicode scalars and encodings.
 - [Group Theory](https://mathlive.io/compute-engine/reference/group-theory.md): The optional group-theory library adds exact permutation, finite-group, exact
 - [Trigonometry](https://mathlive.io/compute-engine/reference/trigonometry.md): Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return.
-- [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md): The Compute Engine provides a unit system for representing and computing with
+- [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md)
 - [Extended Rules — Symbolic Integration](https://mathlive.io/compute-engine/guides/integration-rules.md): The Integration Rules library is an optional add-on that extends the
 - [Sequences](https://mathlive.io/compute-engine/guides/sequences.md): Mathematical sequences like the Fibonacci numbers, arithmetic progressions, or
 - [The Structural Tier](https://mathlive.io/compute-engine/guides/structural-tier.md): The structural tier is the middle ground between a raw parse and a
