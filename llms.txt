@@ -1,6 +1,6 @@
 # MathLive
 
-> Scientific Web Computing. Documentation for MathLive (math input for the web) and the Compute Engine (symbolic computation in JavaScript). The Epsil language is documented at https://epsil.dev.
+> Scientific Web Computing. Documentation for MathLive (math input for the web). The Compute Engine (symbolic computation in JavaScript), MathJSON and the Epsil language are documented at https://epsil.dev.
 
 Every page below is also available as HTML at the same URL without the `.md` suffix.
 
@@ -31,67 +31,6 @@ Every page below is also available as HTML at the same URL without the `.md` suf
 - [Web Component Lifecycle](https://mathlive.io/mathfield/lifecycle.md): A mathfield web component goes through various stages during its lifecycle.
 - [Security](https://mathlive.io/mathfield/guides/security.md): Deploy mathfields safely: the Content Security Policy directives MathLive needs, Trusted Types support, and disabling commands that can modify the DOM.
 - [Mathfield API Reference](https://mathlive.io/mathfield/api.md): Complete API reference for MathLive: the MathfieldElement class, its properties, methods and events, and the options that configure a mathfield.
-
-## Compute Engine
-
-- [All Compute Engine documentation, concatenated](https://mathlive.io/llms-compute-engine.txt)
-- [Introduction - Compute Engine](https://mathlive.io/compute-engine.md): The Compute Engine is a JavaScript/TypeScript library for symbolic computing and numeric evaluation of mathematical expressions.
-- [Compute Engine Demo](https://mathlive.io/compute-engine/demo.md): By default expressions are put in canonical form.
-- [Changelog - Compute Engine](https://mathlive.io/compute-engine/changelog.md): Release notes for the Compute Engine: new features, behavior changes, deprecations and bug fixes, version by version.
-- [Expressions](https://mathlive.io/compute-engine/guides/expressions.md): The Compute Engine produces and manipulates
-- [Evaluation of Expressions](https://mathlive.io/compute-engine/guides/evaluate.md): Evaluating an expression is the process of determining the value of the
-- [Symbolic Computing](https://mathlive.io/compute-engine/guides/symbolic-computing.md): The Compute Engine essentially performs computation by applying
-- [Numeric Evaluation](https://mathlive.io/compute-engine/guides/numeric-evaluation.md): To obtain an exact numeric evaluation of an expression use expr.evaluate().
-- [Execution Constraints](https://mathlive.io/compute-engine/guides/execution-constraints.md): Some innocuous-looking expressions can take a very long time — or forever —
-- [Canonical Form](https://mathlive.io/compute-engine/guides/canonical-form.md): Many mathematical objects can be represented by several equivalent expressions.
-- [Symbols](https://mathlive.io/compute-engine/guides/symbols.md): A symbol is a named object in the Compute Engine. It has a type and may
-- [Custom Functions and Symbols](https://mathlive.io/compute-engine/guides/augmenting.md): The MathJSON Standard Library is a
-- [Parsing and Serializing LaTeX](https://mathlive.io/compute-engine/guides/latex-syntax.md): The Compute Engine manipulates MathJSON expressions. It can also convert LaTeX strings to
-- [Types](https://mathlive.io/compute-engine/guides/types.md): In the Compute Engine, the type of an expression is the set of the
-- [Units and Quantities](https://mathlive.io/compute-engine/guides/units.md): The Compute Engine supports physical units and quantities. You can parse LaTeX
-- [Simplify](https://mathlive.io/compute-engine/guides/simplify.md): A complicated mathematical expression can often be transformed into a form that
-- [Compiling Expressions](https://mathlive.io/compute-engine/guides/compiling.md): The Compute Engine can compile LaTeX expressions to JavaScript functions!
-- [Assumptions](https://mathlive.io/compute-engine/guides/assumptions.md): Assumptions are statements about symbols that are assumed to be true. For
-- [Patterns and Rules](https://mathlive.io/compute-engine/guides/patterns-and-rules.md): Recognizing patterns and applying rules is a powerful symbolic computing tool to
-- [Extended Rules — The Identities Library](https://mathlive.io/compute-engine/guides/identities.md): The Identities Library is an optional add-on that teaches the Compute
-- [Logic and First-Order Logic](https://mathlive.io/compute-engine/guides/logic.md): This guide covers working with logical expressions and First-Order Logic (FOL)
-- [Linear Algebra](https://mathlive.io/compute-engine/guides/linear-algebra.md): This guide covers working with vectors, matrices, and tensors in the Compute
-- [MathJSON Format](https://mathlive.io/math-json.md): MathJSON is a lightweight data interchange format for mathematical notation
-- [Compute Engine API Reference](https://mathlive.io/compute-engine/api.md): Complete API reference for the Compute Engine: the ComputeEngine and BoxedExpression classes, their properties and methods, and the supporting types.
-- [MathJSON Standard Library](https://mathlive.io/compute-engine/standard-library.md): The MathJSON standard library defines the vocabulary used by a MathJSON
-- [Arithmetic](https://mathlive.io/compute-engine/reference/arithmetic.md)
-- [Calculus](https://mathlive.io/compute-engine/reference/calculus.md)
-- [Collections](https://mathlive.io/compute-engine/reference/collections.md)
-- [Colors](https://mathlive.io/compute-engine/reference/colors.md)
-- [Complex](https://mathlive.io/compute-engine/reference/complex.md): Complex numbers in the Compute Engine: the ImaginaryUnit constant and the Real, Imaginary, Conjugate, Abs, Arg and ComplexRoots functions.
-- [Control Structures](https://mathlive.io/compute-engine/reference/control-structures.md)
-- [Core](https://mathlive.io/compute-engine/reference/core.md)
-- [Functions](https://mathlive.io/compute-engine/reference/functions.md)
-- [Linear Algebra](https://mathlive.io/compute-engine/reference/linear-algebra.md)
-- [Logic](https://mathlive.io/compute-engine/reference/logic.md): Boolean logic in the Compute Engine: the True and False constants and the And, Or, Not, implication and equivalence operators, with their LaTeX notation.
-- [Sets](https://mathlive.io/compute-engine/reference/sets.md): A set is a collection of distinct elements.
-- [Special Functions](https://mathlive.io/compute-engine/reference/special-functions.md): Special functions in the Compute Engine: error and Gamma functions, Zeta, Beta, Lambert W, Fresnel integrals, Bessel and Airy functions, and elliptic integrals.
-- [Statistics](https://mathlive.io/compute-engine/reference/statistics.md)
-- [Combinatorics](https://mathlive.io/compute-engine/reference/combinatorics.md)
-- [Number Theory](https://mathlive.io/compute-engine/reference/number-theory.md)
-- [Strings and Text](https://mathlive.io/compute-engine/reference/strings.md): Strings and text in the Compute Engine: strings as indexed collections of characters, the character type, grapheme clusters, Unicode scalars and encodings.
-- [Group Theory](https://mathlive.io/compute-engine/reference/group-theory.md): The optional group-theory library adds exact permutation, finite-group, exact
-- [Trigonometry](https://mathlive.io/compute-engine/reference/trigonometry.md): Trigonometry in the Compute Engine: the Pi and Degrees constants, trigonometric and hyperbolic functions, and the principal values their inverses return.
-- [Units and Quantities](https://mathlive.io/compute-engine/reference/units.md)
-- [Extended Rules — Symbolic Integration](https://mathlive.io/compute-engine/guides/integration-rules.md): The Integration Rules library is an optional add-on that extends the
-- [Sequences](https://mathlive.io/compute-engine/guides/sequences.md): Mathematical sequences like the Fibonacci numbers, arithmetic progressions, or
-- [The Structural Tier](https://mathlive.io/compute-engine/guides/structural-tier.md): The structural tier is the middle ground between a raw parse and a
-- [Fungrim Identities — Bessel and hypergeometric functions](https://mathlive.io/compute-engine/reference/fungrim-bessel-hypergeometric.md): Part of the Fungrim Identities reference — 115 identities for bessel and hypergeometric functions.
-- [Fungrim Identities — Complex numbers](https://mathlive.io/compute-engine/reference/fungrim-complex.md): Part of the Fungrim Identities reference — 36 identities for complex numbers.
-- [Fungrim Identities — Elementary functions](https://mathlive.io/compute-engine/reference/fungrim-elementary.md): Part of the Fungrim Identities reference — 210 identities for elementary functions.
-- [Fungrim Identities — Elliptic integrals](https://mathlive.io/compute-engine/reference/fungrim-elliptic-integrals.md): Part of the Fungrim Identities reference — 304 identities for elliptic integrals.
-- [Fungrim Identities — Gamma and related functions](https://mathlive.io/compute-engine/reference/fungrim-gamma.md): Part of the Fungrim Identities reference — 162 identities for gamma and related functions.
-- [Fungrim Identities — Modular forms and theta functions](https://mathlive.io/compute-engine/reference/fungrim-modular-theta.md): Part of the Fungrim Identities reference — 318 identities for modular forms and theta functions.
-- [Fungrim Identities — Number theory](https://mathlive.io/compute-engine/reference/fungrim-number-theory.md): Part of the Fungrim Identities reference — 70 identities for number theory.
-- [Fungrim Identities — Orthogonal polynomials](https://mathlive.io/compute-engine/reference/fungrim-orthogonal-polynomials.md): Part of the Fungrim Identities reference — 74 identities for orthogonal polynomials.
-- [Fungrim Identities — Combinatorial and integer sequences](https://mathlive.io/compute-engine/reference/fungrim-sequences.md): Part of the Fungrim Identities reference — 65 identities for combinatorial and integer sequences.
-- [Fungrim Identities — Zeta and L-functions](https://mathlive.io/compute-engine/reference/fungrim-zeta.md): Part of the Fungrim Identities reference — 80 identities for zeta and l-functions.
-- [Fungrim Identities](https://mathlive.io/compute-engine/reference/fungrim.md): The Compute Engine ships a library of special-function identities derived from the Fungrim "Mathematical Functions Grimoire". These identities drive symbolic simplification, expansion, and equation…
 
 ## Tutorials
 

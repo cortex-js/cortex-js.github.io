@@ -19621,6 +19621,25 @@ root. This is the reading Mathematica gives `M^(1/2)` too. There is no
 operator for the matrix square root or for a matrix function of a non-integer
 exponent.
 
+A **symbolic** exponent that is not known to be an integer or a non-integer
+keeps the power as it is, and the power evaluates when the exponent gets a
+value. An exponent declared `integer` gives `MatrixPower`:
+
+```js example
+const e = ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^n');
+e.evaluate();
+// → [[1,2],[3,4]]^n
+
+ce.declare('k', 'integer');
+ce.parse('\\begin{pmatrix}1&2\\\\3&4\\end{pmatrix}^k').evaluate();
+// → MatrixPower([[1,2],[3,4]], k)
+
+ce.declare('n', 'integer');
+ce.assign('n', 2);
+e.evaluate();
+// → [[7,10],[15,22]]
+```
+
 `simplify()` follows the same reading. For `A` declared a `matrix`,
 `ce.parse('A A').simplify()` is `MatrixPower(A, 2)`, and
 `\sqrt{A}\sqrt{A}` is `MatrixPower(\sqrt{A}, 2)`. The same-base rules for
@@ -43321,27 +43340,29 @@ It includes definitions such as:
 
 ## Topics
 
-The **MathJSON Standard Library** is organized by topics, each topic is a separate page in
-the documentation.
+The **MathJSON Standard Library** is organized by topics. Each topic is a
+library of the [library reference](/library/), where each entry gives the Epsil
+spelling of a function and, in its MathJSON section, its MathJSON form and its
+LaTeX commands.
 
 <div className="symbols-table" style={{"--first-col-width":"21ch"}}>
 
 | Topic                                                               |                                                       |
 | :------------------------------------------------------------------ | :--------------------------------------------------------------------- |
-| [Arithmetic](/compute-engine/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
-| [Calculus](/compute-engine/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
-| [Collections](/compute-engine/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
-| [Colors](/compute-engine/reference/colors/)                         | `Color` `ColorToString` `ColorMix` `ColorContrast` `ContrastingColor` `Colormap` `ColorToColorspace` `ColorFromColorspace` |
-| [Complex](/compute-engine/reference/complex/)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
-| [Control Structures](/compute-engine/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
-| [Core](/compute-engine/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
-| [Functions](/compute-engine/reference/functions/)                   | `Function` `Apply` `Return` ...                                        |
-| [Logic](/compute-engine/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
+| [Arithmetic](/reference/arithmetic/)                 | `Add` `Multiply` `Power` `Exp` `Log` `ExponentialE` `ImaginaryUnit`... |
+| [Calculus](/reference/calculus/)                     | `D` `Derivative` `Integrate`...                                                |
+| [Collections](/reference/collections/)               | `List` `Reverse` `Filter`...                                           |
+| [Colors](/reference/colors/)                         | `Color` `ColorToString` `ColorMix` `ColorContrast` `ContrastingColor` `Colormap` `ColorToColorspace` `ColorFromColorspace` |
+| [Complex](/reference/arithmetic/#complex-numbers)                       | `Real` `Conjugate`, `ComplexRoots`...                                  |
+| [Control Structures](/reference/control-structures/) | `If` `Block` `Loop` ...                                          |
+| [Core](/reference/core/)                             | `Declare` `Assign` `Error` `LatexString`...                       |
+| [Functions](/reference/core/#functions)                   | `Function` `Apply` `Return` ...                                        |
+| [Logic](/reference/logic/)                           | `And` `Or` `Not` `True` `False` `ForAll` ...                            |
 | [Sets](/compute-engine/reference/sets/)                             | `Union` `Intersection` `EmptySet` `RealNumbers` `Integers`  ...                                  |
-| [Special Functions](/compute-engine/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
-| [Statistics](/compute-engine/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
-| [Strings and Text](/compute-engine/reference/strings/)              | `Characters` `StringJoin` `RangeOf` `StringReplace` `ToUpperCase` `Text`... |
-| [Trigonometry](/compute-engine/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
+| [Special Functions](/reference/special-functions/)   | `Gamma` `Factorial`...                                                 |
+| [Statistics](/reference/statistics/)                 | `StandardDeviation` `Mean` `Erf`...                                    |
+| [Strings and Text](/reference/core/#working-with-strings)              | `Characters` `StringJoin` `RangeOf` `StringReplace` `ToUpperCase` `Text`... |
+| [Trigonometry](/reference/trigonometry/)             | `Pi` `Cos` `Sin` `Tan`...                                              |
 
 </div>
 
@@ -43381,406 +43402,6 @@ LaTeX to MathJSON.
 <ReadMore path="/compute-engine/guides/latex-syntax/" >
 Read more about <strong>Parsing and Serializing LaTeX</strong><Icon name="chevron-right-bold" />
 </ReadMore>
-
----
-
-# Arithmetic
-
-Source: https://epsil.dev/compute-engine/reference/arithmetic/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/ (arithmetic.md, polynomials.md, core.md, relop.md,
-statistics.md). This stub keeps the old anchors and sends each one to its new
-place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/arithmetic/"
-  names={[
-    "AlgebraicGenerator", "Apart", "Cancel", "Clamp", "CoefficientList",
-    "Congruent", "Denominator", "Discriminant", "Distribute", "Expand",
-    "ExpandAll", "Factor", "GCD", "Interpret", "Max", "Min", "Mod",
-    "Numerator", "NumeratorDenominator", "PartialFraction", "Polynomial",
-    "PolynomialDegree", "PolynomialGCD", "PolynomialQuotient",
-    "PolynomialRemainder", "PolynomialRoots", "Product", "Random",
-    "RandomChoice", "RandomSample", "RandomShuffle", "Rational", "Smoothstep",
-    "Sum", "Together", "WithRandomSeed",
-  ]}
-  anchors={{
-    "constants": "/reference/arithmetic/#constants",
-    "functions": "/reference/arithmetic/#operators-and-precedence",
-    "arithmetic-functions": "/reference/arithmetic/#operators-and-precedence",
-    "non-finite-results": "/reference/arithmetic/#infinity-and-nan",
-    "powers": "/reference/arithmetic/#power",
-    "sums-and-products": "/reference/arithmetic/#sums-and-products",
-    "multiple-indexing-sets": "/reference/arithmetic/#multiple-indexing-sets",
-    "condition-filtering": "/reference/arithmetic/#multiple-indexing-sets",
-    "simplification": "/reference/arithmetic/#closed-forms",
-    "infinite-series": "/reference/arithmetic/#infinite-series",
-    "simplification-1": "/reference/arithmetic/#closed-forms-1",
-    "infinite-products": "/reference/arithmetic/#infinite-products",
-    "interpreting-elliptical-notation": "/reference/arithmetic/#interpret",
-    "interpret": "/reference/arithmetic/#interpret",
-    "transcendental-functions": "/reference/arithmetic/#exp",
-    "rounding": "/reference/arithmetic/#rounding-and-remainders",
-    "other-functions": "/reference/arithmetic/#definitions",
-    "other-relational-operators": "/reference/relop/#congruent",
-    "congruent": "/reference/relop/#congruent",
-    "relational-operators": "/reference/relop/#order-and-absent-values",
-    "random-numbers": "/reference/core/#random-numbers",
-    "withrandomseed": "/reference/core/#withrandomseed",
-    "randomchoice": "/reference/core/#randomchoice",
-    "migrating-from-the-previous-random-operators": "/reference/core/#migrating-from-the-previous-random-operators",
-    "polynomial-arithmetic": "/reference/polynomials/",
-    "factor": "/reference/polynomials/#factor",
-    "factoring-over-a-number-field": "/reference/polynomials/#factoring-over-a-number-field",
-    "algebraicgenerator": "/reference/polynomials/#algebraicgenerator",
-    "polynomialroots": "/reference/polynomials/#polynomialroots",
-  }}
-/>
-
----
-
-# Calculus
-
-Source: https://epsil.dev/compute-engine/reference/calculus/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/calculus.md. This stub keeps the old anchors and sends
-each one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/calculus/"
-  names={[
-    "BigO", "D", "DSolve", "Derivative", "Integrate", "InterpolatingFunction",
-    "Limit", "ND", "NDSolve", "NDSolveFunction", "NIntegrate", "NLimit",
-    "Normal", "Series",
-  ]}
-  anchors={{
-    "supported-derivative-formulas": "/reference/calculus/#supported-derivative-formulas",
-    "integral": "/reference/calculus/#integrate",
-    "supported-integral-formulas": "/reference/calculus/#supported-integral-formulas",
-    "logarithmic-patterns": "/reference/calculus/#supported-integral-formulas",
-    "exponential-trigonometric-products": "/reference/calculus/#supported-integral-formulas",
-    "powers-of-sine-and-cosine": "/reference/calculus/#supported-integral-formulas",
-    "piecewise-integrands": "/reference/calculus/#supported-integral-formulas",
-    "special-function-primitives": "/reference/calculus/#supported-integral-formulas",
-    "integrals-by-residues": "/reference/calculus/#supported-integral-formulas",
-    "series-expansion": "/reference/calculus/#series",
-    "differential-equations": "/reference/calculus/#dsolve",
-  }}
-/>
-
----
-
-# Collections
-
-Source: https://epsil.dev/compute-engine/reference/collections/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/collections.md, and in the detail file of the library
-of each entry that belongs to another library. This stub keeps the old
-anchors and sends each one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/collections/"
-  names={[
-    "All", "Any", "Append", "ArgMax", "ArgMin", "At", "Chunk", "ChunkBy",
-    "Comprehension", "Contains", "ContainsSequence", "Count", "CountIf",
-    "Cycle", "Dedup", "DeleteAt", "Differences", "Drop", "DropWhile",
-    "Exists", "Field", "Fill", "Filter", "Find", "First", "FlatMap", "Fold",
-    "ForAll", "GroupBy", "IndexOf", "IndexWhere", "IndexedSequence", "Insert",
-    "IsEmpty", "Iterate", "Join", "Keys", "Last", "Length", "Linspace",
-    "List", "Map", "MaxBy", "MinBy", "Most", "Ordering", "Partition",
-    "Position", "RandomShuffle", "Range", "RangeOf", "Reduce", "Repeat",
-    "ReplaceAt", "Rest", "Reverse", "RotateLeft", "RotateRight", "Scan",
-    "Second", "Sequence", "Set", "Slice", "Sort", "StartsWith", "Table",
-    "Tabulate", "Take", "TakeWhile", "Tally", "Third", "Unique", "Values",
-    "Zip", "ListFrom", "SetFrom", "TupleFrom", "DictionaryFrom", "EndsWith",
-  ]}
-  anchors={{
-    "introduction": "/reference/collections/",
-    "core-properties-of-collections": "/reference/collections/#kinds-of-collection",
-    "indexed-collections-and-non-indexed-collections": "/reference/collections/#indexed-and-non-indexed-collections",
-    "nested-collections": "/reference/collections/#nested-collections",
-    "finite-and-infinite-collections": "/reference/collections/#finite-and-infinite-collections",
-    "lazy-collections-and-eager-collections": "/reference/collections/#lazy-and-eager-collections",
-    "eager-collections": "/reference/collections/#lazy-and-eager-collections",
-    "lazy-collections": "/reference/collections/#lazy-and-eager-collections",
-    "materialization-cap": "/reference/collections/#the-materialization-cap",
-    "types": "/reference/collections/#element-types",
-    "the-shape-of-an-expression-before-evaluation": "/compute-engine/guides/expressions/#the-shape-of-an-expression-before-evaluation",
-    "operations-on-collections": "/reference/collections/#definitions",
-    "creating-eager-collections": "/reference/collections/#list",
-    "creating-lazy-collections": "/reference/collections/#range",
-    "latex-syntax": "/reference/collections/#range",
-    "accessing-elements-of-collections": "/reference/collections/#at",
-    "out-of-range-index": "/reference/collections/#out-of-range-index",
-    "filtering-with-a-condition": "/reference/collections/#filtering-with-a-condition",
-    "subscript-notation": "/reference/collections/#at",
-    "changing-the-order-of-elements": "/reference/collections/#reverse",
-    "operating-on-collections": "/reference/collections/#length",
-    "transforming-collections": "/reference/collections/#join",
-    "materializing-collections": "/reference/collections/#listfrom",
-  }}
-/>
-
----
-
-# Colors
-
-Source: https://epsil.dev/compute-engine/reference/colors/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/colors.md. This stub keeps the old anchors and sends each
-one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/colors/"
-  names={[
-    "Color", "ColorFromColorspace", "ColorToColorspace", "Colormap",
-  ]}
-  anchors={{
-    "named-colors": "/reference/colors/#named-colors",
-    "available-palettes": "/reference/colors/#available-palettes",
-    "sequential": "/reference/colors/#sequential",
-    "diverging": "/reference/colors/#diverging",
-    "categorical": "/reference/colors/#categorical",
-    "functions": "/reference/colors/#definitions",
-  }}
-/>
-
----
-
-# Complex
-
-Source: https://epsil.dev/compute-engine/reference/complex/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/arithmetic.md, under the overview section "Complex
-numbers". This stub keeps the old anchors and sends each one to its new place:
-see reference-details/README.md. Arg is documented under Argument.
--->
-
-<ReferenceMoved
-  to="/reference/arithmetic/#complex-numbers"
-  names={[
-    "Abs", "AbsArg", "ComplexRoots", "Conjugate", "Imaginary", "Real",
-  ]}
-  anchors={{
-    "constants": "/reference/arithmetic/#imaginaryunit",
-    "functions": "/reference/arithmetic/#complex-numbers",
-    "Arg": "/reference/arithmetic/#argument",
-    "arg": "/reference/arithmetic/#argument",
-  }}
-/>
-
----
-
-# Control Structures
-
-Source: https://epsil.dev/compute-engine/reference/control-structures/
-
-<!--
-The entries of this page moved to the Epsil library reference. Their text is
-in reference-details/control-structures.md, and Program and Block in core.md.
-This stub keeps the old anchors and sends each one to its new place: see
-reference-details/README.md. Return has no entry in the library reference;
-its anchor goes to the language page.
--->
-
-<ReferenceMoved
-  to="/reference/control-structures/"
-  names={[
-    "AddTo", "Block", "Break", "Continue", "FixedPoint", "If", "Loop",
-    "Match", "ParallelComprehension", "ParallelLoop", "Program", "Which",
-  ]}
-  anchors={{
-    "overview": "/reference/control-structures/#overview",
-    "sequential-control-structure": "/reference/control-structures/#sequential-control-structure",
-    "conditional-control-structure": "/reference/control-structures/#conditional-control-structure",
-    "loops": "/reference/control-structures/#loops",
-    "controlling-the-flow-of-execution": "/reference/control-structures/#controlling-the-flow-of-execution",
-    "restriction": "/reference/control-structures/#restriction",
-    "a-restriction-of-a-collection": "/reference/control-structures/#a-restriction-of-a-collection",
-    "latex-syntax-for-control-structures": "/reference/control-structures/#latex-syntax-for-control-structures",
-    "element-wise-selection": "/reference/control-structures/#element-wise-selection",
-    "semicolon-blocks": "/reference/core/#block",
-    "where-bindings": "/reference/core/#block",
-    "translating-simultaneous-assignments": "/reference/core/#translating-simultaneous-assignments",
-    "inline-if": "/reference/control-structures/#if",
-    "restriction-braces": "/reference/control-structures/#if",
-    "for-loops": "/reference/control-structures/#loop",
-    "for-comprehensions": "/reference/control-structures/#comprehension",
-    "Return": "/control-flow/#return",
-    "return": "/control-flow/#return",
-  }}
-/>
-
----
-
-# Core
-
-Source: https://epsil.dev/compute-engine/reference/core/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/ (core.md, polynomials.md, relop.md, trigonometry.md).
-The subscript rules moved to the LaTeX syntax guide
-(07-guide-latex-syntax.md). This stub keeps the old anchors and sends each
-one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/core/"
-  names={[
-    "About", "ArbitraryConstant", "Assign", "Assume", "CanonicalForm",
-    "Declare", "DeclareType", "Error", "Evaluate", "Expand", "ExpandAll",
-    "Factor", "Head", "Hold", "HoldValues", "IdenticallyEqual", "Identity",
-    "InverseFunction", "IsError", "IsSame", "Latex", "LatexString", "Module",
-    "N", "Parse", "Same", "Simplify", "Solve", "String", "Symbol", "Tail",
-    "Together", "Type", "Typed",
-  ]}
-  anchors={{
-    "constants": "/reference/core/#nothing",
-    "declaring-assigning-and-assuming": "/declarations/",
-    "structural-operations": "/reference/core/#head",
-    "inspecting-an-expression": "/reference/core/#type",
-    "transforming-an-expression": "/reference/core/#evaluate",
-    "core-functions": "/reference/core/#definitions",
-    "the-errortrace-breadcrumb": "/reference/core/#error",
-    "parsing-and-serializing-latex": "/reference/core/#parse",
-    "superscripts-and-subscripts": "/compute-engine/guides/latex-syntax/#subscripts-and-superscripts",
-    "subscript-handling": "/compute-engine/guides/latex-syntax/#subscript-handling",
-    "subscripts-on-regular-symbols": "/compute-engine/guides/latex-syntax/#subscripts-on-regular-symbols",
-    "subscripts-on-collection-typed-symbols": "/compute-engine/guides/latex-syntax/#subscripts-on-collection-typed-symbols",
-    "custom-subscript-evaluation": "/compute-engine/guides/latex-syntax/#custom-subscript-evaluation",
-    "styled-subscripts": "/compute-engine/guides/latex-syntax/#styled-subscripts",
-    "bracket-notation-for-indexing": "/compute-engine/guides/latex-syntax/#bracket-notation-for-indexing",
-  }}
-/>
-
----
-
-# Functions
-
-Source: https://epsil.dev/compute-engine/reference/functions/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/core.md, under the overview section "Functions". This
-stub keeps the old anchors and sends each one to its new place: see
-reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/core/#functions"
-  names={[
-    "Apply", "Assign", "EvaluateAt", "Function",
-  ]}
-  anchors={{
-    "function-literals": "/reference/core/#function-literals",
-    "shorthand-function-literals": "/reference/core/#shorthand-function-literals",
-    "anonymous-functions": "/reference/core/#anonymous-functions",
-    "evaluating-a-function-literal": "/reference/core/#evaluating-a-function-literal",
-    "closures": "/reference/core/#closures",
-    "broadcasting-over-collections": "/reference/core/#broadcasting-over-collections",
-    "tuple-arguments": "/reference/core/#tuple-arguments",
-    "opting-out": "/reference/core/#opting-out",
-    "operating-on-functions": "/reference/core/#apply",
-  }}
-/>
-
----
-
-# Linear Algebra
-
-Source: https://epsil.dev/compute-engine/reference/linear-algebra/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/linear-algebra.md, and the text about At and Add in
-collections.md and arithmetic.md. This stub keeps the old anchors and sends
-each one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/linear-algebra/"
-  names={[
-    "Add", "AdjugateMatrix", "At", "CharacteristicPolynomial",
-    "CholeskyDecomposition", "ConjugateTranspose", "Cross", "Degree",
-    "Determinant", "Diagonal", "Dimension", "Dot", "Eigen", "Eigenvalues",
-    "Eigenvectors", "Flatten", "HadamardProduct", "Hom", "IdentityMatrix",
-    "Inverse", "IsDiagonal", "IsSquareMatrix", "IsSymmetric", "Kernel",
-    "LUDecomposition", "LinearSolve", "Matrix", "MatrixMultiply",
-    "MatrixPower", "MatrixRank", "Norm", "Ones", "OnesMatrix",
-    "PseudoInverse", "QRDecomposition", "Rank", "Reshape", "RowReduce", "SVD",
-    "Shape", "Trace", "Transpose", "Vector", "ZeroMatrix", "Zeros",
-  ]}
-  anchors={{
-    "representing-matrices": "/reference/linear-algebra/#vectors-matrices-and-tensors",
-    "basic-operations-quick-start": "/reference/linear-algebra/#arithmetic-and-broadcasting",
-    "vector-addition": "/reference/arithmetic/#add",
-    "matrix-addition": "/reference/arithmetic/#add",
-    "matrix-addition-add": "/reference/arithmetic/#add",
-    "scalar-multiplication": "/reference/linear-algebra/#arithmetic-and-broadcasting",
-    "matrix-multiplication-and-the-hadamard-product": "/reference/linear-algebra/#products-and-powers",
-    "latex-matrix-syntax": "/reference/linear-algebra/#matrix",
-    "matrix-properties": "/reference/linear-algebra/#shape",
-    "accessing-the-content-of-tensors": "/reference/collections/#indexing-a-matrix-or-a-tensor",
-    "transforming-matrices": "/reference/linear-algebra/#transpose",
-    "calculating-with-matrices": "/reference/linear-algebra/#determinant",
-    "eigenvalues-and-eigenvectors": "/reference/linear-algebra/#eigenvalues",
-    "matrix-decompositions": "/reference/linear-algebra/#matrix-decompositions",
-    "svd-singular-value-decomposition": "/reference/linear-algebra/#svd",
-  }}
-/>
-
----
-
-# Logic
-
-Source: https://epsil.dev/compute-engine/reference/logic/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/logic.md. This stub keeps the old anchors and sends each
-one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/logic/"
-  names={[
-    "Exists", "ExistsUnique", "ForAll", "IsSatisfiable", "IsTautology",
-    "MinimalCNF", "MinimalDNF", "Predicate", "PrimeImplicants",
-    "PrimeImplicates", "ToCNF", "ToDNF", "TruthTable",
-  ]}
-  anchors={{
-    "constants": "/reference/logic/#constants",
-    "logical-operators": "/reference/logic/#logical-operators",
-    "operator-precedence": "/reference/logic/#operator-precedence",
-    "arrow-notation": "/reference/logic/#arrow-notation",
-    "boolean-simplification": "/reference/logic/#boolean-simplification",
-    "quantifiers": "/reference/logic/#quantifiers",
-    "first-order-logic": "/reference/logic/#first-order-logic",
-    "predicates": "/reference/logic/#predicates",
-    "quantifier-scope": "/reference/logic/#quantifier-scope",
-    "negated-quantifiers": "/reference/logic/#negated-quantifiers",
-    "quantifier-evaluation": "/reference/logic/#quantifier-evaluation",
-    "normal-forms": "/reference/logic/#normal-forms",
-    "satisfiability-and-tautology": "/reference/logic/#satisfiability-and-tautology",
-    "prime-implicants-and-minimal-normal-forms": "/reference/logic/#prime-implicants-and-minimal-normal-forms",
-    "quantifier-scope-option": "/reference/logic/#quantifier-scope",
-  }}
-/>
 
 ---
 
@@ -44185,194 +43806,6 @@ This matters wherever the list reading would also be valid. For example
 `["RandomChoice", ["List", 0, 1], n]` picks `n` times between the two *values*
 `0` and `1` — both produce a list of numbers in range, so a lossy round-trip
 would be undetectable downstream.
-
----
-
-# Special Functions
-
-Source: https://epsil.dev/compute-engine/reference/special-functions/
-
-<!--
-The entries of this page moved to the Epsil library reference. Their text is
-in reference-details/: special-functions.md, and arithmetic.md, statistics.md,
-number-theory.md and trigonometry.md for the entries of those libraries.
-This stub keeps the old anchors and sends each one to its new place: see
-reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/special-functions/"
-  names={[
-    "AGM", "AiryAi", "AiryAiPrime", "AiryBi", "AiryBiPrime", "BarnesG",
-    "BesselI", "BesselJ", "BesselK", "BesselY", "Beta", "BetaRegularized",
-    "ClausenCl", "DedekindEta", "DirichletBeta", "DirichletCharacter",
-    "DirichletEta", "DirichletL", "EllipticE", "EllipticK", "Erf", "ErfInv",
-    "Erfc", "Factorial", "Factorial2", "FresnelC", "FresnelS", "Gamma",
-    "GammaLn", "GammaRegularized", "HarmonicNumber", "Hypergeometric1F1",
-    "Hypergeometric2F1", "JacobiTheta", "LambertW", "LogBarnesG", "LogGamma",
-    "StieltjesGamma", "Zeta",
-  ]}
-  anchors={{
-    "airy-functions": "/reference/arithmetic/#airy-functions",
-    "bessel-functions": "/reference/arithmetic/#bessel-functions",
-    "elliptic-integrals": "/reference/special-functions/#elliptic-integrals",
-    "fresnel-integrals": "/reference/trigonometry/#fresnel-integrals",
-    "hypergeometric-functions": "/reference/special-functions/#hypergeometric2f1",
-    "theta-and-modular-functions": "/reference/special-functions/#jacobitheta",
-  }}
-/>
-
----
-
-# Statistics
-
-Source: https://epsil.dev/compute-engine/reference/statistics/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/statistics.md. This stub keeps the old anchors and sends
-each one to its new place: see reference-details/README.md.
-
-Two old entries have no successor in the statistics library: `Rank` (the
-rank of each element) was removed, and the MathJSON name `Rank` is now the
-length of the shape of an expression; `Argsort` is `Ordering`, in the
-collections library.
--->
-
-<ReferenceMoved
-  to="/reference/statistics/"
-  names={[
-    "BinCounts", "BinomialDistribution", "CDF", "Correlation", "Covariance",
-    "ExponentialDistribution", "Histogram", "InterquartileRange", "Kurtosis",
-    "LinearRegression", "Mean", "Median", "Mode", "NormalDistribution", "PDF",
-    "PoissonDistribution", "PolynomialFit", "PopulationCovariance",
-    "PopulationStandardDeviation", "PopulationVariance", "Quantile",
-    "Quartiles", "RandomSample", "Skewness", "SlidingWindow",
-    "StandardDeviation", "UniformDistribution", "Variance",
-  ]}
-  anchors={{
-    "functions": "/reference/statistics/#definitions",
-    "probability-distributions": "/reference/statistics/#probability-distributions",
-    "Rank": "/reference/statistics/",
-    "rank": "/reference/statistics/",
-    "Argsort": "/reference/collections/#ordering",
-    "argsort": "/reference/collections/#ordering",
-  }}
-/>
-
----
-
-# Combinatorics
-
-Source: https://epsil.dev/compute-engine/reference/combinatorics/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/combinatorics.md. This stub keeps the old anchors and
-sends each one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/combinatorics/"
-  names={[
-    "BellNumber", "Binomial", "CartesianProduct", "Choose", "Combinations",
-    "Fibonacci", "IntegerPartitions", "Multinomial", "Permutations",
-    "PowerSet", "Subfactorial",
-  ]}
-  anchors={{
-    "functions": "/reference/combinatorics/#definitions",
-  }}
-/>
-
----
-
-# Number Theory
-
-Source: https://epsil.dev/compute-engine/reference/number-theory/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/number-theory.md, and ResidueClass in collections.md.
-This stub keeps the old anchors and sends each one to its new place: see
-reference-details/README.md. IsPentagonal has no definition in the engine.
--->
-
-<ReferenceMoved
-  to="/reference/number-theory/"
-  names={[
-    "BernoulliB", "CarmichaelLambda", "CatalanNumber", "ChineseRemainder",
-    "ContinuedFraction", "DigitCount", "DigitSum", "Divides", "DivisorSigma",
-    "Divisors", "EulerE", "Eulerian", "ExtendedGCD", "FactorInteger",
-    "FromContinuedFraction", "FromDigits", "IntegerDigits", "IntegerSqrt",
-    "IsAbundant", "IsCenteredSquare", "IsHappy", "IsOctahedral", "IsPerfect",
-    "IsPerfectPower", "IsSquare", "IsSquareFree", "IsTriangular",
-    "JacobiSymbol", "LegendreSymbol", "LucasL", "ModularInverse", "MoebiusMu",
-    "MultiplicativeOrder", "NPartition", "NextPrime", "NthPrime",
-    "PartitionsQ", "PowerMod", "PowerModList", "PrimeFactors", "PrimeNu",
-    "PrimeOmega", "PrimePi", "PrimitiveRoot", "PrimitiveRootList", "Radical",
-    "RandomPrime", "RationalReconstruction", "ResidueClass", "Sigma0",
-    "Sigma1", "SigmaMinus1", "Stirling", "Totient",
-  ]}
-  anchors={{
-    "finite-arguments": "/reference/number-theory/#finite-arguments",
-    "function-definitions": "/reference/number-theory/#definitions",
-    "congruence-notation": "/reference/number-theory/#congruences",
-    "reduction-of-large-integers": "/reference/number-theory/#reduction-of-large-integers",
-    "solving-congruences": "/reference/number-theory/#solving-congruences",
-    "IsPentagonal": "/reference/number-theory/",
-    "ispentagonal": "/reference/number-theory/",
-  }}
-/>
-
----
-
-# Strings and Text
-
-Source: https://epsil.dev/compute-engine/reference/strings/
-
-<!--
-The entries of this page moved to the Epsil library reference. Their text is
-in reference-details/: core.md (the overview section "Working with strings"
-and most entries), collections.md (Join, RangeOf, ContainsSequence,
-StartsWith, EndsWith) and regexp.md. This stub keeps the old anchors and
-sends each one to its new place: see reference-details/README.md. Spacing is
-no longer defined; its anchor goes to HorizontalSpacing.
--->
-
-<ReferenceMoved
-  to="/reference/core/#working-with-strings"
-  names={[
-    "Annotated", "BaseForm", "CaseFold", "CharacterFrom", "Characters",
-    "ContainsSequence", "Delimiter", "DigitsFrom", "EndsWith",
-    "IntegerString", "IsMatch", "Join", "NumberFrom", "PadStart", "RangeOf",
-    "RegExp", "StartsWith", "String", "StringCompare", "StringFrom",
-    "StringJoin", "StringMatch", "StringMatchAll", "StringRepeat",
-    "StringReplace", "StringSplit", "ToUpperCase", "Trim", "UnicodeScalars",
-    "Utf16", "Utf8",
-  ]}
-  anchors={{
-    "annotated-expressions": "/reference/core/#annotated-expressions",
-    "case": "/reference/core/#case",
-    "compiling-string-operations": "/reference/core/#compiling-string-operations",
-    "searching-for-a-substring": "/reference/core/#searching-for-a-substring",
-    "strings": "/reference/core/#strings",
-    "strings-stay-whole-under-broadcast-and-flattening": "/reference/core/#strings-stay-whole-under-broadcast-and-flattening",
-    "text-and-latex": "/reference/core/#text-and-latex",
-    "text-expressions": "/reference/core/#text-expressions",
-    "the-character-type": "/reference/core/#the-character-type",
-    "the-re-segmentation-caveat": "/reference/core/#the-re-segmentation-caveat",
-    "transforming-a-string": "/reference/core/#transforming-a-string",
-    "unicode-version-stability": "/reference/core/#unicode-version-stability",
-    "views-of-a-string": "/reference/core/#views-of-a-string",
-    "which-operations-return-a-string": "/reference/core/#which-operations-return-a-string",
-    "introduction": "/reference/core/#working-with-strings",
-    "functions": "/reference/core/#definitions",
-    "regular-expressions": "/reference/regexp/#regular-expressions",
-    "patterns-with-stringsplit-and-stringreplace": "/reference/regexp/#patterns-with-stringsplit-and-stringreplace",
-    "Spacing": "/reference/core/#horizontalspacing",
-    "spacing": "/reference/core/#horizontalspacing",
-  }}
-/>
 
 ---
 
@@ -44976,66 +44409,6 @@ For mathematical background, see the GAP reference manual,
 [chapter 43: Permutation Groups](https://docs.gap-system.org/doc/ref/chap43.html).
 The implementation uses standard algorithms and Compute Engine conventions; it
 does not parse GAP programs or embed GAP code.
-
----
-
-# Trigonometry
-
-Source: https://epsil.dev/compute-engine/reference/trigonometry/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/trigonometry.md. This stub keeps the old anchors and
-sends each one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/trigonometry/"
-  names={[
-    "TrigExpand", "TrigReduce", "TrigToExp",
-  ]}
-  anchors={{
-    "constants": "/reference/trigonometry/#pi",
-    "trigonometric-functions": "/reference/trigonometry/#trigonometric-functions",
-    "cardinal-sine-and-fresnel-functions": "/reference/trigonometry/#sinc",
-    "trigonometric-transformations": "/reference/trigonometry/#trigonometric-transformations",
-    "trigonometric-simplification": "/reference/trigonometry/#trigonometric-simplification",
-    "supported-identities": "/reference/trigonometry/#supported-identities",
-  }}
-/>
-
----
-
-# Units and Quantities
-
-Source: https://epsil.dev/compute-engine/reference/units/
-
-<!--
-The entries of this page moved to the Epsil library reference: their text is
-in reference-details/units.md. This stub keeps the old anchors and sends each
-one to its new place: see reference-details/README.md.
--->
-
-<ReferenceMoved
-  to="/reference/units/"
-  names={[
-    "IsCompatibleUnit", "Quantity", "QuantityMagnitude", "QuantityUnit",
-    "UnitConvert", "UnitDimension", "UnitSimplify",
-  ]}
-  anchors={{
-    "supported-units": "/reference/units/#supported-units",
-    "si-base-units": "/reference/units/#si-base-units",
-    "named-derived-si-units": "/reference/units/#named-derived-si-units",
-    "si-prefixes": "/reference/units/#si-prefixes",
-    "non-si-units": "/reference/units/#non-si-units",
-    "angular-units": "/reference/units/#angular-units",
-    "dimensionless-units": "/reference/units/#dimensionless-units",
-    "physics-constants": "/reference/units/#physics-constants",
-    "latex-parsing": "/reference/units/#latex-parsing",
-    "supported-input-forms": "/reference/units/#supported-input-forms",
-    "unit-parsing-rules": "/reference/units/#unit-parsing-rules",
-  }}
-/>
 
 ---
 
@@ -49848,9 +49221,11 @@ The pattern is **irrefutable in form** — no literals, pins, or guards (use
 [`match`](/control-flow/) for conditional destructuring). The value is
 evaluated once; it must be a tuple of the same shape, otherwise the
 declaration yields an `incompatible-type` **error value** and binds nothing.
-With `const`, every bound name is a constant. An initializer is required, and
-a type annotation is not accepted on a pattern. Duplicate names anywhere in
-one pattern are a diagnostic.
+A value whose type is a tuple type but that did not evaluate to a tuple, such
+as `svd([[1, 2], [3, 4]])`, which stays unevaluated until `N`, yields the
+error `unevaluated-tuple` instead. With `const`, every bound name is a
+constant. An initializer is required, and a type annotation is not accepted
+on a pattern. Duplicate names anywhere in one pattern are a diagnostic.
 
 ## Destructuring assignment
 
@@ -49883,10 +49258,10 @@ a
 
 The pattern grammar is exactly the one above — at least two elements, each a
 bare symbol, a `_` skipping that position, or a nested tuple pattern — and a
-shape mismatch is the same `incompatible-type` error value, which writes
-**nothing**: the whole pattern is matched before any target is written, so a
-mismatch nested under a position that would have bound leaves that one alone
-too.
+shape mismatch is the same error value (`incompatible-type` or
+`unevaluated-tuple`), which writes **nothing**: the whole pattern is
+matched before any target is written, so a mismatch nested under a position
+that would have bound leaves that one alone too.
 
 The differences from a destructuring `let` are the ones assignment always has:
 the targets keep their identity and their declared type (a value that does not
@@ -50646,10 +50021,11 @@ literal or a per-element type annotation is a diagnostic):
 ```
 
 The argument must be a tuple of the pattern's shape; anything else yields an
-`incompatible-type` error value, the same one the destructuring `let`
-produces. A destructuring lambda is interpreted, never compiled: no compile
-target lowers the tuple match, so a compiled context falls back rather than
-emit code that binds the wrong names.
+error value (`incompatible-type`, or `unevaluated-tuple` for a value that has
+a tuple type but did not evaluate to a tuple), the same one the destructuring
+`let` produces. A destructuring lambda is interpreted, never compiled: no
+compile target lowers the tuple match, so a compiled context falls back
+rather than emit code that binds the wrong names.
 
 **Callbacks and arity.** An ordinary call with too few arguments partially
 applies the function — `f(1)` on a two-parameter `f` is a function awaiting
@@ -64944,7 +64320,7 @@ intersection({1, 2, 3}, {2, 3, 4})
 
 ### interval
 
-MathJSON `Interval` · `(number, number) -> set<real>`
+`(number, number) -> set<real>`
 
 A set of real numbers between two endpoints. The endpoints may or may not be included.
 
@@ -64952,6 +64328,36 @@ A set of real numbers between two endpoints. The endpoints may or may not be inc
 0.5 in interval(0, 1)
 // ➔ true
 ```
+
+An interval is a set of real numbers. Each bound is included unless it is
+wrapped in `Open`. `Closed` marks an included bound explicitly. An infinite
+bound is never included: `+oo` is not a real number. The integers between two
+bounds are a range instead, written `a..b`.
+
+```epsil
+[0 in interval(0, 1), 1.5 in interval(1, 2), 1.5 in 1..2]
+// ➔ [true,true,false]
+[0 in interval(Open(0), 1), 1 in interval(0, Open(1))]
+// ➔ [false,false]
+[5 in interval(0, oo), oo in interval(0, oo)]
+// ➔ [true,false]
+type(interval(0, 1))
+// ➔ TypeFrom("set<real>")
+```
+
+An interval cannot be enumerated. A quantifier over one is not decided by
+trying its elements: see
+[Quantifier evaluation](/reference/logic/#quantifier-evaluation).
+
+<MathJson name="Interval">
+
+`["Interval", a, b]`, with `["Open", a]` or `["Closed", a]` for a bound:
+`["Interval", ["Open", 0], 1]` is the interval from 0 to 1 without 0. In
+LaTeX, `[a, b]` is closed, `(a, b)` and `]a, b[` are open, and `[a, b)` and
+`(a, b]` are half-open. See the notation table of the
+[Sets](/compute-engine/reference/sets/) reference.
+
+</MathJson>
 
 ### isEmpty
 
@@ -65200,7 +64606,7 @@ last([], 0)
 
 `(any) -> infinity | integer`
 
-Number of elements in a collection. Returns +oo for an infinite collection (an unbounded Range, `Integers`, `Repeat(5)`, an interval), as `Count` does, an `incompatible-type` error for an operand that is decidably not a collection, `NaN` for an absent operand (`Missing`), and stays unevaluated for a collection whose size is not known (a `Filter` over an infinite source).
+Number of elements in a collection. Returns +oo for an infinite collection (an unbounded Range, `Integers`, `Repeat(5)`, an interval), as `Count` does, an `incompatible-type` error for an operand that is decidably not a collection, `Missing` for an absent operand, and stays unevaluated for a collection whose size is not known (a `Filter` over an infinite source).
 
 ```epsil
 length([5, 6, 7])
@@ -86276,6 +85682,347 @@ requires of such a symbol is kept with the expression.
 
 ---
 
+# Arithmetic
+
+Source: https://epsil.dev/compute-engine/reference/arithmetic/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/ (arithmetic.md, polynomials.md, core.md, relop.md,
+statistics.md). This stub keeps the old anchors and sends each one to its new
+place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/arithmetic/"
+  names={[
+    "AlgebraicGenerator", "Apart", "Cancel", "Clamp", "CoefficientList",
+    "Congruent", "Denominator", "Discriminant", "Distribute", "Expand",
+    "ExpandAll", "Factor", "GCD", "Interpret", "Max", "Min", "Mod",
+    "Numerator", "NumeratorDenominator", "PartialFraction", "Polynomial",
+    "PolynomialDegree", "PolynomialGCD", "PolynomialQuotient",
+    "PolynomialRemainder", "PolynomialRoots", "Product", "Random",
+    "RandomChoice", "RandomSample", "RandomShuffle", "Rational", "Smoothstep",
+    "Sum", "Together", "WithRandomSeed",
+  ]}
+  anchors={{
+    "constants": "/reference/arithmetic/#constants",
+    "functions": "/reference/arithmetic/#operators-and-precedence",
+    "arithmetic-functions": "/reference/arithmetic/#operators-and-precedence",
+    "non-finite-results": "/reference/arithmetic/#infinity-and-nan",
+    "powers": "/reference/arithmetic/#power",
+    "sums-and-products": "/reference/arithmetic/#sums-and-products",
+    "multiple-indexing-sets": "/reference/arithmetic/#multiple-indexing-sets",
+    "condition-filtering": "/reference/arithmetic/#multiple-indexing-sets",
+    "simplification": "/reference/arithmetic/#closed-forms",
+    "infinite-series": "/reference/arithmetic/#infinite-series",
+    "simplification-1": "/reference/arithmetic/#closed-forms-1",
+    "infinite-products": "/reference/arithmetic/#infinite-products",
+    "interpreting-elliptical-notation": "/reference/arithmetic/#interpret",
+    "interpret": "/reference/arithmetic/#interpret",
+    "transcendental-functions": "/reference/arithmetic/#exp",
+    "rounding": "/reference/arithmetic/#rounding-and-remainders",
+    "other-functions": "/reference/arithmetic/#definitions",
+    "other-relational-operators": "/reference/relop/#congruent",
+    "congruent": "/reference/relop/#congruent",
+    "relational-operators": "/reference/relop/#order-and-absent-values",
+    "random-numbers": "/reference/core/#random-numbers",
+    "withrandomseed": "/reference/core/#withrandomseed",
+    "randomchoice": "/reference/core/#randomchoice",
+    "migrating-from-the-previous-random-operators": "/reference/core/#migrating-from-the-previous-random-operators",
+    "polynomial-arithmetic": "/reference/polynomials/",
+    "factor": "/reference/polynomials/#factor",
+    "factoring-over-a-number-field": "/reference/polynomials/#factoring-over-a-number-field",
+    "algebraicgenerator": "/reference/polynomials/#algebraicgenerator",
+    "polynomialroots": "/reference/polynomials/#polynomialroots",
+  }}
+/>
+
+---
+
+# Calculus
+
+Source: https://epsil.dev/compute-engine/reference/calculus/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/calculus.md. This stub keeps the old anchors and sends
+each one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/calculus/"
+  names={[
+    "BigO", "D", "DSolve", "Derivative", "Integrate", "InterpolatingFunction",
+    "Limit", "ND", "NDSolve", "NDSolveFunction", "NIntegrate", "NLimit",
+    "Normal", "Series",
+  ]}
+  anchors={{
+    "supported-derivative-formulas": "/reference/calculus/#supported-derivative-formulas",
+    "integral": "/reference/calculus/#integrate",
+    "supported-integral-formulas": "/reference/calculus/#supported-integral-formulas",
+    "logarithmic-patterns": "/reference/calculus/#supported-integral-formulas",
+    "exponential-trigonometric-products": "/reference/calculus/#supported-integral-formulas",
+    "powers-of-sine-and-cosine": "/reference/calculus/#supported-integral-formulas",
+    "piecewise-integrands": "/reference/calculus/#supported-integral-formulas",
+    "special-function-primitives": "/reference/calculus/#supported-integral-formulas",
+    "integrals-by-residues": "/reference/calculus/#supported-integral-formulas",
+    "series-expansion": "/reference/calculus/#series",
+    "differential-equations": "/reference/calculus/#dsolve",
+  }}
+/>
+
+---
+
+# Collections
+
+Source: https://epsil.dev/compute-engine/reference/collections/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/collections.md, and in the detail file of the library
+of each entry that belongs to another library. This stub keeps the old
+anchors and sends each one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/collections/"
+  names={[
+    "All", "Any", "Append", "ArgMax", "ArgMin", "At", "Chunk", "ChunkBy",
+    "Comprehension", "Contains", "ContainsSequence", "Count", "CountIf",
+    "Cycle", "Dedup", "DeleteAt", "Differences", "Drop", "DropWhile",
+    "Exists", "Field", "Fill", "Filter", "Find", "First", "FlatMap", "Fold",
+    "ForAll", "GroupBy", "IndexOf", "IndexWhere", "IndexedSequence", "Insert",
+    "IsEmpty", "Iterate", "Join", "Keys", "Last", "Length", "Linspace",
+    "List", "Map", "MaxBy", "MinBy", "Most", "Ordering", "Partition",
+    "Position", "RandomShuffle", "Range", "RangeOf", "Reduce", "Repeat",
+    "ReplaceAt", "Rest", "Reverse", "RotateLeft", "RotateRight", "Scan",
+    "Second", "Sequence", "Set", "Slice", "Sort", "StartsWith", "Table",
+    "Tabulate", "Take", "TakeWhile", "Tally", "Third", "Unique", "Values",
+    "Zip", "ListFrom", "SetFrom", "TupleFrom", "DictionaryFrom", "EndsWith",
+  ]}
+  anchors={{
+    "introduction": "/reference/collections/",
+    "core-properties-of-collections": "/reference/collections/#kinds-of-collection",
+    "indexed-collections-and-non-indexed-collections": "/reference/collections/#indexed-and-non-indexed-collections",
+    "nested-collections": "/reference/collections/#nested-collections",
+    "finite-and-infinite-collections": "/reference/collections/#finite-and-infinite-collections",
+    "lazy-collections-and-eager-collections": "/reference/collections/#lazy-and-eager-collections",
+    "eager-collections": "/reference/collections/#lazy-and-eager-collections",
+    "lazy-collections": "/reference/collections/#lazy-and-eager-collections",
+    "materialization-cap": "/reference/collections/#the-materialization-cap",
+    "types": "/reference/collections/#element-types",
+    "the-shape-of-an-expression-before-evaluation": "/compute-engine/guides/expressions/#the-shape-of-an-expression-before-evaluation",
+    "operations-on-collections": "/reference/collections/#definitions",
+    "creating-eager-collections": "/reference/collections/#list",
+    "creating-lazy-collections": "/reference/collections/#range",
+    "latex-syntax": "/reference/collections/#range",
+    "accessing-elements-of-collections": "/reference/collections/#at",
+    "out-of-range-index": "/reference/collections/#out-of-range-index",
+    "filtering-with-a-condition": "/reference/collections/#filtering-with-a-condition",
+    "subscript-notation": "/reference/collections/#at",
+    "changing-the-order-of-elements": "/reference/collections/#reverse",
+    "operating-on-collections": "/reference/collections/#length",
+    "transforming-collections": "/reference/collections/#join",
+    "materializing-collections": "/reference/collections/#listfrom",
+  }}
+/>
+
+---
+
+# Colors
+
+Source: https://epsil.dev/compute-engine/reference/colors/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/colors.md. This stub keeps the old anchors and sends each
+one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/colors/"
+  names={[
+    "Color", "ColorFromColorspace", "ColorToColorspace", "Colormap",
+  ]}
+  anchors={{
+    "named-colors": "/reference/colors/#named-colors",
+    "available-palettes": "/reference/colors/#available-palettes",
+    "sequential": "/reference/colors/#sequential",
+    "diverging": "/reference/colors/#diverging",
+    "categorical": "/reference/colors/#categorical",
+    "functions": "/reference/colors/#definitions",
+  }}
+/>
+
+---
+
+# Combinatorics
+
+Source: https://epsil.dev/compute-engine/reference/combinatorics/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/combinatorics.md. This stub keeps the old anchors and
+sends each one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/combinatorics/"
+  names={[
+    "BellNumber", "Binomial", "CartesianProduct", "Choose", "Combinations",
+    "Fibonacci", "IntegerPartitions", "Multinomial", "Permutations",
+    "PowerSet", "Subfactorial",
+  ]}
+  anchors={{
+    "functions": "/reference/combinatorics/#definitions",
+  }}
+/>
+
+---
+
+# Complex
+
+Source: https://epsil.dev/compute-engine/reference/complex/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/arithmetic.md, under the overview section "Complex
+numbers". This stub keeps the old anchors and sends each one to its new place:
+see reference-details/README.md. Arg is documented under Argument.
+-->
+
+<ReferenceMoved
+  to="/reference/arithmetic/#complex-numbers"
+  names={[
+    "Abs", "AbsArg", "ComplexRoots", "Conjugate", "Imaginary", "Real",
+  ]}
+  anchors={{
+    "constants": "/reference/arithmetic/#imaginaryunit",
+    "functions": "/reference/arithmetic/#complex-numbers",
+    "Arg": "/reference/arithmetic/#argument",
+    "arg": "/reference/arithmetic/#argument",
+  }}
+/>
+
+---
+
+# Control Structures
+
+Source: https://epsil.dev/compute-engine/reference/control-structures/
+
+<!--
+The entries of this page moved to the Epsil library reference. Their text is
+in reference-details/control-structures.md, and Program and Block in core.md.
+This stub keeps the old anchors and sends each one to its new place: see
+reference-details/README.md. Return has no entry in the library reference;
+its anchor goes to the language page.
+-->
+
+<ReferenceMoved
+  to="/reference/control-structures/"
+  names={[
+    "AddTo", "Block", "Break", "Continue", "FixedPoint", "If", "Loop",
+    "Match", "ParallelComprehension", "ParallelLoop", "Program", "Which",
+  ]}
+  anchors={{
+    "overview": "/reference/control-structures/#overview",
+    "sequential-control-structure": "/reference/control-structures/#sequential-control-structure",
+    "conditional-control-structure": "/reference/control-structures/#conditional-control-structure",
+    "loops": "/reference/control-structures/#loops",
+    "controlling-the-flow-of-execution": "/reference/control-structures/#controlling-the-flow-of-execution",
+    "restriction": "/reference/control-structures/#restriction",
+    "a-restriction-of-a-collection": "/reference/control-structures/#a-restriction-of-a-collection",
+    "latex-syntax-for-control-structures": "/reference/control-structures/#latex-syntax-for-control-structures",
+    "element-wise-selection": "/reference/control-structures/#element-wise-selection",
+    "semicolon-blocks": "/reference/core/#block",
+    "where-bindings": "/reference/core/#block",
+    "translating-simultaneous-assignments": "/reference/core/#translating-simultaneous-assignments",
+    "inline-if": "/reference/control-structures/#if",
+    "restriction-braces": "/reference/control-structures/#if",
+    "for-loops": "/reference/control-structures/#loop",
+    "for-comprehensions": "/reference/control-structures/#comprehension",
+    "Return": "/control-flow/#return",
+    "return": "/control-flow/#return",
+  }}
+/>
+
+---
+
+# Core
+
+Source: https://epsil.dev/compute-engine/reference/core/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/ (core.md, polynomials.md, relop.md, trigonometry.md).
+The subscript rules moved to the LaTeX syntax guide
+(07-guide-latex-syntax.md). This stub keeps the old anchors and sends each
+one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/core/"
+  names={[
+    "About", "ArbitraryConstant", "Assign", "Assume", "CanonicalForm",
+    "Declare", "DeclareType", "Error", "Evaluate", "Expand", "ExpandAll",
+    "Factor", "Head", "Hold", "HoldValues", "IdenticallyEqual", "Identity",
+    "InverseFunction", "IsError", "IsSame", "Latex", "LatexString", "Module",
+    "N", "Parse", "Same", "Simplify", "Solve", "String", "Symbol", "Tail",
+    "Together", "Type", "Typed",
+  ]}
+  anchors={{
+    "constants": "/reference/core/#nothing",
+    "declaring-assigning-and-assuming": "/declarations/",
+    "structural-operations": "/reference/core/#head",
+    "inspecting-an-expression": "/reference/core/#type",
+    "transforming-an-expression": "/reference/core/#evaluate",
+    "core-functions": "/reference/core/#definitions",
+    "the-errortrace-breadcrumb": "/reference/core/#error",
+    "parsing-and-serializing-latex": "/reference/core/#parse",
+    "superscripts-and-subscripts": "/compute-engine/guides/latex-syntax/#subscripts-and-superscripts",
+    "subscript-handling": "/compute-engine/guides/latex-syntax/#subscript-handling",
+    "subscripts-on-regular-symbols": "/compute-engine/guides/latex-syntax/#subscripts-on-regular-symbols",
+    "subscripts-on-collection-typed-symbols": "/compute-engine/guides/latex-syntax/#subscripts-on-collection-typed-symbols",
+    "custom-subscript-evaluation": "/compute-engine/guides/latex-syntax/#custom-subscript-evaluation",
+    "styled-subscripts": "/compute-engine/guides/latex-syntax/#styled-subscripts",
+    "bracket-notation-for-indexing": "/compute-engine/guides/latex-syntax/#bracket-notation-for-indexing",
+  }}
+/>
+
+---
+
+# Functions
+
+Source: https://epsil.dev/compute-engine/reference/functions/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/core.md, under the overview section "Functions". This
+stub keeps the old anchors and sends each one to its new place: see
+reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/core/#functions"
+  names={[
+    "Apply", "Assign", "EvaluateAt", "Function",
+  ]}
+  anchors={{
+    "function-literals": "/reference/core/#function-literals",
+    "shorthand-function-literals": "/reference/core/#shorthand-function-literals",
+    "anonymous-functions": "/reference/core/#anonymous-functions",
+    "evaluating-a-function-literal": "/reference/core/#evaluating-a-function-literal",
+    "closures": "/reference/core/#closures",
+    "broadcasting-over-collections": "/reference/core/#broadcasting-over-collections",
+    "tuple-arguments": "/reference/core/#tuple-arguments",
+    "opting-out": "/reference/core/#opting-out",
+    "operating-on-functions": "/reference/core/#apply",
+  }}
+/>
+
+---
+
 # Fungrim Identities — Bessel and hypergeometric functions
 
 Source: https://epsil.dev/compute-engine/reference/fungrim-bessel-hypergeometric/
@@ -98406,3 +98153,310 @@ Greatest common divisor (56) · Prime numbers (1) · Totient function (13)
 ### [Combinatorial and integer sequences](/compute-engine/reference/fungrim-sequences/) (65)
 
 Bell numbers (1) · Bernoulli numbers and polynomials (9) · Fibonacci numbers (37) · Integer sequences (8) · Partition function (6) · Stirling numbers (4)
+
+---
+
+# Linear Algebra
+
+Source: https://epsil.dev/compute-engine/reference/linear-algebra/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/linear-algebra.md, and the text about At and Add in
+collections.md and arithmetic.md. This stub keeps the old anchors and sends
+each one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/linear-algebra/"
+  names={[
+    "Add", "AdjugateMatrix", "At", "CharacteristicPolynomial",
+    "CholeskyDecomposition", "ConjugateTranspose", "Cross", "Degree",
+    "Determinant", "Diagonal", "Dimension", "Dot", "Eigen", "Eigenvalues",
+    "Eigenvectors", "Flatten", "HadamardProduct", "Hom", "IdentityMatrix",
+    "Inverse", "IsDiagonal", "IsSquareMatrix", "IsSymmetric", "Kernel",
+    "LUDecomposition", "LinearSolve", "Matrix", "MatrixMultiply",
+    "MatrixPower", "MatrixRank", "Norm", "Ones", "OnesMatrix",
+    "PseudoInverse", "QRDecomposition", "Rank", "Reshape", "RowReduce", "SVD",
+    "Shape", "Trace", "Transpose", "Vector", "ZeroMatrix", "Zeros",
+  ]}
+  anchors={{
+    "representing-matrices": "/reference/linear-algebra/#vectors-matrices-and-tensors",
+    "basic-operations-quick-start": "/reference/linear-algebra/#arithmetic-and-broadcasting",
+    "vector-addition": "/reference/arithmetic/#add",
+    "matrix-addition": "/reference/arithmetic/#add",
+    "matrix-addition-add": "/reference/arithmetic/#add",
+    "scalar-multiplication": "/reference/linear-algebra/#arithmetic-and-broadcasting",
+    "matrix-multiplication-and-the-hadamard-product": "/reference/linear-algebra/#products-and-powers",
+    "latex-matrix-syntax": "/reference/linear-algebra/#matrix",
+    "matrix-properties": "/reference/linear-algebra/#shape",
+    "accessing-the-content-of-tensors": "/reference/collections/#indexing-a-matrix-or-a-tensor",
+    "transforming-matrices": "/reference/linear-algebra/#transpose",
+    "calculating-with-matrices": "/reference/linear-algebra/#determinant",
+    "eigenvalues-and-eigenvectors": "/reference/linear-algebra/#eigenvalues",
+    "matrix-decompositions": "/reference/linear-algebra/#matrix-decompositions",
+    "svd-singular-value-decomposition": "/reference/linear-algebra/#svd",
+  }}
+/>
+
+---
+
+# Logic
+
+Source: https://epsil.dev/compute-engine/reference/logic/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/logic.md. This stub keeps the old anchors and sends each
+one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/logic/"
+  names={[
+    "Exists", "ExistsUnique", "ForAll", "IsSatisfiable", "IsTautology",
+    "MinimalCNF", "MinimalDNF", "Predicate", "PrimeImplicants",
+    "PrimeImplicates", "ToCNF", "ToDNF", "TruthTable",
+  ]}
+  anchors={{
+    "constants": "/reference/logic/#constants",
+    "logical-operators": "/reference/logic/#logical-operators",
+    "operator-precedence": "/reference/logic/#operator-precedence",
+    "arrow-notation": "/reference/logic/#arrow-notation",
+    "boolean-simplification": "/reference/logic/#boolean-simplification",
+    "quantifiers": "/reference/logic/#quantifiers",
+    "first-order-logic": "/reference/logic/#first-order-logic",
+    "predicates": "/reference/logic/#predicates",
+    "quantifier-scope": "/reference/logic/#quantifier-scope",
+    "negated-quantifiers": "/reference/logic/#negated-quantifiers",
+    "quantifier-evaluation": "/reference/logic/#quantifier-evaluation",
+    "normal-forms": "/reference/logic/#normal-forms",
+    "satisfiability-and-tautology": "/reference/logic/#satisfiability-and-tautology",
+    "prime-implicants-and-minimal-normal-forms": "/reference/logic/#prime-implicants-and-minimal-normal-forms",
+    "quantifier-scope-option": "/reference/logic/#quantifier-scope",
+  }}
+/>
+
+---
+
+# Number Theory
+
+Source: https://epsil.dev/compute-engine/reference/number-theory/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/number-theory.md, and ResidueClass in collections.md.
+This stub keeps the old anchors and sends each one to its new place: see
+reference-details/README.md. IsPentagonal has no definition in the engine.
+-->
+
+<ReferenceMoved
+  to="/reference/number-theory/"
+  names={[
+    "BernoulliB", "CarmichaelLambda", "CatalanNumber", "ChineseRemainder",
+    "ContinuedFraction", "DigitCount", "DigitSum", "Divides", "DivisorSigma",
+    "Divisors", "EulerE", "Eulerian", "ExtendedGCD", "FactorInteger",
+    "FromContinuedFraction", "FromDigits", "IntegerDigits", "IntegerSqrt",
+    "IsAbundant", "IsCenteredSquare", "IsHappy", "IsOctahedral", "IsPerfect",
+    "IsPerfectPower", "IsSquare", "IsSquareFree", "IsTriangular",
+    "JacobiSymbol", "LegendreSymbol", "LucasL", "ModularInverse", "MoebiusMu",
+    "MultiplicativeOrder", "NPartition", "NextPrime", "NthPrime",
+    "PartitionsQ", "PowerMod", "PowerModList", "PrimeFactors", "PrimeNu",
+    "PrimeOmega", "PrimePi", "PrimitiveRoot", "PrimitiveRootList", "Radical",
+    "RandomPrime", "RationalReconstruction", "ResidueClass", "Sigma0",
+    "Sigma1", "SigmaMinus1", "Stirling", "Totient",
+  ]}
+  anchors={{
+    "finite-arguments": "/reference/number-theory/#finite-arguments",
+    "function-definitions": "/reference/number-theory/#definitions",
+    "congruence-notation": "/reference/number-theory/#congruences",
+    "reduction-of-large-integers": "/reference/number-theory/#reduction-of-large-integers",
+    "solving-congruences": "/reference/number-theory/#solving-congruences",
+    "IsPentagonal": "/reference/number-theory/",
+    "ispentagonal": "/reference/number-theory/",
+  }}
+/>
+
+---
+
+# Special Functions
+
+Source: https://epsil.dev/compute-engine/reference/special-functions/
+
+<!--
+The entries of this page moved to the Epsil library reference. Their text is
+in reference-details/: special-functions.md, and arithmetic.md, statistics.md,
+number-theory.md and trigonometry.md for the entries of those libraries.
+This stub keeps the old anchors and sends each one to its new place: see
+reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/special-functions/"
+  names={[
+    "AGM", "AiryAi", "AiryAiPrime", "AiryBi", "AiryBiPrime", "BarnesG",
+    "BesselI", "BesselJ", "BesselK", "BesselY", "Beta", "BetaRegularized",
+    "ClausenCl", "DedekindEta", "DirichletBeta", "DirichletCharacter",
+    "DirichletEta", "DirichletL", "EllipticE", "EllipticK", "Erf", "ErfInv",
+    "Erfc", "Factorial", "Factorial2", "FresnelC", "FresnelS", "Gamma",
+    "GammaLn", "GammaRegularized", "HarmonicNumber", "Hypergeometric1F1",
+    "Hypergeometric2F1", "JacobiTheta", "LambertW", "LogBarnesG", "LogGamma",
+    "StieltjesGamma", "Zeta",
+  ]}
+  anchors={{
+    "airy-functions": "/reference/arithmetic/#airy-functions",
+    "bessel-functions": "/reference/arithmetic/#bessel-functions",
+    "elliptic-integrals": "/reference/special-functions/#elliptic-integrals",
+    "fresnel-integrals": "/reference/trigonometry/#fresnel-integrals",
+    "hypergeometric-functions": "/reference/special-functions/#hypergeometric2f1",
+    "theta-and-modular-functions": "/reference/special-functions/#jacobitheta",
+  }}
+/>
+
+---
+
+# Statistics
+
+Source: https://epsil.dev/compute-engine/reference/statistics/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/statistics.md. This stub keeps the old anchors and sends
+each one to its new place: see reference-details/README.md.
+
+Two old entries have no successor in the statistics library: `Rank` (the
+rank of each element) was removed, and the MathJSON name `Rank` is now the
+length of the shape of an expression; `Argsort` is `Ordering`, in the
+collections library.
+-->
+
+<ReferenceMoved
+  to="/reference/statistics/"
+  names={[
+    "BinCounts", "BinomialDistribution", "CDF", "Correlation", "Covariance",
+    "ExponentialDistribution", "Histogram", "InterquartileRange", "Kurtosis",
+    "LinearRegression", "Mean", "Median", "Mode", "NormalDistribution", "PDF",
+    "PoissonDistribution", "PolynomialFit", "PopulationCovariance",
+    "PopulationStandardDeviation", "PopulationVariance", "Quantile",
+    "Quartiles", "RandomSample", "Skewness", "SlidingWindow",
+    "StandardDeviation", "UniformDistribution", "Variance",
+  ]}
+  anchors={{
+    "functions": "/reference/statistics/#definitions",
+    "probability-distributions": "/reference/statistics/#probability-distributions",
+    "Rank": "/reference/statistics/",
+    "rank": "/reference/statistics/",
+    "Argsort": "/reference/collections/#ordering",
+    "argsort": "/reference/collections/#ordering",
+  }}
+/>
+
+---
+
+# Strings and Text
+
+Source: https://epsil.dev/compute-engine/reference/strings/
+
+<!--
+The entries of this page moved to the Epsil library reference. Their text is
+in reference-details/: core.md (the overview section "Working with strings"
+and most entries), collections.md (Join, RangeOf, ContainsSequence,
+StartsWith, EndsWith) and regexp.md. This stub keeps the old anchors and
+sends each one to its new place: see reference-details/README.md. Spacing is
+no longer defined; its anchor goes to HorizontalSpacing.
+-->
+
+<ReferenceMoved
+  to="/reference/core/#working-with-strings"
+  names={[
+    "Annotated", "BaseForm", "CaseFold", "CharacterFrom", "Characters",
+    "ContainsSequence", "Delimiter", "DigitsFrom", "EndsWith",
+    "IntegerString", "IsMatch", "Join", "NumberFrom", "PadStart", "RangeOf",
+    "RegExp", "StartsWith", "String", "StringCompare", "StringFrom",
+    "StringJoin", "StringMatch", "StringMatchAll", "StringRepeat",
+    "StringReplace", "StringSplit", "ToUpperCase", "Trim", "UnicodeScalars",
+    "Utf16", "Utf8",
+  ]}
+  anchors={{
+    "annotated-expressions": "/reference/core/#annotated-expressions",
+    "case": "/reference/core/#case",
+    "compiling-string-operations": "/reference/core/#compiling-string-operations",
+    "searching-for-a-substring": "/reference/core/#searching-for-a-substring",
+    "strings": "/reference/core/#strings",
+    "strings-stay-whole-under-broadcast-and-flattening": "/reference/core/#strings-stay-whole-under-broadcast-and-flattening",
+    "text-and-latex": "/reference/core/#text-and-latex",
+    "text-expressions": "/reference/core/#text-expressions",
+    "the-character-type": "/reference/core/#the-character-type",
+    "the-re-segmentation-caveat": "/reference/core/#the-re-segmentation-caveat",
+    "transforming-a-string": "/reference/core/#transforming-a-string",
+    "unicode-version-stability": "/reference/core/#unicode-version-stability",
+    "views-of-a-string": "/reference/core/#views-of-a-string",
+    "which-operations-return-a-string": "/reference/core/#which-operations-return-a-string",
+    "introduction": "/reference/core/#working-with-strings",
+    "functions": "/reference/core/#definitions",
+    "regular-expressions": "/reference/regexp/#regular-expressions",
+    "patterns-with-stringsplit-and-stringreplace": "/reference/regexp/#patterns-with-stringsplit-and-stringreplace",
+    "Spacing": "/reference/core/#horizontalspacing",
+    "spacing": "/reference/core/#horizontalspacing",
+  }}
+/>
+
+---
+
+# Trigonometry
+
+Source: https://epsil.dev/compute-engine/reference/trigonometry/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/trigonometry.md. This stub keeps the old anchors and
+sends each one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/trigonometry/"
+  names={[
+    "TrigExpand", "TrigReduce", "TrigToExp",
+  ]}
+  anchors={{
+    "constants": "/reference/trigonometry/#pi",
+    "trigonometric-functions": "/reference/trigonometry/#trigonometric-functions",
+    "cardinal-sine-and-fresnel-functions": "/reference/trigonometry/#sinc",
+    "trigonometric-transformations": "/reference/trigonometry/#trigonometric-transformations",
+    "trigonometric-simplification": "/reference/trigonometry/#trigonometric-simplification",
+    "supported-identities": "/reference/trigonometry/#supported-identities",
+  }}
+/>
+
+---
+
+# Units and Quantities
+
+Source: https://epsil.dev/compute-engine/reference/units/
+
+<!--
+The entries of this page moved to the Epsil library reference: their text is
+in reference-details/units.md. This stub keeps the old anchors and sends each
+one to its new place: see reference-details/README.md.
+-->
+
+<ReferenceMoved
+  to="/reference/units/"
+  names={[
+    "IsCompatibleUnit", "Quantity", "QuantityMagnitude", "QuantityUnit",
+    "UnitConvert", "UnitDimension", "UnitSimplify",
+  ]}
+  anchors={{
+    "supported-units": "/reference/units/#supported-units",
+    "si-base-units": "/reference/units/#si-base-units",
+    "named-derived-si-units": "/reference/units/#named-derived-si-units",
+    "si-prefixes": "/reference/units/#si-prefixes",
+    "non-si-units": "/reference/units/#non-si-units",
+    "angular-units": "/reference/units/#angular-units",
+    "dimensionless-units": "/reference/units/#dimensionless-units",
+    "physics-constants": "/reference/units/#physics-constants",
+    "latex-parsing": "/reference/units/#latex-parsing",
+    "supported-input-forms": "/reference/units/#supported-input-forms",
+    "unit-parsing-rules": "/reference/units/#unit-parsing-rules",
+  }}
+/>

@@ -11435,19 +11435,38 @@ export type OperatorCompileContext = {
  * `OperatorDefinition`. It mirrors a built-in compiled-function handler:
  * it receives the (canonical) operands, a `compile` callback to lower a
  * sub-expression to target source, and the compilation `context` (branch on
- * `context.language`). It returns target source, or `undefined` (or
- * an empty string) to fall back to the target's default compilation of this
- * operator (a `null` returned from untyped JavaScript is tolerated and
- * treated the same).
+ * `context.language`: `'javascript'`, `'glsl'`, `'interval-javascript'`).
+ * It returns one of three results:
+ *
+ * - `undefined` (or an empty string; a `null` returned from untyped
+ *   JavaScript is tolerated and treated the same): the target's default
+ *   compilation of this operator.
+ * - an `Expression`: it is compiled in place of the node, with the
+ *   library's definitions. A node of the expression that the handler
+ *   created is compiled with no compile handler consulted, whatever its
+ *   operator (an `At` in the result of a handler of `At` is the library's
+ *   `At`). A node under the operands the handler received (the same
+ *   object), found in the result, is compiled as usual, handlers
+ *   consulted. Reuse the objects you were given: a copy of an operand
+ *   (rebuilt from its JSON) is a created node, and an operator inside it no
+ *   longer gets its handler. A result that holds the node itself declines. The compiler `profile: 'ir'` accepts this result and the
+ *   `undefined` result; it declines a node whose handler returns text or
+ *   calls `compile`.
+ * - target source, as a string.
+ *
+ * The handler can be called more than once for one node in one
+ * compilation: it must be a pure function of its operands and context for
+ * the duration of a `compile()` call.
  *
  * Takes precedence over the target's built-in operator/function mapping and
  * broadcast lowering, so it can override how a built-in operator compiles
  * (e.g. a custom-tolerance `GCD`, or a re-mapped `Add`/`Multiply`/`Power`/
  * relational operator). It does NOT override the structural / control-flow
  * heads (`Sequence`, `Sum`, `Product`, `Function`, `Declare`, `Assign`,
- * `Return`, `Break`, `Continue`, `Loop`, `Comprehension`, `If`, `Which`,
- * `Match`, `Block`), which have their own bespoke lowering; a handler
- * declared on one of those heads is ignored.
+ * `Return`, `Break`, `Continue`, `Loop`, `Comprehension`, `If`, `Match`,
+ * `Block`), which have their own bespoke lowering; a handler declared on
+ * one of those heads is ignored. `Which` is the exception: its handler is
+ * consulted.
  *
  * ```ts
  * ce.declare('MyGcd', {
@@ -11461,7 +11480,7 @@ export type OperatorCompileContext = {
  *
  * @category Compiling
  */
-export type OperatorCompileHandler = (args: ReadonlyArray<Expression>, compile: (expr: Expression) => string, context: OperatorCompileContext) => string | undefined;
+export type OperatorCompileHandler = (args: ReadonlyArray<Expression>, compile: (expr: Expression) => string, context: OperatorCompileContext) => string | Expression | undefined;
 /**
  * Map of `TensorDataType` to JavaScript type.
  *
@@ -33960,6 +33979,16 @@ export declare function complexQuotient(ar: number, ai: number, br: number, bi: 
     re: number;
     im: number;
 };
+/**
+ * True when the textbook quotient `(nr + ni·i) / d`, with `d = |b|²`,
+ * `nr = Re(a·conj(b))` and `ni = Im(a·conj(b))`, has all its intermediate
+ * values in the normal double range, so that neither the denominator nor a
+ * numerator part has overflowed, underflowed or lost digits to the subnormal
+ * range. When it is true, Smith's unscaled formula is accurate as well (its
+ * intermediate values are bounded by the same operands), so a caller that
+ * must keep its previous Smith result bit for bit can use it in this case.
+ */
+export declare function textbookQuotientIsAccurate(ar: number, ai: number, br: number, bi: number, d: number, nr: number, ni: number): boolean;
 /**
  * `a / b` for `complex.js` values, a drop-in replacement for `a.div(b)`
  * that does not overflow or underflow when the quotient is in the range of a
@@ -74876,7 +74905,7 @@ export declare function gpuRefuseShadowedVarsSources(vars: Readonly<Record<strin
  * @module compilation/interval-quadrature
  */
 import type { Expression } from '../global-types.js';
-import { resetSharedCompilationBudgets } from './compile-integrals.js';
+import { withCompilationBudgets } from './compile-integrals.js';
 /**
  * The subdivision count `n` of the OUTERMOST integral of a nest, whose
  * operands are `args` and which has `levels` limits, from the total budget
@@ -74911,28 +74940,29 @@ export declare function intervalQuadratureRefusal(size: {
     depth: number;
 }): string | undefined;
 /**
- * The closed form of the integral of the operands `args`, for the interval
- * mode of the IR pipeline, by the rule of the existing interval target
+ * The closed form of the integral of the operands `args`, for the IR
+ * pipeline (the interval mode and JavaScript), by the rule of the existing
+ * targets
  * (`closedFormIntegral()`: the engine's antiderivative under the budgets of
  * the compilation, and no fold of a `vars` name that holds an engine value
  * or whose text is not a plain read). `vars`: the `vars` texts of the
- * mode, each a read of the inputs object. With an angular unit other than
+ * compilation. With an angular unit other than
  * radians there is none: `closedFormIntegral()` reads operands written in
  * radians (the existing target rewrites its tree at its entry), and the
  * lowering scales the trigonometric functions of the closed form again.
  * There is none either when the operands reach an `NIntegrate`, directly
  * or through a definition.
  *
- * This and `resetIntervalClosedFormBudgets()` are the IR pipeline's one
+ * This and `withIntegralClosedFormBudgets()` are the IR pipeline's one
  * dependency on the shared layer of the old compilers
  * (`compile-integrals.ts`, `CompilerState`), which moves here when that
  * layer is deleted (`docs/plans/2026-11-15-ir-interval-mode.md`, section
  * 13).
  */
-export declare function intervalClosedForm(args: ReadonlyArray<Expression>, vars: Readonly<Record<string, string>>): Expression | undefined;
-/** A fresh antiderivative budget for one compilation of the mode
- *  (`resetSharedCompilationBudgets()`). */
-export declare const resetIntervalClosedFormBudgets: typeof resetSharedCompilationBudgets;
+export declare function integralClosedForm(args: ReadonlyArray<Expression>, vars: Readonly<Record<string, string>>): Expression | undefined;
+/** A compilation of the IR pipeline, with the antiderivative budget of the
+ *  outermost compilation in progress (`withCompilationBudgets()`). */
+export declare const withIntegralClosedFormBudgets: typeof withCompilationBudgets;
 /**
  * The runtime helpers of `mode: 'bigint'` on the JavaScript target (CE-715).
  *
@@ -75386,7 +75416,8 @@ export type Instr = {
     else: Region;
 }
 /** `passes`: each pass is a pass of a `Loop`, which the iteration
- *  budget counts. */
+ *  budget counts. `exit`: the position of a boolean carried value (the
+ *  `Break` flag of a `Loop`); no pass runs once it is true. */
  | {
     k: 'loop';
     outs: V[];
@@ -75395,6 +75426,7 @@ export type Instr = {
     init: V[];
     body: Region;
     passes?: boolean;
+    exit?: number;
 } | {
     k: 'call';
     outs: V[];
@@ -75485,6 +75517,14 @@ export declare function typeToString(t: IRType,
 /** For a message to the user: the axis of the tuple mark of the value
  *  (`tuple<real, real>`), and a run-time length without its value. */
 axis?: number | undefined | false): string;
+/** An upper bound of the passes of every loop (`Loop`, `Sum`, `Product`,
+ *  a reduction) of one evaluation of the program, at compile time: a
+ *  constant count is itself, a run-time count is `budget` (the count of a
+ *  `Sum` or a `Product`, which the lowering tests against it), multiplied
+ *  down the nesting and through the calls (both arms of an `if` are
+ *  added). GLSL counts no pass at run time. `unbounded`: the run-time
+ *  count of a `Loop` (`passes`), which no test bounds on JavaScript. */
+export declare function loopPasses(p: Program, budget: number, def: ReadonlyMap<number, Instr>, unbounded?: number): number;
 /** The functions of `p` that are in a cycle of the call graph: one walk
  *  from each function, each function visited once per walk. */
 export declare function recursiveFunctions(functions: readonly IRFunction[]): Set<string>;
@@ -75795,6 +75835,7 @@ export declare const sliceOptions: (options: IrOptions | undefined) => {
         hoist?: boolean;
         strength?: boolean;
         inline?: 'loop' | 'repeated' | false;
+        unrollBuilds?: number;
         invariants?: boolean;
         listLoops?: boolean;
         dce?: boolean;
@@ -75826,7 +75867,8 @@ export declare function sliceError(e: unknown): unknown;
  * The compilation of `expr` with the profile `'ir'`: a successful result,
  * or a throw of a `CompileDeclineError` (`'outside-profile'` for a decline,
  * `'compile-error'` for an internal error of the slice), or of a
- * cancellation.
+ * cancellation. The closed forms of its integrals take the antiderivative
+ * budget of the outermost compilation in progress.
  */
 export declare function compileWithIrProfile(expr: Expression, options: IrOptions | undefined): CompilationResult<'javascript'>;
 export {};
@@ -75905,9 +75947,9 @@ export declare function functionLowering(cx: Lowering, lists: ReturnType<typeof 
  * - `may-fail`: can throw or not terminate (a loop over too many
  *   iterations); may be removed when its value is not read, but is not
  *   merged, folded, moved or evaluated where it was not written. One
- *   exception, in `cse`: a call of a function that is not on a cycle of
- *   calls is merged with an earlier visible call of the same arguments,
- *   which failed if this one would.
+ *   exception, in `cse`: a call of a function that is not `effectful`
+ *   (also one on a cycle of calls) is merged with an earlier visible call
+ *   of the same arguments, which failed if this one would.
  * - `effectful`: changes or reads state; is evaluated exactly once per
  *   evaluation that the program asks for, in program order.
  *
@@ -75990,6 +76032,14 @@ export declare function hasOwnLowering(name: string, def: {
     compile?: unknown;
     compileHelpers?: unknown;
 } | undefined): boolean;
+/** The answer of the host's `compile` handler of `e` (`hasOwnLowering()`)
+ *  on the target `language`: `undefined` when it defers, the expression it
+ *  returns, or the cause of a decline (text, a call of the `compile`
+ *  callback, a throw, `compileHelpers` with no handler). The callback
+ *  gives `'0'`, the placeholder of the reference analysis of the existing
+ *  compilers, which a handler that records its operands' code already
+ *  tells apart. README, "Selecting the pipeline". */
+export declare function handlerAnswer(e: Fn, language: string): Expression | string | undefined;
 /** The text of `e`, at most about 120 characters (a shared tree can have
  *  a text of exponential length). */
 export declare function text(e: Expression, budget?: number): string;
@@ -76039,7 +76089,8 @@ export type Lowering = {
     /** The list of `elements` (`List(…)`). */
     list(e: Fn, elements: V[]): V;
     /** `e` is a call of the library operator of its name (not a user
-     *  function, not a shadowed name). */
+     *  function, not a shadowed name, no host's `compile` handler that
+     *  answers for it: one that defers keeps the library's). */
     isLibrary(e: Fn): boolean;
     /** The input `name` of the engine type `t`, which a function that the
      *  call `e` calls reads, read at the call. */
@@ -76049,6 +76100,8 @@ export type Lowering = {
     /** The lane of an input of type `number`, `unknown` or none: complex in
      *  `mode: 'complex'`. */
     readonly wide: 'real' | 'complex';
+    /** The interval mode (`LowerOptions.mode`). */
+    readonly interval: boolean;
     /** The name of the user function whose body is being lowered. */
     inFunction?: string;
     /** The `iterationBudget`: a `Sum` or a `Product` of more passes is NaN. */
@@ -76058,6 +76111,13 @@ export type Lowering = {
     /** The most passes of a `Sum` or a `Product` of constant bounds that is
      *  written out (`LowerOptions`). */
     readonly unrollSums: number;
+    /** The longest list of a constant length that is written out
+     *  (`LowerOptions`). */
+    readonly unrollBuilds: number;
+    /** `LowerOptions.attempted`. */
+    readonly attempted: () => void;
+    /** The number of `x`: a literal, or the value a free name holds. */
+    numberOf(x: Expression): Expression | undefined;
     /** The value that `f` lowers in a region of its own, whose instructions
      *  then go to the current region; `undefined`, the region discarded, when
      *  `f` gives no value or declines, or `accept` refuses the region. The
@@ -76087,8 +76147,8 @@ import { type Fn, type Lowering, type Source } from './lower-context.js';
 /** The name of a parameter of a function literal: a symbol, or a symbol
  *  with a type (`Typed(z, "real")`). */
 export declare function parameterName(p: Expression): string | undefined;
-/** `l` is a literal `List` of the library (a user definition or a lowering
- *  of its own declines in `cx.value()`). */
+/** `l` is a literal `List` of the library (a user definition declines in
+ *  `cx.value()`, which lowers a host handler's answer). */
 export declare const literalList: (cx: Lowering, l: Expression) => l is Fn;
 export declare function listLowering(cx: Lowering): {
     source: {
@@ -76097,10 +76157,13 @@ export declare function listLowering(cx: Lowering): {
     };
     listSource: (l: V) => Source;
     built: (site: Expression, length: V, f: (k: V) => V) => V;
-    reduce: (e: Fn, r: OperatorRow, items: (Source | V)[], init: V, empty?: number) => V;
+    reduce: (e: Fn, r: OperatorRow, items: (Source | V)[], init: V, empty?: number, identity?: boolean) => V;
     reduction: (e: Fn, r: OperatorRow) => V;
     build: (e: Fn, l: Expression, f: Expression, filter: boolean) => V;
-    over: (e: Fn, s: Source, name: string, body: Expression | ((x: V) => V), filter: boolean, site: Expression) => V;
+    mapLists: (e: Fn) => V;
+    shortest: (e: Fn, sources: Source[]) => V;
+    mask: (e: Fn, l: V, m: V) => V;
+    over: (e: Fn, s: Source, name: string, body: Expression | ((x: V, k: V) => V), filter: boolean, site: Expression) => V;
     comprehension: (e: Fn) => V;
     join: (e: Fn) => V;
 };
@@ -76174,11 +76237,19 @@ export type Syntax = {
         first(cond: string): string;
         second(cond: string): string;
         join(cond: string, a: string, b: string): string;
+        /** The test of an `if` in a function on a cycle of calls, which runs
+         *  one arm: an undecided verdict throws, so that a recursion ends. */
+        decided(cond: string): string;
+        /** A boolean `if` one of whose arms is the constant verdict `decides`
+         *  (`And`: the else arm `false`; `Or`: the then arm `true`): the lines
+         *  before and after the other arm, which yields `${out}_y`. */
+        lazy(cond: string, out: string, decides: boolean): [string[], string[]];
     };
     /** The lines that open a counted loop of the index `k` from `lo` to `hi`,
      *  each bound evaluated once. `passes`: a pass of a `Loop`, which the
-     *  iteration budget counts. */
-    loopOpen(k: string, lo: string, hi: string, passes: boolean): string[];
+     *  iteration budget counts. `done`: the name of the flag of the loop's
+     *  `exit`; no pass runs once it is true. */
+    loopOpen(k: string, lo: string, hi: string, passes: boolean, done?: string): string[];
     /** The return of the array of `values` (an entry `tuple`). Absent: the
      *  target declines such an entry. */
     retTuple?(values: string[]): string;
@@ -76393,8 +76464,8 @@ export type LowerOptions = {
     /** The names of `vars` whose text reads the inputs object
      *  (`readsVarsObject()`): a function body reads one as an input. */
     readonly objectVars?: readonly string[];
-    /** The interval mode: the text of each `vars` name, for the closed form
-     *  of an integral (`intervalClosedForm()`). */
+    /** The text of each `vars` name, for the closed form of an integral
+     *  (`integralClosedForm()`). */
     readonly varsTexts?: Readonly<Record<string, string>>;
     /** `false` (GLSL): a list parameter of a user function of no stated
      *  length takes the stated length of its argument at the first call. */
@@ -76403,9 +76474,17 @@ export type LowerOptions = {
      *  is written out, its body lowered once per index (`aggregate()` of
      *  `lower-lists.ts`). Default 0: none. */
     readonly unrollSums?: number;
-    /** The numeric derivative of a derivative with no closed form
-     *  (JavaScript, not the interval mode). */
-    readonly stencil?: boolean;
+    /** With `runtimeLengths`: a build, a `Range` or a reduction over a list
+     *  of a constant length of at most this many elements is written out
+     *  (`README.md`, "Lists", the short lists). Default 0: none. */
+    readonly unrollBuilds?: number;
+    /** Called when a sum or a short list starts an attempt to be written
+     *  out (`sliceProgram()` lowers the loops again only after one). */
+    readonly attempted?: () => void;
+    /** JavaScript, not the interval mode: the numeric derivative of a
+     *  derivative with no closed form, and the closed form of a definite
+     *  integral in place of the quadrature. */
+    readonly javascript?: boolean;
 };
 /** The IR operation of the read of the `vars` name of index `k` on the
  *  lane `lane`: an effectful operation, spelled as the host's text. */
@@ -76417,8 +76496,9 @@ export declare function lower(root: Expression, rows: readonly OperatorRow[], op
  * changes the operation of a computation (`a/b` stays a division).
  *
  * - `scalarize`: an operation on static lists becomes one operation per
- *   element (for a target with no element-wise operations), and an `At` of
- *   a constant index in range of a static list an element (`elem`).
+ *   element (for a target with no element-wise operations, and for the
+ *   short lists of JavaScript, `unrollBuilds`), and an `At` of a
+ *   constant index in range of a static list an element (`elem`).
  * - `fold`: a pure operation whose operands are constants is the value of
  *   its row's `fold` (the constants that the passes expose: a sub-expression
  *   with no input is a literal already, `lower.ts`); an element of a list
@@ -76426,7 +76506,8 @@ export declare function lower(root: Expression, rows: readonly OperatorRow[], op
  *   operation on elements; the `At` of `scalarize`; a conditional with no
  *   effect whose condition is a constant is the arm it takes. A value
  *   replaces another only on its lane (an integer arm of a real result
- *   stays an arm).
+ *   stays an arm). The list rules (the elements and the `At`) compute no
+ *   number, and run alone in the interval mode (`fold: 'lists'`).
  * - `hoist`: the operands of `And` and `Or` are lowered in an arm (only
  *   evaluated when needed); a pure operand is moved out of its arm, and the
  *   conditional becomes the `and` or `or` it is.
@@ -76436,7 +76517,9 @@ export declare function lower(root: Expression, rows: readonly OperatorRow[], op
  *   (`inline` below), so that `cse` and `invariants` see the calls it makes.
  * - `cse`: an instruction that repeats an earlier mergeable one whose value
  *   is visible reads that value instead, and so does a call of a function
- *   that is not effectful and not on a cycle of calls (each of its results).
+ *   that is not effectful (also one on a cycle of calls), merged with an
+ *   earlier visible call of the same arguments, which failed if this one
+ *   would (each of its results).
  *   No value is moved.
  * - `invariants`: an instruction of a loop body that reads nothing that the
  *   body computes is computed once, before the loop (`invariants` below).
@@ -76454,13 +76537,19 @@ import { type Program } from './ir.js';
 import { type OperatorRow } from './operators.js';
 export type PassOptions = {
     scalarize?: boolean;
-    fold?: boolean;
+    /** `'lists'`: only the list rules of `fold`, which compute no number
+     *  (the interval mode). */
+    fold?: boolean | 'lists';
     hoist?: boolean;
     strength?: boolean;
     /** The calls that `inline` replaces: `'loop'`, a call in the body of a
      *  `loop`, a `build` or a `filter`; `'repeated'`, also a call of a
      *  function that its caller calls twice or more. */
     inline?: 'loop' | 'repeated' | false;
+    /** The short lists (JavaScript): `scalarize` writes out an
+     *  element-wise operation of at most this many elements, and `inline`
+     *  copies a call whose result is such a list. Default 0: none. */
+    unrollBuilds?: number;
     cse?: boolean;
     invariants?: boolean;
     /** `invariants` moves a loop over the elements of a list that exists out
@@ -76473,7 +76562,7 @@ export type PassOptions = {
 export declare const ALL_PASSES: PassOptions;
 /** The most instructions of a body that `inline` copies (arms included),
  *  and of all its copies in one program, by the rule of the sites. The
- *  rule `'repeated'` is the interval mode's, where the sums written out
+ *  rule `'repeated'` is JavaScript's, where the sums written out
  *  multiply the sites: a function read at 16 terms of each of four sums. */
 export declare const INLINE_SIZE = 64;
 export declare const INLINE_BUDGET: {
@@ -76522,8 +76611,8 @@ export type Profile = {
     readonly recursion: boolean;
     /** Element-wise operations on lists; without, `scalarize` runs first. */
     readonly elementwise: boolean;
-    /** The lanes of which no list is held: a list of colours, and on GLSL
-     *  of complex numbers (a `vec2` has no array of its own here). */
+    /** The lanes of which no list is held: on GLSL, a list of colours or of
+     *  complex numbers (a `vec3` or a `vec2` has no array of its own here). */
     readonly scalarLanes: readonly Lane[];
     /** The operations whose value is admitted only as the result of the
      *  entry: on GLSL a colour is an OKLCh `vec3` with no tag of its space,
@@ -76587,10 +76676,15 @@ export type SliceOptions = {
     readonly storage?: readonly string[];
     /** JavaScript: a `Sum` or a `Product` of constant bounds of at most
      *  `MAX_UNROLLED_SUM` passes is written out (`LowerOptions.unrollSums`).
-     *  Default: in the interval mode only; never on GLSL, whose compiler
-     *  unrolls a constant loop itself. Not an option of `compile()`.
+     *  Default: on, except in the bigint and complex modes; never on GLSL,
+     *  whose compiler unrolls a constant loop itself. `false` (a test of a
+     *  loop of constant bounds) also gives the pass `inline` the rule
+     *  `'loop'` outside the interval mode. Not an option of `compile()`.
      *  @internal */
     readonly unrollSums?: boolean;
+    /** Called at each attempt to write a sum or a short list out (a test of
+     *  the attempts of a nest). @internal */
+    readonly attempted?: () => void;
 };
 /** The verified IR of `expr` for `options.target`, after the passes, and
  *  the warnings. Throws a `Decline` for a program that the slice or the
@@ -76629,6 +76723,8 @@ export declare function compileSlice(expr: Expression, options: SliceOptions & {
 import type { Expression } from '../../global-types.js';
 import type { CompilationResult, IntervalValue } from '../types.js';
 import { type IrOptions } from './adapter.js';
+/** The closed forms of the integrals take the antiderivative budget of the
+ *  outermost compilation in progress. */
 export declare function compileWithIrProfileInterval(expr: Expression, options: IrOptions | undefined): CompilationResult<'interval-js', IntervalValue>;
 /**
  * The profile `'ir'` of `compile()` for the `glsl` target (experimental):
@@ -86998,6 +87094,13 @@ export declare function setAntiderivativeAttemptBudgetForTesting(steps?: number)
  */
 export declare function resetSharedCompilationBudgets(): void;
 /**
+ * `f()`, a compilation of the IR pipeline, with a fresh antiderivative pool
+ * when no compilation of either kind is in progress; a compilation that
+ * starts inside it (of the IR pipeline, or of the existing compilers at
+ * their depth 0) consumes its pool.
+ */
+export declare function withCompilationBudgets<T>(f: () => T): T;
+/**
  * The integrals whose antiderivative-first attempt TIMED OUT, per engine,
  * and the engine state they timed out in.
  *
@@ -90420,8 +90523,7 @@ type BcastValue = number | {
  * interpreter's `Missing`. Another value that is not an array throws, as
  * the interpreter answers an error. An index that is an array at run time
  * (an index typed `integer | list<integer>`) is a gather, read position by
- * position with the same marker, or, when every entry is a boolean, a mask,
- * read by `_SYS.at`.
+ * position with the same marker, or a mask (`isMask()`), read by `_SYS.at`.
  *
  * `absentIsNaN` is true when the compiler found, from the static type of
  * the base, that the read of an absent base is a number: the read of an
@@ -100657,6 +100759,10 @@ export declare class CompilerState {
      *  see {@link ANTIDERIVATIVE_COMPILATION_STEPS}. Module state is safe:
      *  compilation is synchronous and single-threaded. */
     static antiderivativeStepsLeft: number;
+    /** The number of compilations of the IR pipeline in progress
+     *  (`withCompilationBudgets()`): while one runs, a compilation that starts
+     *  consumes its antiderivative pool. */
+    static _irCompileDepth: number;
     static nextDefinitionId: number;
     /** How many antiderivative-first attempts have RUN, as opposed to being
      *  skipped. Read by tests, before and after a compilation. */
@@ -101301,6 +101407,49 @@ export declare function mentionsAnyName(expr: Expression, names: ReadonlySet<str
 export declare function rebindsAnyName(expr: Expression, names: ReadonlySet<string>): boolean;
 /** Enter a lexical context: answers cached inside must not escape it. */
 export declare function _pushComplexMemoLayer(): void;
+/**
+ * The index of the bracket that closes the one at `open` in `text`, or `-1`
+ * when the scan cannot tell.
+ *
+ * The scan reads the code of the C family that the targets write
+ * (JavaScript, GLSL): it counts the three kinds of brackets and skips the
+ * string literals quoted with `'` or `"`. It answers `-1`, and so never
+ * names a wrong bracket, for a bracket that is not closed or is closed by
+ * one of another kind, and for the text in which a bracket may be part of
+ * something it does not read: a template literal, a comment, or a `/` that
+ * may start a regular expression (after an operator, an opening bracket, a
+ * keyword such as `return`, or at the start).
+ */
+export declare function closingBracket(text: string, open: number): number;
+/**
+ * Whether `code`, an expression written for a target of the C family
+ * (JavaScript, GLSL), is a primary expression: an operator binds it as a
+ * whole, so it needs no parentheses as an operand.
+ *
+ * A primary is an atom followed by any number of member reads (`.name`),
+ * index reads (`[…]`) and calls (`(…)`). An atom is a name that is not a
+ * keyword, a number literal with no sign, a string literal, or a group in
+ * parentheses or brackets. Thus `_.x`, `Math.cos(_.x)`, `f(a)(b)`,
+ * `vec2(a, b).x`, `[a, b]`, `(a + b)` and `(() => { … })()` are primaries;
+ * `-1`, `a + b`, `c ? a : b`, `x => x`, `typeof x` and `{ re: 1 }` are not.
+ *
+ * The reading is conservative: it answers `false` when it cannot tell
+ * (`closingBracket()`) and for code longer than `MAX_PRIMARY_LENGTH`, and
+ * parentheses around a primary change nothing.
+ */
+export declare function isPrimaryCode(code: string): boolean;
+/**
+ * `code` written as the operand of an operator of precedence `prec`: in
+ * parentheses, unless it is a primary (`isPrimaryCode()`) or `prec` is `0`
+ * (no operator).
+ *
+ * For the code of a head with no infix spelling, which a handler or a
+ * selection writes as it chooses (`(1 - Math.cos(x)) / 2` for a haversine,
+ * the bare code of the selected branch of an `If`), so that the operator
+ * around it does not bind to a part of it. Empty code and code that starts
+ * a statement are returned as they are.
+ */
+export declare function operandCode(code: string, prec: number): string;
 /**
  * The type and the absence marker of an element read whose base is typed by
  * a tuple.
